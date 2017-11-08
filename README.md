@@ -5,8 +5,10 @@ A python implementation of the ITU-P Recommendations
 ## Dependencies
 * numpy
 * scipy
+* astropy
+* joblib
 
-## Installation
+## Installation (TBD)
 Using pip, simply run:
 ```
 pip install iturpy
