@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import numpy as np
 from astropy import units as u
 
-from models.itu1144 import bilinear_2D_interpolator
-from models.itu1511 import topographic_altitude
-from iturutils import prepare_input_array, prepare_output_array, dataset_dir,\
-                      load_data, prepare_quantity, memory
+from itur.models.itu1144 import bilinear_2D_interpolator
+from itur.models.itu1511 import topographic_altitude
+from itur.utils import prepare_input_array, prepare_output_array, dataset_dir,\
+    load_data, prepare_quantity, memory
+
 
 class __ITU836():
     """Water vapour: surface density and total columnar content
@@ -22,14 +27,18 @@ class __ITU836():
     """
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.836 recommendation.
-    def __init__(self, version = 5):
+
+    def __init__(self, version=5):
         if version == 5:
             self.instance = _ITU836_5()
         elif version == 4:
             self.instance = _ITU836_4()
         else:
-            raise ValueError('Version ' + str(version) + ' is not implemented'+
-            ' for the ITU-R P.836 model.')
+            raise ValueError(
+                'Version ' +
+                str(version) +
+                ' is not implemented' +
+                ' for the ITU-R P.836 model.')
 
     @property
     def __version__(self):
@@ -56,182 +65,53 @@ class _ITU836_5():
 
     def V(self, lat, lon, p):
         if not self._V:
-            ps = [ 0.1, 0.2, 0.3, 0.5,  1, 2, 3, 5, 10, 20, 30,
-                             50 , 60 , 70 , 80 , 90, 95, 99]
+            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
+                  50, 60, 70, 80, 90, 95, 99]
             d_dir = dataset_dir + '836/v5_V_%s.txt'
             lats = load_data(dataset_dir + '836/v5_Lat.txt')
             lons = load_data(dataset_dir + '836/v5_Lon.txt')
             for p_loads in ps:
-                vals = load_data(d_dir%(str(p_loads).replace('.','')))
-                self._V[float(p_loads)] = bilinear_2D_interpolator(lats, lons, vals)
+                vals = load_data(d_dir % (str(p_loads).replace('.', '')))
+                self._V[float(p_loads)] = bilinear_2D_interpolator(
+                    lats, lons, vals)
 
-        return self._V[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._V[float(p)](
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def VSCH(self, lat, lon, p):
         if not self._VSCH:
-            ps = [ 0.1, 0.2, 0.3, 0.5,  1, 2, 3, 5, 10, 20, 30,
-                             50 , 60 , 70 , 80 , 90, 95, 99]
+            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
+                  50, 60, 70, 80, 90, 95, 99]
             d_dir = dataset_dir + '836/v5_VSCH_%s.txt'
             lats = load_data(dataset_dir + '836/v5_Lat.txt')
             lons = load_data(dataset_dir + '836/v5_Lon.txt')
             for p_loads in ps:
-                vals = load_data(d_dir%(str(p_loads).replace('.','')))
-                self._VSCH[float(p_loads)] = bilinear_2D_interpolator(lats, lons, vals)
+                vals = load_data(d_dir % (str(p_loads).replace('.', '')))
+                self._VSCH[float(p_loads)] = bilinear_2D_interpolator(
+                    lats, lons, vals)
 
-        return self._VSCH[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._VSCH[float(p)](
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def rho(self, lat, lon, p):
         if not self._rho:
-            ps = [ 0.1, 0.2, 0.3, 0.5,  1, 2, 3, 5, 10, 20, 30,
-                             50 , 60 , 70 , 80 , 90, 95, 99]
+            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
+                  50, 60, 70, 80, 90, 95, 99]
             d_dir = dataset_dir + '836/v5_RHO_%s.txt'
             lats = load_data(dataset_dir + '836/v5_Lat.txt')
             lons = load_data(dataset_dir + '836/v5_Lon.txt')
             for p_loads in ps:
-                vals = load_data(d_dir%(str(p_loads).replace('.','')))
-                self._rho[float(p_loads)] = bilinear_2D_interpolator(lats, lons, vals)
+                vals = load_data(d_dir % (str(p_loads).replace('.', '')))
+                self._rho[float(p_loads)] = bilinear_2D_interpolator(
+                    lats, lons, vals)
 
-        return self._rho[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._rho[float(p)](
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def surface_water_vapour_density(self, lat, lon, p, alt=None):
         """
         """
-        available_p = np.array([ 0.1, 0.2, 0.3, 0.5,  1, 2, 3, 5, 10,
-                                20, 30, 50 , 60 , 70 , 80 , 90, 95, 99])
-
-        if p in available_p:
-            p_below = p_above = p
-            pExact = True
-        else:
-            pExact = False
-            idx = available_p.searchsorted(p, side='right') - 1
-            idx = np.clip(idx, 0, len(available_p) - 1)
-
-            p_below = available_p[idx]
-            idx = np.clip(idx + 1, 0, len(available_p) - 1)
-            p_above= available_p[idx]
-
-
-        rho_a = self.rho(lat, lon, p_above)
-        VSCH_a = self.VSCH(lat, lon, p_above)
-        altitude_res = topographic_altitude(lat, lon).value
-        if alt is None:
-            alt = altitude_res
-        rho_a = rho_a * np.exp(- (alt - altitude_res) * 1.0 / (VSCH_a))
-
-        if not pExact:
-            rho_b = self.rho(lat, lon, p_below)
-            VSCH_b = self.VSCH(lat, lon, p_below)
-            rho_b = rho_b * np.exp(- (alt - altitude_res) / (VSCH_b))
-
-        # Compute the values of Lred_a
-        if not pExact:
-            rho = rho_b + (rho_a - rho_b) * (np.log(p) - np.log(p_below)) / \
-                                        (np.log(p_above) - np.log(p_below))
-            return rho
-        else:
-            return rho_a
-
-    def total_water_vapour_content(self, lat, lon, p, alt=None):
-        """
-        """
-        available_p = np.array([ 0.1, 0.2, 0.3, 0.5,  1, 2, 3, 5, 10,
-                                20, 30, 50 , 60 , 70 , 80 , 90, 95, 99])
-
-        if p in available_p:
-            p_below = p_above = p
-            pExact = True
-        else:
-            pExact = False
-            idx = available_p.searchsorted(p, side='right') - 1
-            idx = np.clip(idx, 0, len(available_p))
-
-            p_below = available_p[idx]
-            idx = np.clip(idx + 1, 0, len(available_p))
-            p_above= available_p[idx + 1]
-
-        V_a = self.V(lat, lon, p_above)
-        VSCH_a = self.VSCH(lat, lon, p_above)
-        altitude_res = topographic_altitude(lat, lon).value
-
-        if alt is None: alt = altitude_res
-        V_a = V_a * np.exp(-(alt - altitude_res) * 1.0 / (VSCH_a))
-
-        if not pExact:
-            V_b = self.V(lat, lon, p_below)
-            VSCH_b = self.VSCH(lat, lon, p_below)
-
-            V_b = V_b * np.exp(-(alt - altitude_res) * 1.0 / (VSCH_b))
-
-        if not pExact:
-            V = V_b + (V_a - V_b) * (np.log(p) - np.log(p_below)) / \
-                                    (np.log(p_above) - np.log(p_below))
-            return V
-        else:
-            return V_a
-
-
-class _ITU836_4():
-
-    def __init__(self):
-        self.__version__ = 4
-        self.year = 2009
-        self.month = 10
-        self.link = 'https://www.itu.int/rec/R-REC-P.836-4-200910-S/en'
-
-        self._V = {}
-        self._VSCH = {}
-        self._rho = {}
-
-    def V(self, lat, lon, p):
-        if not self._V:
-            ps = [ 0.1, 0.2, 0.3, 0.5,  1, 2, 3, 5, 10, 20, 30,
-                             50 , 60 , 70 , 80 , 90, 95, 99]
-            d_dir = dataset_dir + '836/v4_V_%s.txt'
-            lats = load_data(dataset_dir + '836/v4_Lat.txt')
-            lons = load_data(dataset_dir + '836/v4_Lon.txt')
-            for p_loads in ps:
-                vals = load_data(d_dir%(str(p_loads).replace('.','')))
-                self._V[float(p_loads)] =\
-                    bilinear_2D_interpolator(lats, lons, vals)
-
-        return self._V[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
-
-    def VSCH(self, lat, lon, p):
-        if not self._VSCH:
-            ps = [ 0.1, 0.2, 0.3, 0.5,  1, 2, 3, 5, 10, 20, 30,
-                             50 , 60 , 70 , 80 , 90, 95, 99]
-            d_dir = dataset_dir + '836/v4_VSCH_%s.txt'
-            lats = load_data(dataset_dir + '836/v4_Lat.txt')
-            lons = load_data(dataset_dir + '836/v4_Lon.txt')
-            for p_loads in ps:
-                vals = load_data(d_dir % (str(p_loads).replace('.', '')))
-                self._VSCH[float(p_loads)] =\
-                    bilinear_2D_interpolator(lats, lons, vals)
-
-        return self._VSCH[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
-
-    def rho(self, lat, lon, p):
-        if not self._rho:
-            ps = [ 0.1, 0.2, 0.3, 0.5,  1, 2, 3, 5, 10, 20, 30,
-                  50 , 60, 70, 80 , 90, 95, 99]
-            d_dir = dataset_dir + '836/v4_RHO_%s.txt'
-            lats = load_data(dataset_dir + '836/v4_Lat.txt')
-            lons = load_data(dataset_dir + '836/v4_Lon.txt')
-            for p_loads in ps:
-                vals = load_data(d_dir % (str(p_loads).replace('.', '')))
-                self._rho[float(p_loads)] =\
-                    bilinear_2D_interpolator(lats, lons, vals)
-
-        return self._rho[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
-
-    # The procedure to compute the surface water vapour density and the
-    # total water vapour content is similar to the ones in recommendation
-    # ITU-P R.836-5.
-    def surface_water_vapour_density(self, lat, lon, p, alt=None):
-        """
-        """
-        available_p = np.array([0.1, 0.2, 0.3, 0.5,  1, 2, 3, 5, 10,
+        available_p = np.array([0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10,
                                 20, 30, 50, 60, 70, 80, 90, 95, 99])
 
         if p in available_p:
@@ -261,7 +141,7 @@ class _ITU836_4():
         # Compute the values of Lred_a
         if not pExact:
             rho = rho_b + (rho_a - rho_b) * (np.log(p) - np.log(p_below)) / \
-                                        (np.log(p_above) - np.log(p_below))
+                (np.log(p_above) - np.log(p_below))
             return rho
         else:
             return rho_a
@@ -269,7 +149,7 @@ class _ITU836_4():
     def total_water_vapour_content(self, lat, lon, p, alt=None):
         """
         """
-        available_p = np.array([0.1, 0.2, 0.3, 0.5,  1, 2, 3, 5, 10,
+        available_p = np.array([0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10,
                                 20, 30, 50, 60, 70, 80, 90, 95, 99])
 
         if p in available_p:
@@ -304,6 +184,145 @@ class _ITU836_4():
             return V
         else:
             return V_a
+
+
+class _ITU836_4():
+
+    def __init__(self):
+        self.__version__ = 4
+        self.year = 2009
+        self.month = 10
+        self.link = 'https://www.itu.int/rec/R-REC-P.836-4-200910-S/en'
+
+        self._V = {}
+        self._VSCH = {}
+        self._rho = {}
+
+    def V(self, lat, lon, p):
+        if not self._V:
+            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
+                  50, 60, 70, 80, 90, 95, 99]
+            d_dir = dataset_dir + '836/v4_V_%s.txt'
+            lats = load_data(dataset_dir + '836/v4_Lat.txt')
+            lons = load_data(dataset_dir + '836/v4_Lon.txt')
+            for p_loads in ps:
+                vals = load_data(d_dir % (str(p_loads).replace('.', '')))
+                self._V[float(p_loads)] =\
+                    bilinear_2D_interpolator(lats, lons, vals)
+
+        return self._V[float(p)](
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+
+    def VSCH(self, lat, lon, p):
+        if not self._VSCH:
+            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
+                  50, 60, 70, 80, 90, 95, 99]
+            d_dir = dataset_dir + '836/v4_VSCH_%s.txt'
+            lats = load_data(dataset_dir + '836/v4_Lat.txt')
+            lons = load_data(dataset_dir + '836/v4_Lon.txt')
+            for p_loads in ps:
+                vals = load_data(d_dir % (str(p_loads).replace('.', '')))
+                self._VSCH[float(p_loads)] =\
+                    bilinear_2D_interpolator(lats, lons, vals)
+
+        return self._VSCH[float(p)](
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+
+    def rho(self, lat, lon, p):
+        if not self._rho:
+            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
+                  50, 60, 70, 80, 90, 95, 99]
+            d_dir = dataset_dir + '836/v4_RHO_%s.txt'
+            lats = load_data(dataset_dir + '836/v4_Lat.txt')
+            lons = load_data(dataset_dir + '836/v4_Lon.txt')
+            for p_loads in ps:
+                vals = load_data(d_dir % (str(p_loads).replace('.', '')))
+                self._rho[float(p_loads)] =\
+                    bilinear_2D_interpolator(lats, lons, vals)
+
+        return self._rho[float(p)](
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+
+    # The procedure to compute the surface water vapour density and the
+    # total water vapour content is similar to the ones in recommendation
+    # ITU-P R.836-5.
+    def surface_water_vapour_density(self, lat, lon, p, alt=None):
+        """
+        """
+        available_p = np.array([0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10,
+                                20, 30, 50, 60, 70, 80, 90, 95, 99])
+
+        if p in available_p:
+            p_below = p_above = p
+            pExact = True
+        else:
+            pExact = False
+            idx = available_p.searchsorted(p, side='right') - 1
+            idx = np.clip(idx, 0, len(available_p) - 1)
+
+            p_below = available_p[idx]
+            idx = np.clip(idx + 1, 0, len(available_p) - 1)
+            p_above = available_p[idx]
+
+        rho_a = self.rho(lat, lon, p_above)
+        VSCH_a = self.VSCH(lat, lon, p_above)
+        altitude_res = topographic_altitude(lat, lon).value
+        if alt is None:
+            alt = altitude_res
+        rho_a = rho_a * np.exp(- (alt - altitude_res) * 1.0 / (VSCH_a))
+
+        if not pExact:
+            rho_b = self.rho(lat, lon, p_below)
+            VSCH_b = self.VSCH(lat, lon, p_below)
+            rho_b = rho_b * np.exp(- (alt - altitude_res) / (VSCH_b))
+
+        # Compute the values of Lred_a
+        if not pExact:
+            rho = rho_b + (rho_a - rho_b) * (np.log(p) - np.log(p_below)) / \
+                (np.log(p_above) - np.log(p_below))
+            return rho
+        else:
+            return rho_a
+
+    def total_water_vapour_content(self, lat, lon, p, alt=None):
+        """
+        """
+        available_p = np.array([0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10,
+                                20, 30, 50, 60, 70, 80, 90, 95, 99])
+
+        if p in available_p:
+            p_below = p_above = p
+            pExact = True
+        else:
+            pExact = False
+            idx = available_p.searchsorted(p, side='right') - 1
+            idx = np.clip(idx, 0, len(available_p))
+
+            p_below = available_p[idx]
+            idx = np.clip(idx + 1, 0, len(available_p))
+            p_above = available_p[idx + 1]
+
+        V_a = self.V(lat, lon, p_above)
+        VSCH_a = self.VSCH(lat, lon, p_above)
+        altitude_res = topographic_altitude(lat, lon).value
+
+        if alt is None:
+            alt = altitude_res
+        V_a = V_a * np.exp(-(alt - altitude_res) * 1.0 / (VSCH_a))
+
+        if not pExact:
+            V_b = self.V(lat, lon, p_below)
+            VSCH_b = self.VSCH(lat, lon, p_below)
+
+            V_b = V_b * np.exp(-(alt - altitude_res) * 1.0 / (VSCH_b))
+
+        if not pExact:
+            V = V_b + (V_a - V_b) * (np.log(p) - np.log(p_below)) / \
+                                    (np.log(p_above) - np.log(p_below))
+            return V
+        else:
+            return V_a
+
 
 __model = __ITU836()
 

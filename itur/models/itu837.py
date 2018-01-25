@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import numpy as np
 from astropy import units as u
 
-from models.itu1144 import bilinear_2D_interpolator
-from iturutils import load_data, dataset_dir, prepare_input_array,\
-                      prepare_output_array, memory
+from itur.models.itu1144 import bilinear_2D_interpolator
+from itur.utils import load_data, dataset_dir, prepare_input_array,\
+    prepare_output_array, memory
+
 
 class __ITU837():
     """Characteristics of precipitation for propagation modelling
@@ -19,7 +24,8 @@ class __ITU837():
     """
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.837 recommendation.
-    def __init__(self, version = 6):
+
+    def __init__(self, version=6):
         if version == 6:
             self.instance = _ITU837_6()
         elif version == 5:
@@ -33,8 +39,11 @@ class __ITU837():
         elif version == 1:
             self.instance = _ITU837_1()
         else:
-            raise ValueError('Version ' + str(version) + ' is not implemented' +
-            ' for the ITU-R P.837 model.')
+            raise ValueError(
+                'Version ' +
+                str(version) +
+                ' is not implemented' +
+                ' for the ITU-R P.837 model.')
 
     @property
     def __version__(self):
@@ -61,7 +70,6 @@ class _ITU837_6():
         self._Mt = {}
         self._Beta = {}
 
-
     def Pr6(self, lat, lon):
         if not self._Pr6:
             vals = load_data(dataset_dir + '837/ESARAIN_PR6_v5.txt')
@@ -69,7 +77,8 @@ class _ITU837_6():
             lons = load_data(dataset_dir + '837/ESARAIN_LON_v5.txt')
             self._Pr6 = bilinear_2D_interpolator(lats, lons, vals)
 
-        return self._Pr6(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._Pr6(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def Mt(self, lat, lon):
         if not self._Mt:
@@ -78,7 +87,8 @@ class _ITU837_6():
             lons = load_data(dataset_dir + '837/ESARAIN_LON_v5.txt')
             self._Mt = bilinear_2D_interpolator(lats, lons, vals)
 
-        return self._Mt(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._Mt(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def Beta(self, lat, lon):
         if not self._Beta:
@@ -87,8 +97,8 @@ class _ITU837_6():
             lons = load_data(dataset_dir + '837/ESARAIN_LON_v5.txt')
             self._Beta = bilinear_2D_interpolator(lats, lons, vals)
 
-        return self._Beta(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
-
+        return self._Beta(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def rain_percentage_probability(self, lat_d, lon_d):
         """
@@ -98,11 +108,12 @@ class _ITU837_6():
         Mt = self.Mt(lat_d, lon_d)
         Beta = self.Beta(lat_d, lon_d)
 
-         # Step 3: Convert MT and β to Mc and Ms as follows:
+        # Step 3: Convert MT and β to Mc and Ms as follows:
         Ms = (1 - Beta) * Mt
 
-        # Step 4: Derive the percentage propability of rain in an average year, P0:
-        P0 = Pr6 * (1 - np.exp(-0.0079 * (Ms / Pr6) ) ) # Eq. 1
+        # Step 4: Derive the percentage propability of rain in an average year,
+        # P0:
+        P0 = Pr6 * (1 - np.exp(-0.0079 * (Ms / Pr6)))  # Eq. 1
 
         return P0
 
@@ -117,20 +128,24 @@ class _ITU837_6():
         Mc = Beta * Mt
         Ms = (1 - Beta) * Mt
 
-        # Step 4: Derive the percentage propability of rain in an average year, P0:
-        P0 = np.where(Pr6 > 0 , Pr6 * (1 - np.exp(-0.0079 * (Ms / Pr6) ) ), 0) # Eq. 1
+        # Step 4: Derive the percentage propability of rain in an average year,
+        # P0:
+        P0 = np.where(Pr6 > 0,
+                      Pr6 * (1 - np.exp(-0.0079 * (Ms / Pr6))),
+                      0)  # Eq. 1
 
-        # Step 5: Derive the rainfall rate, Rp, exceeded for p% of the average year, where p <= P0, from:
+        # Step 5: Derive the rainfall rate, Rp, exceeded for p% of the average
+        # year, where p <= P0, from:
         def computeRp(P0, Mc, Ms):
             a = 1.09                        # Eq. 2d
             b = (Mc + Ms) / (21797 * P0)    # Eq. 2e
             c = 26.02 * b                   # Eq. 2f
 
             A = a * b                       # Eq. 2a
-            B = a + c * np.log( p / P0 )    # Eq. 2b
+            B = a + c * np.log(p / P0)    # Eq. 2b
             C = np.log(p / P0)              # Eq. 2c
 
-            Rp = (-B + np.sqrt(B**2 - 4 * A * C)) / (2 * A) # Eq. 2
+            Rp = (-B + np.sqrt(B**2 - 4 * A * C)) / (2 * A)  # Eq. 2
 
             return Rp
 
@@ -140,6 +155,7 @@ class _ITU837_6():
 
 
 __model = __ITU837()
+
 
 def change_version(new_version):
     """
@@ -159,6 +175,7 @@ def change_version(new_version):
     """
     global __model
     __model = __ITU837(new_version)
+
 
 def get_version():
     """
@@ -261,4 +278,4 @@ def unavailability_from_rainfall_rate(lat, lon, R):
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
-    #TODO: write this function
+    # TODO: write this function

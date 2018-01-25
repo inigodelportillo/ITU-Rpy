@@ -1,0 +1,21 @@
+Metadata-Version: 1.1
+Name: itur
+Version: 0.1
+Summary: A python implementation of the ITU-P Recommendations
+Home-page: https://github.com/iportillo/ITU-Rpy
+Author: Inigo del Portillo
+Author-email: portillo@mit.edu
+License: MIT
+Description: UNKNOWN
+Keywords: atmopheric-propagation attenuation communications
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Telecommunications Industry
+Classifier: Topic :: Scientific/Engineering :: Physics
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6

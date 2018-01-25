@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import numpy as np
 from astropy import units as u
 
-from models.itu1144 import bicubic_2D_interpolator
-from iturutils import load_data, dataset_dir, prepare_input_array,\
-                      prepare_output_array, memory
+from itur.models.itu1144 import bicubic_2D_interpolator
+from itur.utils import load_data, dataset_dir, prepare_input_array,\
+    prepare_output_array, memory
 
 
 class __ITU1511():
@@ -18,6 +22,7 @@ class __ITU1511():
     """
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.1511 recommendation.
+
     def __init__(self, version=1):
         if version == 1:
             self.instance = _ITU1511_1()
@@ -47,6 +52,7 @@ class _ITU1511_1():
     level at the desired location can be obtained by performing a bi-cubic
     interpolation.
     """
+
     def __init__(self):
         self.__version__ = 1
         self.year = 2015
@@ -64,7 +70,8 @@ class _ITU1511_1():
             lons = load_data(dataset_dir + '1511/v1_Lon.txt')
             self._altitude = bicubic_2D_interpolator(lats, lons, vals)
 
-        return self._altitude(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._altitude(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def topographic_altitude(self, lat_d, lon_d):
         """
@@ -99,7 +106,8 @@ class _ITU1511_0():
             lons = load_data(dataset_dir + '1511/v1_Lon.txt')
             self._altitude = bicubic_2D_interpolator(lats, lons, vals)
 
-        return self._altitude(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._altitude(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def topographic_altitude(self, lat_d, lon_d):
         """
@@ -107,6 +115,7 @@ class _ITU1511_0():
         sea level of the surface of the Earth.
         """
         return self.altitude(lat_d, lon_d)
+
 
 __model = __ITU1511()
 

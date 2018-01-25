@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import numpy as np
 from astropy import units as u
 
-from models.itu1144 import bicubic_2D_interpolator
-from iturutils import load_data, dataset_dir, prepare_input_array,\
-                      prepare_output_array, memory
+from itur.models.itu1144 import bicubic_2D_interpolator
+from itur.utils import load_data, dataset_dir, prepare_input_array,\
+    prepare_output_array, memory
 
 
 class __ITU1510():
@@ -15,6 +19,7 @@ class __ITU1510():
     """
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.1510 recommendation.
+
     def __init__(self, version=0):
         if version == 0:
             self.instance = _ITU1510_0()
@@ -49,7 +54,8 @@ class _ITU1510_0():
             lons = load_data(dataset_dir + '1510/v0_Lon.txt')
             self._temperature = bicubic_2D_interpolator(lats, lons, vals)
 
-        return self._temperature(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._temperature(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def surface_mean_temperature(self, lat_d, lon_d):
         """
@@ -57,6 +63,7 @@ class _ITU1510_0():
         above the surface of the Earth
         """
         return self.temperature(lat_d, lon_d)
+
 
 __model = __ITU1510()
 

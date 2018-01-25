@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import numpy as np
 from scipy.interpolate import griddata, RegularGridInterpolator
 from scipy.ndimage.interpolation import map_coordinates
@@ -12,6 +17,7 @@ References
 [1] Guide to the application of the propagation methods of Radiocommunication
 Study Group 3: https://www.itu.int/rec/R-REC-P.1144/en
 """
+
 
 def is_regular_grid(lats_o, lons_o):
     '''
@@ -33,12 +39,13 @@ def is_regular_grid(lats_o, lons_o):
     Delta_lons = np.unique(np.diff(lons_o, axis=1))
     Delta_lats = np.unique(np.diff(lats_o, axis=0))
 
-    return (Delta_lons.size == 1 and (Delta_lons !=0).all() and\
-        Delta_lats.size == 1 and (Delta_lats !=0).all())
+    return (Delta_lons.size == 1 and (Delta_lons != 0).all() and
+            Delta_lats.size == 1 and (Delta_lats != 0).all())
 
-###############################################################################
+###############################################
 ####                    Nearest Neighbour Interpolation                    ####
-###############################################################################
+###############################################
+
 
 def nearest_2D_interpolator(lats_o, lons_o, values):
     '''
@@ -71,20 +78,22 @@ def nearest_2D_interpolator(lats_o, lons_o, values):
     else:
         return _nearest_2D_interpolator_arb(lats_o, lons_o, values)
 
+
 def _nearest_2D_interpolator_reg(lats_o, lons_o, values, lats_d, lons_d):
-    f = RegularGridInterpolator((np.flipud(lats_o[:,0]), lons_o[0,:]),
-                               np.flipud(values), method='nearest',
-                               bounds_error=False)
+    f = RegularGridInterpolator((np.flipud(lats_o[:, 0]), lons_o[0, :]),
+                                np.flipud(values), method='nearest',
+                                bounds_error=False)
     return f
+
 
 def _nearest_2D_interpolator_arb(lats_o, lons_o, values):
     return lambda x: griddata((lats_o.ravel(), lons_o.ravel()), values.ravel(),
-             (x[:,0], x[:,1]), 'nearest')
+                              (x[:, 0], x[:, 1]), 'nearest')
 
 
-###############################################################################
+############################################
 ####                         Bilinear Interpolation                        ####
-###############################################################################
+############################################
 
 def bilinear_2D_interpolator(lats_o, lons_o, values):
     '''
@@ -116,19 +125,22 @@ def bilinear_2D_interpolator(lats_o, lons_o, values):
     else:
         return _bilinear_2D_interpolator_arb(lats_o, lons_o, values)
 
+
 def _bilinear_2D_interpolator_reg(lats_o, lons_o, values):
-    f = RegularGridInterpolator((np.flipud(lats_o[:,0]), lons_o[0,:]),
-                               np.flipud(values), method='linear',
-                               bounds_error=False)
+    f = RegularGridInterpolator((np.flipud(lats_o[:, 0]), lons_o[0, :]),
+                                np.flipud(values), method='linear',
+                                bounds_error=False)
     return f
+
 
 def _bilinear_2D_interpolator_arb(lats_o, lons_o, values):
     return lambda x: griddata((lats_o.ravel(), lons_o.ravel()), values.ravel(),
-             (x[:,0], x[:,1]), 'linear')
+                              (x[:, 0], x[:, 1]), 'linear')
 
-###############################################################################
+
+############################################
 ####                         Bicubic Interpolation                         ####
-###############################################################################
+############################################
 
 def bicubic_2D_interpolator(lats_o, lons_o, values):
     '''
@@ -154,20 +166,21 @@ def bicubic_2D_interpolator(lats_o, lons_o, values):
         Bicubic interpolator function
     '''
     if is_regular_grid(lats_o[2:-2, 2:-2], lons_o[2:-2, 2:-2]):
-        return lambda x : _bicubic_2D_interpolator_reg(lats_o, lons_o,
-                                                       values, x)
+        return lambda x: _bicubic_2D_interpolator_reg(lats_o, lons_o,
+                                                      values, x)
     else:
         return
     _bicubic_2D_interpolator_arb(lats_o, lons_o, values)
 
 
 def _bicubic_2D_interpolator_arb(lats_o, lons_o, values):
-    return lambda x:  griddata((lats_o.ravel(), lons_o.ravel()),
-                               values.ravel(), (x[:, 0], x[:, 1]), 'cubic')
+    return lambda x: griddata((lats_o.ravel(), lons_o.ravel()),
+                              values.ravel(), (x[:, 0], x[:, 1]), 'cubic')
 
 
 def _bicubic_2D_interpolator_reg(lats_o, lons_o, values, x):
     D_lat = np.unique(np.diff(lats_o[2:-2, 2]))
     D_lon = np.unique(np.diff(lons_o[2, 2:-2]))
-    return map_coordinates(values, np.array([(x[:,0] + lats_o.min())/D_lat, x[:,1]/D_lon]),
-                           order=3, mode='nearest')
+    return map_coordinates(
+        values, np.array([(x[:, 0] + lats_o.min()) / D_lat, x[:, 1] / D_lon]),
+        order=3, mode='nearest')

@@ -1,16 +1,23 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import numpy as np
-from models.itu1144 import bilinear_2D_interpolator
-from iturutils import prepare_input_array, prepare_quantity, load_data,\
-                prepare_output_array, dataset_dir
+from itur.models.itu1144 import bilinear_2D_interpolator
+from itur.utils import prepare_input_array, prepare_quantity, load_data,\
+    prepare_output_array, dataset_dir
 from astropy import units as u
 
 
 class __ITU453():
-    """The radio refractive index: its formula and refractivity data
+    """Implementation of the methods in Recommendation ITU-R P.453
+      "The radio refractive index: its formula and refractivity data"
 
     Available versions:
-    * P.453-12 (07/15) (Current version)
+    * P.453-12 (07/15)
+
+    TODO: Implement version P.453-13
 
     Recommendation ITU-R P.453 provides methods to estimate the radio refractive
     index and its behaviour for locations worldwide; describes both surface and
@@ -19,12 +26,16 @@ class __ITU453():
     """
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.453 recommendation.
-    def __init__(self, version = 12):
+
+    def __init__(self, version=12):
         if version == 12:
             self.instance = _ITU453_12()
         else:
-            raise ValueError('Version ' + str(version) + ' is not implemented'+
-            ' for the ITU-R P.453 model.')
+            raise ValueError(
+                'Version ' +
+                str(version) +
+                ' is not implemented' +
+                ' for the ITU-R P.453 model.')
 
     @property
     def __version__(self):
@@ -40,10 +51,12 @@ class __ITU453():
         return self.instance.radio_refractive_index(P, e, T)
 
     def water_vapour_pressure(self, T, P, H, type_hydrometeor='water'):
-        return self.instance.water_vapour_pressure(T, P, H, type_hydrometeor='water')
+        return self.instance.water_vapour_pressure(
+            T, P, H, type_hydrometeor='water')
 
     def saturation_vapour_pressure(self, T, P, type_hydrometeor='water'):
-        return self.instance.saturation_vapour_pressure(T, P, type_hydrometeor='water')
+        return self.instance.saturation_vapour_pressure(
+            T, P, type_hydrometeor='water')
 
     def map_wet_term_radio_refractivity(self, lat, lon):
         return self.instance.map_wet_term_radio_refractivity(lat, lon)
@@ -53,6 +66,7 @@ class __ITU453():
 
     def DN1(self, lat, lon, p):
         return self.instance.DN1(lat, lon, p)
+
 
 class _ITU453_12():
 
@@ -68,34 +82,37 @@ class _ITU453_12():
 
     def DN65(self, lat, lon, p):
         if not self._DN65:
-            ps = [ 0.1, 0.2, 0.5,  1, 2, 3, 5, 10, 20, 30, 50, 60, 70, 80,
+            ps = [0.1, 0.2, 0.5, 1, 2, 3, 5, 10, 20, 30, 50, 60, 70, 80,
                   90, 95, 98, 99, 99.5, 99.8, 99.9]
             d_dir = dataset_dir + '453/DN65m_%02dd%02d_v1.txt'
             lats = load_data(dataset_dir + '453/lat0d75.txt')
             lons = load_data(dataset_dir + '453/lon0d75.txt')
             for p_loads in ps:
-                int_p = p_loads//1
+                int_p = p_loads // 1
                 frac_p = p_loads % 1
-                vals = load_data(d_dir%(int_p, frac_p))
-                self._DN65[float(p_loads)] = bilinear_2D_interpolator(lats, lons, vals)
+                vals = load_data(d_dir % (int_p, frac_p))
+                self._DN65[float(p_loads)] = bilinear_2D_interpolator(
+                    lats, lons, vals)
 
-        return self._DN65[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._DN65[float(p)](
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def DN1(self, lat, lon, p):
         if not self._DN1:
-            ps = [ 0.1, 0.2, 0.5,  1, 2, 3, 5, 10, 20, 30, 50, 60, 70, 80,
+            ps = [0.1, 0.2, 0.5, 1, 2, 3, 5, 10, 20, 30, 50, 60, 70, 80,
                   90, 95, 98, 99, 99.5, 99.8, 99.9]
             d_dir = dataset_dir + '453/DN_%02dd%02d_v1.txt'
             lats = load_data(dataset_dir + '453/lat0d75.txt')
             lons = load_data(dataset_dir + '453/lon0d75.txt')
             for p_loads in ps:
-                int_p = p_loads//1
+                int_p = p_loads // 1
                 frac_p = p_loads % 1
-                vals = load_data(d_dir%(int_p, frac_p))
-                self._DN1[float(p_loads)] = bilinear_2D_interpolator(lats, lons, vals)
+                vals = load_data(d_dir % (int_p, frac_p))
+                self._DN1[float(p_loads)] = bilinear_2D_interpolator(
+                    lats, lons, vals)
 
-        return self._DN1[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
-
+        return self._DN1[float(p)](
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def N_wet(self, lat, lon):
         if not self._N_wet:
@@ -104,42 +121,43 @@ class _ITU453_12():
             lons = load_data(dataset_dir + '453/v12_ESALON.txt')
             self._N_wet = bilinear_2D_interpolator(lats, lons, vals)
 
-        return self._N_wet(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._N_wet(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def wet_term_radio_refractivity(self, e, T):
         N_wet = (72 * e / (T + 273.15) + 3.75e5 * e / (T + 273.15)**2) * 1e-6
         return N_wet
 
     def dry_term_radio_refractivity(self, Pd, T):
-        N_dry = 77.6 * Pd/T
+        N_dry = 77.6 * Pd / T  # Eq. 3
         return N_dry
 
     def radio_refractive_index(self, P, e, T):
-        N = 77.6 * P/T  - 5.6 * e/T + 3.75e5 * e/T**2     # Eq. 2    [N-units]
-        n = 1 + N * 1e-6
+        N = 77.6 * P / T - 5.6 * e / T + 3.75e5 * e / T**2   # Eq. 6 [N-units]
+        n = 1 + N * 1e-6   # Eq. 1
         return n
 
     def water_vapour_pressure(self, T, P, H, type_hydrometeor='water'):
         e_s = self.saturation_vapour_pressure(T, P, type_hydrometeor)
-        return H * e_s / 100
+        return H * e_s / 100   # Eq. 8
 
     def saturation_vapour_pressure(self, T, P, type_hydrometeor='water'):
 
         if type_hydrometeor == 'water':
-            EF = 1 + 1e-4*(7.2 + P*(0.00320 + 5.9e-6 * T**2))
+            EF = 1 + 1e-4 * (7.2 + P * (0.00320 + 5.9e-6 * T**2))
             a = 6.1121
             b = 18.678
             c = 257.14
             d = 234.5
 
         elif type_hydrometeor == 'ice':
-            EF = 1 + 1e-4*(2.2 + P*(0.00382 + 6.4e-7 * T**2))
+            EF = 1 + 1e-4 * (2.2 + P * (0.00382 + 6.4e-7 * T**2))
             a = 6.11215
             b = 23.036
             c = 279.82
             d = 333.7
 
-        e_s = EF * a * np.exp((b - T/d)*T/(T+c))
+        e_s = EF * a * np.exp((b - T / d) * T / (T + c))
         return e_s
 
     def map_wet_term_radio_refractivity(self, lat, lon):
@@ -147,6 +165,7 @@ class _ITU453_12():
 
 
 __model = __ITU453()
+
 
 def change_version(new_version):
     """
@@ -162,12 +181,14 @@ def change_version(new_version):
     global __model
     __model = __ITU453(new_version)
 
+
 def get_version():
     """
     Obtain the version of the ITU-R P.453 recommendation currently being used.
     """
     global __model
     return __model.__version__
+
 
 def wet_term_radio_refractivity(e, T):
     """
@@ -195,7 +216,8 @@ def wet_term_radio_refractivity(e, T):
     e = prepare_quantity(e, u.hPa, 'Water vapour pressure ')
     T = prepare_quantity(T, u.K, 'Absolute temperature')
     val = __model.wet_term_radio_refractivity(e, T)
-    return val*u.dimensionless_unscaled
+    return val * u.dimensionless_unscaled
+
 
 def dry_term_radio_refractivity(Pd, T):
     """
@@ -223,7 +245,8 @@ def dry_term_radio_refractivity(Pd, T):
     Pd = prepare_quantity(Pd, u.hPa, 'Dry atmospheric pressure')
     T = prepare_quantity(T, u.K, 'Absolute temperature')
     val = __model.dry_term_radio_refractivity(Pd, T)
-    return val*u.dimensionless_unscaled
+    return val * u.dimensionless_unscaled
+
 
 def radio_refractive_index(P, e, T):
     """
@@ -254,7 +277,7 @@ def radio_refractive_index(P, e, T):
     e = prepare_quantity(e, u.hPa, 'Water vapour pressure ')
     T = prepare_quantity(T, u.K, 'Absolute temperature')
     val = __model.radio_refractive_index(P, e, T)
-    return val*u.dimensionless_unscaled
+    return val * u.dimensionless_unscaled
 
 
 def water_vapour_pressure(T, P, H, type_hydrometeor='water'):
@@ -287,9 +310,8 @@ def water_vapour_pressure(T, P, H, type_hydrometeor='water'):
     T = prepare_quantity(T, u.C, 'Absolute temperature')
     P = prepare_quantity(P, u.hPa, 'Total atmospheric pressure')
     H = prepare_quantity(H, u.percent, 'Total atmospheric pressure')
-    val = __model.water_vapour_pressure(T, P, H,type_hydrometeor)
-    return val*u.hPa
-
+    val = __model.water_vapour_pressure(T, P, H, type_hydrometeor)
+    return val * u.hPa
 
 
 def saturation_vapour_pressure(T, P, type_hydrometeor='water'):
@@ -320,8 +342,7 @@ def saturation_vapour_pressure(T, P, type_hydrometeor='water'):
     T = prepare_quantity(T, u.C, 'Absolute temperature')
     P = prepare_quantity(P, u.hPa, 'Total atmospheric pressure')
     val = __model.saturation_vapour_pressure(T, P, type_hydrometeor)
-    return val*u.hPa
-
+    return val * u.hPa
 
 
 def map_wet_term_radio_refractivity(lat, lon):

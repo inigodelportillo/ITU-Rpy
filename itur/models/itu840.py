@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import numpy as np
 from astropy import units as u
 
-from models.itu1144 import bilinear_2D_interpolator
-from iturutils import load_data, dataset_dir, prepare_input_array, \
-                prepare_output_array, prepare_quantity, memory
+from itur.models.itu1144 import bilinear_2D_interpolator
+from itur.utils import load_data, dataset_dir, prepare_input_array, \
+    prepare_output_array, prepare_quantity, memory
 
 
 class __ITU840():
@@ -24,7 +28,8 @@ class __ITU840():
     """
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.840 recommendation.
-    def __init__(self, version = 6):
+
+    def __init__(self, version=6):
         if version == 6:
             self.instance = _ITU840_6()
         elif version == 5:
@@ -32,8 +37,11 @@ class __ITU840():
         elif version == 4:
             self.instance = _ITU840_4()
         else:
-            raise ValueError('Version ' + str(version) + ' is not implemented' +
-            ' for the ITU-R P.840 model.')
+            raise ValueError(
+                'Version ' +
+                str(version) +
+                ' is not implemented' +
+                ' for the ITU-R P.840 model.')
 
     @property
     def __version__(self):
@@ -49,7 +57,7 @@ class __ITU840():
 
     def cloud_attenuation(self, lat, lon, el, f, p):
         # Abstract method to compute the cloud attenuation
-        Kl = self.instance.specific_attenuation_coefficients(f, T = 0)
+        Kl = self.instance.specific_attenuation_coefficients(f, T=0)
         Lred = self.instance.columnar_content_reduced_liquid(lat, lon, p)
         A = Lred * Kl / np.sin(np.deg2rad(el))
 
@@ -58,6 +66,7 @@ class __ITU840():
     def lognormal_approximation_coefficient(self, lat, lon):
         # Abstract method to compute the lognormal approximation coefficients
         return self.instance.lognormal_approximation_coefficient(lat, lon)
+
 
 class _ITU840_6():
 
@@ -74,16 +83,18 @@ class _ITU840_6():
 
     def Lred(self, lat, lon, p):
         if not self._Lred:
-            ps = [ 0.1, 0.2, 0.3, 0.5,  1, 2, 3, 5, 10, 20, 30,
-                         50 , 60 , 70 , 80 , 90, 95]
+            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
+                  50, 60, 70, 80, 90, 95]
             d_dir = dataset_dir + '840/v6_Lred_%s.txt'
             lats = load_data(dataset_dir + '840/v6_Lat.txt')
             lons = load_data(dataset_dir + '840/v6_Lon.txt')
             for p_load in ps:
-                vals = load_data(d_dir%(str(p_load).replace('.','')))
-                self._Lred[float(p_load)] = bilinear_2D_interpolator(lats, lons, vals)
+                vals = load_data(d_dir % (str(p_load).replace('.', '')))
+                self._Lred[float(p_load)] = bilinear_2D_interpolator(
+                    lats, lons, vals)
 
-        return self._Lred[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._Lred[float(p)](
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def M(self, lat, lon):
         if not self._M:
@@ -92,8 +103,8 @@ class _ITU840_6():
             lons = load_data(dataset_dir + '840/v6_Lon.txt')
             self._M = bilinear_2D_interpolator(lats, lons, vals)
 
-        return self._M(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
-
+        return self._M(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def sigma(self, lat, lon):
         if not self._sigma:
@@ -102,7 +113,8 @@ class _ITU840_6():
             lons = load_data(dataset_dir + '840/v6_Lon.txt')
             self._sigma = bilinear_2D_interpolator(lats, lons, vals)
 
-        return self._sigma(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._sigma(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def Pcwl(self, lat, lon):
         if not self._Pcwl:
@@ -111,14 +123,15 @@ class _ITU840_6():
             lons = load_data(dataset_dir + '840/v6_Lon.txt')
             self._Pcwl = bilinear_2D_interpolator(lats, lons, vals)
 
-        return self._Pcwl(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
-
+        return self._Pcwl(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def specific_attenuation_coefficients(self, f, T):
         """
         """
         if f > 1000:
-            raise ValueError('Frequency must be introduced in GHz and the maximum range is 1000 GHz')
+            raise ValueError(
+                'Frequency must be introduced in GHz and the maximum range is 1000 GHz')
 
         T_kelvin = T + 273.15
         theta = 300.0 / T_kelvin                # Eq. 9
@@ -133,12 +146,11 @@ class _ITU840_6():
         fs = 39.0 * fp                                              # Eq. 11
 
         # Compute the dielectric permitivity of water
-        epsilonp = (epsilon0 - epsilon1) / (1 + (f / fp)**2) + \
-                   (epsilon1 - epsilon2)/(1 + (f/fs)**2)  + epsilon2   # Eq. 5
+        epsilonp = (epsilon0 - epsilon1) / (1 + (f / fp) ** 2) + (epsilon1 -
+                                                                  epsilon2) / (1 + (f / fs) ** 2) + epsilon2  # Eq. 5
 
-        epsilonpp = f*(epsilon0 - epsilon1)/(fp*(1 + (f/fp)**2)) + \
-                    f*(epsilon1 - epsilon2)/(fs*(1 + (f/fs)**2))       # Eq. 4
-
+        epsilonpp = f * (epsilon0 - epsilon1) / (fp * (1 + (f / fp)**2)) + \
+            f * (epsilon1 - epsilon2) / (fs * (1 + (f / fs)**2))       # Eq. 4
 
         eta = (2 + epsilonp) / epsilonpp                    # Eq. 3
         Kl = (0.819 * f) / (epsilonpp * (1 + eta**2))       # Eq. 2
@@ -148,8 +160,9 @@ class _ITU840_6():
     def columnar_content_reduced_liquid(self, lat, lon, p):
         """
         """
-        available_p = np.array([ 0.1, 0.2, 0.3, 0.5,  1.0, 2.0, 3.0, 5.0, 10.0,
-                                20.0, 30.0, 50.0 , 60.0 , 70.0 , 80.0 , 90.0, 95.0])
+        available_p = np.array(
+            [0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0, 30.0, 50.0,
+             60.0, 70.0, 80.0, 90.0, 95.0])
 
         if p in available_p:
             p_below = p_above = p
@@ -160,14 +173,14 @@ class _ITU840_6():
             idx = np.clip(idx, 0, len(available_p))
 
             p_below = available_p[idx]
-            p_above= available_p[idx + 1]
+            p_above = available_p[idx + 1]
 
         # Compute the values of Lred_a
         Lred_a = self.Lred(lat, lon, p_above)
         if not pExact:
             Lred_b = self.Lred(lat, lon, p_below)
             Lred = Lred_b + (Lred_a - Lred_b) * (np.log(p) - np.log(p_below)) \
-                    / (np.log(p_above) - np.log(p_below))
+                / (np.log(p_above) - np.log(p_below))
             return Lred
         else:
             return Lred_a
@@ -178,6 +191,7 @@ class _ITU840_6():
         Pcwl = self.Pcwl(lat, lon)
 
         return m, sigma, Pcwl
+
 
 class _ITU840_5():
 
@@ -194,16 +208,18 @@ class _ITU840_5():
 
     def Lred(self, lat, lon, p):
         if not self._Lred:
-            ps = [ 0.1, 0.2, 0.3, 0.5,  1, 2, 3, 5, 10, 20, 30,
-                         50 , 60 , 70 , 80 , 90, 95]
+            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
+                  50, 60, 70, 80, 90, 95]
             d_dir = dataset_dir + '840/v4_ESAWRED_%s.txt'
             lats = load_data(dataset_dir + '840/v4_Lat.txt')
             lons = load_data(dataset_dir + '840/v4_Lon.txt')
             for p_load in ps:
-                vals = load_data(d_dir%(str(p_load).replace('.','')))
-                self._Lred[float(p_load)] = bilinear_2D_interpolator(lats, lons, vals)
+                vals = load_data(d_dir % (str(p_load).replace('.', '')))
+                self._Lred[float(p_load)] = bilinear_2D_interpolator(
+                    lats, lons, vals)
 
-        return self._Lred[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._Lred[float(p)](
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def M(self, lat, lon):
         if not self._M:
@@ -212,8 +228,8 @@ class _ITU840_5():
             lons = load_data(dataset_dir + '840/v6_Lon.txt')
             self._M = bilinear_2D_interpolator(lats, lons, vals)
 
-        return self._M(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
-
+        return self._M(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def sigma(self, lat, lon):
         if not self._sigma:
@@ -222,7 +238,8 @@ class _ITU840_5():
             lons = load_data(dataset_dir + '840/v6_Lon.txt')
             self._sigma = bilinear_2D_interpolator(lats, lons, vals)
 
-        return self._sigma(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._sigma(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def Pcwl(self, lat, lon):
         if not self._Pcwl:
@@ -231,13 +248,15 @@ class _ITU840_5():
             lons = load_data(dataset_dir + '840/v6_Lon.txt')
             self._Pcwl = bilinear_2D_interpolator(lats, lons, vals)
 
-        return self._Pcwl(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._Pcwl(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def specific_attenuation_coefficients(self, f, T):
         """
         """
         if f > 1000:
-            raise ValueError('Frequency must be introduced in GHz and the maximum range is 1000 GHz')
+            raise ValueError(
+                'Frequency must be introduced in GHz and the maximum range is 1000 GHz')
 
         T_kelvin = T + 273.15
         theta = 300.0 / T_kelvin                # Eq. 9
@@ -252,12 +271,11 @@ class _ITU840_5():
         fs = 590 - 1500 * (theta - 1)                               # Eq. 11
 
         # Compute the dielectric permitivity of water
-        epsilonp = (epsilon0 - epsilon1) / (1 + (f / fp)**2) + \
-                   (epsilon1 - epsilon2)/(1 + (f/fs)**2)  + epsilon2   # Eq. 5
+        epsilonp = (epsilon0 - epsilon1) / (1 + (f / fp) ** 2) + (epsilon1 -
+                                                                  epsilon2) / (1 + (f / fs) ** 2) + epsilon2  # Eq. 5
 
-        epsilonpp = f*(epsilon0 - epsilon1)/(fp*(1 + (f/fp)**2)) + \
-                    f*(epsilon1 - epsilon2)/(fs*(1 + (f/fs)**2))       # Eq. 4
-
+        epsilonpp = f * (epsilon0 - epsilon1) / (fp * (1 + (f / fp)**2)) + \
+            f * (epsilon1 - epsilon2) / (fs * (1 + (f / fs)**2))       # Eq. 4
 
         eta = (2 + epsilonp) / epsilonpp                    # Eq. 3
         Kl = (0.819 * f) / (epsilonpp * (1 + eta**2))       # Eq. 2
@@ -267,8 +285,9 @@ class _ITU840_5():
     def columnar_content_reduced_liquid(self, lat, lon, p):
         """
         """
-        available_p = np.array([ 0.1, 0.2, 0.3, 0.5,  1.0, 2.0, 3.0, 5.0, 10.0,
-                                20.0, 30.0, 50.0 , 60.0 , 70.0 , 80.0 , 90.0, 95.0])
+        available_p = np.array(
+            [0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0, 30.0, 50.0,
+             60.0, 70.0, 80.0, 90.0, 95.0])
 
         if p in available_p:
             p_below = p_above = p
@@ -279,13 +298,13 @@ class _ITU840_5():
             idx = np.clip(idx, 0, len(available_p))
 
             p_below = available_p[idx]
-            p_above= available_p[idx + 1]
+            p_above = available_p[idx + 1]
 
         Lred_a = self.Lred(lat, lon, p_above)
         if not pExact:
             Lred_b = self.Lred(lat, lon, p_below)
             Lred = Lred_b + (Lred_a - Lred_b) * (np.log(p) - np.log(p_below)) \
-                    / (np.log(p_above) - np.log(p_below))
+                / (np.log(p_above) - np.log(p_below))
             return Lred
         else:
             return Lred_a
@@ -296,6 +315,7 @@ class _ITU840_5():
         Pcwl = self.Pcwl(lat, lon)
 
         return m, sigma, Pcwl
+
 
 class _ITU840_4():
 
@@ -312,16 +332,18 @@ class _ITU840_4():
 
     def Lred(self, lat, lon, p):
         if not self._Lred:
-            ps = [ 0.1, 0.2, 0.3, 0.5,  1, 2, 3, 5, 10, 20, 30,
-                         50 , 60 , 70 , 80 , 90, 95]
+            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
+                  50, 60, 70, 80, 90, 95]
             d_dir = dataset_dir + '840/v4_ESAWRED_%s.txt'
             lats = load_data(dataset_dir + '840/v4_Lat.txt')
             lons = load_data(dataset_dir + '840/v4_Lon.txt')
             for p_load in ps:
-                vals = load_data(d_dir%(str(p_load).replace('.','')))
-                self._Lred[float(p_load)] = bilinear_2D_interpolator(lats, lons, vals)
+                vals = load_data(d_dir % (str(p_load).replace('.', '')))
+                self._Lred[float(p_load)] = bilinear_2D_interpolator(
+                    lats, lons, vals)
 
-        return self._Lred[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._Lred[float(p)](
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def M(self, lat, lon):
         if not self._M:
@@ -330,8 +352,8 @@ class _ITU840_4():
             lons = load_data(dataset_dir + '840/v6_Lon.txt')
             self._M = bilinear_2D_interpolator(lats, lons, vals)
 
-        return self._M(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
-
+        return self._M(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def sigma(self, lat, lon):
         if not self._sigma:
@@ -340,7 +362,8 @@ class _ITU840_4():
             lons = load_data(dataset_dir + '840/v6_Lon.txt')
             self._sigma = bilinear_2D_interpolator(lats, lons, vals)
 
-        return self._sigma(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._sigma(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def Pcwl(self, lat, lon):
         if not self._Pcwl:
@@ -349,13 +372,15 @@ class _ITU840_4():
             lons = load_data(dataset_dir + '840/v6_Lon.txt')
             self._Pcwl = bilinear_2D_interpolator(lats, lons, vals)
 
-        return self._Pcwl(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._Pcwl(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def specific_attenuation_coefficients(self, f, T):
         """
         """
         if f > 1000:
-            raise ValueError('Frequency must be introduced in GHz and the maximum range is 1000 GHz')
+            raise ValueError(
+                'Frequency must be introduced in GHz and the maximum range is 1000 GHz')
 
         T_kelvin = T + 273.15
         theta = 300.0 / T_kelvin                # Eq. 9
@@ -370,12 +395,11 @@ class _ITU840_4():
         fs = 590 - 1500 * (theta - 1)                               # Eq. 11
 
         # Compute the dielectric permitivity of water
-        epsilonp = (epsilon0 - epsilon1) / (1 + (f / fp)**2) + \
-                   (epsilon1 - epsilon2)/(1 + (f/fs)**2)  + epsilon2   # Eq. 5
+        epsilonp = (epsilon0 - epsilon1) / (1 + (f / fp) ** 2) + (epsilon1 -
+                                                                  epsilon2) / (1 + (f / fs) ** 2) + epsilon2  # Eq. 5
 
-        epsilonpp = f*(epsilon0 - epsilon1)/(fp*(1 + (f/fp)**2)) + \
-                    f*(epsilon1 - epsilon2)/(fs*(1 + (f/fs)**2))       # Eq. 4
-
+        epsilonpp = f * (epsilon0 - epsilon1) / (fp * (1 + (f / fp)**2)) + \
+            f * (epsilon1 - epsilon2) / (fs * (1 + (f / fs)**2))       # Eq. 4
 
         eta = (2 + epsilonp) / epsilonpp                    # Eq. 3
         Kl = (0.819 * f) / (epsilonpp * (1 + eta**2))       # Eq. 2
@@ -385,8 +409,9 @@ class _ITU840_4():
     def columnar_content_reduced_liquid(self, lat, lon, p):
         """
         """
-        available_p = np.array([ 0.1, 0.2, 0.3, 0.5,  1.0, 2.0, 3.0, 5.0, 10.0,
-                                20.0, 30.0, 50.0 , 60.0 , 70.0 , 80.0 , 90.0, 95.0])
+        available_p = np.array(
+            [0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0, 30.0, 50.0,
+             60.0, 70.0, 80.0, 90.0, 95.0])
 
         if p in available_p:
             p_below = p_above = p
@@ -397,13 +422,13 @@ class _ITU840_4():
             idx = np.clip(idx, 0, len(available_p))
 
             p_below = available_p[idx]
-            p_above= available_p[idx + 1]
+            p_above = available_p[idx + 1]
 
         Lred_a = self.Lred(lat, lon, p_above)
         if not pExact:
             Lred_b = Lred_a = self.Lred(lat, lon, p_below)
             Lred = Lred_b + (Lred_a - Lred_b) * (np.log(p) - np.log(p_below)) \
-                    / (np.log(p_above) - np.log(p_below))
+                / (np.log(p_above) - np.log(p_below))
             return Lred
         else:
             return Lred_a
@@ -415,7 +440,9 @@ class _ITU840_4():
 
         return m, sigma, Pcwl
 
+
 __model = __ITU840()
+
 
 def change_version(new_version):
     """
@@ -584,5 +611,6 @@ def lognormal_approximation_coefficient(lat, lon):
     lon = np.mod(lon, 360)
     val = __model.lognormal_approximation_coefficient(lat, lon)
     return (prepare_output_array(val[0], type_output) * u.dimensionless_unscaled,
-            prepare_output_array(val[1], type_output) * u.dimensionless_unscaled,
+            prepare_output_array(val[1], type_output) *
+            u.dimensionless_unscaled,
             prepare_output_array(val[2], type_output) * u.dimensionless_unscaled)
