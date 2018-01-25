@@ -1,4 +1,0 @@
-joblib
-astropy
-scipy
-numpy
