@@ -4,13 +4,16 @@ from itur.models.itu676 import gaseous_attenuation_slant_path,\
     gaseous_attenuation_inclined_path,\
     gaseous_attenuation_terrestrial_path
 from itur.models.itu835 import pressure
-from itur.models.itu836 import surface_water_vapour_density	
+from itur.models.itu836 import surface_water_vapour_density
 from itur.models.itu840 import cloud_attenuation
 from itur.models.itu1510 import surface_mean_temperature
 from itur.models.itu1511 import topographic_altitude
 
 import itur.models
 
+import numpy as np
+import warnings
+import astropy.units as u
 
 def atmospheric_attenuation_slant_path(
         lat, lon, el, f, p, D, hs=None, rho=None, R001=None, eta=0.5, T=None,
@@ -47,7 +50,7 @@ def atmospheric_attenuation_slant_path(
     if include_rain:
         Ar = rain_attenuation(lat, lon, f, el, hs, p, R001, tau, Ls)
     else:
-        Ar = 0 * units.dB
+        Ar = 0 * u.dB
 
     # This takes account of the fact that a large part of the cloud attenuation
     # and gaseous attenuation is already included in the rain attenuation
@@ -58,18 +61,18 @@ def atmospheric_attenuation_slant_path(
     if include_gas:
         Ag = gaseous_attenuation_slant_path(f, el, rho, P, T, mode)
     else:
-        Ag = 0 * units.dB
+        Ag = 0 * u.dB
 
     if include_clouds:
         Ac = cloud_attenuation(lat, lon, el, f, p_c_g)
     else:
-        Ac = 0 * units.dB
+        Ac = 0 * u.dB
 
     if include_scintillation:
         As = scintillation_attenuation(lat, lon, f, el, p, D, eta,
                                        T, H, P, hL)
     else:
-        As = 0 * units.dB
+        As = 0 * u.dB
 
     # Compute the total attenuation according to
     A = Ag + np.sqrt((Ar + Ac)**2 + As**2)
