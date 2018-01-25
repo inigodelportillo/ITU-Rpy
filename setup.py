@@ -40,7 +40,7 @@ setup(
     # For a discussion on single-sourcing the version across setup.py and the
     # project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.01', 
+    version='0.1', 
 
     # This is a one-line description or tagline of what your project does. This
     # corresponds to the "Summary" metadata field:
@@ -61,8 +61,8 @@ setup(
     # above.
     author_email='portillo@mit.edu',
 
-	license='MIT',
-	
+    license='MIT',
+    
     # Classifiers help users find your project by categorizing it.
     #
     # For a list of valid classifiers, see
@@ -122,6 +122,15 @@ setup(
     # If using Python 2.6 or earlier, then these have to be included in
     # MANIFEST.in as well.
     package_data={  # Optional
-		'itur': ['data/*'],
+        'itur': [ 'data/453/*.*',
+                  'data/530/*.*',
+                  'data/676/*.*',
+                  'data/836/*.*',
+                  'data/837/*.*',
+                  'data/839/*.*',
+                  'data/840/*.*',
+                  'data/1510/*.*',
+                  'data/1511/*.*'],
+
     },
 )
