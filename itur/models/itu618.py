@@ -8,31 +8,34 @@ from astropy import units as u
 
 from models.itu453 import water_vapour_pressure, wet_term_radio_refractivity,\
                     map_wet_term_radio_refractivity
-from models.itu837 import rainfall_rate,rain_percentage_probability
+from models.itu837 import rainfall_rate, rain_percentage_probability
 from models.itu838 import rain_specific_attenuation
 from models.itu839 import rain_height
 from models.itu1511 import topographic_altitude
 from iturutils import prepare_input_array, prepare_output_array,\
                       prepare_quantity, compute_distance_earth_to_earth
 
+
 class _ITU618():
     """
-    Propagation data and prediction methods required for the design of Earth-space
-    telecommunication systems.
+    Propagation data and prediction methods required for the design of
+    Earth-space telecommunication systems.
 
     Available versions include:
     * P.618-12 (07/15) (Current version)
-    * P.618-11 (07/15) (Current version)
-    * P.618-10 (07/15) (Current version)
-    * P.618-09 (07/15) (Current version)
-    * P.618-08 (07/15) (Current version)
-    * P.618-07 (07/15) (Current version)
-    * P.618-06 (07/15) (Current version)
-    * P.618-05 (07/15) (Current version)
-    * P.618-04 (07/15) (Current version)
-    * P.618-03 (07/15) (Current version)
-    * P.618-02 (07/15) (Current version)
-    * P.618-01 (07/15) (Current version)
+
+    Versions that need to be implemented
+    * P.618-11
+    * P.618-10
+    * P.618-09
+    * P.618-08
+    * P.618-07
+    * P.618-06
+    * P.618-05
+    * P.618-04
+    * P.618-03
+    * P.618-02
+    * P.618-01
 
     Recommendation ITU-R P.618 provides methods to estimate the propagation
     loss on an Earth-space path, relative to the free-space loss. This value
@@ -51,43 +54,43 @@ class _ITU618():
     """
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.618 recommendation.
-    def __init__(self, version = 12):
+    def __init__(self, version=12):
         if version == 12:
             self.instance = _ITU618_12()
         elif version == 11:
-            self.instance = _ITU618_11()
+            self.instance = _ITU618_11() #TODO: Implement older versions or recommendation
         elif version == 10:
-            self.instance = _ITU618_10()
+            self.instance = _ITU618_10() #TODO: Implement older versions or recommendation
         elif version == 9:
-            self.instance = _ITU618_9()
+            self.instance = _ITU618_9()  #TODO: Implement older versions or recommendation
         elif version == 8:
-            self.instance = _ITU618_8()
+            self.instance = _ITU618_8()  #TODO: Implement older versions or recommendation
         elif version == 7:
-            self.instance = _ITU618_7()
+            self.instance = _ITU618_7()  #TODO: Implement older versions or recommendation
         elif version == 6:
-            self.instance = _ITU618_6()
+            self.instance = _ITU618_6()  #TODO: Implement older versions or recommendation
         elif version == 5:
-            self.instance = _ITU618_5()
+            self.instance = _ITU618_5()  #TODO: Implement older versions or recommendation
         elif version == 4:
-            self.instance = _ITU618_4()
+            self.instance = _ITU618_4()  #TODO: Implement older versions or recommendation
         elif version == 3:
-            self.instance = _ITU618_3()
+            self.instance = _ITU618_3()  #TODO: Implement older versions or recommendation
         elif version == 2:
-            self.instance = _ITU618_2()
+            self.instance = _ITU618_2()  #TODO: Implement older versions or recommendation
         elif version == 1:
-            self.instance = _ITU618_1()
+            self.instance = _ITU618_1()  #TODO: Implement older versions or recommendation
         else:
-            raise ValueError('Version ' + str(version) + ' is not implemented' +
-            ' for the ITU-R P.618 model.')
+            raise ValueError('Version {0} is not implemented' +
+                             ' for the ITU-R P.618 model.'.format(version))
 
     @property
     def __version__(self):
         return self.instance.__version__
 
     def rain_attenuation(self, lat, lon, f, el, hs=None, p=0.01, R001=None,
-                                 tau=45, Ls=None):
+                         tau=45, Ls=None):
         return self.instance.rain_attenuation(lat, lon, f, el, hs, p,
-                                                      R001, tau, Ls)
+                                              R001, tau, Ls)
 
     def rain_attenuation_probability(self, lat, lon, el, Ls, P0=None):
         return self.instance.rain_attenuation_probability(lat, lon, el, Ls, P0)
@@ -96,12 +99,15 @@ class _ITU618():
         return self.instance.rain_cross_polarization_discrimination(Ap, f, el,
                                                                     p, tau)
 
-    def scintillation_attenuation(self, lat, lon, f, el, p, D, eta, T, H, P, hL):
+    def scintillation_attenuation(self, lat, lon, f, el, p, D, eta,
+                                  T, H, P, hL):
         return self.instance.scintillation_attenuation(lat, lon, f, el, p, D,
-                                                    eta, T, H, P, hL)
+                                                       eta, T, H, P, hL)
 
     def fit_rain_attenuation_to_lognormal(self, lat, lon, f, el, hs, P_k):
-        return self.instance.fit_rain_attenuation_to_lognormal(lat, lon, f, el, hs, P_k)
+        return self.instance.fit_rain_attenuation_to_lognormal(lat, lon, f,
+                                                               el, hs, P_k)
+
 
 class _ITU618_12():
 
@@ -109,14 +115,15 @@ class _ITU618_12():
         self.__version__ = 12
 
     def rain_attenuation(self, lat, lon, f, el, hs=None, p=0.01, R001=None,
-                                 tau=45, Ls=None):
+                         tau=45, Ls=None):
 
         if p < 0.001 or p > 5:
-            warnings.warn(RuntimeWarning('The method to compute the rain '
-                      'attenuation in recommendation ITU-P 618-12 is only '
-                      'valid for unavailability values between 0.001 and 5'))
+            warnings.warn(
+                RuntimeWarning('The method to compute the rain attenuation in '
+                               'recommendation ITU-P 618-12 is only valid for '
+                               'unavailability values between 0.001 and 5'))
 
-        Re = 8500 # Efective radius of the Earth (8500 km)
+        Re = 8500   # Efective radius of the Earth (8500 km)
 
         if hs is None:
             hs = topographic_altitude(lat, lon).to(u.km).value
@@ -126,17 +133,17 @@ class _ITU618_12():
 
         # Step 2: Compute the slant path length
         if Ls is None:
-            Ls = np.where(el >= 5,
-                          (hr - hs) / (np.sin(np.deg2rad(el))), # Eq. 1
-                          2 * (hr - hs) / ((( np.sin(np.deg2rad(el) ) )**2 +
-                          2*(hr -hs) / Re)**0.5 + ( np.sin( np.deg2rad(el)))) # Eq. 2
-                          )
+            Ls = np.where(
+                el >= 5, (hr - hs) / (np.sin(np.deg2rad(el))),  # Eq. 1
+                2 * (hr - hs) / (((np.sin(np.deg2rad(el)))**2 +
+                2 * (hr - hs) / Re)**0.5 + (np.sin(np.deg2rad(el)))))  # Eq. 2
 
-        # Step 3: Calculate the horizontal projection, LG, of the slant-path length
+        # Step 3: Calculate the horizontal projection, LG, of the
+        # slant-path length
         Lg = np.abs(Ls * np.cos(np.deg2rad(el)))
 
-        # Obtain the raingall rate, exceeded for 0.01% of an average year, if not provided,
-        # as described in ITU-R P.837.
+        # Obtain the raingall rate, exceeded for 0.01% of an average year,
+        # if not provided, as described in ITU-R P.837.
         if R001 is None:
             R001 = rainfall_rate(lat, lon, 0.01).to(u.mm/u.hr).value
 
@@ -145,27 +152,28 @@ class _ITU618_12():
         # https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.838-3-200503-I!!PDF-E.pdf
         gammar = rain_specific_attenuation(R001, f, el, tau).to(u.dB/u.km).value
 
-        # Step 6: Calculate the horizontal reduction factor, r0.01, for 0.01% of the time:
-        r001 = 1 / (1 + 0.78 * np.sqrt(Lg * gammar / f) - 0.38 * (1 - np.exp(-2 * Lg)))
+        # Step 6: Calculate the horizontal reduction factor, r0.01,
+        # for 0.01% of the time:
+        r001 = 1. / (1 + 0.78 * np.sqrt(Lg * gammar / f) - 0.38 * (1 - np.exp(-2 * Lg)))
 
-        # Step 7: Calculate the vertical adjustment factor, v0.01, for 0.01% of the time:
-        eta = np.rad2deg(np.arctan2(hr - hs , Lg * r001))
+        # Step 7: Calculate the vertical adjustment factor, v0.01,
+        # for 0.01% of the time:
+        eta = np.rad2deg(np.arctan2(hr - hs, Lg * r001))
 
-        Lr = np.where(eta > el,
-                      Lg * r001 / np.cos( np.deg2rad(el)),
-                      (hr - hs) / np.sin( np.deg2rad(el))
-                      )
+        Lr = np.where(eta > el, Lg * r001 / np.cos(np.deg2rad(el)),
+                      (hr - hs) / np.sin(np.deg2rad(el)))
 
-        xi = np.where(np.abs(lat) < 36, 36 - np.abs(lat) ,0)
+        xi = np.where(np.abs(lat) < 36, 36 - np.abs(lat), 0)
 
-        v001 = 1 / (1 + np.sqrt(np.sin(np.deg2rad(el))) * (31 * (1 - np.exp(-(el/(1 + xi)))) *
-                np.sqrt(Lr * gammar)/f**2 - 0.45))
+        v001 = 1. / (1 + np.sqrt(np.sin(np.deg2rad(el))) *
+                     (31 * (1 - np.exp(-(el/(1 + xi)))) *
+                      np.sqrt(Lr * gammar)/f**2 - 0.45))
 
         # Step 8: calculate the effective path length:
-        Le = Lr * v001 # (km)
+        Le = Lr * v001   # (km)
 
         # Step 9: The predicted attenuation exceeded for 0.01% of an average year
-        A001 = gammar * Le # (dB)
+        A001 = gammar * Le   # (dB)
 
         # Step 10: The estimated attenuation to be exceeded for other percentages
         # of an average year
@@ -175,12 +183,12 @@ class _ITU618_12():
             beta = np.where(np.abs(lat) > 36,
                      np.zeros_like(A001),
                      np.where((np.abs(lat) < 36) & (el > 25),
-                              -0.005 * ( np.abs(lat) - 36),
-                              -0.005 * ( np.abs(lat) - 36) + 1.8 -
-                              4.25 * np.sin( np.deg2rad(el) )))
+                              -0.005 * (np.abs(lat) - 36),
+                              -0.005 * (np.abs(lat) - 36) + 1.8 -
+                              4.25 * np.sin(np.deg2rad(el))))
 
-        A = A001 * (p / 0.01)**(- (0.655 + 0.033 * np.log(p) -
-            0.045 * np.log( A001) - beta * (1 -p)*np.sin( np.deg2rad(el) ) ) )
+        A = A001 * (p / 0.01)**(-(0.655 + 0.033 * np.log(p) -
+            0.045 * np.log(A001) - beta * (1 -p)*np.sin(np.deg2rad(el))))
 
         return A
 
@@ -189,7 +197,7 @@ class _ITU618_12():
         # This function calculates the complementary bivariate normal distribution
         # with limits alpha_x, alpha_y and correlation factor rho
         def CDF_bivariate_normal_fcn(x, y, rho):
-            return np.exp( - (x**2 - 2 *rho*x*y + y**2) / (2*(1-rho**2) ) )
+            return np.exp(- (x**2 - 2 *rho*x*y + y**2) / (2. * (1-rho**2)))
 
         def CDF_bivariate_normal_int(alpha, y, rho):
              return scipy.integrate.quad(CDF_bivariate_normal_fcn, alpha, np.inf, args=(y, rho))[0]
@@ -206,8 +214,9 @@ class _ITU618_12():
         if hs is None:
             hs = topographic_altitude(lat, lon).to(u.km).value
 
-        #Step 1: Estimate the probability of rain, at the earth station either\
-        # from Recommendation ITU-R P.837 or from local measured rainfall rate data
+        # Step 1: Estimate the probability of rain, at the earth station either
+        # from Recommendation ITU-R P.837 or from local measured rainfall
+        # rate data
         if P0 is None:
             P0 = rain_percentage_probability(lat, lon).\
                         to(u.dimensionless_unscaled).value
@@ -222,9 +231,9 @@ class _ITU618_12():
         if Ls is None:
             Ls = np.where(el >= 5,
                           (hr - hs) / (np.sin(np.deg2rad(el))), # Eq. 1
-                          2 * (hr - hs) / ( ( ( np.sin(np.deg2rad(el) ) )**2 +
-                          2*(hr -hs) / Re)**0.5 + ( np.sin( np.deg2rad(el)))) # Eq. 2
-                          )
+                          2 * (hr - hs) / (((np.sin(np.deg2rad(el)))**2 +
+                          2*(hr -hs) / Re)**0.5 + (np.sin(np.deg2rad(el))))) # Eq. 2
+
         d = Ls * np.cos(np.deg2rad(el))
         rho = 0.59 * np.exp(-abs(d) / 31) + 0.41 * np.exp(-abs(d)/800)
 
@@ -344,7 +353,7 @@ class _ITU618_12():
         C_a = V * np.log10(Ap)
 
         # Step 3: Calculate the polarization improvement factor:
-        C_tau = -10 * np.log10(1 - 0.484* ( 1 + np.cos(np.deg2rad(4*tau))))
+        C_tau = -10 * np.log10(1 - 0.484* (1 + np.cos(np.deg2rad(4*tau))))
 
         # Step 4: Calculate the elevation angle-dependent term:
         C_theta = -40 * np.log10(np.cos(np.deg2rad(el)))
@@ -407,14 +416,14 @@ class _ITU618_12():
         # Step 6: Step 6: Calculate the antenna averaging factor
         x = 1.22 * D_eff**2 * f/L
         g = np.where(x >= 7.0, 0,
-                np.sqrt(3.86 * (x**2 + 1)**(11/12) * np.sin(11/6*np.arctan2(1, x)) -\
-                7.08 * x**(5/6)))                  #Eq. 46    [-]
+                np.sqrt(3.86 * (x**2 + 1)**(11./12) * np.sin(11./6*np.arctan2(1, x)) -\
+                7.08 * x**(5./6)))                  #Eq. 46    [-]
 
         # Step 7: Calculate the standard deviation of the signal for the
         # applicable period and propagation path:
-        sigma = sigma_ref * f**(7/12) * g/np.sin(np.deg2rad(el))**1.2
+        sigma = sigma_ref * f**(7./12) * g/np.sin(np.deg2rad(el))**1.2
 
-        # Step 8: Calculate the time percentage factor, a( p), for the time
+        # Step 8: Calculate the time percentage factor, a(p), for the time
         # percentage, p, in the range between 0.01% < p  50%:
         a = -0.061 * np.log10(p)**3 + 0.072 * np.log10(p)**2 - 1.71*np.log10(p) + 3
 
