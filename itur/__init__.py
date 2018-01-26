@@ -3,21 +3,22 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from itur.models.itu618 import rain_attenuation, scintillation_attenuation
-from itur.models.itu676 import gaseous_attenuation_slant_path,\
+from .models.itu618 import rain_attenuation, scintillation_attenuation
+from .models.itu676 import gaseous_attenuation_slant_path,\
     gaseous_attenuation_inclined_path,\
     gaseous_attenuation_terrestrial_path
-from itur.models.itu835 import pressure
-from itur.models.itu836 import surface_water_vapour_density
-from itur.models.itu840 import cloud_attenuation
-from itur.models.itu1510 import surface_mean_temperature
-from itur.models.itu1511 import topographic_altitude
+from .models.itu835 import pressure
+from .models.itu836 import surface_water_vapour_density
+from .models.itu840 import cloud_attenuation
+from .models.itu1510 import surface_mean_temperature
+from .models.itu1511 import topographic_altitude
 
 import numpy as np
 import warnings
 import astropy.units as u
 
-from itur.__version__ import __version__
+from .__version__ import __version__
+
 AUTHORS = "Inigo del Portillo"
 
 
@@ -118,8 +119,8 @@ def atmospheric_attenuation_slant_path(
         Gaseous, Cloud, Rain, Scintillation cotributions to total attenuation,
         and total attenuation (dB)
 
-		
-		
+
+
     References
     -------------
     [1] Propagation data and prediction methods required for the design of
