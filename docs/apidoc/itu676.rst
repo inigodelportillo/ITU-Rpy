@@ -1,0 +1,28 @@
+
+Recommendation ITU-R P.676
+-----------------------------------
+
+Implementation of the methods in Recommendation ITU-R P.676 "Attenuation by atmospheric gases".
+
+This Recommendation provides methods to estimate the attenuation of atmospheric gases on terrestrial and
+slant paths using:
+   * an estimate of gaseous attenuation computed by a summation of individual absorption lines that is valid for the frequency range 1-1 000 GHz; and
+   * a simplified approximate method to estimate gaseous attenuation that is applicable in the frequency range 1-350 GHz.
+
+Available versions include:
+   * P.676-1 (03/92) (Superseded)
+   * P.676-2 (10/95) (Superseded)
+   * P.676-3 (08/97) (Superseded)
+   * P.676-4 (10/99) (Superseded)
+   * P.676-5 (02/01) (Superseded)
+   * P.676-6 (03/05) (Superseded)
+   * P.676-7 (02/07) (Superseded)
+   * P.676-8 (10/09) (Superseded)
+   * P.676-9 (02/12) (Superseded)
+   * P.676-10 (09/13) (Superseded)
+   * P.676-11 (09/16) (Current version)
+
+.. automodule:: itur.models.itu676
+    :members:
+    :undoc-members:
+    :show-inheritance:

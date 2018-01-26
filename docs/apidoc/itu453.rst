@@ -1,0 +1,20 @@
+
+Recommendation ITU-R P.453
+-----------------------------------
+
+Implementation of the methods in Recommendation ITU-R P.453 "The radio refractive index: its formula and refractivity data"
+
+Available versions:
+   * P.453-12 (07/15)
+
+TODO: Implement version P.453-13
+
+Recommendation ITU-R P.453 provides methods to estimate the radio refractive
+index and its behaviour for locations worldwide; describes both surface and
+vertical profile characteristics; and provides global maps for the
+distribution of refractivity parameters and their statistical variation.
+
+.. automodule:: itur.models.itu453
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,41 @@
+
+Recommendation ITU-R P.618
+-----------------------------------
+
+Implementation of the methods in Recommendation ITU-R P.618 " Propagation data and prediction methods required for the design of Earth-space telecommunication systems."
+
+Available versions include:
+   * P.618-12 (07/15) (Current version)
+
+Versions that need to be implemented
+   * P.618-11
+   * P.618-10
+   * P.618-09
+   * P.618-08
+   * P.618-07
+   * P.618-06
+   * P.618-05
+   * P.618-04
+   * P.618-03
+   * P.618-02
+   * P.618-01
+
+Recommendation ITU-R P.618 provides methods to estimate the propagation
+loss on an Earth-space path, relative to the free-space loss. This value
+is the sum of different contributions as follows:
+   * attenuation by atmospheric gases;
+   * attenuation by rain, other precipitation and clouds;
+   * focusing and defocusing;
+   * decrease in antenna gain due to wave-front incoherence;
+   * scintillation and multipath effects;
+   * attenuation by sand and dust storms.
+Each of these contributions has its own characteristics as a function of
+frequency, geographic location and elevation angle. As a rule, at elevation
+angles above 10°, only gaseous attenuation, rain and cloud attenuation and
+possibly scintillation will be significant, depending on propagation
+conditions.
+
+.. automodule:: itur.models.itu618
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,13 @@
+
+Recommendation ITU-R P.1510
+-------------------------------------
+
+Implementation of the methods in Recommendation ITU-R P.1510 "Annual mean surface temperature"
+
+Available versions include:
+    * P.1510-0 (02/01) (Current version)
+	
+.. automodule:: itur.models.itu1510
+    :members:
+    :undoc-members:
+    :show-inheritance:

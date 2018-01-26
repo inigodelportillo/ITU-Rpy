@@ -1,0 +1,27 @@
+
+Recommendation ITU-R P.835
+-----------------------------------
+
+Implementation of the methods in Recommendation ITU-R P.835 "Reference Standard Atmospheres".
+
+Available versions:
+   * P.835-5 (02/12) (Current version)
+
+Not available versions:
+   * P.835-1 (08/94) (Superseded)
+   * P.835-2 (08/97) (Superseded)
+   * P.835-3 (10/99) (Superseded)
+   * P.835-4 (03/05) (Superseded)
+
+The procedures to compute the reference standard atmosphere parameters
+pressented in these versions are identical to those included in version
+ITU_T P.835-5. Version 3 includes a dataset with vertical profiles for
+353 locations over the world using 10 years of radiosonde observations
+. Version 4 includes another dataset with monthly vertical profiles worldwide
+(grid of 1.5 by 1.5 deg). None of these are currently implemente but TODO
+work.
+
+.. automodule:: itur.models.itu835
+    :members:
+    :undoc-members:
+    :show-inheritance:

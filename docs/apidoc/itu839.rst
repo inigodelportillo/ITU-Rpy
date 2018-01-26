@@ -1,0 +1,18 @@
+
+Recommendation ITU-R P.839
+---------------------
+
+Implementation of the methods in Recommendation ITU-R P.839 "Rain height model for prediction methods."
+
+Available versions include:
+   * P.839-2 (10/99) (Superseded)
+   * P.839-3 (02/01) (Superseded)
+   * P.839-4 (09/2013) (Current version)
+Not available versions:
+   * P.839-0 (03/92) (Superseded)
+   * P.839-1 (83/97) (Superseded)
+
+.. automodule:: itur.models.itu839
+    :members:
+    :undoc-members:
+    :show-inheritance:

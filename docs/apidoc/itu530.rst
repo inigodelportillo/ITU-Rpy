@@ -1,0 +1,24 @@
+
+Recommendation ITU-R P.530
+-----------------------------------
+
+Propagation data and prediction methods required for the design of
+terrestrial line-of-sight systems
+
+Available versions:
+   * P.530-16 (07/15) (Current version)
+
+Not available versions:
+
+This recommendation includes prediction methods for the propagation effects
+that should be taken into account in the design of digital fixed
+line-of-sight links, both in clear-air and rainfall conditions. It also
+provides link design guidance in clear step-by-step procedures including
+the use of mitigation techniques to minimize propagation impairments. The
+final outage predicted is the base for other Recommendations addressing
+error performance and availability.
+
+.. automodule:: itur.models.itu530
+    :members:
+    :undoc-members:
+    :show-inheritance:

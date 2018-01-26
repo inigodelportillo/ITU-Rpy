@@ -1,0 +1,18 @@
+
+Recommendation ITU-R P.837
+-----------------------------------
+
+Implementation of the methods in Recommendation ITU-R P.837 "Characteristics of precipitation for propagation modeling"
+
+Available versions include:
+   * P.837-1 (08/94) (Superseded)
+   * P.837-2 (10/99) (Superseded)
+   * P.837-3 (02/01) (Superseded)
+   * P.837-4 (04/03) (Superseded)
+   * P.837-5 (08/07) (Superseded)
+   * P.837-6 (02/12) (Current version)
+	
+.. automodule:: itur.models.itu837
+    :members:
+    :undoc-members:
+    :show-inheritance:

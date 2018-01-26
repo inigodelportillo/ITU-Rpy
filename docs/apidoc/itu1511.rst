@@ -1,0 +1,16 @@
+
+Recommendation ITU-R P.1511
+---------------------
+
+Implementation of the methods in Recommendation ITU-R P.1511 "Topography for Earth-to-space propagation modelling".
+
+This model shall be used to obtain the height above mean sea level when no local data are available or when no data with a better spatial resolution is available.
+
+Available versions include:
+   * P.1511-0 (02/01) (Superseded)
+   * P.1511-1 (07/15) (Current version)
+
+.. automodule:: itur.models.itu1511
+    :members:
+    :undoc-members:
+    :show-inheritance:

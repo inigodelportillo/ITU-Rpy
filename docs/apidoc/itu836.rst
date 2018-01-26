@@ -1,0 +1,20 @@
+
+Recommendation ITU-R P.836
+-----------------------------------
+
+Implementation of the methods in Recommendation ITU-R P.836 "Water vapour: surface density and total columnar content"
+
+Available versions:
+   * P.836-5 (09/13) (Current version)
+   * P.836-4 (10/09) (Superseded)
+
+Not available versions:
+   * P.836-0 (03/92) (Superseded)
+   * P.836-1 (08/97) (Superseded)
+   * P.836-2 (02/01) (Superseded)
+   * P.836-3 (11/01) (Superseded)
+
+.. automodule:: itur.models.itu836
+    :members:
+    :undoc-members:
+    :show-inheritance:

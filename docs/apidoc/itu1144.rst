@@ -1,0 +1,19 @@
+
+Recommendation ITU-R P.1144
+------------------------------------
+
+Implementation of the methods in Recommendation ITU-R P.1144 "
+Interpolation methods for the geophysical properties used to compute
+propagation effects."
+These methods are based on those in Recommendation ITU-R P.1144-7.
+
+
+[1] Guide to the application of the propagation methods of Radiocommunication
+Study Group 3: https://www.itu.int/rec/R-REC-P.1144/en
+
+
+.. automodule:: itur.models.itu1144
+    :members:
+    :undoc-members:
+    :show-inheritance:
+	
