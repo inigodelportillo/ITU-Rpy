@@ -19,6 +19,10 @@ dataset_dir = os.path.join(dir_path, './data/')
 cachedir = mkdtemp()
 memory = Memory(cachedir=cachedir, verbose=0)
 
+__NUMERIC_TYPES__ = [numbers.Number, int, float, complex,
+                     np.float, np.float16, np.float32, np.float64,
+                     np.int, np.int8, np.int16, np.int32, np.int64]
+
 
 def load_data(path, is_text=False, **kwargs):
     """ Loads data files from /itur/data/
@@ -53,6 +57,8 @@ def prepare_input_array(array):
 def prepare_output_array(array, type_input=None):
     """ Formats the output to have the same shape and type as the input
     """
+    global output_quantity
+
     if isinstance(array, u.Quantity):
         value = array.value
         unit = array.unit
@@ -60,8 +66,10 @@ def prepare_output_array(array, type_input=None):
         value = array
         unit = None
 
-    if type_input in [numbers.Number, int, float, complex] and len(array) == 1:
-        value = float(value)
+    if type_input in __NUMERIC_TYPES__ and \
+       ((isinstance(array, np.ndarray) and array.size == 1) or
+        (not isinstance(array, np.ndarray) and len(array) == 1)):
+            value = float(value)
     elif type_input is list:
         if isinstance(value, np.ndarray):
             value = value.to_list()
@@ -69,6 +77,10 @@ def prepare_output_array(array, type_input=None):
             value = list(value)
     else:
         value = value
+
+    # Squeeze output array to remove singleton dimensions
+    if isinstance(value, np.ndarray):
+        value = value.squeeze()
 
     if unit is not None:
         return value * unit
@@ -190,7 +202,7 @@ def elevation_angle(h, lat_s, lon_s, lat_grid, lon_grid):
     Parameters
     ----------
     h : float
-        Altitude of the satellite (km)
+        Orbital altitude of the satellite (km)
     lat_s : float
         latitude of the projection of the satellite (degrees)
     lon_s : float
@@ -211,6 +223,8 @@ def elevation_angle(h, lat_s, lon_s, lat_grid, lon_grid):
     References
     [1] http://www.propagation.gatech.edu/ECE6390/notes/ASD5.pdf - Slides 3, 4
     '''
+    h = prepare_quantity(h, u.km, name_val='Orbital altitude of the satellite')
+
     RE = 6371.0     # Radius of the Earth (km)
     rs = RE + h
 
@@ -229,3 +243,47 @@ def elevation_angle(h, lat_s, lon_s, lat_grid, lon_grid):
                                   2 * (RE / rs) * np.cos(gamma)))  # In radians
 
     return np.rad2deg(elevation)
+
+
+def plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
+                lon_min=None, lon_max=None, cbar_text='',
+                **kwargs):
+
+    import matplotlib.pyplot as plt
+
+    try:
+        from mpl_toolkits.basemap import Basemap
+    except:
+        raise RuntimeError('Basemap is not installed and therefore plot_in_map'
+                           ' cannot be used')
+
+    if all([el is None for el in [lat, lon, lat_min, lon_min, lat_max, lon_max]]):
+        raise ValueError('Either \{lat, lon\} or \{lat_min, lon_min, lat_max,'
+                         'lon_max\} need to be provided')
+
+    elif lat is not None and lon is not None:
+        assert(np.shape(lat) == np.shape(lon) and
+               np.shape(lat) == np.shape(data))
+        lat_max = np.max(lat)
+        lat_min = np.min(lat)
+        lon_max = np.max(lon)
+        lon_min = np.min(lon)
+
+    ax = plt.subplot(111)
+    m = Basemap(ax=ax, projection='cyl', llcrnrlat=lat_min,
+                urcrnrlat=lat_max, llcrnrlon=lon_min, urcrnrlon=lon_max,
+                resolution='l')
+
+    m.drawcoastlines(color='white', linewidth=0.5)
+    m.drawcountries(color='grey', linewidth=0.3)
+    parallels = np.arange(-80, 81, 20)
+    m.drawparallels(parallels, labels=[1, 0, 0, 1], dashes=[2, 1],
+                    linewidth=0.2, color='white')
+    meridians = np.arange(0., 360., 30.)
+    m.drawmeridians(meridians, labels=[1, 0, 0, 1], dashes=[2, 1],
+                    linewidth=0.2, color='white')
+
+    im = m.imshow(np.flipud(data), **kwargs)
+    cbar = m.colorbar(im, location='bottom', pad="8%")
+    cbar.set_label(cbar_text)
+    return m
