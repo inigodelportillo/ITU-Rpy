@@ -1,0 +1,21 @@
+
+Recommendation ITU-R P.840
+-----------------------------------
+
+Implementation of the methods in Recommendation ITU-R P.840 "Attenuation due to clouds and fog"
+This Recommendation provides methods to predict the attenuation due to clouds and fog on Earth-space paths.
+
+Available versions include:
+    * P.840-4 (10/09) (Superseded)
+    * P.840-5 (02/12) (Superseded)
+    * P.840-6 (09/13) (Current version)
+
+Non-available versions include:
+    * P.840-1 (08/94) (Superseded) - Looks similar to P.840-4
+    * P.840-2 (08/97) (Superseded) - Looks similar to P.840-4
+    * P.840-3 (10/99) (Superseded) - Looks similar to P.840-4
+	
+.. automodule:: itur.models.itu840
+    :members:
+    :undoc-members:
+    :show-inheritance:

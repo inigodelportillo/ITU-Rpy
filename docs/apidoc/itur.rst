@@ -1,25 +1,6 @@
 itur package
 ============
 
-Subpackages
------------
-
-.. toctree::
-
-    itur.models
-
-Submodules
-----------
-
-itur.utils module
------------------
-
-.. automodule:: itur.utils
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
 Module contents
 ---------------
 
@@ -27,3 +8,17 @@ Module contents
     :members:
     :undoc-members:
     :show-inheritance:
+
+
+Submodules
+----------
+
+Utils module (itur.utils)
+---------------------------
+
+.. automodule:: itur.utils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+

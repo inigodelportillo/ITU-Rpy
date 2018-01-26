@@ -1,6 +1,6 @@
 Contact
 =======
 
-ITU-Rpy is developed by `Inigo del Portillo <mailto:portillo@mit.edu/>`_.
+ITU-Rpy is developed by Inigo del Portillo (`portillo@mit.edu <mailto:portillo@mit.edu/>`_).
 
 If you found a bug, please report to https://github.com/iportillo/ITU-Rpy

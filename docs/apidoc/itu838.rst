@@ -1,0 +1,16 @@
+
+Recommendation ITU-R P.838
+-----------------------------------
+
+Implementation of the methods in Recommendation ITU-R P.838 "Specific attenuation model for rain for use in prediction methods"
+
+Available versions include:
+    * P.838-0 (03/92) (Superseded)
+    * P.838-1 (10/99) (Superseded)
+    * P.838-2 (04/03) (Superseded)
+    * P.838-3 (03/05) (Current version)
+	
+.. automodule:: itur.models.itu838
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -20,7 +20,9 @@ Module contents
     itu618
     itu676
     itu835
+	itu836
     itu837
+	itu838
     itu839
     itu1144
     itu1510
