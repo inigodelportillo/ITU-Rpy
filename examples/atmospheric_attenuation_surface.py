@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """ An example of how to use the itur module to compute the attenuation at a
 lat-lon surface."""
-import astropy.units as u
 import numpy as np
-import itur
 import matplotlib.pyplot as plt
+
+import itur
+import astropy.units as u
+
 from mpl_toolkits.basemap import Basemap
 
 from iturutils import regular_lat_lon_grid, elevation_angle
@@ -35,13 +37,8 @@ P = 1013 * u.hPa
 rho = itur.models.itu836.surface_water_vapour_density(lat, lon, p)
 
 # Compute each of the attenuation components
-Ar = itur.rain_attenuation(lat, lon, f, el, hs, p)
-Ag = itur.gaseous_attenuation_slant_path(f, el, rho, P, T, mode='approx')
-Ac = itur.cloud_attenuation(lat, lon, el, f, p)
-As = itur.scintillation_attenuation(lat, lon, f, el, p, D, eta, T=T, P=P)
-
-# Compute the total attenuation
-A = Ag + np.sqrt((Ar + Ac)**2 + As**2)
+Att = itur.total_atmospheric_attenuation_slant_path(lat, lon, el, f, p, D,
+																		  hs=hs, eta=eta)
 
 # Do some plotting
 fig = plt.figure(figsize=(17, 8))
@@ -50,10 +47,12 @@ m = Basemap(ax=ax1, projection='cyl',llcrnrlat=-50,urcrnrlat=50,\
             llcrnrlon=-30,urcrnrlon=90,resolution='l')
 m.drawcountries(linewidth=0.2,color='w')
 m.drawcoastlines(linewidth=0.2,color='w')
-#m.drawmapscale()
+
 m.drawmeridians([-20, 0, 20, 40, 60, 80], labels=[1,0,0,1], color='w', linewidth=0.1, fontdict={'size':11})
 m.drawparallels([-40, -20, 0, 20, 40], labels=[1,0,0,1], color='w', linewidth=0.1, fontdict={'size':11})
+
 nx = int((m.xmax-m.xmin)/0.025)+1; ny = int((m.ymax-m.ymin)/0.025)+1
+
 topodat = m.transform_scalar(np.flipud(A.value), np.arange(-30,90,0.1),
                              np.arange(-50, 50, 0.1), nx, ny)
 im = m.imshow(topodat, cmap='inferno')
@@ -61,21 +60,3 @@ cbar = m.colorbar(im, location='bottom', pad="8%")
 cbar.set_label('Atmospheric Attenuation [dB]')
 ax1.set_title('Attenuation for f={0} GHz, unavailability p={1} %'.format(f.value,
                                                                       p))
-
-ax2 = fig.add_subplot(122)
-m = Basemap(ax=ax2, projection='cyl',llcrnrlat=-50,urcrnrlat=50,\
-            llcrnrlon=-30,urcrnrlon=90,resolution='l')
-m.drawcountries(linewidth=0.4,color='w')
-m.drawcoastlines(linewidth=0.4,color='w')
-#m.drawmapscale()
-m.drawmeridians([-20, 0, 20, 40, 60, 80], labels=[1,0,0,1], color='w', linewidth=0.1, fontdict={'size':11})
-m.drawparallels([-40, -20, 0, 20, 40], labels=[1,0,0,1], color='w', linewidth=0.1, fontdict={'size':11})
-nx = int((m.xmax-m.xmin)/0.025)+1; ny = int((m.ymax-m.ymin)/0.025)+1
-topodat = m.transform_scalar(np.flipud(A.value), np.arange(-30,90,0.1),
-                             np.arange(-50, 50, 0.1), nx, ny)
-im = m.contourf(lon, lat, A.value, [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55], cmap='Vega20')
-cbar = m.colorbar(im, location='bottom', pad="8%")
-cbar.set_label('Atmospheric Attenuation [dB]')
-ax2.set_title('Regions attenuation for f={0} GHz, unavailability p={1} %'.format(f.value,
-
-plt.savefig('att_f_{0}_unav_{1}.png'.format(f.value, p))

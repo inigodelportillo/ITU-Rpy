@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-"""
-"""
-import astropy.units as u
 import numpy as np
 import matplotlib.pyplot as plt
+
+import astropy.units as u
 import itur
 
 # Ground station location
@@ -11,16 +10,13 @@ lat = 15
 lon = 25
 hs = itur.topographic_altitude(lat, lon)
 
-# Elevation angle and frequency of the link
-el = 35
-p = 1
+# Elevation angle and unavailability of the link
+el = 35   # Elevation angle = 35 deg
+p = 1      # Unavailability = 1 %
 
-# Antenna parameters
+# Antenna diameter and efficiency for scintillation computation
 D = 5 * u.m
-eta = 0.65
-
-rho = itur.models.itu836.surface_water_vapour_density(lat, lon, p, hs)
-T = itur.models.itu1510.surface_mean_temperature(lat, lon)
+eta = 0.65  
 
 # Unavailability probability
 fs = np.linspace(5, 200, 200)
@@ -34,10 +30,12 @@ A = np.zeros_like(fs)
 
 # Compute each of the attenuation components
 for i, f in enumerate(fs):
+
+	# Using return_contributions we can get the atmospheric 
+	# attenuation due to gases, clouds, rain, and scintillation
     a_g, a_c, a_r, a_s, a =\
         itur.total_atmospheric_attenuation_slant_path(lat, lon, el, f, p, D,
-                                                      hs=hs, eta=eta, rho=rho,
-                                                      T=T,
+                                                      hs=hs, eta=eta, 
                                                       return_contributions=True)
     Ar[i] = a_r.value
     Ag[i] = a_g.value

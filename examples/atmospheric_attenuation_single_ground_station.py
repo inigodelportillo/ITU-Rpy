@@ -41,11 +41,12 @@ As = itur.scintillation_attenuation(lat, lon, f, el, p, D, eta, T=T, P=P)
 A = Ag + np.sqrt((Ar + Ac)**2 + As**2)
 
 # Print the results
-print(('Attenuation for {0:0.2f} unavailability for a \n' +
-       'ground station in lat  {1:.2f} and lon {2:.2f} \n'
-       '==========================================\n' +
-       'Rain attenuation {3:0.2f} \n' +
-      'Gaseous attenuation {4:0.2f} \n' +
-      'Scintillation attenuation {5:0.2f} \n' +
-      'Clouds attenuation {6:0.2f} \n\n' +
-      'Total attenuation {7:0.2f}').format(p, lat, lon, Ar, Ag, As, Ac, A))
+print(
+("""Attenuation for {0:0.2f} unavailability for a
+   ground station in lat  {1:.2f} and lon {2:.2f}
+   ==========================================
+   Rain attenuation {3:0.2f}
+   Gaseous attenuation {4:0.2f}
+   Scintillation attenuation {5:0.2f}
+   Clouds attenuation {6:0.2f}
+   Total attenuation {7:0.2f}""").format(p, lat, lon, Ar, Ag, As, Ac, A))
