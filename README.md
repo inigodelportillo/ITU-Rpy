@@ -45,10 +45,10 @@ el = 60           # Elevation angle constant of 60 degrees
 p = 3             # Percentage of time that attenuation values are exceeded.
 	
 # Generate a regular grid latitude and longitude points with 0.1 degrees resolution	
-lat, lon = regular_lat_lon_grid() 
+lat, lon = itur.utils.regular_lat_lon_grid() 
 
 # Comute the atmospheric attenuation
-Att = itur.atmospheric_attenuation_slant_path(lat, lon, f, el, p, D) 
+Att = itur.atmospheric_attenuation_slant_path(lat, lon, el, f, p, D) 
 ```
 
 The individual models can be accessed in `itur.models`.
