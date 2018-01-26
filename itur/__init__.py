@@ -17,7 +17,7 @@ import numpy as np
 import warnings
 import astropy.units as u
 
-from smac.__version__ import __version__
+from itur.__version__ import __version__
 AUTHORS = "Inigo del Portillo"
 
 
