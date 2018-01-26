@@ -48,10 +48,13 @@ p = 3             # Percentage of time that attenuation values are exceeded.
 lat, lon = itur.utils.regular_lat_lon_grid() 
 
 # Comute the atmospheric attenuation
-Att = itur.atmospheric_attenuation_slant_path(lat, lon, el, f, p, D) 
+Att = itur.atmospheric_attenuation_slant_path(lat, lon, f, el, p, D) 
 itur.utils.plot_in_map(Att.value, lat, lon, 
-                       cbar_text='Atmospheric attenuation [dB]',
+                       cbar_text='Atmospheric attenuation [dB]')
 ```
+
+![alt text](https://raw.githubusercontent.com/iportillo/ITU-Rpy/master/docs/images/att_world.png)
+
 
 The individual models can be accessed in `itur.models`.
 Examples for other use cases can be found in the `examples` folder.
