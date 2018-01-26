@@ -9,7 +9,8 @@ from astropy import units as u
 from itur.models.itu453 import DN65
 from itur.models.itu837 import rainfall_rate
 from itur.models.itu1144 import bilinear_2D_interpolator
-from itur.models.itu838 import rain_specific_attenuation, rain_specific_attenuation_coefficients
+from itur.models.itu838 import rain_specific_attenuation,\
+    rain_specific_attenuation_coefficients
 from itur.utils import prepare_input_array, prepare_quantity, load_data,\
     dataset_dir, prepare_output_array
 
@@ -19,7 +20,7 @@ class __ITU530():
     terrestrial line-of-sight systems
 
     Available versions:
-    * P.530-16 (07/15) (Current version)
+       * P.530-16 (07/15) (Current version)
 
     Not available versions:
 
@@ -340,12 +341,13 @@ def change_version(new_version):
     """
     Change the version of the ITU-R P.530 recommendation currently being used.
 
+
     Parameters
     ----------
     new_version : int
         Number of the version to use.
         Valid values are:
-        * P.530-16 (07/15) (Current version)
+           * P.530-16 (07/15) (Current version)
     """
     global __model
     __model = __ITU530(new_version)
@@ -363,6 +365,7 @@ def fresnel_ellipse_radius(d1, d2, f):
     """
     Computes the radius of the first Fresnel ellipsoid.
 
+
     Parameters
     ----------
     d1 : number, sequence, or numpy.ndarray
@@ -372,13 +375,15 @@ def fresnel_ellipse_radius(d1, d2, f):
     f : number
         Frequency of the link [GHz]
 
+
     Returns
     -------
     F1: Quantity
        Radius of the first Fresnel ellipsoid [m]
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
@@ -395,7 +400,8 @@ def fresnel_ellipse_radius(d1, d2, f):
 def diffraction_loss(d1, d2, h, f):
     """
     Diffraction loss over average terrain. This value is valid for losses
-    greater than about 15 dB.
+    greater than 15 dB.
+
 
     Parameters
     ----------
@@ -410,13 +416,15 @@ def diffraction_loss(d1, d2, h, f):
     f : number
         Frequency of the link [GHz]
 
+
     Returns
     -------
     A_d: Quantity
         Diffraction loss over average terrain  [dB]
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
@@ -442,8 +450,9 @@ def multipath_loss_for_A(lat, lon, h_e, h_r, d, f, A):
 
     This method is only valid for small percentages of time.
 
-    Multipath fading and enhancement only need to be calculated for path lengths
-    longer than 5 km, and can be set to zero for shorter paths.
+    Multipath fading and enhancement only need to be calculated for path
+    lengths longer than 5 km, and can be set to zero for shorter paths.
+
 
     Parameters
     ----------
@@ -462,14 +471,16 @@ def multipath_loss_for_A(lat, lon, h_e, h_r, d, f, A):
     A : number
          Fade depth [dB]
 
+
     Returns
     -------
     p_w: Quantity
          percentage of time that fade depth A is exceeded in the average
          worst month  [%]
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
@@ -499,8 +510,9 @@ def multipath_loss(lat, lon, h_e, h_r, d, f, A):
     This method does not make use of the path profile and can be used for
     initial planning, licensing, or design purposes.
 
-    Multipath fading and enhancement only need to be calculated for path lengths
-    longer than 5 km, and can be set to zero for shorter paths.
+    Multipath fading and enhancement only need to be calculated for path
+    lengths longer than 5 km, and can be set to zero for shorter paths.
+
 
     Parameters
     ----------
@@ -519,14 +531,16 @@ def multipath_loss(lat, lon, h_e, h_r, d, f, A):
     A : number
          Fade depth [dB]
 
+
     Returns
     -------
     p_w: Quantity
          percentage of time that fade depth A is exceeded in the average
          worst month  [%]
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
@@ -553,6 +567,7 @@ def rain_attenuation(lat, lon, d, f, el, p, tau=45, R001=None):
     snow, hail and fog. Although rain attenuation can be ignored at frequencies
     below about 5 GHz, it must be included in design calculations at higher
     frequencies, where its importance increases rapidly.
+
 
     Parameters
     ----------
@@ -583,13 +598,15 @@ def rain_attenuation(lat, lon, d, f, el, p, tau=45, R001=None):
         Polarization tilt angle relative to the horizontal (degrees)
         (tau = 45 deg for circular polarization). Default value is 45
 
+
     Returns
     -------
     A_r: Quantity
          Attenuation exceeded during p percent of the time  [dB]
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
@@ -610,6 +627,7 @@ def rain_attenuation(lat, lon, d, f, el, p, tau=45, R001=None):
 def inverse_rain_attenuation(lat, lon, d, f, el, Ap, tau=45, R001=None):
     """ Estimate the percentage of time a given attenuation is exceeded due to
     rain events.
+
 
     Parameters
     ----------
@@ -640,13 +658,15 @@ def inverse_rain_attenuation(lat, lon, d, f, el, Ap, tau=45, R001=None):
         Polarization tilt angle relative to the horizontal (degrees)
         (tau = 45 deg for circular polarization). Default value is 45
 
+
     Returns
     -------
     p: Quantity
         Percentage of time that the attenuation A is exceeded.
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
@@ -668,6 +688,7 @@ def inverse_rain_attenuation(lat, lon, d, f, el, Ap, tau=45, R001=None):
 def rain_event_count(lat, lon, d, f, el, A, tau=45, R001=None):
     """ Estimate the number of fade events exceeding attenuation 'A'
     for 10 seconds or longer.
+
 
     Parameters
     ----------
@@ -698,13 +719,15 @@ def rain_event_count(lat, lon, d, f, el, A, tau=45, R001=None):
         Polarization tilt angle relative to the horizontal (degrees)
         (tau = 45 deg for circular polarization). Default value is 45
 
+
     Returns
     -------
     p: Quantity
         Percentage of time that the attenuation A is exceeded.
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
@@ -727,6 +750,7 @@ def XPD_outage_clear_air(lat, lon, h_e, h_r, d, f, XPD_g, C0_I, XPIF=0):
     """ Estimate the probability of outage due to cross-polar discrimnation
     reduction due to clear-air effects, assuming that a targe C0_I is
     required.
+
 
     Parameters
     ----------
@@ -755,13 +779,15 @@ def XPD_outage_clear_air(lat, lon, h_e, h_r, d, f, XPD_g, C0_I, XPIF=0):
         A typical value of XPIF is about 20 dB. Default value 0 dB (no XPIC)
         [dB]
 
+
     Returns
     -------
     p_XP: Quantity
         Probability of outage due to clear-air cross-polarization
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
@@ -792,6 +818,7 @@ def XPD_outage_precipitation(lat, lon, d, f, el, C0_I, tau=45,
     reduction due to clear-air effects, assuming that a targe C0_I is
     required.
 
+
     Parameters
     ----------
     lat : number, sequence, or numpy.ndarray
@@ -820,13 +847,15 @@ def XPD_outage_precipitation(lat, lon, d, f, el, C0_I, tau=45,
         A typical value of XPIF is about 20 dB. Default value 0 dB (no XPIC)
         [dB]
 
+
     Returns
     -------
     p_XP: Quantity
         Probability of outage due to clear-air cross-polarization
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """

@@ -7,17 +7,18 @@ import numpy as np
 import scipy.stats as stats
 import scipy.special
 import scipy.integrate
-import warnings
 from astropy import units as u
 
-from itur.models.itu453 import water_vapour_pressure, wet_term_radio_refractivity,\
-    map_wet_term_radio_refractivity
+from itur.models.itu453 import water_vapour_pressure,\
+    wet_term_radio_refractivity, map_wet_term_radio_refractivity
 from itur.models.itu837 import rainfall_rate, rain_percentage_probability
 from itur.models.itu838 import rain_specific_attenuation
 from itur.models.itu839 import rain_height
 from itur.models.itu1511 import topographic_altitude
 from itur.utils import prepare_input_array, prepare_output_array,\
     prepare_quantity, compute_distance_earth_to_earth
+
+import warnings
 
 
 class _ITU618():
@@ -26,20 +27,20 @@ class _ITU618():
     Earth-space telecommunication systems.
 
     Available versions include:
-    * P.618-12 (07/15) (Current version)
+       * P.618-12 (07/15) (Current version)
 
     Versions that need to be implemented
-    * P.618-11
-    * P.618-10
-    * P.618-09
-    * P.618-08
-    * P.618-07
-    * P.618-06
-    * P.618-05
-    * P.618-04
-    * P.618-03
-    * P.618-02
-    * P.618-01
+       * P.618-11
+       * P.618-10
+       * P.618-09
+       * P.618-08
+       * P.618-07
+       * P.618-06
+       * P.618-05
+       * P.618-04
+       * P.618-03
+       * P.618-02
+       * P.618-01
 
     Recommendation ITU-R P.618 provides methods to estimate the propagation
     loss on an Earth-space path, relative to the free-space loss. This value
@@ -184,8 +185,8 @@ class _ITU618_12():
         # year
         A001 = gammar * Le   # (dB)
 
-        # Step 10: The estimated attenuation to be exceeded for other percentages
-        # of an average year
+        # Step 10: The estimated attenuation to be exceeded for other
+        # percentages of an average year
         if p >= 1:
             beta = np.zeros_like(A001)
         else:
@@ -238,10 +239,10 @@ class _ITU618_12():
         hr = rain_height(lat, lon).value
 
         if Ls is None:
-            Ls = np.where(el >= 5,
-                          (hr - hs) / (np.sin(np.deg2rad(el))),  # Eq. 1
-                          2 * (hr - hs) / (((np.sin(np.deg2rad(el)))**2 +
-                                            2 * (hr - hs) / Re)**0.5 + (np.sin(np.deg2rad(el)))))  # Eq. 2
+            Ls = np.where(
+                el >= 5, (hr - hs) / (np.sin(np.deg2rad(el))),    # Eq. 1
+                2 * (hr - hs) / (((np.sin(np.deg2rad(el)))**2 +
+                2 * (hr - hs) / Re)**0.5 + (np.sin(np.deg2rad(el)))))  # Eq. 2
 
         d = Ls * np.cos(np.deg2rad(el))
         rho = 0.59 * np.exp(-abs(d) / 31) + 0.41 * np.exp(-abs(d) / 800)
@@ -283,10 +284,10 @@ class _ITU618_12():
                                                lon2, a2, f, el1, el2, hs1=None,
                                                hs2=None):
         # The diversity prediction method assumes a log-normal distribution of
-        # rain intensity and rain attenuation. This method predicts Pr (A1 > a1,
-        # A2 > a2), the joint probability (%) that the attenuation on the path to
-        # the first site is greater than a1 and the attenuation on the path to
-        # the second site is greater than a2.
+        # rain intensity and rain attenuation. This method predicts
+        # Pr(A1 > a1, A2 > a2), the joint probability (%) that the attenuation
+        # on the path to the first site is greater than a1 and the attenuation
+        # on the path to the second site is greater than a2.
         d = compute_distance_earth_to_earth(lat1, lon1, lat2, lon2)
         rho_r = 0.7 * np.exp(-d / 60) + 0.3 * np.exp(-(d / 700)**2)
 
@@ -445,7 +446,7 @@ class _ITU618_12():
         sigma = sigma_ref * f**(7. / 12) * g / np.sin(np.deg2rad(el))**1.2
 
         # Step 8: Calculate the time percentage factor, a(p), for the time
-        # percentage, p, in the range between 0.01% < p  50%:
+        # percentage, p, in the range between 0.01% < p < 50%:
         a = -0.061 * np.log10(p)**3 + 0.072 * \
             np.log10(p)**2 - 1.71 * np.log10(p) + 3
 
@@ -475,6 +476,7 @@ def rain_attenuation(lat, lon, f, el, hs=None, p=0.01, R001=None,
     The following procedure provides estimates of the long-term statistics of
     the slant-path rain attenuation at a given location for frequencies up
     to 55 GHz.
+
 
     Parameters
     ----------
@@ -512,21 +514,24 @@ def rain_attenuation(lat, lon, f, el, hs=None, p=0.01, R001=None,
         rain height and the elevation angle. The ITU model does not require this
         parameter as an input.
 
+
     Returns
     -------
     attenuation: Quantity
         Attenuation due to rain (dB)
 
     References
-    ----------
+    --------
     [1] Propagation data and prediction methods required for the design of
     Earth-space telecommunication systems:
     https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
     """
     global __model
     type_output = type(lat)
+
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
+
     lon = np.mod(lon, 360)
     f = prepare_quantity(f, u.GHz, 'Frequency')
     el = prepare_quantity(prepare_input_array(el), u.deg, 'Elevation angle')
@@ -543,12 +548,9 @@ def rain_attenuation(lat, lon, f, el, hs=None, p=0.01, R001=None,
 
 def rain_attenuation_probability(lat, lon, el, hs=None, Ls=None, P0=None):
     """
-    Calculation of monthly and long-term statistics of amplitude scintillations
-    at elevation angles greater than 5°.
+    The following procedure computes the probability of non-zero rain
+    attenuation on a given slant path Pr(Ar > 0).
 
-    The following procedure provides estimates of the long-term statistics of
-    the slant-path rain attenuation at a given location for frequencies up
-    to 20 GHz.
 
     Parameters
     ----------
@@ -571,21 +573,25 @@ def rain_attenuation_probability(lat, lon, el, hs=None, Ls=None, P0=None):
         Probability of rain at the earth station, (0 ≤ P0 ≤ 1)
 
 
+
     Returns
     -------
     p: Quantity
          Probability of rain attenuation on the slant path (%)
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Propagation data and prediction methods required for the design of
     Earth-space telecommunication systems:
     https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
     """
     global __model
     type_output = type(lat)
+
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
+
     lon = np.mod(lon, 360)
     el = prepare_quantity(prepare_input_array(el), u.deg, 'Elevation angle')
     Ls = prepare_quantity(
@@ -603,12 +609,13 @@ def site_diversity_rain_outage_probability(self, lat1, lon1, a1, el1, lat2,
     """
     Calculate the link outage probability in a diversity based scenario (two
     ground stations) due to rain attenuation. This method is valid for
-    frequencies below 20 GHz, as at higher frequencies other imapirments might
+    frequencies below 20 GHz, as at higher frequencies other impairments might
     affect affect site diversity performance.
 
-    This method predicts Pr (A1 > a1, A2 > a2), the joint probability (%) that
+    This method predicts Pr(A1 > a1, A2 > a2), the joint probability (%) that
     the attenuation on the path to the first site is greater than a1 and the
     attenuation on the path to the second site is greater than a2.
+
 
     Parameters
     ----------
@@ -639,6 +646,7 @@ def site_diversity_rain_outage_probability(self, lat1, lon1, a1, el1, lat2,
         provided, uses Recommendation ITU-R P.1511 to compute the toporgraphic
         altitude
 
+
     Returns
     -------
     probability: Quantity
@@ -646,8 +654,9 @@ def site_diversity_rain_outage_probability(self, lat1, lon1, a1, el1, lat2,
         site is greater than a1 and the attenuation on the path to the second
         site is greater than a2
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Propagation data and prediction methods required for the design of
     Earth-space telecommunication systems:
     https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
@@ -655,20 +664,22 @@ def site_diversity_rain_outage_probability(self, lat1, lon1, a1, el1, lat2,
     global __model
     type_output = type(lat1)
     lon1 = np.mod(lon1)
-    lat1 = prepare_quantity(lat1, u.deg, 'Latgitude in ground station 1')
+    lat1 = prepare_quantity(lat1, u.deg, 'Latitude in ground station 1')
     lon1 = prepare_quantity(lon1, u.deg, 'Longitude in ground station 1')
     a1 = prepare_quantity(a1, u.dB, 'Attenuation margin in ground station 1')
-    lon1 = np.mod(lon1)
-    lat2 = prepare_quantity(lat2, u.deg, 'Latgitude in ground station 2')
+
+    lon2 = np.mod(lon2)
+    lat2 = prepare_quantity(lat2, u.deg, 'Latitude in ground station 2')
     lon2 = prepare_quantity(lon2, u.deg, 'Longitude in ground station 2')
     a2 = prepare_quantity(a2, u.dB, 'Attenuation margin in ground station 2')
+
     f = prepare_quantity(f, u.GHz, 'Frequency')
     el1 = prepare_quantity(el1, u.deg, 'Elevation angle in ground station 1')
-    el2 = prepare_quantity(el1, u.deg, 'Elevation angle in ground station 2')
+    el2 = prepare_quantity(el2, u.deg, 'Elevation angle in ground station 2')
     hs1 = prepare_quantity(
         hs1, u.deg, 'Altitude over the sea level for ground station 1')
     hs2 = prepare_quantity(
-        hs1, u.deg, 'Altitude over the sea level for ground station 2')
+        hs2, u.deg, 'Altitude over the sea level for ground station 2')
 
     val = __model.site_diversity_rain_outage_probability(
         lat1, lon1, a1, lat2, lon2, a2, f, el1, el2, hs1=hs1, hs2=hs2)
@@ -680,11 +691,8 @@ def scintillation_attenuation(lat, lon, f, el, p, D, eta=0.5, T=None,
                               H=None, P=None, hL=1000):
     """
     Calculation of monthly and long-term statistics of amplitude scintillations
-    at elevation angles greater than 5°.
+    at elevation angles greater than 5° and frequencies up to 20 GHz.
 
-    The following procedure provides estimates of the long-term statistics of
-    the slant-path rain attenuation at a given location for frequencies up
-    to 20 GHz.
 
     Parameters
     ----------
@@ -714,21 +722,25 @@ def scintillation_attenuation(lat, lon, f, el, p, D, eta=0.5, T=None,
     hL : number, optional
         Height of the turbulent layer (m). Default value 1000 m
 
+
     Returns
     -------
     attenuation: Quantity
-        Attenuation due to rain (dB)
+        Attenuation due to scintillation (dB)
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Propagation data and prediction methods required for the design of
     Earth-space telecommunication systems:
     https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
     """
     global __model
     type_output = type(lat)
+
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
+
     lon = np.mod(lon, 360)
     f = prepare_quantity(f, u.GHz, 'Frequency')
     el = prepare_quantity(prepare_input_array(el), u.deg, 'Elevation angle')
@@ -747,11 +759,12 @@ def scintillation_attenuation(lat, lon, f, el, p, D, eta=0.5, T=None,
 
 def rain_cross_polarization_discrimination(Ap, f, el, p, tau=45):
     """
-    Calculation of the cross-polarization discrimination (XPD) statistics from rain
-    attenuation statistics. The following procedure provides estimates of the
-    long-term statistics of the cross-polarization discrimination (XPD)
+    Calculation of the cross-polarization discrimination (XPD) statistics from
+    rain attenuation statistics. The following procedure provides estimates of
+    the long-term statistics of the cross-polarization discrimination (XPD)
     statistics for frequencies up to 55 GHz and elevation angles lower than 60
     deg.
+
 
     Parameters
     ----------
@@ -768,13 +781,15 @@ def rain_cross_polarization_discrimination(Ap, f, el, p, tau=45):
         Polarization tilt angle relative to the horizontal (degrees)
         (tau = 45 deg for circular polarization). Default value is 45
 
+
     Returns
     -------
     attenuation: Quantity
         Cross-polarization discrimination (dB)
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Propagation data and prediction methods required for the design of
     Earth-space telecommunication systems:
     https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
@@ -791,6 +806,10 @@ def rain_cross_polarization_discrimination(Ap, f, el, p, tau=45):
 
 def fit_rain_attenuation_to_lognormal(lat, lon, f, el, hs, P_k):
     """
+    Compute the log-normal fit of rain attenuation vs. probability of
+    occurrence.
+
+
     Parameters
     ----------
     lat : number, sequence, or numpy.ndarray
@@ -809,14 +828,16 @@ def fit_rain_attenuation_to_lognormal(lat, lon, f, el, hs, P_k):
     P_k : number
         Rain probability
 
+
     Returns
     -------
     sigma_lna:
         Standar deviation of the lognormal distribution
     m_lna:
         Mean of the lognormal distribution
-    References:
-    -----------
+
+    References
+    ----------
     [1] Propagation data and prediction methods required for the design of
     Earth-space telecommunication systems:
     https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf

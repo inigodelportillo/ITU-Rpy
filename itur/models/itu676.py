@@ -18,17 +18,17 @@ class __ITU676():
     """Attenuation by atmospheric gases.
 
     Available versions include:
-    * P.676-1 (03/92) (Superseded)
-    * P.676-2 (10/95) (Superseded)
-    * P.676-3 (08/97) (Superseded)
-    * P.676-4 (10/99) (Superseded)
-    * P.676-5 (02/01) (Superseded)
-    * P.676-6 (03/05) (Superseded)
-    * P.676-7 (02/07) (Superseded)
-    * P.676-8 (10/09) (Superseded)
-    * P.676-9 (02/12) (Superseded)
-    * P.676-10 (09/13) (Superseded)
-    * P.676-11 (09/16) (Current version)
+       * P.676-1 (03/92) (Superseded)
+       * P.676-2 (10/95) (Superseded)
+       * P.676-3 (08/97) (Superseded)
+       * P.676-4 (10/99) (Superseded)
+       * P.676-5 (02/01) (Superseded)
+       * P.676-6 (03/05) (Superseded)
+       * P.676-7 (02/07) (Superseded)
+       * P.676-8 (10/09) (Superseded)
+       * P.676-9 (02/12) (Superseded)
+       * P.676-10 (09/13) (Superseded)
+       * P.676-11 (09/16) (Current version)
     """
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.676 recommendation.
@@ -521,17 +521,18 @@ def change_version(new_version):
     """
     Change the version of the ITU-R P.676 recommendation currently being used.
 
+
     Parameters
     ----------
     new_version : int
         Number of the version to use.
         Valid values are:
-        * P.676-1 (08/94) (Superseded)
-        * P.676-2 (10/99) (Superseded)
-        * P.676-3 (02/01) (Superseded)
-        * P.676-4 (04/03) (Superseded)
-        * P.676-5 (08/07) (Superseded)
-        * P.676-6 (02/12) (Current version)
+           * P.676-1 (08/94) (Superseded)
+           * P.676-2 (10/99) (Superseded)
+           * P.676-3 (02/01) (Superseded)
+           * P.676-4 (04/03) (Superseded)
+           * P.676-5 (08/07) (Superseded)
+           * P.676-6 (02/12) (Current version)
     """
     global __model
     __model = __ITU676(new_version)
@@ -556,6 +557,7 @@ def gaseous_attenuation_terrestrial_path(r, f, el, rho, P, T, mode):
     individual absorption lines that is valid for the frequency
     range 1-1,000 GHz
 
+
     Parameters
     ----------
     r : number or Quantity
@@ -575,13 +577,14 @@ def gaseous_attenuation_terrestrial_path(r, f, el, rho, P, T, mode):
         'approx' Uses the method in Annex 2 of the recommendation (if any),
         else uses the method described in Section 1. Default, 'approx'
 
+
     Returns
     -------
     attenuation: Quantity
         Terrestrial path attenuation (dB)
 
     References
-    ----------
+    --------
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
@@ -607,6 +610,7 @@ def gaseous_attenuation_slant_path(f, el, rho, P, T, mode='approx'):
     individual absorption lines that is valid for the frequency
     range 1-1,000 GHz
 
+
     Parameters
     ----------
     f : number or Quantity
@@ -624,13 +628,14 @@ def gaseous_attenuation_slant_path(f, el, rho, P, T, mode='approx'):
         'approx' Uses the method in Annex 2 of the recommendation (if any),
         else uses the method described in Section 1. Default, 'approx'
 
+
     Returns
     -------
     attenuation: Quantity
         Slant path attenuation (dB)
 
     References
-    ----------
+    --------
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
@@ -647,14 +652,15 @@ def gaseous_attenuation_slant_path(f, el, rho, P, T, mode='approx'):
 def gaseous_attenuation_inclined_path(f, el, rho, P, T, h1, h2, mode='approx'):
     """
     Estimate the attenuation of atmospheric gases on inclined paths between two
-    ground stations at heights h1 and h2. This function
-    operates in two modes, 'approx', and 'exact':
+    ground stations at heights h1 and h2. This function operates in two modes,
+    'approx', and 'exact':
 
     * 'approx': a simplified approximate method to estimate gaseous attenuation
     that is applicable in the frequency range 1-350 GHz.
     * 'exact': an estimate of gaseous attenuation computed by summation of
     individual absorption lines that is valid for the frequency
     range 1-1,000 GHz
+
 
     Parameters
     ----------
@@ -677,13 +683,14 @@ def gaseous_attenuation_inclined_path(f, el, rho, P, T, h1, h2, mode='approx'):
         'approx' Uses the method in Annex 2 of the recommendation (if any),
         else uses the method described in Section 1. Default, 'approx'
 
+
     Returns
     -------
     attenuation: Quantity
         Inclined path attenuation (dB)
 
     References
-    ----------
+    --------
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
@@ -703,9 +710,10 @@ def gaseous_attenuation_inclined_path(f, el, rho, P, T, h1, h2, mode='approx'):
 @memory.cache
 def zenit_water_vapour_attenuation(lat, lon, p, f, V_t=None, alt=None):
     """
-    An alternative method may be used to compute the slant path
-    attenuation by water vapour, in cases where the integrated water vapour
-    content along the path, V_t, is known.
+    An alternative method may be used to compute the slant path attenuation by
+    water vapour, in cases where the integrated water vapour content along the
+    path, ``V_t``, is known.
+
 
     Parameters
     ----------
@@ -727,13 +735,14 @@ def zenit_water_vapour_attenuation(lat, lon, p, f, V_t=None, alt=None):
         Altitude of the receivers. If None, use the topographical altitude as
         described in recommendation ITU-R P.1511
 
+
     Returns
     -------
     A_w : Quantity
         Water vapour attenuation along the slant path (dB)
 
     References
-    ----------
+    --------
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
@@ -755,6 +764,7 @@ def gammaw_approx(f, P, rho, T):
     """
     Method to estimate the specific attenuation due to water vapour.
 
+
     Parameters
     ----------
     f : number or Quantity
@@ -766,13 +776,14 @@ def gammaw_approx(f, P, rho, T):
     T : number or Quantity
         Absolute temperature (K)
 
+
     Returns
     -------
     gamma_w : Quantity
         Water vapour specific attenuation (dB/km)
 
     References
-    ----------
+    --------
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
@@ -790,6 +801,7 @@ def gamma0_approx(f, P, T):
     """
     Method to estimate the specific attenuation due to dry atmosphere.
 
+
     Parameters
     ----------
     f : number or Quantity
@@ -799,13 +811,14 @@ def gamma0_approx(f, P, T):
     T : number or Quantity
         Absolute temperature (K)
 
+
     Returns
     -------
     gamma_w : Quantity
         Dry atmosphere specific attenuation (dB/km)
 
     References
-    ----------
+    --------
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """

@@ -161,17 +161,18 @@ def change_version(new_version):
     """
     Change the version of the ITU-R P.837 recommendation currently being used.
 
+
     Parameters
     ----------
     new_version : int
         Number of the version to use.
         Valid values are:
-        * P.837-1 (08/94) (Superseded)
-        * P.837-2 (10/99) (Superseded)
-        * P.837-3 (02/01) (Superseded)
-        * P.837-4 (04/03) (Superseded)
-        * P.837-5 (08/07) (Superseded)
-        * P.837-6 (02/12) (Current version)
+           * P.837-1 (08/94) (Superseded)
+           * P.837-2 (10/99) (Superseded)
+           * P.837-3 (02/01) (Superseded)
+           * P.837-4 (04/03) (Superseded)
+           * P.837-5 (08/07) (Superseded)
+           * P.837-6 (02/12) (Current version)
     """
     global __model
     __model = __ITU837(new_version)
@@ -188,7 +189,9 @@ def get_version():
 @memory.cache
 def rain_percentage_probability(lat, lon):
     """
-    A method to compute the percentage probability of rain in an average year, P0
+    A method to compute the percentage probability of rain in an average
+    year, P0
+
 
     Parameters
     ----------
@@ -197,13 +200,15 @@ def rain_percentage_probability(lat, lon):
     lon : number, sequence, or numpy.ndarray
         Longitudes of the receiver points
 
+
     Returns
     -------
     P0: numpy.ndarray
         Percentage probability of rain in an average year
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Characteristics of precipitation for propagation modelling
     https://www.itu.int/rec/R-REC-P.837/en
     """
@@ -221,6 +226,7 @@ def rainfall_rate(lat, lon, p):
     """
     A method to compute the rainfall rate exceeded for p% of the average year
 
+
     Parameters
     ----------
     lat : number, sequence, or numpy.ndarray
@@ -230,13 +236,15 @@ def rainfall_rate(lat, lon, p):
     p : number
         Percentage of time exceeded for p% of the average year
 
+
     Returns
     -------
     R001: numpy.ndarray
         Rainfall rate exceeded for p% of the average year
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Characteristics of precipitation for propagation modelling
     https://www.itu.int/rec/R-REC-P.837/en
     """
@@ -251,9 +259,10 @@ def rainfall_rate(lat, lon, p):
 
 def unavailability_from_rainfall_rate(lat, lon, R):
     """
-    A method to estimate the percentage of time of the average year that a given
-    rainfall rate (R) is exceeded. This method calls successively to the
+    A method to estimate the percentage of time of the average year that a
+    given rainfall rate (R) is exceeded. This method calls successively to the
     `rainfall_rate` method and interpolates its value.
+
 
     Parameters
     ----------
@@ -264,13 +273,15 @@ def unavailability_from_rainfall_rate(lat, lon, R):
     R : number, sequence, or numpy.ndarray
         Rainfall rate (mm/h)
 
+
     Returns
     -------
     p: numpy.ndarray
         Rainfall rate exceeded for p% of the average year
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Characteristics of precipitation for propagation modelling
     https://www.itu.int/rec/R-REC-P.837/en
     """

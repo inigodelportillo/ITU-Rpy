@@ -448,6 +448,7 @@ def change_version(new_version):
     """
     Change the version of the ITU-R P.840 recommendation currently being used.
 
+
     Parameters
     ----------
     new_version : int
@@ -478,6 +479,7 @@ def specific_attenuation_coefficients(f, T):
     This model can be used to calculate the value of the specific attenuation
     coefficient for frequencies up to 1000 GHz:
 
+
     Parameters
     ----------
     f : number
@@ -485,13 +487,15 @@ def specific_attenuation_coefficients(f, T):
     T : number
         Temperature (degrees C)
 
+
     Returns
     -------
     Kl: numpy.ndarray
         Specific attenuation coefficient (dB/km)
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Attenuation due to clouds and fog:
     https://www.itu.int/rec/R-REC-P.840/en
     """
@@ -507,6 +511,7 @@ def columnar_content_reduced_liquid(lat, lon, p):
     A method to compute the total columnar content of reduced cloud liquid
     water, Lred (kg/m2), exceeded for p% of the average year
 
+
     Parameters
     ----------
     lat : number, sequence, or numpy.ndarray
@@ -516,6 +521,7 @@ def columnar_content_reduced_liquid(lat, lon, p):
     p : number
         Percentage of time exceeded for p% of the average year
 
+
     Returns
     -------
     Lred: numpy.ndarray
@@ -523,8 +529,9 @@ def columnar_content_reduced_liquid(lat, lon, p):
         exceeded for p% of the average year
 
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Attenuation due to clouds and fog:
     https://www.itu.int/rec/R-REC-P.840/en
     """
@@ -542,6 +549,7 @@ def cloud_attenuation(lat, lon, el, f, p):
     A method to estimate the attenuation due to clouds along slant paths for
     a given probability.
 
+
     Parameters
     ----------
     lat : number, sequence, or numpy.ndarray
@@ -555,14 +563,16 @@ def cloud_attenuation(lat, lon, el, f, p):
     p : number
          Percentage of time exceeded for p% of the average year
 
+
     Returns
     -------
     p: numpy.ndarray
         Rainfall rate exceeded for p% of the average year
 
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Attenuation due to clouds and fog:
     https://www.itu.int/rec/R-REC-P.840/en
     """
@@ -583,12 +593,14 @@ def lognormal_approximation_coefficient(lat, lon):
     A method to estimate the paramerts of the lognormla distribution used to
     approximate the total columnar content of cloud liquid water
 
+
     Parameters
     ----------
     lat : number, sequence, or numpy.ndarray
         Latitudes of the receiver points
     lon : number, sequence, or numpy.ndarray
         Longitudes of the receiver points
+
 
     Returns
     -------
@@ -600,8 +612,9 @@ def lognormal_approximation_coefficient(lat, lon):
         Probability of liquid water of the lognormal distribution
 
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Attenuation due to clouds and fog:
     https://www.itu.int/rec/R-REC-P.840/en
     """

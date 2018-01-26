@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import os
 import numpy as np
 from astropy import units as u
 
@@ -16,14 +17,14 @@ class __ITU836():
     """Water vapour: surface density and total columnar content
 
     Available versions:
-    * P.836-5 (09/13) (Current version)
-    * P.836-4 (10/09) (Superseded)
+       * P.836-5 (09/13) (Current version)
+       * P.836-4 (10/09) (Superseded)
 
     Not available versions:
-    * P.836-0 (03/92) (Superseded)
-    * P.836-1 (08/97) (Superseded)
-    * P.836-2 (02/01) (Superseded)
-    * P.836-3 (11/01) (Superseded)
+       * P.836-0 (03/92) (Superseded)
+       * P.836-1 (08/97) (Superseded)
+       * P.836-2 (02/01) (Superseded)
+       * P.836-3 (11/01) (Superseded)
     """
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.836 recommendation.
@@ -67,9 +68,9 @@ class _ITU836_5():
         if not self._V:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
-            d_dir = dataset_dir + '836/v5_V_%s.txt'
-            lats = load_data(dataset_dir + '836/v5_Lat.txt')
-            lons = load_data(dataset_dir + '836/v5_Lon.txt')
+            d_dir = os.path.join(dataset_dir, '836/v5_V_%s.txt')
+            lats = load_data(os.path.join(dataset_dir, '836/v5_Lat.txt'))
+            lons = load_data(os.path.join(dataset_dir, '836/v5_Lon.txt'))
             for p_loads in ps:
                 vals = load_data(d_dir % (str(p_loads).replace('.', '')))
                 self._V[float(p_loads)] = bilinear_2D_interpolator(
@@ -82,9 +83,9 @@ class _ITU836_5():
         if not self._VSCH:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
-            d_dir = dataset_dir + '836/v5_VSCH_%s.txt'
-            lats = load_data(dataset_dir + '836/v5_Lat.txt')
-            lons = load_data(dataset_dir + '836/v5_Lon.txt')
+            d_dir = os.path.join(dataset_dir, '836/v5_VSCH_%s.txt')
+            lats = load_data(os.path.join(dataset_dir, '836/v5_Lat.txt'))
+            lons = load_data(os.path.join(dataset_dir, '836/v5_Lon.txt'))
             for p_loads in ps:
                 vals = load_data(d_dir % (str(p_loads).replace('.', '')))
                 self._VSCH[float(p_loads)] = bilinear_2D_interpolator(
@@ -97,9 +98,9 @@ class _ITU836_5():
         if not self._rho:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
-            d_dir = dataset_dir + '836/v5_RHO_%s.txt'
-            lats = load_data(dataset_dir + '836/v5_Lat.txt')
-            lons = load_data(dataset_dir + '836/v5_Lon.txt')
+            d_dir = os.path.join(dataset_dir, '836/v5_RHO_%s.txt')
+            lats = load_data(os.path.join(dataset_dir, '836/v5_Lat.txt'))
+            lons = load_data(os.path.join(dataset_dir, '836/v5_Lon.txt'))
             for p_loads in ps:
                 vals = load_data(d_dir % (str(p_loads).replace('.', '')))
                 self._rho[float(p_loads)] = bilinear_2D_interpolator(
@@ -202,9 +203,9 @@ class _ITU836_4():
         if not self._V:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
-            d_dir = dataset_dir + '836/v4_V_%s.txt'
-            lats = load_data(dataset_dir + '836/v4_Lat.txt')
-            lons = load_data(dataset_dir + '836/v4_Lon.txt')
+            d_dir = os.path.join(dataset_dir, '836/v4_V_%s.txt')
+            lats = load_data(os.path.join(dataset_dir, '836/v4_Lat.txt'))
+            lons = load_data(os.path.join(dataset_dir, '836/v4_Lon.txt'))
             for p_loads in ps:
                 vals = load_data(d_dir % (str(p_loads).replace('.', '')))
                 self._V[float(p_loads)] =\
@@ -217,9 +218,9 @@ class _ITU836_4():
         if not self._VSCH:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
-            d_dir = dataset_dir + '836/v4_VSCH_%s.txt'
-            lats = load_data(dataset_dir + '836/v4_Lat.txt')
-            lons = load_data(dataset_dir + '836/v4_Lon.txt')
+            d_dir = os.path.join(dataset_dir, '836/v4_VSCH_%s.txt')
+            lats = load_data(os.path.join(dataset_dir, '836/v4_Lat.txt'))
+            lons = load_data(os.path.join(dataset_dir, '836/v4_Lon.txt'))
             for p_loads in ps:
                 vals = load_data(d_dir % (str(p_loads).replace('.', '')))
                 self._VSCH[float(p_loads)] =\
@@ -232,9 +233,9 @@ class _ITU836_4():
         if not self._rho:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
-            d_dir = dataset_dir + '836/v4_RHO_%s.txt'
-            lats = load_data(dataset_dir + '836/v4_Lat.txt')
-            lons = load_data(dataset_dir + '836/v4_Lon.txt')
+            d_dir = os.path.join(dataset_dir, '836/v4_RHO_%s.txt')
+            lats = load_data(os.path.join(dataset_dir, '836/v4_Lat.txt'))
+            lons = load_data(os.path.join(dataset_dir, '836/v4_Lon.txt'))
             for p_loads in ps:
                 vals = load_data(d_dir % (str(p_loads).replace('.', '')))
                 self._rho[float(p_loads)] =\
@@ -331,17 +332,20 @@ def change_version(new_version):
     """
     Change the version of the ITU-R P.836 recommendation currently being used.
 
+
     Parameters
     ----------
     new_version : int
         Number of the version to use.
-        Valid values are:
-        * P.836-1 (08/94) (Superseded)
-        * P.836-2 (10/99) (Superseded)
-        * P.836-3 (02/01) (Superseded)
-        * P.836-4 (04/03) (Superseded)
-        * P.836-5 (08/07) (Superseded)
-        * P.836-6 (02/12) (Current version)
+        Available versions:
+           * P.836-5 (09/13) (Current version)
+           * P.836-4 (10/09) (Superseded)
+
+        Not available versions:
+           * P.836-0 (03/92) (Superseded)
+           * P.836-1 (08/97) (Superseded)
+           * P.836-2 (02/01) (Superseded)
+           * P.836-3 (11/01) (Superseded)
     """
     global __model
     __model = __ITU836(new_version)
@@ -361,6 +365,7 @@ def surface_water_vapour_density(lat, lon, p, alt=None):
     Method to compute the surface water vapour density along a path  at any
     desired location on the surface of the Earth.
 
+
     Parameters
     ----------
     lat : number, sequence, or numpy.ndarray
@@ -373,13 +378,15 @@ def surface_water_vapour_density(lat, lon, p, alt=None):
         Altitude of the receivers. If None, use the topographical altitude as
         described in recommendation ITU-R P.1511
 
+
     Returns
     -------
     rho: Quantity
        Surface water vapour density (g/m3)
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Water vapour: surface density and total columnar content
     https://www.itu.int/rec/R-REC-P.836/en
     """
@@ -400,6 +407,7 @@ def total_water_vapour_content(lat, lon, p, alt=None):
     Method to compute the total water vapour content along a path  at any
     desired location on the surface of the Earth.
 
+
     Parameters
     ----------
     lat : number, sequence, or numpy.ndarray
@@ -412,13 +420,15 @@ def total_water_vapour_content(lat, lon, p, alt=None):
         Altitude of the receivers. If None, use the topographical altitude as
         described in recommendation ITU-R P.1511
 
+
     Returns
     -------
     V: Quantity
        Total water vapour content (kg/m2)
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Water vapour: surface density and total columnar content
     https://www.itu.int/rec/R-REC-P.836/en
     """

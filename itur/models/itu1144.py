@@ -13,7 +13,7 @@ propagation effects. These methods are based on those in Recommendation
 ITU-R P.1144-7.
 
 References
-----------
+--------
 [1] Guide to the application of the propagation methods of Radiocommunication
 Study Group 3: https://www.itu.int/rec/R-REC-P.1144/en
 """
@@ -21,18 +21,21 @@ Study Group 3: https://www.itu.int/rec/R-REC-P.1144/en
 
 def is_regular_grid(lats_o, lons_o):
     '''
+
     Returns whether the grids in lats_o and lons_o are both regular grids or
     not. A grid is regular if the difference (column-wise or row-wise)
     between consecutive values is constant across the grid.
 
-    Parameters:
+
+    Parameters
     -----------
     lats_o : numpy.ndarray
         Grid of latitude coordinates
     lons_o : numpy.ndarray
         Grid of longitude coordinates
 
-    Returns:
+
+    Returns
     --------
         is_regular: boolean
     '''
@@ -58,7 +61,8 @@ def nearest_2D_interpolator(lats_o, lons_o, values):
        f = nearest_2D_interpolator(lat_origin, lon_origin, values_origin)
        interp_values = f(lat_interp, lon_interp)
 
-    Parameters:
+
+    Parameters
     -----------
     lats_o: numpy.ndarray
         Latitude coordinates of the values usde by the interpolator
@@ -67,7 +71,8 @@ def nearest_2D_interpolator(lats_o, lons_o, values):
     values: numpy.ndarray
         Values usde by the interpolator
 
-    Returns:
+
+    Returns
     --------
     interpolator: function
         Nearest neighbour interpolator function
@@ -106,7 +111,8 @@ def bilinear_2D_interpolator(lats_o, lons_o, values):
        f = nearest_2D_interpolator(lat_origin, lon_origin, values_origin)
        interp_values = f(lat_interp, lon_interp)
 
-    Parameters:
+
+    Parameters
     -----------
     lats_o: numpy.ndarray
         Latitude coordinates of the values usde by the interpolator
@@ -115,7 +121,8 @@ def bilinear_2D_interpolator(lats_o, lons_o, values):
     values: numpy.ndarray
         Values usde by the interpolator
 
-    Returns:
+
+    Returns
     --------
     interpolator: function
         Bilinear interpolator function
@@ -151,7 +158,8 @@ def bicubic_2D_interpolator(lats_o, lons_o, values):
        f = nearest_2D_interpolator(lat_origin, lon_origin, values_origin)
        interp_values = f(lat_interp, lon_interp)
 
-    Parameters:
+
+    Parameters
     -----------
     lats_o: numpy.ndarray
         Latitude coordinates of the values usde by the interpolator
@@ -160,7 +168,8 @@ def bicubic_2D_interpolator(lats_o, lons_o, values):
     values: numpy.ndarray
         Values usde by the interpolator
 
-    Returns:
+
+    Returns
     --------
     interpolator: function
         Bicubic interpolator function

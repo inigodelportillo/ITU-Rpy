@@ -374,6 +374,7 @@ def change_version(new_version):
     """
     Change the version of the ITU-R P.838 recommendation currently being used.
 
+
     Parameters
     ----------
     new_version : int
@@ -401,6 +402,7 @@ def rain_specific_attenuation_coefficients(f, el, tau):
     A method to compute the values for the coefficients k and α to compute
     the specific attenuation γ_R (dB/km)
 
+
     Parameters
     ----------
     f : number or Quantity
@@ -411,6 +413,7 @@ def rain_specific_attenuation_coefficients(f, el, tau):
         Polarization tilt angle relative to the horizontal (degrees). Tau = 45
         deg for circular polarization)
 
+
     Returns
     -------
     k: number
@@ -418,8 +421,9 @@ def rain_specific_attenuation_coefficients(f, el, tau):
     alpha: number
         Zero isoterm height (km)
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Rain height model for prediction methods:
     https://www.itu.int/rec/R-REC-P.838/en
     """
@@ -437,6 +441,7 @@ def rain_specific_attenuation(R, f, el, tau):
     ..math:
         \\gamma_R = k R^\\alpha
 
+
     Parameters
     ----------
     R : number, sequence, numpy.ndarray or Quantity
@@ -449,13 +454,15 @@ def rain_specific_attenuation(R, f, el, tau):
         Polarization tilt angle relative to the horizontal (degrees). Tau = 45
         deg for circular polarization)
 
+
     Returns
     -------
     gamma_R: numpy.ndarray
         Specific attenuation from rain (dB/km)
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Rain height model for prediction methods:
     https://www.itu.int/rec/R-REC-P.838/en
     """

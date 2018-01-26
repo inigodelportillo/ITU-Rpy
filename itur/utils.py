@@ -6,12 +6,10 @@ from __future__ import print_function
 import numpy as np
 import os
 import numbers
-import csv
 
 from tempfile import mkdtemp
 from joblib import Memory
 
-from io import StringIO
 from astropy import units as u
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -21,7 +19,24 @@ dataset_dir = os.path.join(dir_path, './data/')
 cachedir = mkdtemp()
 memory = Memory(cachedir=cachedir, verbose=0)
 
+
 def load_data(path, is_text=False, **kwargs):
+    """ Loads data files from /itur/data/
+
+
+    Parameters
+    ----------
+    path : string
+        Path of the data to load
+    is_text : bool
+        Indicates whether the data is numerical or text
+
+
+    Returns
+    -------
+    data: numpy.ndarray
+        Numpy-array with the data. Numerical data is returned as a float
+    """
     if is_text:
         data = np.loadtxt(path, dtype=np.string_, delimiter=',', **kwargs)
     else:
@@ -30,22 +45,14 @@ def load_data(path, is_text=False, **kwargs):
 
 
 def prepare_input_array(array):
-    if isinstance(array, numbers.Number):
-        return np.array([[array]])
-    elif isinstance(array, list):
-        if isinstance(array[0], list):
-            return np.array(array)
-        else:
-            return np.array([array])
-    elif isinstance(array, np.ndarray):
-        if array.ndim == 1:
-            return np.array([array])
-        else:
-            return array
+    """ Formats an array to be a 2-D numpy-array
+    """
+    return np.atleast_2d(array)
 
 
 def prepare_output_array(array, type_input=None):
-
+    """ Formats the output to have the same shape and type as the input
+    """
     if isinstance(array, u.Quantity):
         value = array.value
         unit = array.unit
@@ -53,11 +60,13 @@ def prepare_output_array(array, type_input=None):
         value = array
         unit = None
 
-    if type_input in [numbers.Number, int, float, complex]:
+    if type_input in [numbers.Number, int, float, complex] and len(array) == 1:
         value = float(value)
-
     elif type_input is list:
-        value = list(value[0])
+        if isinstance(value, np.ndarray):
+            value = value.to_list()
+        else:
+            value = list(value)
     else:
         value = value
 
@@ -68,6 +77,8 @@ def prepare_output_array(array, type_input=None):
 
 
 def prepare_quantity(value, units=None, name_val=None):
+    """ The function verifys that a
+    """
     if value is None:
         return None
 
@@ -87,51 +98,32 @@ def prepare_quantity(value, units=None, name_val=None):
                          (name_val, str(units)))
 
 
-def format_text_file_ITU(path_values, path_lon, path_lat):
-    lon = read_raw_file_ITU(path_lon)
-    lat = read_raw_file_ITU(path_lat)
-    if lon[0:-1] == 360:
-        lon = lon[:, :-1]
-
-#    mode = stats.mode(lon, axis=0)[0]
-#    idx = np.where(mode == 180)[1]
-#    lon[lon > 180] = lon[lon>180] - 360
-    idx = 0
-    lon2 = np.roll(lon, idx, axis=1)
-    lat2 = np.roll(lat, idx, axis=1)
-
-    np.savetxt(path_lon, lon2, '%.2f', delimiter=',')
-    np.savetxt(path_lat, lat2, '%.2f', delimiter=',')
-
-    for path in path_values:
-        values = read_raw_file_ITU(path)
-        values2 = np.roll(values, idx, axis=1)
-        np.savetxt(path, values2, '%.6g', delimiter=',')
-
-
 def compute_distance_earth_to_earth(lat_p, lon_p, lat_grid, lon_grid):
     '''
     Compute the distance between a point (P) in (lat_s, lon_s) and a matrix of
     latitude and longitudes (lat_grid, lon_grid)
 
+
     Parameters
     ----------
-        lat_p : number
-            latitude projection of the point P (degrees)
-        lon_p : number
-            longitude projection of the point P (degrees)
-        lat_grid : number, sequence of np.ndarray
-            Grid of latitude points to which compute the distance (degrees)
-        lon_grid : number, sequence of np.ndarray
-            Grid of longitude points to which compute the distance (degrees)
+    lat_p : number
+        latitude projection of the point P (degrees)
+    lon_p : number
+        longitude projection of the point P (degrees)
+    lat_grid : number, sequence of np.ndarray
+        Grid of latitude points to which compute the distance (degrees)
+    lon_grid : number, sequence of np.ndarray
+        Grid of longitude points to which compute the distance (degrees)
+
 
     Returns
     -------
-        d : numpy array
+    d : numpy.ndarray
         Distance between the point P and each point in (lat_grid, lon_grid)
         (km)
 
-    References:
+
+    References
     This is based on the Haversine formula
     '''
     RE = 6371.0  # Radius of the Earth, km
@@ -158,19 +150,24 @@ def regular_lat_lon_grid(resolution_lat=1, resolution_lon=1, lon_start_0=False,
     Build latitude and longitude coordinate matrix with resolution
     resolution_lat, resolution_lon
 
+
     Parameters
     ----------
-        resolution_lat, number
-            Resolution for the latitude axis (deg)
-        resolution_lon, number
-            Resolution for the longitude axis (deg)
+    resolution_lat: number
+        Resolution for the latitude axis (deg)
+    resolution_lon: number
+        Resolution for the longitude axis (deg)
+    lon_start_0: boolean
+        Indicates whether the longitude is indexed using a 0 - 360 scale (True)
+        or using -180 - 180 scale (False). Default value is False
+
 
     Returns
     -------
-        lat, numpy.array :
-            Grid of coordinates of the latitude point
-        lon, numpy.array :
-            Grid of coordinates of the latitude point
+    lat: numpy.ndarray
+        Grid of coordinates of the latitude point
+    lon: numpy.ndarray
+        Grid of coordinates of the latitude point
     '''
     if lon_start_0:
         lon, lat = np.meshgrid(np.arange(lon_min + 180.0, lon_max + 180.0,
@@ -189,18 +186,30 @@ def elevation_angle(h, lat_s, lon_s, lat_grid, lon_grid):
     at height h and located above coordinates (lat_s, lon_s) and a matrix of
     latitude and longitudes (lat_grid, lon_grid)
 
-    Args:
-        h : Altitude of the satellite (km)
-        lat_s : latitude of the projection of the satellite (degrees)
-        lon_s : longitude of the projection of the satellite (degrees)
-        lat_grid : Grid of latitude points to which compute the elevation angle (degrees)
-        lon_grid : Grid of longitude points to which compute the elevation angle (degrees)
 
-    Returns:
-        elevation : Elevation angle between the satellite and each point in (lat_grid, lon_grid) (degrees)
+    Parameters
+    ----------
+    h : float
+        Altitude of the satellite (km)
+    lat_s : float
+        latitude of the projection of the satellite (degrees)
+    lon_s : float
+        longitude of the projection of the satellite (degrees)
+    lat_grid :  number, sequence of np.ndarray
+        Grid of latitude points to which compute the elevation angle (degrees)
+    lon_grid :  number, sequence of np.ndarray
+        Grid of longitude points to which compute the elevation angle (degrees)
 
-    References:
-    [1] http://www.propagation.gatech.edu/ECE6390/notes/ASD5.pdf - Slides 3 and 4
+
+    Returns
+    -------
+    elevation : numpy.ndarray
+        Elevation angle between the satellite and each point in
+        (lat_grid, lon_grid) (degrees)
+
+
+    References
+    [1] http://www.propagation.gatech.edu/ECE6390/notes/ASD5.pdf - Slides 3, 4
     '''
     RE = 6371.0     # Radius of the Earth (km)
     rs = RE + h
@@ -212,54 +221,11 @@ def elevation_angle(h, lat_s, lon_s, lat_grid, lon_grid):
     lon2 = np.deg2rad(lon_s)
 
     # Compute the elevation angle as described in
-    gamma = np.arccos(np.clip(np.sin(lat2) * np.sin(lat1) +
-                              np.cos(lat1) * np.cos(lat2) * np.cos(lon2 - lon1), -1, 1))
-    elevation = np.arccos(np.sin(gamma) / np.sqrt(1 + (RE / rs)
-                                                  ** 2 - 2 * (RE / rs) * np.cos(gamma)))  # In radians
+    gamma = np.arccos(
+        np.clip(np.sin(lat2) * np.sin(lat1) +
+                np.cos(lat1) * np.cos(lat2) * np.cos(lon2 - lon1), -1, 1))
+    elevation = np.arccos(np.sin(gamma) /
+                          np.sqrt(1 + (RE / rs)**2 -
+                                  2 * (RE / rs) * np.cos(gamma)))  # In radians
 
     return np.rad2deg(elevation)
-
-
-def read_raw_file_ITU(path):
-    print(path)
-    with open(path, 'r') as f:
-        lines = f.readlines()
-        values = []
-        for line in lines:
-            line = line.replace('                      NaN', ',NaN')
-            line = line.replace('             NaN', ',NaN')
-            line = line.replace(',,,,,, NaN', ',NaN')
-            line = line.replace(',,,,, NaN', ',NaN')
-            line = line.replace(',,,, NaN', ',NaN')
-            line = line.replace(',,, NaN', ',NaN')
-            line = line.replace('     ', ',')
-            line = line.replace('    ', ',')
-            line = line.replace('   ', ',')
-            line = line.replace('  ', ',')
-            line = line.replace(' ', ',')
-            line = line.replace('\t', ',')
-            line = line.replace(' \n', '')
-            line = line.replace(',\n', '')
-            if line[0] == ',':
-                line = line[1:]
-
-            f = StringIO(line)
-            reader = csv.reader(f, delimiter=',')
-            for row in reader:
-                values.append(row)
-        return np.array(values, dtype=float)
-
-
-if __name__ == '__main__':
-    pass
-    import glob
-
-    folders = ['453/', '530/', '836/', '837/', '839/', '840/', '1510/',
-               '1511/']
-    for f in folders:
-        for doc in glob.iglob(dataset_dir + f + '*.*'):
-            vals = read_raw_file_ITU(doc)
-            if 'lat' in doc.lower() or 'lon' in doc.lower():
-                np.savetxt(doc, vals, '%.5f', delimiter=',')
-            else:
-                np.savetxt(doc, vals, '%.14g', delimiter=',')

@@ -192,6 +192,7 @@ def change_version(new_version):
     """
     Change the version of the ITU-R P.839 recommendation currently being used.
 
+
     Parameters
     ----------
     new_version : int
@@ -220,6 +221,7 @@ def isoterm_0(lat, lon):
     """
     A method to estimate the zero isoterm height for propagation prediction.
 
+
     Parameters
     ----------
     lat : number, sequence, or numpy.ndarray
@@ -227,13 +229,15 @@ def isoterm_0(lat, lon):
     lon : number, sequence, or numpy.ndarray
         Longitudes of the receiver points
 
+
     Returns
     -------
     zero_isoterm: numpy.ndarray
         Zero isoterm height (km)
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Rain height model for prediction methods:
     https://www.itu.int/rec/R-REC-P.839/en
 
@@ -252,6 +256,7 @@ def rain_height(lat, lon):
     """
     A method to estimate the rain height for propagation prediction.
 
+
     Parameters
     ----------
     lat : number, sequence, or numpy.ndarray
@@ -259,13 +264,15 @@ def rain_height(lat, lon):
     lon : number, sequence, or numpy.ndarray
         Longitudes of the receiver points
 
+
     Returns
     -------
     rain_height: numpy.ndarray
         Rain height (km)
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Rain height model for prediction methods:
     https://www.itu.int/rec/R-REC-P.839/en
     """

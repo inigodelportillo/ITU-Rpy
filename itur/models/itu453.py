@@ -12,10 +12,10 @@ from astropy import units as u
 
 class __ITU453():
     """Implementation of the methods in Recommendation ITU-R P.453
-      "The radio refractive index: its formula and refractivity data"
+    "The radio refractive index: its formula and refractivity data"
 
     Available versions:
-    * P.453-12 (07/15)
+       * P.453-12 (07/15)
 
     TODO: Implement version P.453-13
 
@@ -171,12 +171,13 @@ def change_version(new_version):
     """
     Change the version of the ITU-R P.453 recommendation currently being used.
 
+
     Parameters
     ----------
     new_version : int
         Number of the version to use.
         Valid values are:
-        * P.453-12 (02/12) (Current version)
+           * P.453-12 (02/12) (Current version)
     """
     global __model
     __model = __ITU453(new_version)
@@ -194,6 +195,7 @@ def wet_term_radio_refractivity(e, T):
     """
     Method to determine the wet term of the radio refractivity
 
+
     Parameters
     ----------
     e : number or Quantity
@@ -201,13 +203,16 @@ def wet_term_radio_refractivity(e, T):
     T : number or Quantity
         Absolute temperature (K)
 
+
     Returns
     -------
     N_wet: Quantity
         Wet term of the radio refractivity (-)
 
-    References:
-    -----------
+
+
+    References
+    ----------
     [1] The radio refractive index: its formula and refractivity data
     https://www.itu.int/rec/R-REC-P.453/en
 
@@ -223,6 +228,7 @@ def dry_term_radio_refractivity(Pd, T):
     """
     Method to determine the dry term of the radio refractivity
 
+
     Parameters
     ----------
     Pd : number or Quantity
@@ -230,13 +236,16 @@ def dry_term_radio_refractivity(Pd, T):
     T : number or Quantity
         Absolute temperature (K)
 
+
     Returns
     -------
     N_dry: Quantity
         Dry term of the radio refractivity (-)
 
-    References:
-    -----------
+
+
+    References
+    ----------
     [1] The radio refractive index: its formula and refractivity data
     https://www.itu.int/rec/R-REC-P.453/en
 
@@ -252,6 +261,7 @@ def radio_refractive_index(P, e, T):
     """
     Method to compute the radio refractive index
 
+
     Parameters
     ----------
     P : number or Quantity
@@ -261,13 +271,16 @@ def radio_refractive_index(P, e, T):
     T : number or Quantity
         Absolute temperature (K)
 
+
     Returns
     -------
     n: Quantity
         Radio refractive index (-)
 
-    References:
-    -----------
+
+
+    References
+    ----------
     [1] The radio refractive index: its formula and refractivity data
     https://www.itu.int/rec/R-REC-P.453/en
 
@@ -284,6 +297,7 @@ def water_vapour_pressure(T, P, H, type_hydrometeor='water'):
     """
     Method to determine the water vapour pressure
 
+
     Parameters
     ----------
     T : number or Quantity
@@ -295,13 +309,16 @@ def water_vapour_pressure(T, P, H, type_hydrometeor='water'):
     type_hydrometeor : string
         Type of hydrometeor. Valid strings are 'water' and 'ice'
 
+
     Returns
     -------
     e: Quantity
         Water vapour pressure (hPa)
 
-    References:
-    -----------
+
+
+    References
+    ----------
     [1] The radio refractive index: its formula and refractivity data
     https://www.itu.int/rec/R-REC-P.453/en
 
@@ -318,6 +335,7 @@ def saturation_vapour_pressure(T, P, type_hydrometeor='water'):
     """
     Method to determine the saturation water vapour pressure
 
+
     Parameters
     ----------
     T : number or Quantity
@@ -327,13 +345,16 @@ def saturation_vapour_pressure(T, P, type_hydrometeor='water'):
     type_hydrometeor : string
         Type of hydrometeor. Valid strings are 'water' and 'ice'
 
+
     Returns
     -------
     e_s: Quantity
         Saturation water vapour pressure (hPa)
 
-    References:
-    -----------
+
+
+    References
+    ----------
     [1] The radio refractive index: its formula and refractivity data
     https://www.itu.int/rec/R-REC-P.453/en
 
@@ -349,6 +370,7 @@ def map_wet_term_radio_refractivity(lat, lon):
     """
     Method to determine the wet term of the radio refractivity
 
+
     Parameters
     ----------
     lat : number, sequence, or numpy.ndarray
@@ -356,13 +378,16 @@ def map_wet_term_radio_refractivity(lat, lon):
     lon : number, sequence, or numpy.ndarray
         Longitudes of the receiver points
 
+
     Returns
     -------
     N_wet: Quantity
         Wet term of the radio refractivity (-)
 
-    References:
-    -----------
+
+
+    References
+    ----------
     [1] The radio refractive index: its formula and refractivity data
     https://www.itu.int/rec/R-REC-P.453/en
     """
@@ -380,6 +405,7 @@ def DN65(lat, lon, p):
     Method to determine the statistics of the vertical gradient of radio
     refractivity in the lowest 65 m from the surface of the Earth.
 
+
     Parameters
     ----------
     lat : number, sequence, or numpy.ndarray
@@ -389,14 +415,17 @@ def DN65(lat, lon, p):
     p : number
         Percentage of time exceeded for p% of the average year
 
+
     Returns
     -------
     DN65_p: Quantity
         Vertical gradient of radio refractivity in the lowest 65 m from the
         surface of the Earth exceeded for p% of the average year
 
-    References:
-    -----------
+
+
+    References
+    ----------
     [1] The radio refractive index: its formula and refractivity data
     https://www.itu.int/rec/R-REC-P.453/en
 
@@ -412,8 +441,9 @@ def DN65(lat, lon, p):
 
 def DN1(lat, lon, p):
     """
-     Method to determine the statistics of the vertical gradient of radio
+    Method to determine the statistics of the vertical gradient of radio
     refractivity over a 1 km layer from the surface.
+
 
     Parameters
     ----------
@@ -424,14 +454,17 @@ def DN1(lat, lon, p):
     p : number
         Percentage of time exceeded for p% of the average year
 
+
     Returns
     -------
     DN1_p: Quantity
         Vertical gradient of radio refractivity over a 1 km layer from the
         surface exceeded for p% of the average year
 
-    References:
-    -----------
+
+
+    References
+    ----------
     [1] The radio refractive index: its formula and refractivity data
     https://www.itu.int/rec/R-REC-P.453/en
     """

@@ -13,13 +13,13 @@ class __ITU835():
     """Reference Standard Atmospheres
 
     Available versions:
-    * P.835-5 (02/12) (Current version)
+       * P.835-5 (02/12) (Current version)
 
     Not available versions:
-    * P.835-1 (08/94) (Superseded)
-    * P.835-2 (08/97) (Superseded)
-    * P.835-3 (10/99) (Superseded)
-    * P.835-4 (03/05) (Superseded)
+       * P.835-1 (08/94) (Superseded)
+       * P.835-2 (08/97) (Superseded)
+       * P.835-3 (10/99) (Superseded)
+       * P.835-4 (03/05) (Superseded)
 
     The procedures to compute the reference standard atmosphere parameters
     pressented in these versions are identical to those included in version
@@ -157,8 +157,9 @@ class _ITU835_5():
     def low_latitude_water_vapour(self, h):
         """Section 3.1 of Recommendation ITU-R P.835
         """
-        return np.where((0 <= h) & (h <= 15), 19.6542 * np.exp(- 0.2313 * h -
-                                                               0.1122 * h**2 + 0.01351 * h**3 - 0.0005923 * h**4), 0)
+        return np.where((0 <= h) & (h <= 15), 19.6542 *
+                        np.exp(- 0.2313 * h - 0.1122 * h**2 + 0.01351 * h**3 -
+                               0.0005923 * h**4), 0)
 
     # High latitude standard atmosphere functions  (Section ITU-R P.835-5-2)
     # ##
@@ -359,17 +360,18 @@ def change_version(new_version):
     """
     Change the version of the ITU-R P.835 recommendation currently being used.
 
+
     Parameters
     ----------
     new_version : int
         Number of the version to use.
         Valid values are:
-        * P.835-1 (08/94) (Superseded)
-        * P.835-2 (10/99) (Superseded)
-        * P.835-3 (02/01) (Superseded)
-        * P.835-4 (04/03) (Superseded)
-        * P.835-5 (08/07) (Superseded)
-        * P.835-6 (02/12) (Current version)
+           * P.835-1 (08/94) (Superseded)
+           * P.835-2 (10/99) (Superseded)
+           * P.835-3 (02/01) (Superseded)
+           * P.835-4 (04/03) (Superseded)
+           * P.835-5 (08/07) (Superseded)
+           * P.835-6 (02/12) (Current version)
     """
     global __model
     __model = __ITU835(new_version)
@@ -389,6 +391,7 @@ def temperature(lat, h, season='summer'):
     for calculating gaseous attenuation along an Earth-space path. This method
     is recommended when more reliable local data are not available.
 
+
     Parameters
     ----------
     lat : number, sequence, or numpy.ndarray
@@ -399,13 +402,15 @@ def temperature(lat, h, season='summer'):
         Season of the year (available values, 'summer', and 'winter').
         Default 'summer'
 
+
     Returns
     -------
     T: Quantity
         Temperature (K)
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Reference Standard Atmospheres
     https://www.itu.int/rec/R-REC-P.835/en
 
@@ -424,6 +429,7 @@ def pressure(lat, h, season='summer'):
     for calculating gaseous attenuation along an Earth-space path.
     This method is recommended when more reliable local data are not available.
 
+
     Parameters
     ----------
     lat : number, sequence, or numpy.ndarray
@@ -434,13 +440,15 @@ def pressure(lat, h, season='summer'):
         Season of the year (available values, 'summer', and 'winter').
         Default 'summer'
 
+
     Returns
     -------
     P: Quantity
         Pressure (hPa)
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Reference Standard Atmospheres
     https://www.itu.int/rec/R-REC-P.835/en
     """
@@ -455,9 +463,10 @@ def pressure(lat, h, season='summer'):
 def water_vapour_density(lat, h, season='summer'):
     """
     Method to determine the water-vapour density as a
-    function of altitude and latitude, for calculating gaseous attenuation along
-    an Earth-space path. This method is recommended when more reliable
+    function of altitude and latitude, for calculating gaseous attenuation
+    along an Earth-space path. This method is recommended when more reliable
     local data are not available.
+
 
     Parameters
     ----------
@@ -469,13 +478,15 @@ def water_vapour_density(lat, h, season='summer'):
         Season of the year (available values, 'summer', and 'winter').
         Default 'summer'
 
+
     Returns
     -------
     rho: Quantity
         Water vapour density (g/m^3)
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Reference Standard Atmospheres
     https://www.itu.int/rec/R-REC-P.835/en
     """
@@ -496,6 +507,7 @@ def standard_temperature(h, T_0=288.15):
     Atmosphere, 1976, in which the atmosphere is divided into seven successive
     layers showing linear variation with temperature.
 
+
     Parameters
     ----------
     h : number or Quantity
@@ -503,13 +515,15 @@ def standard_temperature(h, T_0=288.15):
     T_0 : number or Quantity
         Surface temperature (K)
 
+
     Returns
     -------
     T: Quantity
         Temperature (K)
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Reference Standard Atmospheres
     https://www.itu.int/rec/R-REC-P.835/en
     """
@@ -522,12 +536,13 @@ def standard_temperature(h, T_0=288.15):
 
 def standard_pressure(h, T_0=288.15, P_0=1013.25):
     """
-    Method to compute the total atmopsheric pressure of an standard atmosphere at
-    a given height.
+    Method to compute the total atmopsheric pressure of an standard atmosphere
+    at a given height.
 
     The reference standard atmosphere is based on the United States Standard
     Atmosphere, 1976, in which the atmosphere is divided into seven successive
     layers showing linear variation with temperature.
+
 
     Parameters
     ----------
@@ -538,13 +553,15 @@ def standard_pressure(h, T_0=288.15, P_0=1013.25):
     P_0 : number or Quantity
         Surface pressure (hPa)
 
+
     Returns
     -------
     P: Quantity
         Pressure (hPa)
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Reference Standard Atmospheres
     https://www.itu.int/rec/R-REC-P.835/en
     """
@@ -565,6 +582,7 @@ def standard_water_vapour_density(h, h_0=2, rho_0=7.5):
     Atmosphere, 1976, in which the atmosphere is divided into seven successive
     layers showing linear variation with temperature.
 
+
     Parameters
     ----------
     h : number or Quantity
@@ -574,13 +592,15 @@ def standard_water_vapour_density(h, h_0=2, rho_0=7.5):
     rho_0 : number or Quantity
         Surface water vapour density (g/m^3)
 
+
     Returns
     -------
     rho: Quantity
         Water vapour density (g/m^3)
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Reference Standard Atmospheres
     https://www.itu.int/rec/R-REC-P.835/en
     """
@@ -604,6 +624,7 @@ def standard_water_vapour_pressure(h, h_0=2, rho_0=7.5):
     Atmosphere, 1976, in which the atmosphere is divided into seven successive
     layers showing linear variation with temperature.
 
+
     Parameters
     ----------
     h : number or Quantity
@@ -613,13 +634,15 @@ def standard_water_vapour_pressure(h, h_0=2, rho_0=7.5):
     rho_0 : number or Quantity
         Surface water vapour density (g/m^3)
 
+
     Returns
     -------
     e: Quantity
         Water vapour pressure (hPa)
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Reference Standard Atmospheres
     https://www.itu.int/rec/R-REC-P.835/en
     """

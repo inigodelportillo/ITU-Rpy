@@ -1,4 +1,7 @@
-# Import specific functions that are available under the main itur module
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 from itur.models.itu618 import rain_attenuation, scintillation_attenuation
 from itur.models.itu676 import gaseous_attenuation_slant_path,\
     gaseous_attenuation_inclined_path,\
@@ -9,18 +12,120 @@ from itur.models.itu840 import cloud_attenuation
 from itur.models.itu1510 import surface_mean_temperature
 from itur.models.itu1511 import topographic_altitude
 
-import itur.models
-
 import numpy as np
 import warnings
 import astropy.units as u
 
+from smac.__version__ import __version__
+AUTHORS = "Inigo del Portillo"
+
+
 def atmospheric_attenuation_slant_path(
-        lat, lon, el, f, p, D, hs=None, rho=None, R001=None, eta=0.5, T=None,
+        lat, lon, f, el, p, D, hs=None, rho=None, R001=None, eta=0.5, T=None,
         H=None, P=None, hL=1e3, Ls=None, tau=45, mode='approx',
         return_contributions=False, include_rain=True, include_gas=True,
         include_scintillation=True, include_clouds=True):
-    """
+    """ Calculation of long-term atmospheric attenuation statistics.
+    The following procedure provides estimates of the long-term statistics of
+    the slant-path atmospheric attenuation at a given location for
+    frequencies up to 55 GHz and percentages of time 0.001 % < p < 50 %.
+
+
+    Parameters
+    -------------
+    lat : number, sequence, or numpy.ndarray
+        Latitudes of the receiver points
+    lon : number, sequence, or numpy.ndarray
+        Longitudes of the receiver points
+    f : number or Quantity
+        Frequency (GHz)
+    el : sequence, number or Quantity
+        Elevation angle (degrees)
+    p : number
+        Percetage of the time the rain attenuation value is exceeded.
+    D: number or Quantity
+        Physical diameter of the earth-station antenna (m)
+    hs : number, sequence, or numpy.ndarray, optional
+        Heigh above mean sea level of the earth station (km). If local data for
+        the earth station height above mean sea level is not available, an
+        estimate is obtained from the maps of topographic altitude
+        given in Recommendation ITU-R P.1511.
+    rho : number or Quantity, optional
+        Water vapor density (g/m3). If not provided, an estimate is obtained
+        from Recommendation Recommendation ITU-R P.836.
+    R001: number  or Quantity, optional
+        Point rainfall rate for the location for 0.01% of an average year (mm/h).
+        If not provided, an estimate is obtained from Recommendation
+        Recommendation ITU-R P.837. Some useful values:
+            * 0.25 mm/h : Drizle
+            *  2.5 mm/h : Light rain
+            * 12.5 mm/h : Medium rain
+            * 25.0 mm/h : Heavy rain
+            * 50.0 mm/h : Dwonpour
+            * 100  mm/h : Tropical
+            * 150  mm/h : Monsoon
+    eta: number, optional
+        Antenna efficiency. Default value 0.5 (conservative estimate)
+    T: number, sequence, or numpy.ndarray, optional
+        Average surface ambient temperature (°C) at the site. If None, uses the
+        ITU-R P.453 to estimate the wet term of the radio refractivity.
+    H: number, sequence, or numpy.ndarray, optional
+        Average surface relative humidity (%) at the site. If None, uses the
+        ITU-R P.453 to estimate the wet term of the radio refractivity.
+    P: number, sequence, or numpy.ndarray, optional
+        Average surface pressure (hPa) at the site. If None, uses the
+        ITU-R P.453 to estimate the wet term of the radio refractivity.
+    hL : number, optional
+        Height of the turbulent layer (m). Default value 1000 m
+    Ls :number, optional
+        Slant path length (km). If not provided, it will be computed using the
+        rain height and the elevation angle. The ITU model does not require this
+        parameter as an input.
+    tau : number, optional
+        Polarization tilt angle relative to the horizontal (degrees)
+        (tau = 45 deg for circular polarization). Default value is 45
+    mode : string, optional
+        Mode for the calculation of gaseous attenuation. Valid values are
+        'approx', 'exact'. If 'approx' Uses the method in Annex 2 of
+        Recommendation ITU-R P.676, else uses the method described in
+        Section 1. Default, 'approx'
+    return_contributions: bool, optional
+        Determines whether individual contributions from gases, rain, clouds
+        and scintillation are returned in addition ot the total attenuation
+        (True), or just the total atmospheric attenuation (False).
+        Default is False
+    include_rain: bool, optional
+        Determines whether to include the rain contribution in the total
+        atmospheric attenuation calculation or not. Default is True
+    include_gas: bool, optional
+        Determines whether to include the gaseous contribution in the total
+        atmospheric attenuation calculation or not. Default is True
+    include_scintillation: bool, optional
+        Determines whether to include the scintillation contribution in the
+        total atmospheric attenuation calculation or not. Default is True
+    include_clouds: bool, optional
+        Determines whether to include the clouds contribution in the total
+        atmospheric attenuation calculation or not. Default is True
+
+
+    Returns
+    ---------
+    A : Quantity
+        Total atmospheric attenuation (dB)
+
+    Ag, Ac, Ar, As, A : tuple
+        Gaseous, Cloud, Rain, Scintillation cotributions to total attenuation,
+        and total attenuation (dB)
+
+		
+		
+    References
+    -------------
+    [1] Propagation data and prediction methods required for the design of
+    Earth-space telecommunication systems:
+    https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
+
+
     """
     if p < 0.001 or p > 50:
         warnings.warn(

@@ -124,6 +124,7 @@ def change_version(new_version):
     """
     Change the version of the ITU-R P.1511 recommendation currently being used.
 
+
     Parameters
     ----------
     new_version : int
@@ -151,6 +152,7 @@ def topographic_altitude(lat, lon):
     of the Earth a
 
 
+
     Parameters
     ----------
     lat : number, sequence, or numpy.ndarray
@@ -158,13 +160,15 @@ def topographic_altitude(lat, lon):
     lon : number, sequence, or numpy.ndarray
         Longitudes of the receiver points
 
+
     Returns
     -------
     altitude: numpy.ndarray
         Topographic altitude (km)
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Topography for Earth-to-space propagation modelling:
     https://www.itu.int/rec/R-REC-P.1511/en
 

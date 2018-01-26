@@ -282,6 +282,7 @@ def change_version(new_version):
     """
     Change the version of the ITU-R P.1853 recommendation currently being used.
 
+
     Parameters
     ----------
     new_version : int
@@ -310,6 +311,7 @@ def rain_attenuation_synthesis(lat, lon, f, el, hs, T, Ts=1, n=None):
     """
     A method to compute the rainfall rate exceeded for p% of the average year
 
+
     Parameters
     ----------
     lat : number, sequence, or numpy.ndarray
@@ -332,13 +334,15 @@ def rain_attenuation_synthesis(lat, lon, f, el, hs, T, Ts=1, n=None):
     n : list, np.array, optional
         Additive White Gaussian Noise used as input for the
 
+
     Returns
     -------
     rain_att: numpy.ndarray
         Synthesized rain attenuation time series (dB)
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Characteristics of precipitation for propagation modelling
     https://www.itu.int/rec/R-REC-P.1853/en
     """
@@ -360,6 +364,7 @@ def unavailability_from_rainfall_rate(lat, lon, R):
     rainfall rate (R) is exceeded. This method calls successively to the
     `rainfall_rate` method and interpolates its value.
 
+
     Parameters
     ----------
     lat : number, sequence, or numpy.ndarray
@@ -369,13 +374,15 @@ def unavailability_from_rainfall_rate(lat, lon, R):
     R : number, sequence, or numpy.ndarray
         Rainfall rate (mm/h)
 
+
     Returns
     -------
     p: numpy.ndarray
         Rainfall rate exceeded for p% of the average year
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Characteristics of precipitation for propagation modelling
     https://www.itu.int/rec/R-REC-P.1853/en
     """

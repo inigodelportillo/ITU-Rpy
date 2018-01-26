@@ -72,6 +72,7 @@ def change_version(new_version):
     """
     Change the version of the ITU-R P.1510 recommendation currently being used.
 
+
     Parameters
     ----------
     new_version : int
@@ -97,6 +98,7 @@ def surface_mean_temperature(lat, lon):
     A method to estimate the annual mean surface temperature (K) at 2 m
     above the surface of the Earth
 
+
     Parameters
     ----------
     lat : number, sequence, or numpy.ndarray
@@ -104,13 +106,15 @@ def surface_mean_temperature(lat, lon):
     lon : number, sequence, or numpy.ndarray
         Longitudes of the receiver points
 
+
     Returns
     -------
     temperature: numpy.ndarray
         Annual mean surface temperature (K)
 
-    References:
-    -----------
+
+    References
+    ----------
     [1] Annual mean surface temperature:
     https://www.itu.int/rec/R-REC-P.1510/en
 
