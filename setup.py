@@ -32,7 +32,7 @@ setup(
     # There are some restrictions on what makes a valid project name
     # specification here:
     # https://packaging.python.org/specifications/core-metadata/#name
-    name='itur', 
+    name='itur',
 
     # Versions should comply with PEP 440:
     # https://www.python.org/dev/peps/pep-0440/
@@ -40,12 +40,12 @@ setup(
     # For a discussion on single-sourcing the version across setup.py and the
     # project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.1.1', 
+    version='0.1.3',
 
     # This is a one-line description or tagline of what your project does. This
     # corresponds to the "Summary" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#summary
-    description='A python implementation of the ITU-P Recommendations', 
+    description='A python implementation of the ITU-P Recommendations',
 
     # This should be a valid link to your project's main homepage.
     #
@@ -62,7 +62,7 @@ setup(
     author_email='portillo@mit.edu',
 
     license='MIT',
-    
+
     # Classifiers help users find your project by categorizing it.
     #
     # For a list of valid classifiers, see
@@ -95,7 +95,7 @@ setup(
     # project page. What does your project relate to?
     #
     # Note that this is a string of words separated by whitespace, not a list.
-    keywords='atmopheric-propagation attenuation communications', 
+    keywords='atmopheric-propagation attenuation communications',
 
     # You can just specify package directories manually here if your project is
     # simple. Or you can use find_packages().
@@ -106,7 +106,7 @@ setup(
     #
     #   py_modules=["my_module"],
     #
-    packages=find_packages(exclude=['contrib', 'docs', 'tests']), 
+    packages=find_packages(exclude=['contrib', 'docs', 'tests']),
 
     # This field lists other packages that your project depends on to run.
     # Any package you put here will be installed by pip when your project is
@@ -122,15 +122,15 @@ setup(
     # If using Python 2.6 or earlier, then these have to be included in
     # MANIFEST.in as well.
     package_data={  # Optional
-        'itur': [ 'data/453/*.*',
-                  'data/530/*.*',
-                  'data/676/*.*',
-                  'data/836/*.*',
-                  'data/837/*.*',
-                  'data/839/*.*',
-                  'data/840/*.*',
-                  'data/1510/*.*',
-                  'data/1511/*.*'],
+        'itur': ['data/453/*.*',
+                 'data/530/*.*',
+                 'data/676/*.*',
+                 'data/836/*.*',
+                 'data/837/*.*',
+                 'data/839/*.*',
+                 'data/840/*.*',
+                 'data/1510/*.*',
+                 'data/1511/*.*'],
 
     },
 )
