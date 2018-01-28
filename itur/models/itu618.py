@@ -242,7 +242,7 @@ class _ITU618_12():
             Ls = np.where(
                 el >= 5, (hr - hs) / (np.sin(np.deg2rad(el))),    # Eq. 1
                 2 * (hr - hs) / (((np.sin(np.deg2rad(el)))**2 +
-                2 * (hr - hs) / Re)**0.5 + (np.sin(np.deg2rad(el)))))  # Eq. 2
+                                  2 * (hr - hs) / Re)**0.5 + (np.sin(np.deg2rad(el)))))  # Eq. 2
 
         d = Ls * np.cos(np.deg2rad(el))
         rho = 0.59 * np.exp(-abs(d) / 31) + 0.41 * np.exp(-abs(d) / 800)

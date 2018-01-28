@@ -134,7 +134,8 @@ class _ITU676_10():
             (844.6 * eta1 * np.exp(0.17 * (1 - rt))) / ((f - 557.000) ** 2) *
             g(f, 557.0) + (290.0 * eta1 * np.exp(0.41 * (1 - rt))) /
             ((f - 752.000) ** 2) * g(f, 752.0) +
-            (8.3328e4 * eta2 * np.exp(0.99 * (1 - rt))) / ((f - 1780.00) ** 2) *
+            (8.3328e4 * eta2 * np.exp(0.99 * (1 - rt))) /
+            ((f - 1780.00) ** 2) *
             g(f, 1780.0)) * f ** 2 * rt ** 2.5 * rho * 1e-4
         return gammaw
 
@@ -165,28 +166,50 @@ class _ITU676_10():
         gamma64 = 6.819 * phi(rp, rt, 1.4320, 0.6258, 0.3177, -0.5914)
         gamma66 = 1.908 * phi(rp, rt, 2.0717, -4.1404, 0.4910, -4.8718)
 
-        if f <= 54:
-            gamma0 = ((7.2 * rt**2.8) / (f**2 + 0.34 * rp**2 * rt**1.6) +
-                      (0.62 * xi3) / ((54 - f)**(1.16 * xi1) + 0.83 * xi2)) * \
-                f**2 * rp**2 * 1e-3
-        elif 54 < f <= 60:
-            gamma0 = np.exp(np.log(gamma54) / 24.0 * (f - 58) * (f - 60) -
-                            np.log(gamma58) / 8.0 * (f - 54) * (f - 60) +
-                            np.log(gamma60) / 12.0 * (f - 54) * (f - 58))
-        elif 60 < f <= 62:
-            gamma0 = gamma60 + (gamma62 - gamma60) * (f - 60) / 2.0
-        elif 62 < f <= 66:
-            gamma0 = np.exp(np.log(gamma62) / 8.0 * (f - 64) * (f - 66) -
-                            np.log(gamma64) / 4.0 * (f - 62) * (f - 66) +
-                            np.log(gamma66) / 8.0 * (f - 62) * (f - 64))
-        elif 66 < f <= 120:
-            gamma0 = (3.02e-4 * rt**3.5 + (0.283 * rt**3.8) / ((f - 118.75)**2 + 2.91 * rp**2 * rt**1.6) +
-                      (0.502 * xi6 * (1 - 0.0163 * xi7 * (f - 66))) / ((f - 66)**(1.4346 * xi4) + 1.15 * xi5)) * \
-                f**2 * rp**2 * 1e-3
-        else:
-            gamma0 = ((3.02e-4) / (1 + 1.9e-5 * f**1.5) +
-                      (0.283 * rt**0.3) / ((f - 118.75)**2 + 2.91 * rp**2 * rt**1.6)) * \
-                f**2 * rp**2 * rt**3.5 * 1e-3 + delta
+        def fcn_le_54():
+            return (((7.2 * rt**2.8) / (f**2 + 0.34 * rp**2 * rt**1.6) +
+                     (0.62 * xi3) / ((54 - f)**(1.16 * xi1) + 0.83 * xi2)) *
+                    f**2 * rp**2 * 1e-3)
+
+        def fcn_le_60():
+            return (np.exp(np.log(gamma54) / 24.0 * (f - 58) * (f - 60) -
+                           np.log(gamma58) / 8.0 * (f - 54) * (f - 60) +
+                           np.log(gamma60) / 12.0 * (f - 54) * (f - 58)))
+
+        def fcn_le_62():
+            return (gamma60 + (gamma62 - gamma60) * (f - 60) / 2.0)
+
+        def fcn_le_66():
+            return (np.exp(np.log(gamma62) / 8.0 * (f - 64) * (f - 66) -
+                           np.log(gamma64) / 4.0 * (f - 62) * (f - 66) +
+                           np.log(gamma66) / 8.0 * (f - 62) * (f - 64)))
+
+        def fcn_le_120():
+            return ((3.02e-4 * rt**3.5 + (0.283 * rt**3.8) /
+                     ((f - 118.75)**2 + 2.91 * rp**2 * rt**1.6) +
+                     (0.502 * xi6 * (1 - 0.0163 * xi7 * (f - 66))) /
+                     ((f - 66)**(1.4346 * xi4) + 1.15 * xi5)) *
+                    f**2 * rp**2 * 1e-3)
+
+        def fcn_rest():
+            return (((3.02e-4) / (1 + 1.9e-5 * f**1.5) +
+                     (0.283 * rt**0.3) / ((f - 118.75)**2 +
+                                          2.91 * rp**2 * rt**1.6)) *
+                    f**2 * rp**2 * rt**3.5 * 1e-3 + delta)
+
+        gamma0 = \
+            np.where(
+                f <= 54, fcn_le_54(),
+                np.where(
+                    np.logical_and(54 < f, f <= 60), fcn_le_60(),
+                    np.where(
+                        np.logical_and(60 < f, f <= 62), fcn_le_62(),
+                        np.where(
+                            np.logical_and(62 < f, f <= 66), fcn_le_66(),
+                            np.where(
+                                np.logical_and(66 < f, f <= 120),
+                                fcn_le_120(),
+                                fcn_rest())))))
 
         return gamma0
 
@@ -247,8 +270,9 @@ class _ITU676_10():
         N_pp_ox = Si_ox * F_i_ox
         N_pp_wv = Si_wv * F_i_wv
         d = 5.6e-4 * (p + e) * theta**0.8
-        N_d_pp = f * p * theta**2 * (6.14e-5 / (d * (1 + (f / d)**2)) +
-                                     1.4e-12 * p * theta**1.5 / (1 + 1.9e-5 * f**1.5))
+        N_d_pp = f * p * theta**2 * \
+            (6.14e-5 / (d * (1 + (f / d)**2)) +
+             1.4e-12 * p * theta**1.5 / (1 + 1.9e-5 * f**1.5))
         N_pp = N_pp_ox.sum() + N_pp_wv.sum() + N_d_pp
 
         gamma = 0.1820 * f * N_pp           # Eq. 1 [dB/km]
@@ -259,14 +283,14 @@ class _ITU676_10():
         """
         T goes in Kelvin
         """
-        if f > 350:
+        if np.any(f > 350):
             warnings.warn(
                 RuntimeWarning(
                     'The approximated method to computes '
                     'the gaseous attenuation in recommendation ITU-P 676-11 '
                     'is only recommended for frequencies below 350GHz'))
 
-        if (5 > el).any() or (np.mod(el, 90) < 5).any():
+        if np.any(5 > el) or np.any(np.mod(el, 90) < 5):
             warnings.warn(
                 RuntimeWarning(
                     'The approximated method to compute '
@@ -290,12 +314,15 @@ class _ITU676_10():
             np.exp(- ((f - 59.7) / (2.87 + 12.4 * np.exp(-7.9 * rp)))**2)
         t2 = (0.14 * np.exp(2.21 * rp)) / \
             ((f - 118.75)**2 + 0.031 * np.exp(2.2 * rp))
-        t3 = (0.0114) / (1 + 0.14 * rp**-2.6) * f * (-0.0247 + 0.0001 * f +
-                                                     1.61e-6 * f**2) / (1 - 0.0169 * f + 4.1e-5 * f**2 + 3.2e-7 * f**3)
+        t3 = (0.0114) / (1 + 0.14 * rp**-2.6) * f * \
+             (-0.0247 + 0.0001 * f + 1.61e-6 * f**2) / \
+             (1 - 0.0169 * f + 4.1e-5 * f**2 + 3.2e-7 * f**3)
+
         h0 = (6.1) / (1 + 0.17 * rp**-1.1) * (1 + t1 + t2 + t3)
 
-        if f < 70:
-            h0 = np.minimum(h0, 10.7 * rp**0.3)
+        h0 = np.where(f < 70,
+                      np.minimum(h0, 10.7 * rp**0.3),
+                      h0)
 
         sigmaw = (1.013) / (1 + np.exp(-8.6 * (rp - 0.57)))
         hw = 1.66 * (1 + (1.39 * sigmaw) / ((f - 22.235)**2 + 2.56 * sigmaw) +
@@ -411,8 +438,9 @@ class _ITU676_10():
         rho_ref = V_t / 4     # [g/m3]
         t_ref = 14 * np.log(0.22 * V_t / 4) + 3    # [Celsius]
 
-        return 0.0173 * V_t * self.gammaw_approx(f, p_ref, rho_ref, t_ref + 273) / \
-            self.gammaw_approx(f_ref, p_ref, rho_ref, t_ref + 273)
+        return (0.0173 * V_t *
+                self.gammaw_approx(f, p_ref, rho_ref, t_ref + 273) /
+                self.gammaw_approx(f_ref, p_ref, rho_ref, t_ref + 273))
 
 
 class _ITU676_9():
@@ -506,8 +534,9 @@ class _ITU676_9():
         N_pp_ox = Si_ox * F_i_ox
         N_pp_wv = Si_wv * F_i_wv
         d = 5.6e-4 * (p + e) * theta**0.8
-        N_d_pp = f * p * theta**2 * (6.14e-5 / (d * (1 + (f / d)**2)) +
-                                     1.4e-12 * p * theta**1.5 / (1 + 1.9e-5 * f**1.5))
+        N_d_pp = f * p * theta**2 * \
+            (6.14e-5 / (d * (1 + (f / d)**2)) +
+             1.4e-12 * p * theta**1.5 / (1 + 1.9e-5 * f**1.5))
         N_pp = N_pp_ox.sum() + N_pp_wv.sum() + N_d_pp
 
         gamma = 0.1820 * f * N_pp           # Eq. 1 [dB/km]

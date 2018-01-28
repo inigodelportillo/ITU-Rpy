@@ -129,9 +129,9 @@ class _ITU840_6():
     def specific_attenuation_coefficients(self, f, T):
         """
         """
-        if f > 1000:
-            raise ValueError(
-                'Frequency must be introduced in GHz and the maximum range is 1000 GHz')
+        if np.any(f > 1000):
+            raise ValueError('Frequency must be introduced in GHz and the '
+                             'maximum range is 1000 GHz')
 
         T_kelvin = T + 273.15
         theta = 300.0 / T_kelvin                # Eq. 9
@@ -146,8 +146,8 @@ class _ITU840_6():
         fs = 39.0 * fp                                              # Eq. 11
 
         # Compute the dielectric permitivity of water
-        epsilonp = (epsilon0 - epsilon1) / (1 + (f / fp) ** 2) + (epsilon1 -
-                                                                  epsilon2) / (1 + (f / fs) ** 2) + epsilon2  # Eq. 5
+        epsilonp = (epsilon0 - epsilon1) / (1 + (f / fp) ** 2) + \
+                   (epsilon1 - epsilon2) / (1 + (f / fs) ** 2) + epsilon2  # Eq. 5
 
         epsilonpp = f * (epsilon0 - epsilon1) / (fp * (1 + (f / fp)**2)) + \
             f * (epsilon1 - epsilon2) / (fs * (1 + (f / fs)**2))       # Eq. 4
@@ -254,7 +254,7 @@ class _ITU840_5():
     def specific_attenuation_coefficients(self, f, T):
         """
         """
-        if f > 1000:
+        if np.any(f > 1000):
             raise ValueError(
                 'Frequency must be introduced in GHz and the maximum range is 1000 GHz')
 
@@ -378,7 +378,7 @@ class _ITU840_4():
     def specific_attenuation_coefficients(self, f, T):
         """
         """
-        if f > 1000:
+        if np.any(f > 1000):
             raise ValueError(
                 'Frequency must be introduced in GHz and the maximum range is 1000 GHz')
 
