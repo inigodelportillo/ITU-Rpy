@@ -66,21 +66,21 @@ def prepare_output_array(array, type_input=None):
         value = array
         unit = None
 
-    if type_input in __NUMERIC_TYPES__ and \
+    # Squeeze output array to remove singleton dimensions
+    if type(value) in [np.ndarray, list]:
+        value = np.array(value).squeeze()
+
+    if type_input in __NUMERIC_TYPES__ and (type(array) in __NUMERIC_TYPES__) or\
        ((isinstance(array, np.ndarray) and array.size == 1) or
-        (not isinstance(array, np.ndarray) and len(array) == 1)):
-            value = float(value)
+            (not type(array) not in __NUMERIC_TYPES__ and len(array) == 1)):
+        value = float(value)
     elif type_input is list:
         if isinstance(value, np.ndarray):
-            value = value.to_list()
+            value = value.tolist()
         else:
             value = list(value)
     else:
         value = value
-
-    # Squeeze output array to remove singleton dimensions
-    if isinstance(value, np.ndarray):
-        value = value.squeeze()
 
     if unit is not None:
         return value * unit
@@ -253,7 +253,7 @@ def plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
 
     try:
         from mpl_toolkits.basemap import Basemap
-    except:
+    except BaseException:
         raise RuntimeError('Basemap is not installed and therefore plot_in_map'
                            ' cannot be used')
 
