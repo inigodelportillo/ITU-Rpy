@@ -48,19 +48,19 @@ width = 0.15
 
 fig, ax = plt.subplots(1, 1)
 ax.bar(city_idx, Att.value, 0.6, label='Total atmospheric Attenuation')
-
 ax.bar(city_idx - 1.5 * width, Ar.value, width, label='Rain attenuation')
 ax.bar(city_idx - 0.5 * width, Ag.value, width, label='Gaseous attenuation')
 ax.bar(city_idx + 0.5 * width, Ac.value, width, label='Clouds attenuation')
 ax.bar(city_idx + 1.5 * width, As.value, width,
        label='Scintillation attenuation')
 
+# Set the labels
 ticks = ax.set_xticklabels([''] + list(cities.keys()))
 for t in ticks:
     t.set_rotation(45)
 ax.set_ylabel('Atmospheric attenuation exceeded for 0.1% [dB]')
 
+# Format image
 ax.yaxis.grid(which='both', linestyle=':')
 ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.3), ncol=2)
-
 plt.tight_layout(rect=(0, 0, 1, 0.85))
