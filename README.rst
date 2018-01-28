@@ -1,7 +1,7 @@
 ITU-Rpy |GitHub license|
 ========================
 
-A python implementation of the ITU-P R.XXXX Recommendations to compute
+A python implementation of the ITU-P R Recommendations to compute
 atmospheric attenuation in slant and horizontal paths.
 
 The propagation loss on an Earth-space path and a horizontal-path,
@@ -10,14 +10,26 @@ namely: attenuation by atmospheric gases; attenuation by rain, other
 precipitation and clouds; scintillation and multipath effects;
 attenuation by sand and dust storms. Each of these contributions has its
 own characteristics as a function of frequency, geographic location and
-elevation angle. This package allows for fast, vectorial computation of
-the different contributions to the atmospheric attenuation.
+elevation angle. ITU-Rpy allows for fast, vectorial computation of the
+different contributions to the atmospheric attenuation.
+
+Documentation
+-------------
+
+The documentation can be found at `ITU-Rpy
+documentation <http://itu-rpy.readthedocs.io/en/latest/index.html>`__ in
+Read the docs.
+
+Examples of use cases can be found in the
+`examples <https://github.com/iportillo/ITU-Rpy/tree/master/examples>`__
+folder.
 
 Installation
 ------------
 
 ITU-Rpy has the followind dependencies: ``numpy``, ``scipy``,
-``joblib``, and ``astropy``
+``joblib``, and ``astropy``. Installation of ``basemap`` and
+``matplotlib`` is recommended to display results in a map.
 
 Using pip, you can install all of them by running:
 
@@ -25,11 +37,9 @@ Using pip, you can install all of them by running:
 
     pip install itur
 
-and using conda using:
-
-::
-
-    conda install itur
+More information about the installation process can be found on the
+`documentation <https://github.com/iportillo/ITU-Rpy/blob/master/docs/installation.rst>`__
+.
 
 ITU-P Recommendations implemented:
 ----------------------------------
@@ -50,6 +60,8 @@ compute propagation effects \* **ITU-P R.1511-1:** Topography for
 Earth-to-space propagation modelling \* **ITU-P R.1853-1:** Tropospheric
 attenuation time series synthesis
 
+The individual models can be accessed using the ``itur.models`` package.
+
 Usage
 -----
 
@@ -60,19 +72,22 @@ The following code examples shows the usage of ITU-Rpy
     import itur
     from astropy import units as u
 
-    f = 86 * u.GHz    # Link frequency
+    f = 22.5 * u.GHz    # Link frequency
     D = 1 * u.m       # Size of the receiver antenna
     el = 60           # Elevation angle constant of 60 degrees
     p = 3             # Percentage of time that attenuation values are exceeded.
         
-    # Generate a regular grid latitude and longitude points with 0.1 degrees resolution 
-    lat, lon = regular_lat_lon_grid() 
+    # Generate a regular grid latitude and longitude points with 1 degrees resolution   
+    lat, lon = itur.utils.regular_lat_lon_grid() 
 
     # Comute the atmospheric attenuation
     Att = itur.atmospheric_attenuation_slant_path(lat, lon, f, el, p, D) 
+    itur.utils.plot_in_map(Att.value, lat, lon, 
+                           cbar_text='Atmospheric attenuation [dB]')
 
-The individual models can be accessed in ``itur.models``. Examples for
-other use cases can be found in the ``examples`` folder.
+which produces: |Attenuation worldmap|
 
 .. |GitHub license| image:: https://img.shields.io/badge/license-MIT-lightgrey.svg
    :target: https://raw.githubusercontent.com/Carthage/Carthage/master/LICENSE.md
+.. |Attenuation worldmap| image:: https://raw.githubusercontent.com/iportillo/ITU-Rpy/master/docs/images/att_world.png
+

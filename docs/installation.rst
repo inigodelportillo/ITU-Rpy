@@ -16,8 +16,7 @@ line:
 
 Manual Installation
 -------------------
-To install ITU-Rpy from command line, please type the following commands on the
-command line:
+To install the development version of ITU-Rpy, please type the following commands on the command line:
 
 .. code-block:: bash
 
@@ -48,3 +47,10 @@ If that does not work, you can try to download it using conda:
 
     conda -c conda-forge install basemap
 
+If you are using Windows, you cna also install basemap using the appropriate pre-compiled wheels file from `this webpage <https://www.lfd.uci.edu/~gohlke/pythonlibs/#basemap>`_. 
+After downloading the .whl file, basemap can be installed running:
+
+
+.. code-block:: bash
+
+	pip install name_of_whl_file.whl

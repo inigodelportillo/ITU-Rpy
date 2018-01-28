@@ -5,21 +5,19 @@ A python implementation of the ITU-P R Recommendations to compute atmospheric at
 The propagation loss on an Earth-space path and a horizontal-path, relative to the free-space loss, is the sum of different contributions, namely:  attenuation by atmospheric gases; attenuation by rain, other precipitation and clouds; scintillation and multipath effects; attenuation by sand and dust storms. Each of these contributions has its own characteristics as a function of frequency, geographic location and elevation angle. ITU-Rpy allows for fast, vectorial computation of the different contributions to the atmospheric attenuation. 
 
 ## Documentation
-The documentation can be found at [ITU-Rpy Documentation](http://itu-rpy.readthedocs.io/en/latest/index.html) in Read the docs.
-Examples of use cases can be found in the `examples` folder.
+The documentation can be found at [ITU-Rpy documentation](http://itu-rpy.readthedocs.io/en/latest/index.html) in Read the docs.
+
+Examples of use cases can be found in the [examples](https://github.com/iportillo/ITU-Rpy/tree/master/examples) folder.
 
 ## Installation
-ITU-Rpy has the followind dependencies: `numpy`, `scipy`, `joblib`, and `astropy`
+ITU-Rpy has the followind dependencies: `numpy`, `scipy`, `joblib`, and `astropy`. Installation of `basemap` and `matplotlib` is recommended to display results in a map.
 
 Using pip, you can install all of them by running:
 ```
 pip install itur
 ```
 
-and using conda using:
-```
-conda install itur
-```
+More information about the installation process can be found on the [documentation](https://github.com/iportillo/ITU-Rpy/blob/master/docs/installation.rst) .
 
 ## ITU-P Recommendations implemented:
 The following ITU-P Recommendations are implemented in ITU-Rpy

@@ -18,8 +18,8 @@ Contents:
    quickstart
    api
    faq
-   contact
    license
+   contact
 
 ITU-Rpy is mainly written in Python 3 and continuously tested with Python 3.5-3.6.
 It depends on `numpy`, `scipy`, `joblib`, and `astropy`.
