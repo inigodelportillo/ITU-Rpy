@@ -40,7 +40,7 @@ p = 0.1                  # Unavailability (Values exceeded 0.1% of time)
 
 # Compute the atmospheric attenuation
 Ag, Ac, Ar, As, Att = itur.atmospheric_attenuation_slant_path(
-        lat, lon, f, el, p, D, return_contributions=True)
+    lat, lon, f, el, p, D, return_contributions=True)
 
 # Plot the results
 city_idx = np.arange(len(cities))
@@ -52,7 +52,8 @@ ax.bar(city_idx, Att.value, 0.6, label='Total atmospheric Attenuation')
 ax.bar(city_idx - 1.5 * width, Ar.value, width, label='Rain attenuation')
 ax.bar(city_idx - 0.5 * width, Ag.value, width, label='Gaseous attenuation')
 ax.bar(city_idx + 0.5 * width, Ac.value, width, label='Clouds attenuation')
-ax.bar(city_idx + 1.5 * width, As.value, width, label='Scintillation attenuation')
+ax.bar(city_idx + 1.5 * width, As.value, width,
+       label='Scintillation attenuation')
 
 ticks = ax.set_xticklabels([''] + list(cities.keys()))
 for t in ticks:
