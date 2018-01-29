@@ -28,14 +28,14 @@ I cannot operate with the values returned by *ITU-Rpy*
 	print(d1 + p1)     # Generates an error.
 
 
-The user can transform between compatible units using the `.to()` method.
+The user can transform between compatible units using the ``.to()`` method.
 
 .. code-block:: python
 	
 	print(d1.to(itur.u.km))    # prints 0.3 km
 	
 
-One can access to the values and units using the `.value` and `.unit` methods respectively. Some matplotlib functions accept Quantities as inputs (`plt.plot`, `plt.scatter`), whereas others require plain values (`plt.bar`).
+One can access to the values and units using the ``.value`` and ``.unit`` methods respectively. Some matplotlib functions accept Quantities as inputs (``plt.plot``, ``plt.scatter``), whereas others require plain values (`plt.bar`).
  
 
 I discovered a bug/have criticism or ideas on *ITU-Rpy*. Where should I report to?
