@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import matplotlib.pyplot as plt
-from satcomm_utils import RE
+from satcomm_utils import RE, C
 
 """
 Method to compute the antenna gain in angles different from the boresight. 
-The method is based on the 3rd one found in Recommendation ITU-R S.1528-0. 
+The method is based on the 2nd one found in Recommendation ITU-R S.1528-0. 
 
 References
 --------
@@ -24,46 +24,113 @@ def convert_nparray(arr):
     return arr
 
 
-def calculate_psi(lat_boresight, lon_boresight, lat, lon, a):
+def calculate_psi(lat_boresight, lon_boresight, lat_sat, lon_sat,
+                  lat, lon, a):
+    """
+    Calculates the angle (psi, in deg) from the direction of the beam boresight
+    to the points defined by (lat, lon) as seen from the satellite defined by
+    (lat_sat, lon_sat, a)
+
+
+    Parameters
+    -----------
+    lat_boresight: float
+        Latitude coordinate of the beam boresight
+    lon_boresight: float
+        Longitude coordinate of the beam boresight
+    lat_sat: float
+        Latitude coordinate of the satellite
+    lon_sat: float
+        Longitude coordinate of the satellite
+    lat: numpy.ndarray or list or float
+        Latitude coordinates of the points for which psi will be calculated
+    lon: numpy.ndarray or list or float
+        Longitude coordinates of the points for which psi will be calculated
+    a: float
+        Semi-major axis of the satellite (km)
+
+
+    Returns
+    --------
+    psi: numpy.ndarray
+        Angles from the boresight to the points (deg)
+    """
     lat = convert_nparray(lat)
     lon = convert_nparray(lon)
 
     lat_boresight = np.deg2rad(lat_boresight)
     lon_boresight = np.deg2rad(lon_boresight)
+    # lat_sat = np.deg2rad(lat_sat)  # TODO: exact method
+    # lon_sat = np.deg2rad(lon_sat)
     lat = np.deg2rad(lat)
     lon = np.deg2rad(lon)
 
     radii = a / RE
-    delta_lat = lat_boresight - lat
-    delta_lon = lon_boresight - lon
+
+    delta_lat = lat - lat_boresight
+    delta_lon = lon - lon_boresight
     beta = np.arccos(np.cos(delta_lat) * np.cos(delta_lon))
-    ret = np.arctan2(np.sin(beta), (radii - np.cos(beta)))
-    return np.rad2deg(ret)
+    psi = np.arctan2(np.sin(beta), (radii - np.cos(beta)))  # SSP-point
+
+    return np.rad2deg(psi)
 
 
-def calculate_gain(lat_boresight, lon_boresight, lat, lon, a, D, l, G_m,
-                   L_n=-25, L_f=3, z=1, psi_b=None, psi=None):
+def calculate_gain(lat_boresight, lon_boresight, lat_sat, lon_sat, lat, lon, a,
+                   G_m, D=None, l=None, L_n=-25, L_f=3, z=1, psi_b=None,
+                   psi=None):
     """
-    Calculates the gain of a multiple-beam satellite antenna having either
+    Calculates the gain pattern of a multiple-beam satellite antenna having
     circular or elliptical beams. Method #2 of the recommendation.
 
 
     Parameters
     -----------
+    lat_boresight: float
+        Latitude coordinate of the beam boresight
+    lon_boresight: float
+        Longitude coordinate of the beam boresight
+    lat_sat: float
+        Latitude coordinate of the satellite
+    lon_sat: float
+        Longitude coordinate of the satellite
     lat: numpy.ndarray or list or float
-        Latitude coordinates of
+        Latitude coordinates of the points for which psi will be calculated
     lon: numpy.ndarray or list or float
-        Longitude coordinates of
+        Longitude coordinates of the points for which psi will be calculated
+    a: float
+        Semi-major axis of the satellite (km)
+    G_m: float
+        Maximum gain in the boresight, the main lobe (dB)
+    D: float
+        Diameter of the antenna (m), used to calculate psi_b if not given
+    l: float
+        Wavelength of the lowest band edge of interest(m), used to calculate
+        psi_b if not given
+    L_n: float
+        near-in-side-lobe level (dB) relative to the peak gain required
+        by the system design. L_n should be in [-15, -20, -25, -30] if z != 1
+    L_f: float
+        0 dBi far-out side-lobe level (dBi)
+    z: float
+        (major axis/minor axis) for the radiated beam
+    psi_b: float
+        One-half the 3 dB beamwidth (3 dB below G_m) (deg)
+    psi: np.array
+        Angles  (deg) from the boresight to the points on which gain is to be
+        calculated. If it is given, lats, lons and 'a' are ignored.
 
 
     Returns
     --------
     gain: numpy.ndarray
-        Antenna gain...
+        Antenna gain in the direction specified by the input parameters (dB)
     """
 
     if psi is None:
-        psi = calculate_psi(lat_boresight, lon_boresight, lat, lon, a)
+        psi = calculate_psi(lat_boresight, lon_boresight, lat_sat, lon_sat,
+                            lat, lon, a)
+    else:
+        psi = convert_nparray(psi)
     assert all(0 <= angle <= 90 for angle in psi)
 
     if psi_b is None:
@@ -94,22 +161,28 @@ def calculate_gain(lat_boresight, lon_boresight, lat, lon, a, D, l, G_m,
 
 
 if __name__ == '__main__':
-    lat_boresight = [20, 18]
-    lon_boresight = [10, 12]
-    lat = 20
-    lon = 10
+    lat_lon_boresight = [20, 10]
+    lat_sat = 20
+    lon_sat = 10
+    # lat_lon = [20.1, 9.9]
+    lat = [21]
+    lon = [10]
     a = 8000
     epsilon = 0.4
     freq = 30e9
-    l = 299792458/freq
-    D = 70*l/(2*epsilon)
+    # l = C/freq
+    # D = 70*l/(2*epsilon)
     G_m = 35
-    print(calculate_gain(lat_boresight, lon_boresight, lat, lon, a, D, l, G_m,
-                         psi_b = epsilon))
+    print(calculate_gain(*lat_lon_boresight,lat_sat, lon_sat,
+                         lat, lon, a, G_m, psi_b = epsilon))
 
-    psi = np.linspace(0, 12)  # 28.8
-    G = calculate_gain(0, 0, 0, 0, 0, D, l, G_m, psi_b=epsilon, psi=psi)
+    psi = np.linspace(0, 12)
+    G = calculate_gain(0, 0, 0, 0, 0, 0, 0, G_m, psi_b=epsilon, psi=psi)
     plt.plot(psi, G)
+    plt.title('Radiation pattern envelope function')
+    plt.xlabel('Off-axis angle (deg)')
+    plt.ylabel('Gain (dB)')
+    plt.grid()
     plt.show()
 
 # psi = np.rad2deg(psi)
