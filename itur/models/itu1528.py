@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import matplotlib.pyplot as plt
-from satcomm_utils import RE, C
+from satcomm_utils import RE, LLA_to_ECEF
+
 
 """
 Method to compute the antenna gain in angles different from the boresight. 
@@ -58,20 +59,13 @@ def calculate_psi(lat_boresight, lon_boresight, lat_sat, lon_sat,
     lat = convert_nparray(lat)
     lon = convert_nparray(lon)
 
-    lat_boresight = np.deg2rad(lat_boresight)
-    lon_boresight = np.deg2rad(lon_boresight)
-    # lat_sat = np.deg2rad(lat_sat)  # TODO: exact method
-    # lon_sat = np.deg2rad(lon_sat)
-    lat = np.deg2rad(lat)
-    lon = np.deg2rad(lon)
-
-    radii = a / RE
-
-    delta_lat = lat - lat_boresight
-    delta_lon = lon - lon_boresight
-    beta = np.arccos(np.cos(delta_lat) * np.cos(delta_lon))
-    psi = np.arctan2(np.sin(beta), (radii - np.cos(beta)))  # SSP-point
-
+    boresight = LLA_to_ECEF([lon_boresight, lat_boresight, 0])
+    sat = LLA_to_ECEF([lon_sat, lat_sat, (a - RE)*1000])
+    points = LLA_to_ECEF([lon, lat, 0])  # [0]*len(lon))
+    vec_b = boresight - sat
+    vec_p = points - sat
+    psi = np.arccos(np.dot(vec_b, vec_p) /
+                    (np.linalg.norm(vec_b)*np.linalg.norm(vec_p)))
     return np.rad2deg(psi)
 
 
@@ -131,6 +125,7 @@ def calculate_gain(lat_boresight, lon_boresight, lat_sat, lon_sat, lat, lon, a,
                             lat, lon, a)
     else:
         psi = convert_nparray(psi)
+
     assert all(0 <= angle <= 90 for angle in psi)
 
     if psi_b is None:
@@ -161,20 +156,18 @@ def calculate_gain(lat_boresight, lon_boresight, lat_sat, lon_sat, lat, lon, a,
 
 
 if __name__ == '__main__':
-    lat_lon_boresight = [20, 10]
-    lat_sat = 20
-    lon_sat = 10
+    lat_lon_boresight = [2, 0]
+    lat_sat = 0
+    lon_sat = 1
+    a = 2*RE
     # lat_lon = [20.1, 9.9]
-    lat = [21]
-    lon = [10]
-    a = 8000
+    lat = 0
+    lon = 3
     epsilon = 0.4
     freq = 30e9
-    # l = C/freq
-    # D = 70*l/(2*epsilon)
     G_m = 35
-    print(calculate_gain(*lat_lon_boresight,lat_sat, lon_sat,
-                         lat, lon, a, G_m, psi_b = epsilon))
+    print(calculate_gain(*lat_lon_boresight, lat_sat, lon_sat,
+                         lat, lon, a, G_m, psi_b=epsilon))
 
     psi = np.linspace(0, 12)
     G = calculate_gain(0, 0, 0, 0, 0, 0, 0, G_m, psi_b=epsilon, psi=psi)
