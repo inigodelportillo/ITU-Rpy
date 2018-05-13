@@ -8,7 +8,8 @@ import warnings
 from astropy import units as u
 
 from itur.models.itu453 import radio_refractive_index
-from itur.models.itu835 import standard_pressure, standard_temperature
+from itur.models.itu835 import standard_pressure, standard_temperature, \
+    standard_water_vapour_density
 from itur.models.itu836 import total_water_vapour_content
 from itur.utils import prepare_quantity, prepare_output_array,\
     prepare_input_array, load_data, dataset_dir, memory
@@ -359,7 +360,7 @@ class _ITU676_10():
             h_n = np.cumsum(delta_h)
             T_n = standard_temperature(h_n).to(u.K).value
             press_n = standard_pressure(h_n).value
-            rho = 7.5
+            rho_n = standard_water_vapour_density(h_n).value
 
             e = rho * T / 216.7
             n_n = radio_refractive_index(press_n, e, T).value
@@ -368,12 +369,13 @@ class _ITU676_10():
 
             b = np.pi / 2 - np.deg2rad(el)
             Agas = 0
-            for t, press, r, delta, n_r in zip(
-                    T_n, press_n, r_n, delta_h, n_ratio):
+            for t, press, rho, r, delta, n_r in zip(
+                    T_n, press_n, rho_n, r_n, delta_h, n_ratio):
                 a = - r * np.cos(b) + 0.5 * np.sqrt(
                     4 * r**2 * np.cos(b)**2 + 8 * r * delta + 4 * delta**2)
-                alpha = np.pi - np.arccos((-a**2 - 2 * r * delta - delta**2) /
-                                          (2 * a * r + 2 * a * delta))
+                a_cos_arg = np.clip((-a**2 - 2 * r * delta - delta**2) /
+                                    (2 * a * r + 2 * a * delta), -1, 1)
+                alpha = np.pi - np.arccos(a_cos_arg)
                 gamma = self.gaseous_attenuation_exact(f, press, rho, t)
                 Agas += a * gamma
                 b = np.arcsin(n_r * np.sin(alpha))
