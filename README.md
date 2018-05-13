@@ -17,7 +17,7 @@ Using pip, you can install all of them by running:
 pip install itur
 ```
 
-More information about the installation process can be found on the [documentation](https://github.com/iportillo/ITU-Rpy/blob/master/docs/installation.rst) .
+More information about the installation process can be found on the [documentation](https://github.com/iportillo/ITU-Rpy/blob/master/docs/installation.rst).
 
 ## ITU-P Recommendations implemented:
 The following ITU-P Recommendations are implemented in ITU-Rpy
