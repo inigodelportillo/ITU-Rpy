@@ -103,7 +103,7 @@ class _ITU835_5():
             P = np.zeros((n + 1))
             P[0] = P_0
             for i in range(n):
-                h_p = H[ret_i] if i == (n - 1) else H[i + 1]
+                h_p = h[ret_i] if i == (n - 1) else H[i + 1]
                 if L[i] != 0:
                     P[i + 1] = P[i] * \
                         (T[i] / (T[i] + L[i] * (h_p - H[i])))**(34.163 / L[i])
