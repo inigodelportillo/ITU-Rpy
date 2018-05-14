@@ -85,6 +85,11 @@ class __ITU676():
         return self.instance.zenit_water_vapour_attenuation(
             lat, lon, p, f, V_t, alt)
 
+    def gamma_exact(self, f, p, rho, t):
+        # Abstract method to compute the specific attenuation using the
+        # line-by-line method
+        return self.instance.gamma_exact(f, p, rho, t)
+
     def gammaw_approx(self, f, p, rho, t):
         # Abstract method to compute the specific attenuation due to water
         # vapour
@@ -215,17 +220,15 @@ class _ITU676_10():
         return gamma0
 
     @classmethod
-    def gaseous_attenuation_exact(self, f, p, rho, T):
+    def gamma_exact(self, f, p, rho, T):
         # T in Kelvin
         # e : water vapour partial pressure in hPa (total barometric pressure
         # ptot = p + e)
         theta = 300 / T
         e = rho * T / 216.7
 
-        tmp = load_data(
-            dataset_dir +
-            '676//v10_lines_oxygen.txt',
-            skip_header=1)
+        tmp = load_data(dataset_dir + '676//v10_lines_oxygen.txt',
+                        skip_header=1)
         f_ox = tmp[:, 0]
         a1 = tmp[:, 1]
         a2 = tmp[:, 2]
@@ -234,10 +237,8 @@ class _ITU676_10():
         a5 = tmp[:, 5]
         a6 = tmp[:, 6]
 
-        tmp = load_data(
-            dataset_dir +
-            '676//v10_lines_water_vapour.txt',
-            skip_header=1)
+        tmp = load_data(dataset_dir + '676//v10_lines_water_vapour.txt',
+                        skip_header=1)
         f_wv = tmp[:, 0]
         b1 = tmp[:, 1]
         b2 = tmp[:, 2]
@@ -246,10 +247,8 @@ class _ITU676_10():
         b5 = tmp[:, 5]
         b6 = tmp[:, 6]
 
-        D_f_ox = a3 * 1e-4 * (p * np.power(theta * np.ones_like(a4),
-                                           (0.8 - a4)) + 1.1 * e * theta)
-        D_f_wv = b3 * 1e-4 * (p * np.power(theta * np.ones_like(b4),
-                                           b4) + np.power(b5 * e * theta, b6))
+        D_f_ox = a3 * 1e-4 * (p * (theta ** (0.8 - a4)) + 1.1 * e * theta)
+        D_f_wv = b3 * 1e-4 * (p * (theta ** b4) + b5 * e * theta ** b6)
 
         D_f_ox = np.sqrt(D_f_ox**2 + 2.25e-6)
         D_f_wv = 0.535 * D_f_wv + \
@@ -270,10 +269,13 @@ class _ITU676_10():
 
         N_pp_ox = Si_ox * F_i_ox
         N_pp_wv = Si_wv * F_i_wv
+
         d = 5.6e-4 * (p + e) * theta**0.8
+
         N_d_pp = f * p * theta**2 * \
             (6.14e-5 / (d * (1 + (f / d)**2)) +
              1.4e-12 * p * theta**1.5 / (1 + 1.9e-5 * f**1.5))
+
         N_pp = N_pp_ox.sum() + N_pp_wv.sum() + N_d_pp
 
         gamma = 0.1820 * f * N_pp           # Eq. 1 [dB/km]
@@ -342,7 +344,7 @@ class _ITU676_10():
                 f, el, rho, P, T)
             return (gamma0 + gammaw) * r
         else:
-            gamma = self.gaseous_attenuation_exact(f, el, rho, P, T)
+            gamma = self.gamma_exact(f, P, rho, T)
             return gamma * r
 
     @classmethod
@@ -360,7 +362,7 @@ class _ITU676_10():
             h_n = np.cumsum(delta_h)
             T_n = standard_temperature(h_n).to(u.K).value
             press_n = standard_pressure(h_n).value
-            rho_n = standard_water_vapour_density(h_n).value
+            rho_n = standard_water_vapour_density(h_n, rho_0=rho).value
 
             e = rho * T / 216.7
             n_n = radio_refractive_index(press_n, e, T).value
@@ -376,7 +378,7 @@ class _ITU676_10():
                 a_cos_arg = np.clip((-a**2 - 2 * r * delta - delta**2) /
                                     (2 * a * r + 2 * a * delta), -1, 1)
                 alpha = np.pi - np.arccos(a_cos_arg)
-                gamma = self.gaseous_attenuation_exact(f, press, rho, t)
+                gamma = self.gamma_exact(f, press, rho, t)
                 Agas += a * gamma
                 b = np.arcsin(n_r * np.sin(alpha))
 
@@ -398,7 +400,8 @@ class _ITU676_10():
             gamma0, gammaw = self.gaseous_attenuation_approximation(
                 f, el, rho, P, T)
         else:
-            gamma0, gammaw = self.gaseous_attenuation_exact(f, el, rho, P, T)
+            gamma0 = self.gamma_exact(f, P, rho, T)
+            gammaw = 0
 
         h0, hw = self.slant_inclined_path_coefficients(f, P)
 
@@ -480,7 +483,7 @@ class _ITU676_9():
         return _ITU676_10.gaseous_attenuation_slant_path(*args, **kwargs)
 
     # The exact gaseous attenuation presents differences between classes.
-    def gaseous_attenuation_exact(self, f, p, rho, T):
+    def gamma_exact(self, f, p, rho, T):
         # T in Kelvin
         # e : water vapour partial pressure in hPa (total barometric pressure
         # ptot = p + e)
@@ -725,9 +728,9 @@ def gaseous_attenuation_inclined_path(f, el, rho, P, T, h1, h2, mode='approx'):
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
-    type_output = type(el)
     f = prepare_quantity(f, u.GHz, 'Frequency')
     el = prepare_quantity(el, u.deg, 'Elevation angle')
+    type_output = type(el)
     rho = prepare_quantity(rho, u.g / u.m**3, 'Water vapor density')
     P = prepare_quantity(P, u.hPa, 'Atospheric pressure')
     T = prepare_quantity(T, u.K, 'Temperature')
@@ -791,6 +794,44 @@ def zenit_water_vapour_attenuation(lat, lon, p, f, V_t=None, alt=None):
     return prepare_output_array(val, type_output) * u.dB
 
 
+def gamma_exact(f, P, rho, T):
+    """
+    Method to estimate the specific attenuation using the line-by-line method
+    described in Annex 1 of the recommendation.
+
+
+    Parameters
+    ----------
+    f : number or Quantity
+        Frequency (GHz)
+    P : number or Quantity
+        Atmospheric pressure (hPa)
+    rho : number or Quantity
+        Water vapor density (g/m3)
+    T : number or Quantity
+        Absolute temperature (K)
+
+    Returns
+    -------
+    gamma : Quantity
+        Specific attenuation (dB/km)
+
+    References
+    --------
+    [1] Attenuation by atmospheric gases:
+    https://www.itu.int/rec/R-REC-P.676/en
+    """
+    global __model
+    f = prepare_quantity(f, u.GHz, 'Frequency')
+    type_output = type(f)
+
+    P = prepare_quantity(P, u.hPa, 'Atmospheric pressure ')
+    rho = prepare_quantity(rho, u.g / u.m**3, 'Water vapour density')
+    T = prepare_quantity(T, u.K, 'Temperature')
+    val = __model.gamma_exact(f, P, rho, T)
+    return prepare_output_array(val, type_output) * u.dB / u.km
+
+
 def gammaw_approx(f, P, rho, T):
     """
     Method to estimate the specific attenuation due to water vapour.
@@ -831,7 +872,6 @@ def gammaw_approx(f, P, rho, T):
 def gamma0_approx(f, P, T):
     """
     Method to estimate the specific attenuation due to dry atmosphere.
-
 
     Parameters
     ----------
