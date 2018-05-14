@@ -94,12 +94,13 @@ class _ITU835_5():
         L = [-6.5, 0, 1, 2.8, 0, -2.8, -2]
         T = np.array([0, -65, -65, -53, -11, -11, -67, -95]) + T_0
 
-        num_splits = np.minimum(np.array(np.searchsorted(H, h)), 7)
+        num_splits = np.minimum(np.searchsorted(H, h), 7)
         if not hasattr(num_splits, '__iter__'):
             num_splits = list([num_splits])
 
-        ret = np.ones_like(num_splits) * P_0
+        ret = np.ones_like(h) * P_0
         for ret_i, n in enumerate(num_splits):
+            n = n.squeeze()
             P = np.zeros((n + 1))
             P[0] = P_0
             for i in range(n):
@@ -567,10 +568,13 @@ def standard_pressure(h, T_0=288.15, P_0=1013.25):
     """
     global __model
 
+    type_output = type(h)
+    h = np.atleast_1d(h)
     h = prepare_quantity(h, u.km, 'Height')
     T_0 = prepare_quantity(T_0, u.Kelvin, 'Surface temperature')
     P_0 = prepare_quantity(P_0, u.hPa, 'Surface pressure')
-    return __model.standard_pressure(h, T_0, P_0) * u.hPa
+    val = __model.standard_pressure(h, T_0, P_0)
+    return prepare_output_array(val, type_output) * u.hPa
 
 
 def standard_water_vapour_density(h, h_0=2, rho_0=7.5):
