@@ -12,10 +12,8 @@ python:
   - "3.6-dev"  # 3.6 development branch
   - "3.7-dev"  # 3.7 development branch
   - "nightly"
-# command to install dependencies
 install:
   - pip install .
   - pip install -r requirements.txt
-  
- script:
+script:
   - python ./tests/validate.py
