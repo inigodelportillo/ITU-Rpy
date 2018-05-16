@@ -13,7 +13,7 @@ from joblib import Memory
 from astropy import units as u
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-dataset_dir = os.path.join(dir_path, './data/')
+dataset_dir = os.path.join(dir_path, 'data/')
 
 # Create a memory cache to memoize results of some functions
 cachedir = mkdtemp()
