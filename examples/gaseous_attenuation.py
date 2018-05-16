@@ -53,7 +53,7 @@ plt.grid(which='both', linestyle=':', color='gray', linewidth=0.3, alpha=0.5)
 plt.grid(which='major', linestyle=':', color='black')
 plt.title('FIGURE 1. - Specific attenuation due to atmospheric gases,\n '
           'calculated at 1 GHz intervals, including line centres')
-
+plt.tight_layout()
 
 ###############################################################################
 #                  Specific attenuation at different altitudes                #
@@ -99,6 +99,7 @@ plt.grid(which='major', linestyle=':', color='black')
 plt.title('FIGURE 2. - Specific attenuation in the range 50-70 GHz at the\n'
           ' altitudes indicated, calculated at intervals of 10 MHz\n'
           ' including line centers (0, 5, 10 15, 20) km')
+plt.tight_layout()
 
 ###############################################################################
 #               Comparison of line-by-line and approximate method             #
@@ -144,3 +145,4 @@ plt.legend()
 plt.grid(which='both', linestyle=':', color='gray', linewidth=0.3, alpha=0.5)
 plt.grid(which='major', linestyle=':', color='black')
 plt.title('Comparison of line-by-line method to approximate method')
+plt.tight_layout()
