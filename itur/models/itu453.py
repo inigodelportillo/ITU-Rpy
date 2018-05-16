@@ -4,10 +4,12 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+import os
+from astropy import units as u
+
 from itur.models.itu1144 import bilinear_2D_interpolator
 from itur.utils import prepare_input_array, prepare_quantity, load_data,\
     prepare_output_array, dataset_dir
-from astropy import units as u
 
 
 class __ITU453():
@@ -84,9 +86,9 @@ class _ITU453_12():
         if not self._DN65:
             ps = [0.1, 0.2, 0.5, 1, 2, 3, 5, 10, 20, 30, 50, 60, 70, 80,
                   90, 95, 98, 99, 99.5, 99.8, 99.9]
-            d_dir = dataset_dir + '453/DN65m_%02dd%02d_v1.txt'
-            lats = load_data(dataset_dir + '453/lat0d75.txt')
-            lons = load_data(dataset_dir + '453/lon0d75.txt')
+            d_dir = os.path.join(dataset_dir, '453/DN65m_%02dd%02d_v1.txt')
+            lats = load_data(os.path.join(dataset_dir, '453/lat0d75.txt'))
+            lons = load_data(os.path.join(dataset_dir, '453/lon0d75.txt'))
             for p_loads in ps:
                 int_p = p_loads // 1
                 frac_p = p_loads % 1
@@ -101,9 +103,9 @@ class _ITU453_12():
         if not self._DN1:
             ps = [0.1, 0.2, 0.5, 1, 2, 3, 5, 10, 20, 30, 50, 60, 70, 80,
                   90, 95, 98, 99, 99.5, 99.8, 99.9]
-            d_dir = dataset_dir + '453/DN_%02dd%02d_v1.txt'
-            lats = load_data(dataset_dir + '453/lat0d75.txt')
-            lons = load_data(dataset_dir + '453/lon0d75.txt')
+            d_dir = os.path.join(dataset_dir, '453/DN_%02dd%02d_v1.txt')
+            lats = load_data(os.path.join(dataset_dir, '453/lat0d75.txt'))
+            lons = load_data(os.path.join(dataset_dir, '453/lon0d75.txt'))
             for p_loads in ps:
                 int_p = p_loads // 1
                 frac_p = p_loads % 1
@@ -116,9 +118,9 @@ class _ITU453_12():
 
     def N_wet(self, lat, lon):
         if not self._N_wet:
-            vals = load_data(dataset_dir + '453/v12_ESANWET.txt')
-            lats = load_data(dataset_dir + '453/v12_ESALAT.txt')
-            lons = load_data(dataset_dir + '453/v12_ESALON.txt')
+            vals = load_data(os.path.join(dataset_dir, '453/v12_ESANWET.txt'))
+            lats = load_data(os.path.join(dataset_dir, '453/v12_ESALAT.txt'))
+            lons = load_data(os.path.join(dataset_dir, '453/v12_ESALON.txt'))
             self._N_wet = bilinear_2D_interpolator(lats, lons, vals)
 
         return self._N_wet(

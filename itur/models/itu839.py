@@ -4,6 +4,7 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+import os
 from astropy import units as u
 
 from itur.models.itu1144 import bilinear_2D_interpolator
@@ -14,9 +15,10 @@ from itur.utils import load_data, dataset_dir, prepare_input_array,\
 class __ITU839():
     """Rain height model for prediction methods.
 
-    Available versions include:
+    Not available versions:
     * P.839-0 (03/92) (Superseded)
     * P.839-1 (83/97) (Superseded)
+    Available versions include:
     * P.839-2 (10/99) (Superseded)
     * P.839-3 (02/01) (Superseded)
     * P.839-4 (09/2013) (Current version)
@@ -31,10 +33,10 @@ class __ITU839():
             self.instance = _ITU839_3()
         elif version == 2:
             self.instance = _ITU839_2()
-        elif version == 1:
-            self.instance = _ITU839_1()
-        elif version == 0:
-            self.instance = _ITU839_0()
+#        elif version == 1:
+#            self.instance = _ITU839_1()
+#        elif version == 0:
+#            self.instance = _ITU839_0()
         else:
             raise ValueError(
                 'Version ' +
@@ -68,9 +70,10 @@ class _ITU839_4():
 
     def zero_isoterm_data(self, lat, lon):
         if not self._zero_isoterm_data:
-            vals = load_data(dataset_dir + '839/v4_ESA0HEIGHT.txt')
-            lats = load_data(dataset_dir + '839/v4_ESALAT.txt')
-            lons = load_data(dataset_dir + '839/v4_ESALON.txt')
+            vals = load_data(os.path.join(dataset_dir,
+                                          '839/v4_ESA0HEIGHT.txt'))
+            lats = load_data(os.path.join(dataset_dir, '839/v4_ESALAT.txt'))
+            lons = load_data(os.path.join(dataset_dir, '839/v4_ESALON.txt'))
             self._zero_isoterm_data = bilinear_2D_interpolator(
                 lats, lons, vals)
 
@@ -80,9 +83,9 @@ class _ITU839_4():
     def isoterm_0(self, lat_d, lon_d):
         """
         The data is interpolated using a -180° to 180° in longitude and
-        +90° to –90° in latitude grid. The mean annual 0°C isotherm height above
-        mean sea level at the desired location is derived by performing a bilinear
-        interpolator on the values at the four closest gridpoints
+        +90° to –90° in latitude grid. The mean annual 0°C isotherm height
+        above mean sea level at the desired location is derived by performing
+        a bilinear interpolator on the values at the four closest gridpoints
         """
         return self.zero_isoterm_data(lat_d, lon_d)
 
@@ -110,20 +113,20 @@ class _ITU839_3():
     def zero_isoterm_data(self):
         if self._zero_isoterm_data is None:
             self._zero_isoterm_data['values'] = load_data(
-                dataset_dir + 'v3_ESA0HEIGHT.txt')
+                os.path.join(dataset_dir, 'v3_ESA0HEIGHT.txt'))
             self._zero_isoterm_data['lat'] = load_data(
-                dataset_dir + 'v3_ESALAT.txt')
+                os.path.join(dataset_dir, 'v3_ESALAT.txt'))
             self._zero_isoterm_data['lon'] = load_data(
-                dataset_dir + 'v3_ESALON.txt')
+                os.path.join(dataset_dir, 'v3_ESALON.txt'))
 
         return self._zero_isoterm_data
 
     def isoterm_0(self, lat_d, lon_d):
         """
         The data is interpolated using a -180° to 180° in longitude and
-        +90° to –90° in latitude grid. The mean annual 0°C isotherm height above
-        mean sea level at the desired location is derived by performing a bilinear
-        interpolator on the values at the four closest gridpoints
+        +90° to –90° in latitude grid. The mean annual 0°C isotherm height
+        above mean sea level at the desired location is derived by performing
+        a bilinear interpolator on the values at the four closest gridpoints
         """
         zero_isoterm = self.zero_isoterm_data
         return bilinear_2D_interpolator(
@@ -172,8 +175,8 @@ class _ITU839_2():
         """
         For areas of the world where no specific information is available,
         the mean rain height, may be approximated by the mean 0C isotherm
-        height, and for for North America and for Europe west of 60° E longitude
-        the mean rain height is approximated by
+        height, and for for North America and for Europe west of 60° E
+        longitude the mean rain height is approximated by
 
         ..math:
             h_r = 3.2 - 0.075 (\\lambda - 35) \\qquad for \\qquad

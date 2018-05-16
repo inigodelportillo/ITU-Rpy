@@ -4,6 +4,7 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+import os
 from astropy import units as u
 
 from itur.models.itu453 import DN65
@@ -101,9 +102,9 @@ class _ITU530_16():
         using bi-linear interpolation.
         """
         if not self._s_a:
-            vals = load_data(dataset_dir + '530/v16_gtopo_30.txt')
-            lats = load_data(dataset_dir + '530/v16_lat.txt')
-            lons = load_data(dataset_dir + '530/v16_lon.txt')
+            vals = load_data(os.path.join(dataset_dir, '530/v16_gtopo_30.txt'))
+            lats = load_data(os.path.join(dataset_dir, '530/v16_lat.txt'))
+            lons = load_data(os.path.join(dataset_dir, '530/v16_lon.txt'))
             self._Pr6 = bilinear_2D_interpolator(lats, lons, vals)
 
         return self._Pr6(
