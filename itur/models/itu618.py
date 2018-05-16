@@ -9,9 +9,10 @@ import scipy.special
 import scipy.integrate
 from astropy import units as u
 
+import itur.utils as utils
 from itur.models.itu453 import water_vapour_pressure,\
     wet_term_radio_refractivity, map_wet_term_radio_refractivity
-from itur.models.itu837 import rainfall_rate, rain_percentage_probability
+from itur.models.itu837 import rainfall_rate, rainfall_probability
 from itur.models.itu838 import rain_specific_attenuation
 from itur.models.itu839 import rain_height
 from itur.models.itu1511 import topographic_altitude
@@ -63,28 +64,28 @@ class _ITU618():
     def __init__(self, version=12):
         if version == 12:
             self.instance = _ITU618_12()
-        elif version == 11:
-            self.instance = _ITU618_11()  # TODO: Implement older versions or recommendation
-        elif version == 10:
-            self.instance = _ITU618_10()  # TODO: Implement older versions or recommendation
-        elif version == 9:
-            self.instance = _ITU618_9()  # TODO: Implement older versions or recommendation
-        elif version == 8:
-            self.instance = _ITU618_8()  # TODO: Implement older versions or recommendation
-        elif version == 7:
-            self.instance = _ITU618_7()  # TODO: Implement older versions or recommendation
-        elif version == 6:
-            self.instance = _ITU618_6()  # TODO: Implement older versions or recommendation
-        elif version == 5:
-            self.instance = _ITU618_5()  # TODO: Implement older versions or recommendation
-        elif version == 4:
-            self.instance = _ITU618_4()  # TODO: Implement older versions or recommendation
-        elif version == 3:
-            self.instance = _ITU618_3()  # TODO: Implement older versions or recommendation
-        elif version == 2:
-            self.instance = _ITU618_2()  # TODO: Implement older versions or recommendation
-        elif version == 1:
-            self.instance = _ITU618_1()  # TODO: Implement older versions or recommendation
+#        elif version == 11:
+#            self.instance = _ITU618_11()  # TODO: Implement older versions or recommendation
+#        elif version == 10:
+#            self.instance = _ITU618_10()  # TODO: Implement older versions or recommendation
+#        elif version == 9:
+#            self.instance = _ITU618_9()  # TODO: Implement older versions or recommendation
+#        elif version == 8:
+#            self.instance = _ITU618_8()  # TODO: Implement older versions or recommendation
+#        elif version == 7:
+#            self.instance = _ITU618_7()  # TODO: Implement older versions or recommendation
+#        elif version == 6:
+#            self.instance = _ITU618_6()  # TODO: Implement older versions or recommendation
+#        elif version == 5:
+#            self.instance = _ITU618_5()  # TODO: Implement older versions or recommendation
+#        elif version == 4:
+#            self.instance = _ITU618_4()  # TODO: Implement older versions or recommendation
+#        elif version == 3:
+#            self.instance = _ITU618_3()  # TODO: Implement older versions or recommendation
+#        elif version == 2:
+#            self.instance = _ITU618_2()  # TODO: Implement older versions or recommendation
+#        elif version == 1:
+#            self.instance = _ITU618_1()  # TODO: Implement older versions or recommendation
         else:
             raise ValueError('Version {0} is not implemented' +
                              ' for the ITU-R P.618 model.'.format(version))
@@ -203,8 +204,8 @@ class _ITU618_12():
         return A
 
     def CDF_bivariate_normal(self, alpha_x, alpha_y, rho):
-        # This function calculates the complementary bivariate normal distribution
-        # with limits alpha_x, alpha_y and correlation factor rho
+        # This function calculates the complementary bivariate normal
+        # distribution with limits alpha_x, alpha_y and correlation factor rho
         def CDF_bivariate_normal_fcn(x, y, rho):
             return np.exp(- (x**2 - 2 * rho * x * y + y**2) /
                           (2. * (1 - rho**2)))
@@ -228,7 +229,7 @@ class _ITU618_12():
         # from Recommendation ITU-R P.837 or from local measured rainfall
         # rate data
         if P0 is None:
-            P0 = rain_percentage_probability(lat, lon).\
+            P0 = rainfall_probability(lat, lon).\
                 to(u.dimensionless_unscaled).value
 
         # Step 2: Calculate the parameter alpha using the inverse of the
@@ -291,10 +292,10 @@ class _ITU618_12():
         d = compute_distance_earth_to_earth(lat1, lon1, lat2, lon2)
         rho_r = 0.7 * np.exp(-d / 60) + 0.3 * np.exp(-(d / 700)**2)
 
-        P_1 = rain_percentage_probability(lat1, lon1).\
+        P_1 = rainfall_probability(lat1, lon1).\
             to(u.dimensionless_unscaled).value
 
-        P_2 = rain_percentage_probability(lat2, lon2).\
+        P_2 = rainfall_probability(lat2, lon2).\
             to(u.dimensionless_unscaled).value
 
         R_1 = stats.norm.ppf(1 - P_1)
@@ -329,15 +330,17 @@ class _ITU618_12():
             warnings.warn(
                 RuntimeWarning(
                     'The method to compute the cross '
-                    'polarization discrimination in recommendation ITU-P 618-12 is only '
-                    'valid for frequency values between 4 and 55 GHz'))
+                    'polarization discrimination in recommendation '
+                    'ITU-P 618-12 is only valid for frequency values between'
+                    ' 4 and 55 GHz'))
 
         if el > 60:
             warnings.warn(
                 RuntimeWarning(
                     'The method to compute thecross '
-                    'polarization discrimination in recommendation ITU-P 618-12 is '
-                    'only valid for elevation angle values below 60 degrees'))
+                    'polarization discrimination in recommendation ITU-P '
+                    '618-12 is only valid for elevation angle values below '
+                    '60 degrees'))
 
         # In case that the frequency is comprised between 4 and 6 GHz, scaling
         # is necessary
@@ -462,6 +465,7 @@ __model = _ITU618()
 def change_version(new_version):
     global __model
     __model = _ITU618(new_version)
+    utils.memory.clear()
 
 
 def get_version():
@@ -472,7 +476,8 @@ def get_version():
 def rain_attenuation(lat, lon, f, el, hs=None, p=0.01, R001=None,
                      tau=45, Ls=None):
     """
-    Calculation of long-term rain attenuation statistics from point rainfall rate
+    Calculation of long-term rain attenuation statistics from point rainfall
+    rate.
     The following procedure provides estimates of the long-term statistics of
     the slant-path rain attenuation at a given location for frequencies up
     to 55 GHz.
@@ -496,7 +501,8 @@ def rain_attenuation(lat, lon, f, el, hs=None, p=0.01, R001=None,
     p : number, optional
         Percetage of the time the rain attenuation value is exceeded.
     R001: number, optional
-        Point rainfall rate for the location for 0.01% of an average year (mm/h).
+        Point rainfall rate for the location for 0.01% of an average year
+        (mm/h).
         If not provided, an estimate is obtained from Recommendation
         Recommendation ITU-R P.837. Some useful values:
             * 0.25 mm/h : Drizle
@@ -511,8 +517,8 @@ def rain_attenuation(lat, lon, f, el, hs=None, p=0.01, R001=None,
         (tau = 45 deg for circular polarization). Default value is 45
     Ls :number, optional
         Slant path length (km). If not provided, it will be computed using the
-        rain height and the elevation angle. The ITU model does not require this
-        parameter as an input.
+        rain height and the elevation angle. The ITU model does not require
+        this parameter as an input.
 
 
     Returns
