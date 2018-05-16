@@ -11,5 +11,5 @@ install:
   - pip install coveralls  
 script:
   - python setup.py nosetests --with-coverage --cover-package itur  
- after_sucess:
+after_sucess:
   coveralls
