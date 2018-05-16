@@ -7,5 +7,9 @@ python:
 install:
   - pip install .
   - pip install -r requirements.txt
+  - pip install nose coverage
+  - pip install coveralls  
 script:
-  - python ./tests/validation.py
+  - python setup.py nosetests --with-coverage --cover-package itur  
+ after_sucess:
+  coveralls
