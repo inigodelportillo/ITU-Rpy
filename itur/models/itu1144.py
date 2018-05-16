@@ -5,7 +5,6 @@ from __future__ import print_function
 
 import numpy as np
 from scipy.interpolate import griddata, RegularGridInterpolator
-from scipy.ndimage.interpolation import map_coordinates
 
 """
 Interpolation methods for the geophysical properties used to compute
@@ -175,7 +174,7 @@ def bicubic_2D_interpolator(lats_o, lons_o, values):
         Bicubic interpolator function
     '''
     if is_regular_grid(lats_o[2:-2, 2:-2], lons_o[2:-2, 2:-2]):
-        return regular_bicubic_interpolator(lats_o, lons_o, values)
+        return _bicubic_2D_interpolator_reg(lats_o, lons_o, values)
     else:
         return _bicubic_2D_interpolator_arb(lats_o, lons_o, values)
 
@@ -185,18 +184,10 @@ def _bicubic_2D_interpolator_arb(lats_o, lons_o, values):
                               values.ravel(), (x[:, 0], x[:, 1]), 'cubic')
 
 
-#def _bicubic_2D_interpolator_reg(lats_o, lons_o, values, x):
-#    D_lat = np.unique(np.diff(lats_o[2:-2, 2]))
-#    D_lon = np.unique(np.diff(lons_o[2, 2:-2]))
-#    return map_coordinates(
-#        values, np.array([(x[:, 0] + lats_o.min()) / D_lat, x[:, 1] / D_lon]),
-#        order=3, mode='nearest')
-
-def regular_bicubic_interpolator(lats, lons, vals):
-
-    lat_row = lats[1:-1, 1]
-    lon_row = lons[1, 1:-1]
-    I = vals
+def _bicubic_2D_interpolator_reg(lats_o, lons_o, values):
+    lat_row = lats_o[1:-1, 1]
+    lon_row = lons_o[1, 1:-1]
+    I = values
 
     def K(d):
         d = np.abs(d)
@@ -209,8 +200,11 @@ def regular_bicubic_interpolator(lats, lons, vals):
         lat = vect[:, 0]
         lon = vect[:, 1]
 
-        R = np.searchsorted(lat_row, lat, 'right') - 1
-        C = np.searchsorted(lon_row, lon, 'right') - 1
+        # Make sure that we do not hit the limit cases
+        R = ((np.searchsorted(lat_row, lat, 'right') - 1) +
+             (np.searchsorted(lat_row, lat, 'left') - 1))//2
+        C = ((np.searchsorted(lon_row, lon, 'right') - 1) +
+             (np.searchsorted(lon_row, lon, 'right') - 1))//2
 
         diff_lats = np.diff(lat_row)[0]
         diff_lons = np.diff(lon_row)[0]
