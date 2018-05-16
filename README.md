@@ -1,4 +1,4 @@
-# ITU-Rpy [![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg)](https://raw.githubusercontent.com/Carthage/Carthage/master/LICENSE.md)
+# ITU-Rpy [![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg)](https://raw.githubusercontent.com/Carthage/Carthage/master/LICENSE.md) [![Build Status](https://travis-ci.org/iportillo/ITU-Rpy.svg?branch=master)](https://travis-ci.org/iportillo/ITU-Rpy) [![PyPI version](https://badge.fury.io/py/itur.svg)](https://badge.fury.io/py/itur)
 
 A python implementation of the ITU-P R Recommendations to compute atmospheric attenuation in slant and horizontal paths.
 
