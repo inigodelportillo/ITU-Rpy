@@ -9,7 +9,7 @@ from astropy import units as u
 from scipy.optimize import bisect
 import scipy.stats as stats
 
-import itur.utils as utils
+from itur import utils
 from itur.models.itu1510 import surface_month_mean_temperature
 from itur.models.itu1144 import bilinear_2D_interpolator
 from itur.utils import load_data, dataset_dir, prepare_input_array,\
@@ -117,15 +117,17 @@ class _ITU837_7():
         """
 
         """
+        lat_f = lat_d.flatten()
+        lon_f = lon_d.flatten()
+
         Nii = np.array([31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31])
 
         # Step 2: For each month, determine the monthly mean surface
         # temperature
-        Tii = surface_month_mean_temperature(lat_d, lon_d, self.months).value
+        Tii = surface_month_mean_temperature(lat_f, lon_f, self.months).value
 
         # Step 3: For each month, determine the monthly mean total rainfall
-        MTii = np.array([self.Mt(lat_d, lon_d, m) for m in self.months])\
-                 .squeeze()
+        MTii = np.array([self.Mt(lat_f, lon_f, m) for m in self.months]).T
 
         # Step 4: For each month, determine the monthly mean total rainfall
         tii = Tii - 273.15
@@ -141,9 +143,9 @@ class _ITU837_7():
         P0ii = np.where(P0ii > 70, 70, P0ii)
 
         # Step 7: Calculate the annual probability of rain, P0anual
-        P0anual = np.sum(Nii * P0ii) / 365.25  # Eq. 3
+        P0anual = np.sum(Nii * P0ii, axis=-1) / 365.25  # Eq. 3
 
-        return P0anual
+        return P0anual.reshape(lat_d.shape)
 
     def rainfall_rate(self, lat_d, lon_d, p):
         """
@@ -151,15 +153,17 @@ class _ITU837_7():
         if p == 0.01:
             return self.R001(lat_d, lon_d)
 
+        lat_f = lat_d.flatten()
+        lon_f = lon_d.flatten()
+
         Nii = np.array([31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31])
 
         # Step 2: For each month, determine the monthly mean surface
         # temperature
-        Tii = surface_month_mean_temperature(lat_d, lon_d, self.months).value
+        Tii = surface_month_mean_temperature(lat_f, lon_f, self.months).value
 
         # Step 3: For each month, determine the monthly mean total rainfall
-        MTii = np.array([self.Mt(lat_d, lon_d, m) for m in self.months])\
-                 .squeeze()
+        MTii = np.array([self.Mt(lat_f, lon_f, m) for m in self.months]).T
 
         # Step 4: For each month, determine the monthly mean total rainfall
         tii = Tii - 273.15
@@ -175,20 +179,24 @@ class _ITU837_7():
         P0ii = np.where(P0ii > 70, 70, P0ii)
 
         # Step 7: Calculate the annual probability of rain, P0anual
-        P0anual = np.sum(Nii * P0ii) / 365.25
+        P0anual = np.sum(Nii * P0ii, axis=-1) / 365.25
 
         # Step 8: Compute the rainfall rate exceeded for p
-        if p > P0anual:
-            return 0
-        else:
-            # Use a bisection method to determine
-            def f_Rp(Rref):
-                P_r_ge_Rii = P0ii * stats.norm.sf(
-                        (np.log(Rref) + 0.7938 - np.log(rii)) / 1.26)
-                P_r_ge_R = np.sum(Nii * P_r_ge_Rii) / 365.25
-                return 100 * (P_r_ge_R / p - 1)
+        def _ret_fcn(P0):
+            if p > P0:
+                return 0
+            else:
+                # Use a bisection method to determine
+                def f_Rp(Rref):
+                    P_r_ge_Rii = P0ii * stats.norm.sf(
+                            (np.log(Rref) + 0.7938 - np.log(rii)) / 1.26)
+                    P_r_ge_R = np.sum(Nii * P_r_ge_Rii) / 365.25
+                    return 100 * (P_r_ge_R / p - 1)
 
-            return bisect(f_Rp, 1e-10, 1000, xtol=1e-3)
+                return bisect(f_Rp, 1e-10, 1000, xtol=1e-5)
+
+        fcn = np.vectorize(_ret_fcn)
+        return fcn(P0anual).reshape(lat_d.shape)
 
 
 class _ITU837_6():
