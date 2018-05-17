@@ -7,7 +7,7 @@ import numpy as np
 import os
 from astropy import units as u
 
-import itur.utils as utils
+from itur import utils
 from itur.models.itu1144 import bicubic_2D_interpolator
 from itur.utils import load_data, dataset_dir, prepare_input_array,\
     prepare_output_array, memory
