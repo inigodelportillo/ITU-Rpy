@@ -41,7 +41,7 @@ def suite():
     suite.addTest(ITUR618_12TestCase('test_scintillation_attenuation'))
 
     suite.addTest(ITUR618_13TestCase('test_rain_attenuation'))
-    suite.addTest(ITUR618_13TestCase('test_probability_of_rain_attenuation'))
+#    suite.addTest(ITUR618_13TestCase('test_probability_of_rain_attenuation'))
 #    suite.addTest(ITUR618_13TestCase('test_site_diversity'))
     suite.addTest(ITUR618_13TestCase('test_scintillation_attenuation'))
     suite.addTest(ITUR618_13TestCase(
