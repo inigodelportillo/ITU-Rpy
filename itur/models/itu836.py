@@ -7,6 +7,7 @@ import os
 import numpy as np
 from astropy import units as u
 
+from itur import utils
 from itur.models.itu1144 import bilinear_2D_interpolator,\
      bicubic_2D_interpolator
 from itur.models.itu1511 import topographic_altitude
@@ -83,7 +84,8 @@ class _ITU836_6():
                 self._V[float(p_loads)] = bilinear_2D_interpolator(
                     lats, lons, vals)
 
-        return self._V[float(p)](np.array([lat.ravel(), lon.ravel()]).T)
+        return self._V[float(p)](
+                np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def VSCH(self, lat, lon, p):
         if not self._VSCH:
@@ -98,7 +100,7 @@ class _ITU836_6():
                     lats, lons, vals)
 
         return self._VSCH[float(p)](
-                np.array([lat, lon]).T).reshape(lat.shape)
+                np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def rho(self, lat, lon, p):
         if not self._rho:
@@ -130,6 +132,9 @@ class _ITU836_6():
     def surface_water_vapour_density(self, lat, lon, p, alt=None):
         """
         """
+        lat_f = lat.flatten()
+        lon_f = lon.flatten()
+
         available_p = np.array([0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10,
                                 20, 30, 50, 60, 70, 80, 90, 95, 99])
 
@@ -145,29 +150,57 @@ class _ITU836_6():
             idx = np.clip(idx + 1, 0, len(available_p) - 1)
             p_above = available_p[idx]
 
-        rho_a = self.rho(lat, lon, p_above)
-        VSCH_a = self.VSCH(lat, lon, p_above)
-        altitude_res = self.topo_alt(lat, lon)
+        R = -(lat_f - 90) // 1.125
+        C = lon_f // 1.125
+
+        lats = np.array([90 - R * 1.125, 90 - (R + 1) * 1.125,
+                         90 - R * 1.125, 90 - (R + 1) * 1.125])
+
+        lons = np.mod(np.array([C * 1.125, C * 1.125,
+                                (C + 1) * 1.125, (C + 1) * 1.125]), 360)
+
+        r = - (lat_f - 90) / 1.125
+        c = lon_f / 1.125
+
+        rho_a = self.rho(lats, lons, p_above)
+        VSCH_a = self.VSCH(lats, lons, p_above)
+        altitude_res = self.topo_alt(lats, lons)
         if alt is None:
             alt = altitude_res
+        else:
+            alt = alt.flatten()
+
         rho_a = rho_a * np.exp(- (alt - altitude_res) * 1.0 / (VSCH_a))
 
+        rho_a = (rho_a[0, :] * ((R + 1 - r) * (C + 1 - c)) +
+                 rho_a[1, :] * ((r - R) * (C + 1 - c)) +
+                 rho_a[2, :] * ((R + 1 - r) * (c - C)) +
+                 rho_a[3, :] * ((r - R) * (c - C)))
+
         if not pExact:
-            rho_b = self.rho(lat, lon, p_below)
-            VSCH_b = self.VSCH(lat, lon, p_below)
+            rho_b = self.rho(lats, lons, p_below)
+            VSCH_b = self.VSCH(lats, lons, p_below)
             rho_b = rho_b * np.exp(- (alt - altitude_res) / (VSCH_b))
+
+            rho_b = (rho_b[0, :] * ((R + 1 - r) * (C + 1 - c)) +
+                     rho_b[1, :] * ((r - R) * (C + 1 - c)) +
+                     rho_b[2, :] * ((R + 1 - r) * (c - C)) +
+                     rho_b[3, :] * ((r - R) * (c - C)))
 
         # Compute the values of Lred_a
         if not pExact:
             rho = rho_b + (rho_a - rho_b) * (np.log(p) - np.log(p_below)) / \
                 (np.log(p_above) - np.log(p_below))
-            return rho
+            return rho.reshape(lat.shape)
         else:
-            return rho_a
+            return rho_a.reshape(lat.shape)
 
     def total_water_vapour_content(self, lat, lon, p, alt=None):
         """
         """
+        lat_f = lat.flatten()
+        lon_f = lon.flatten()
+
         available_p = np.array([0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10,
                                 20, 30, 50, 60, 70, 80, 90, 95, 99])
 
@@ -177,32 +210,55 @@ class _ITU836_6():
         else:
             pExact = False
             idx = available_p.searchsorted(p, side='right') - 1
-            idx = np.clip(idx, 0, len(available_p))
+            idx = np.clip(idx, 0, len(available_p) - 1)
 
             p_below = available_p[idx]
-            idx = np.clip(idx + 1, 0, len(available_p))
-            p_above = available_p[idx + 1]
+            idx = np.clip(idx + 1, 0, len(available_p) - 1)
+            p_above = available_p[idx]
 
-        V_a = self.V(lat, lon, p_above)
-        VSCH_a = self.VSCH(lat, lon, p_above)
-        altitude_res = self.topo_alt(lat, lon)
+        R = -(lat_f - 90) // 1.125
+        C = lon_f // 1.125
 
+        lats = np.array([90 - R * 1.125, 90 - (R + 1) * 1.125,
+                         90 - R * 1.125, 90 - (R + 1) * 1.125])
+
+        lons = np.mod(np.array([C * 1.125, C * 1.125,
+                                (C + 1) * 1.125, (C + 1) * 1.125]), 360)
+
+        r = - (lat_f - 90) / 1.125
+        c = lon_f / 1.125
+
+        V_a = self.V(lats, lons, p_above)
+        VSCH_a = self.VSCH(lats, lons, p_above)
+        altitude_res = self.topo_alt(lats, lons)
         if alt is None:
             alt = altitude_res
+        else:
+            alt = alt.flatten()
+
         V_a = V_a * np.exp(-(alt - altitude_res) * 1.0 / (VSCH_a))
 
+        V_a = (V_a[0, :] * ((R + 1 - r) * (C + 1 - c)) +
+               V_a[1, :] * ((r - R) * (C + 1 - c)) +
+               V_a[2, :] * ((R + 1 - r) * (c - C)) +
+               V_a[3, :] * ((r - R) * (c - C)))
+
         if not pExact:
-            V_b = self.V(lat, lon, p_below)
-            VSCH_b = self.VSCH(lat, lon, p_below)
+            V_b = self.V(lats, lons, p_below)
+            VSCH_b = self.VSCH(lats, lons, p_below)
 
             V_b = V_b * np.exp(-(alt - altitude_res) * 1.0 / (VSCH_b))
+            V_b = (V_b[0, :] * ((R + 1 - r) * (C + 1 - c)) +
+                   V_b[1, :] * ((r - R) * (C + 1 - c)) +
+                   V_b[2, :] * ((R + 1 - r) * (c - C)) +
+                   V_b[3, :] * ((r - R) * (c - C)))
 
         if not pExact:
             V = V_b + (V_a - V_b) * (np.log(p) - np.log(p_below)) / \
                                     (np.log(p_above) - np.log(p_below))
-            return V
+            return V.reshape(lat.shape)
         else:
-            return V_a
+            return V_a.reshape(lat.shape)
 
 
 class _ITU836_5():
@@ -265,6 +321,9 @@ class _ITU836_5():
     def surface_water_vapour_density(self, lat, lon, p, alt=None):
         """
         """
+        lat_f = lat.flatten()
+        lon_f = lon.flatten()
+
         available_p = np.array([0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10,
                                 20, 30, 50, 60, 70, 80, 90, 95, 99])
 
@@ -280,29 +339,58 @@ class _ITU836_5():
             idx = np.clip(idx + 1, 0, len(available_p) - 1)
             p_above = available_p[idx]
 
-        rho_a = self.rho(lat, lon, p_above)
-        VSCH_a = self.VSCH(lat, lon, p_above)
-        altitude_res = topographic_altitude(lat, lon).value
+        R = -(lat_f - 90) // 1.125
+        C = lon_f // 1.125
+
+        lats = np.array([90 - R * 1.125, 90 - (R + 1) * 1.125,
+                         90 - R * 1.125, 90 - (R + 1) * 1.125])
+
+        lons = np.mod(np.array([C * 1.125, C * 1.125,
+                                (C + 1) * 1.125, (C + 1) * 1.125]), 360)
+
+        r = - (lat_f - 90) / 1.125
+        c = lon_f / 1.125
+
+        rho_a = self.rho(lats, lons, p_above)
+        VSCH_a = self.VSCH(lats, lons, p_above)
+        altitude_res = topographic_altitude(lats,
+                                            lons).value.reshape(lats.shape)
         if alt is None:
             alt = altitude_res
+        else:
+            alt = alt.flatten()
+
         rho_a = rho_a * np.exp(- (alt - altitude_res) * 1.0 / (VSCH_a))
 
+        rho_a = (rho_a[0, :] * ((R + 1 - r) * (C + 1 - c)) +
+                 rho_a[1, :] * ((r - R) * (C + 1 - c)) +
+                 rho_a[2, :] * ((R + 1 - r) * (c - C)) +
+                 rho_a[3, :] * ((r - R) * (c - C)))
+
         if not pExact:
-            rho_b = self.rho(lat, lon, p_below)
-            VSCH_b = self.VSCH(lat, lon, p_below)
+            rho_b = self.rho(lats, lons, p_below)
+            VSCH_b = self.VSCH(lats, lons, p_below)
             rho_b = rho_b * np.exp(- (alt - altitude_res) / (VSCH_b))
+
+            rho_b = (rho_b[0, :] * ((R + 1 - r) * (C + 1 - c)) +
+                     rho_b[1, :] * ((r - R) * (C + 1 - c)) +
+                     rho_b[2, :] * ((R + 1 - r) * (c - C)) +
+                     rho_b[3, :] * ((r - R) * (c - C)))
 
         # Compute the values of Lred_a
         if not pExact:
             rho = rho_b + (rho_a - rho_b) * (np.log(p) - np.log(p_below)) / \
                 (np.log(p_above) - np.log(p_below))
-            return rho
+            return rho.reshape(lat.shape)
         else:
-            return rho_a
+            return rho_a.reshape(lat.shape)
 
     def total_water_vapour_content(self, lat, lon, p, alt=None):
         """
         """
+        lat_f = lat.flatten()
+        lon_f = lon.flatten()
+
         available_p = np.array([0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10,
                                 20, 30, 50, 60, 70, 80, 90, 95, 99])
 
@@ -312,32 +400,56 @@ class _ITU836_5():
         else:
             pExact = False
             idx = available_p.searchsorted(p, side='right') - 1
-            idx = np.clip(idx, 0, len(available_p))
+            idx = np.clip(idx, 0, len(available_p) - 1)
 
             p_below = available_p[idx]
-            idx = np.clip(idx + 1, 0, len(available_p))
-            p_above = available_p[idx + 1]
+            idx = np.clip(idx + 1, 0, len(available_p) - 1)
+            p_above = available_p[idx]
 
-        V_a = self.V(lat, lon, p_above)
-        VSCH_a = self.VSCH(lat, lon, p_above)
-        altitude_res = topographic_altitude(lat, lon).value
+        R = -(lat_f - 90) // 1.125
+        C = lon_f // 1.125
 
+        lats = np.array([90 - R * 1.125, 90 - (R + 1) * 1.125,
+                         90 - R * 1.125, 90 - (R + 1) * 1.125])
+
+        lons = np.mod(np.array([C * 1.125, C * 1.125,
+                                (C + 1) * 1.125, (C + 1) * 1.125]), 360)
+
+        r = - (lat_f - 90) / 1.125
+        c = lon_f / 1.125
+
+        V_a = self.V(lats, lons, p_above)
+        VSCH_a = self.VSCH(lats, lons, p_above)
+        altitude_res = topographic_altitude(lats,
+                                            lons).value.reshape(lats.shape)
         if alt is None:
             alt = altitude_res
+        else:
+            alt = alt.flatten()
+
         V_a = V_a * np.exp(-(alt - altitude_res) * 1.0 / (VSCH_a))
 
+        V_a = (V_a[0, :] * ((R + 1 - r) * (C + 1 - c)) +
+               V_a[1, :] * ((r - R) * (C + 1 - c)) +
+               V_a[2, :] * ((R + 1 - r) * (c - C)) +
+               V_a[3, :] * ((r - R) * (c - C)))
+
         if not pExact:
-            V_b = self.V(lat, lon, p_below)
-            VSCH_b = self.VSCH(lat, lon, p_below)
+            V_b = self.V(lats, lons, p_below)
+            VSCH_b = self.VSCH(lats, lons, p_below)
 
             V_b = V_b * np.exp(-(alt - altitude_res) * 1.0 / (VSCH_b))
+            V_b = (V_b[0, :] * ((R + 1 - r) * (C + 1 - c)) +
+                   V_b[1, :] * ((r - R) * (C + 1 - c)) +
+                   V_b[2, :] * ((R + 1 - r) * (c - C)) +
+                   V_b[3, :] * ((r - R) * (c - C)))
 
         if not pExact:
             V = V_b + (V_a - V_b) * (np.log(p) - np.log(p_below)) / \
                                     (np.log(p_above) - np.log(p_below))
-            return V
+            return V.reshape(lat.shape)
         else:
-            return V_a
+            return V_a.reshape(lat.shape)
 
 
 class _ITU836_4():
@@ -403,6 +515,9 @@ class _ITU836_4():
     def surface_water_vapour_density(self, lat, lon, p, alt=None):
         """
         """
+        lat_f = lat.flatten()
+        lon_f = lon.flatten()
+
         available_p = np.array([0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10,
                                 20, 30, 50, 60, 70, 80, 90, 95, 99])
 
@@ -418,29 +533,58 @@ class _ITU836_4():
             idx = np.clip(idx + 1, 0, len(available_p) - 1)
             p_above = available_p[idx]
 
-        rho_a = self.rho(lat, lon, p_above)
-        VSCH_a = self.VSCH(lat, lon, p_above)
-        altitude_res = topographic_altitude(lat, lon).value
+        R = -(lat_f - 90) // 1.125
+        C = lon_f // 1.125
+
+        lats = np.array([90 - R * 1.125, 90 - (R + 1) * 1.125,
+                         90 - R * 1.125, 90 - (R + 1) * 1.125])
+
+        lons = np.mod(np.array([C * 1.125, C * 1.125,
+                                (C + 1) * 1.125, (C + 1) * 1.125]), 360)
+
+        r = - (lat_f - 90) / 1.125
+        c = lon_f / 1.125
+
+        rho_a = self.rho(lats, lons, p_above)
+        VSCH_a = self.VSCH(lats, lons, p_above)
+        altitude_res = topographic_altitude(lats,
+                                            lons).value.reshape(lats.shape)
         if alt is None:
             alt = altitude_res
+        else:
+            alt = alt.flatten()
+
         rho_a = rho_a * np.exp(- (alt - altitude_res) * 1.0 / (VSCH_a))
 
+        rho_a = (rho_a[0, :] * ((R + 1 - r) * (C + 1 - c)) +
+                 rho_a[1, :] * ((r - R) * (C + 1 - c)) +
+                 rho_a[2, :] * ((R + 1 - r) * (c - C)) +
+                 rho_a[3, :] * ((r - R) * (c - C)))
+
         if not pExact:
-            rho_b = self.rho(lat, lon, p_below)
-            VSCH_b = self.VSCH(lat, lon, p_below)
+            rho_b = self.rho(lats, lons, p_below)
+            VSCH_b = self.VSCH(lats, lons, p_below)
             rho_b = rho_b * np.exp(- (alt - altitude_res) / (VSCH_b))
+
+            rho_b = (rho_b[0, :] * ((R + 1 - r) * (C + 1 - c)) +
+                     rho_b[1, :] * ((r - R) * (C + 1 - c)) +
+                     rho_b[2, :] * ((R + 1 - r) * (c - C)) +
+                     rho_b[3, :] * ((r - R) * (c - C)))
 
         # Compute the values of Lred_a
         if not pExact:
             rho = rho_b + (rho_a - rho_b) * (np.log(p) - np.log(p_below)) / \
                 (np.log(p_above) - np.log(p_below))
-            return rho
+            return rho.reshape(lat.shape)
         else:
-            return rho_a
+            return rho_a.reshape(lat.shape)
 
     def total_water_vapour_content(self, lat, lon, p, alt=None):
         """
         """
+        lat_f = lat.flatten()
+        lon_f = lon.flatten()
+
         available_p = np.array([0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10,
                                 20, 30, 50, 60, 70, 80, 90, 95, 99])
 
@@ -450,32 +594,56 @@ class _ITU836_4():
         else:
             pExact = False
             idx = available_p.searchsorted(p, side='right') - 1
-            idx = np.clip(idx, 0, len(available_p))
+            idx = np.clip(idx, 0, len(available_p) - 1)
 
             p_below = available_p[idx]
-            idx = np.clip(idx + 1, 0, len(available_p))
-            p_above = available_p[idx + 1]
+            idx = np.clip(idx + 1, 0, len(available_p) - 1)
+            p_above = available_p[idx]
 
-        V_a = self.V(lat, lon, p_above)
-        VSCH_a = self.VSCH(lat, lon, p_above)
-        altitude_res = topographic_altitude(lat, lon).value
+        R = -(lat_f - 90) // 1.125
+        C = lon_f // 1.125
 
+        lats = np.array([90 - R * 1.125, 90 - (R + 1) * 1.125,
+                         90 - R * 1.125, 90 - (R + 1) * 1.125])
+
+        lons = np.mod(np.array([C * 1.125, C * 1.125,
+                                (C + 1) * 1.125, (C + 1) * 1.125]), 360)
+
+        r = - (lat_f - 90) / 1.125
+        c = lon_f / 1.125
+
+        V_a = self.V(lats, lons, p_above)
+        VSCH_a = self.VSCH(lats, lons, p_above)
+        altitude_res = topographic_altitude(lats,
+                                            lons).value.reshape(lats.shape)
         if alt is None:
             alt = altitude_res
+        else:
+            alt = alt.flatten()
+
         V_a = V_a * np.exp(-(alt - altitude_res) * 1.0 / (VSCH_a))
 
+        V_a = (V_a[0, :] * ((R + 1 - r) * (C + 1 - c)) +
+               V_a[1, :] * ((r - R) * (C + 1 - c)) +
+               V_a[2, :] * ((R + 1 - r) * (c - C)) +
+               V_a[3, :] * ((r - R) * (c - C)))
+
         if not pExact:
-            V_b = self.V(lat, lon, p_below)
-            VSCH_b = self.VSCH(lat, lon, p_below)
+            V_b = self.V(lats, lons, p_below)
+            VSCH_b = self.VSCH(lats, lons, p_below)
 
             V_b = V_b * np.exp(-(alt - altitude_res) * 1.0 / (VSCH_b))
+            V_b = (V_b[0, :] * ((R + 1 - r) * (C + 1 - c)) +
+                   V_b[1, :] * ((r - R) * (C + 1 - c)) +
+                   V_b[2, :] * ((R + 1 - r) * (c - C)) +
+                   V_b[3, :] * ((r - R) * (c - C)))
 
         if not pExact:
             V = V_b + (V_a - V_b) * (np.log(p) - np.log(p_below)) / \
                                     (np.log(p_above) - np.log(p_below))
-            return V
+            return V.reshape(lat.shape)
         else:
-            return V_a
+            return V_a.reshape(lat.shape)
 
 
 __model = __ITU836()
@@ -503,6 +671,7 @@ def change_version(new_version):
     """
     global __model
     __model = __ITU836(new_version)
+    utils.memory.clear()
 
 
 def get_version():
