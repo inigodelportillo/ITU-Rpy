@@ -1,8 +1,4 @@
 language: python
-os:
-  - linux
-  - osx
-  - windows  
 virtualenv:
   system_site_packages: true
 python:
