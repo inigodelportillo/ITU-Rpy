@@ -9,8 +9,9 @@ import numbers
 
 from tempfile import mkdtemp
 from joblib import Memory
-
 from astropy import units as u
+
+from pyproj import Geod
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 dataset_dir = os.path.join(dir_path, 'data/')
@@ -22,6 +23,7 @@ memory = Memory(cachedir=cachedir, verbose=0)
 __NUMERIC_TYPES__ = [numbers.Number, int, float, complex,
                      np.float, np.float16, np.float32, np.float64,
                      np.int, np.int8, np.int16, np.int32, np.int64]
+__wgs84_geod__ = Geod(ellps='WGS84')
 
 
 def load_data(path, is_text=False, **kwargs):
@@ -70,9 +72,10 @@ def prepare_output_array(array, type_input=None):
     if type(value) in [np.ndarray, list]:
         value = np.array(value).squeeze()
 
-    if type_input in __NUMERIC_TYPES__ and (type(array) in __NUMERIC_TYPES__) or\
-       ((isinstance(array, np.ndarray) and array.size == 1) or
-            (not type(array) not in __NUMERIC_TYPES__ and len(array) == 1)):
+    if (type_input in __NUMERIC_TYPES__ and
+        (type(array) in __NUMERIC_TYPES__) or
+        ((isinstance(array, np.ndarray) and array.size == 1) or
+         (not type(array) not in __NUMERIC_TYPES__ and len(array) == 1))):
         value = float(value)
     elif type_input is list:
         if isinstance(value, np.ndarray):
@@ -110,10 +113,83 @@ def prepare_quantity(value, units=None, name_val=None):
                          (name_val, str(units)))
 
 
-def compute_distance_earth_to_earth(lat_p, lon_p, lat_grid, lon_grid):
+def compute_distance_earth_to_earth(lat_p, lon_p, lat_grid, lon_grid,
+                                    method=None):
     '''
     Compute the distance between a point (P) in (lat_s, lon_s) and a matrix of
-    latitude and longitudes (lat_grid, lon_grid)
+    latitude and longitudes (lat_grid, lon_grid).
+
+    If the number of elements in lat_grid is smaller than 100,000, uses the
+    WGS84 method, otherwise, uses the harvesine formula.
+
+
+    Parameters
+    ----------
+    lat_p : number
+        latitude projection of the point P (degrees)
+    lon_p : number
+        longitude projection of the point P (degrees)
+    lat_grid : number, sequence of np.ndarray
+        Grid of latitude points to which compute the distance (degrees)
+    lon_grid : number, sequence of np.ndarray
+        Grid of longitude points to which compute the distance (degrees)
+
+
+    Returns
+    -------
+    d : numpy.ndarray
+        Distance between the point P and each point in (lat_grid, lon_grid)
+        (km)
+
+    '''
+    if ((method == 'WGS84' and not(method is not None)) or
+        (type(lat_p) in __NUMERIC_TYPES__) or
+        (type(lat_grid) in __NUMERIC_TYPES__) or
+        (len(lat_grid) < 10000) or
+        (isinstance(lat_grid, np.ndarray) and lat_grid.size < 1e5)):
+            return compute_distance_earth_to_earth_wgs84(
+                    lat_p, lon_p, lat_grid, lon_grid)
+    else:
+            return compute_distance_earth_to_earth_haversine(
+                    lat_p, lon_p, lat_grid, lon_grid)
+
+
+def compute_distance_earth_to_earth_wgs84(lat_p, lon_p, lat_grid, lon_grid):
+    '''
+    Compute the distance between a point (P) in (lat_s, lon_s) and a matrix of
+    latitude and longitudes (lat_grid, lon_grid) using the WGS84 inverse method
+
+
+    Parameters
+    ----------
+    lat_p : number
+        latitude projection of the point P (degrees)
+    lon_p : number
+        longitude projection of the point P (degrees)
+    lat_grid : number, sequence of np.ndarray
+        Grid of latitude points to which compute the distance (degrees)
+    lon_grid : number, sequence of np.ndarray
+        Grid of longitude points to which compute the distance (degrees)
+
+
+    Returns
+    -------
+    d : numpy.ndarray
+        Distance between the point P and each point in (lat_grid, lon_grid)
+        (km)
+
+    '''
+    lat_p = lat_p * np.ones_like(lat_grid)
+    lon_p = lon_p * np.ones_like(lon_grid)
+    _a, _b, d = __wgs84_geod__.inv(lon_p, lat_p, lon_grid, lat_grid)
+    return d/1e3
+
+
+def compute_distance_earth_to_earth_haversine(lat_p, lon_p,
+                                              lat_grid, lon_grid):
+    '''
+    Compute the distance between a point (P) in (lat_s, lon_s) and a matrix of
+    latitude and longitudes (lat_grid, lon_grid) using the Haversine formula
 
 
     Parameters
@@ -257,7 +333,8 @@ def plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
         raise RuntimeError('Basemap is not installed and therefore plot_in_map'
                            ' cannot be used')
 
-    if all([el is None for el in [lat, lon, lat_min, lon_min, lat_max, lon_max]]):
+    if all([el is None for el in [lat, lon, lat_min, lon_min,
+                                  lat_max, lon_max]]):
         raise ValueError('Either \{lat, lon\} or \{lat_min, lon_min, lat_max,'
                          'lon_max\} need to be provided')
 

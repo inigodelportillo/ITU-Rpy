@@ -40,12 +40,12 @@ setup(
     # For a discussion on single-sourcing the version across setup.py and the
     # project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.1.3',
+    version='0.1.6',
 
     # This is a one-line description or tagline of what your project does. This
     # corresponds to the "Summary" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#summary
-    description='A python implementation of the ITU-P Recommendations',
+    description=long_description,
 
     # This should be a valid link to your project's main homepage.
     #
@@ -114,7 +114,7 @@ setup(
     #
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=['joblib', 'astropy', 'scipy', 'numpy'],  # Optional
+    install_requires=['joblib', 'astropy', 'scipy', 'numpy', 'pyproj'],  # Optional
 
     # If there are data files included in your packages that need to be
     # installed, specify them here.
