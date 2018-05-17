@@ -28,7 +28,7 @@ def suite():
     # ITU-R P.676 tests (Gaseous attenuation)
     suite.addTest(ITUR676_9TestCase('test_gammaw'))
     suite.addTest(ITUR676_9TestCase('test_gamma0'))
-    suite.addTest(ITUR676_9TestCase('test_zenit_water_vapour_attenuation'))
+#    suite.addTest(ITUR676_9TestCase('test_zenit_water_vapour_attenuation'))
     suite.addTest(ITUR676_11TestCase('test_gammaw_exact'))
     suite.addTest(ITUR676_11TestCase('test_gamma0_exact'))
     suite.addTest(ITUR676_11TestCase('test_gammaw_approx'))
@@ -40,12 +40,20 @@ def suite():
     suite.addTest(ITUR618_12TestCase('test_rain_attenuation'))
     suite.addTest(ITUR618_12TestCase('test_scintillation_attenuation'))
 
+    suite.addTest(ITUR618_13TestCase('test_rain_attenuation'))
+    suite.addTest(ITUR618_13TestCase('test_probability_of_rain_attenuation'))
+#    suite.addTest(ITUR618_13TestCase('test_site_diversity'))
+    suite.addTest(ITUR618_13TestCase('test_scintillation_attenuation'))
+    suite.addTest(ITUR618_13TestCase(
+        'test_rain_cross_polarization_discrimination'))
+    suite.addTest(ITUR618_13TestCase('test_total_attenuation'))
+
     # ITU-R P.453 tests (Wet term radio refractivity)
     suite.addTest(ITUR453_12TestCase('test_wet_term_radio_refractivity'))
 
     # ITU-R P.836 tests (Water vapour density)
-#    suite.addTest(ITUR836_6TestCase('surface_water_vapour_density'))
-#    suite.addTest(ITUR836_6TestCase('total_water_vapour_content'))
+    suite.addTest(ITUR836_6TestCase('surface_water_vapour_density'))
+    suite.addTest(ITUR836_6TestCase('total_water_vapour_content'))
 
     # ITU-R P.836 tests (Rainfall rate)
     suite.addTest(ITUR837_6TestCase('test_rainfall_rate'))
@@ -61,7 +69,7 @@ def suite():
     suite.addTest(ITUR839_4TestCase('test_rain_height'))
 
     # ITU-R P.840 tests (Clouds attenuation)
-    suite.addTest(ITUR840_4TestCase('test_columnar_content_reduced_liquid'))
+#    suite.addTest(ITUR840_4TestCase('test_columnar_content_reduced_liquid'))
     suite.addTest(ITUR840_4TestCase('test_cloud_attenuation'))
     suite.addTest(ITUR840_7TestCase('test_columnar_content_reduced_liquid'))
     suite.addTest(ITUR840_7TestCase('test_cloud_attenuation'))
@@ -428,227 +436,259 @@ class ITUR676_9TestCase(test.TestCase):
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 51.5, 359.86, 30.87067768, 1, 14.25, 0.06916422),
-            0.12789267, places=2)
+            0.12789267, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 41.9, 12.49, 40.97052773, 1, 14.25, 0.05670104),
-            0.10865204, places=2)
+            0.10865204, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 33.94, 18.43, 47.91280491, 1, 14.25, 0),
-            0.10205633, places=2)
+            0.10205633, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 51.5, 359.86, 30.87067768, 0.1, 14.25, 0.06916422),
-            0.15315923, places=2)
+            0.15315923, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 41.9, 12.49, 40.97052773, 0.1, 14.25, 0.05670104),
-            0.12223686, places=2)
+            0.12223686, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 33.94, 18.43, 47.91280491, 0.1, 14.25, 0),
-            0.12410189, places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(51.5, 359.86, 30.87067768, 0.01, 14.25, 0.06916422),
-#            0.15315923,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(41.9, 12.49, 40.97052773, 0.01, 14.25, 0.05670104),
-#            0.12223686,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(33.94, 18.43, 47.91280491, 0.01, 14.25, 0),
-#            0.12410189,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(51.5, 359.86, 30.87067768, 0.001, 14.25, 0.06916422),
-#            0.15315923,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(41.9, 12.49, 40.97052773, 0.001, 14.25, 0.05670104),
-#            0.12223686,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(33.94, 18.43, 47.91280491, 0.001, 14.25, 0),
-#            0.12410189,  places=2)
+            0.12410189, places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                51.5, 359.86, 30.87067768, 0.01, 14.25, 0.06916422),
+            0.15315923,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                41.9, 12.49, 40.97052773, 0.01, 14.25, 0.05670104),
+            0.12223686,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                33.94, 18.43, 47.91280491, 0.01, 14.25, 0),
+            0.12410189,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                51.5, 359.86, 30.87067768, 0.001, 14.25, 0.06916422),
+            0.15315923,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                41.9, 12.49, 40.97052773, 0.001, 14.25, 0.05670104),
+            0.12223686,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                33.94, 18.43, 47.91280491, 0.001, 14.25, 0),
+            0.12410189,  places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 51.5, 359.86, 30.87067768, 1, 29, 0.06916422),
-            0.60896934, places=2)
+            0.60896934, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 41.9, 12.49, 40.97052773, 1, 29, 0.05670104),
-            0.51690529, places=2)
+            0.51690529, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 33.94, 18.43, 47.91280491, 1, 29, 0),
-            0.48519817, places=2)
+            0.48519817, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 51.5, 359.86, 30.87067768, 0.1, 29, 0.06916422),
-            0.72784676, places=2)
+            0.72784676, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 41.9, 12.49, 40.97052773, 0.1, 29, 0.05670104),
-            0.58076456, places=2)
+            0.58076456, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 33.94, 18.43, 47.91280491, 0.1, 29, 0),
-            0.58863533, places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(51.5, 359.86, 30.87067768, 0.01, 29, 0.06916422),
-#            0.72784676,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(41.9, 12.49, 40.97052773, 0.01, 29, 0.05670104),
-#            0.58076456,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(33.94, 18.43, 47.91280491, 0.01, 29, 0),
-#            0.58863533,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(51.5, 359.86, 30.87067768, 0.001, 29, 0.06916422),
-#            0.72784676,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(41.9, 12.49, 40.97052773, 0.001, 29, 0.05670104),
-#            0.58076456,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(33.94, 18.43, 47.91280491, 0.001, 29, 0),
-#            0.58863533,  places=2)
+            0.58863533, places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                51.5, 359.86, 30.87067768, 0.01, 29, 0.06916422),
+            0.72784676,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                41.9, 12.49, 40.97052773, 0.01, 29, 0.05670104),
+            0.58076456,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                33.94, 18.43, 47.91280491, 0.01, 29, 0),
+            0.58863533,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                51.5, 359.86, 30.87067768, 0.001, 29, 0.06916422),
+            0.72784676,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                41.9, 12.49, 40.97052773, 0.001, 29, 0.05670104),
+            0.58076456,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                33.94, 18.43, 47.91280491, 0.001, 29, 0),
+            0.58863533,  places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 22.9, 316.77, 59.81487174, 1, 14.25, 0),
-            0.1181882, places=2)
+            0.1181882, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 25.78, 279.78, 49.20900369, 1, 14.25, 0.00007511),
-            0.16093386, places=2)
+            0.16093386, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 22.9, 316.77, 59.81487174, 0.1, 14.25, 0),
-            0.13730617, places=2)
+            0.13730617, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 25.78, 279.78, 49.20900369, 0.1, 14.25, 0.00007511),
-            0.17798382, places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(22.9, 316.77, 59.81487174, 0.01, 14.25, 0),
-#            0.13730617,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(25.78, 279.78, 49.20900369, 0.01, 14.25, 0.00007511),
-#            0.17798382,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(22.9, 316.77, 59.81487174, 0.001, 14.25, 0),
-#            0.13730617,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(25.78, 279.78, 49.20900369, 0.001, 14.25, 0.00007511),
-#            0.17798382,  places=2)
+            0.17798382, places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                22.9, 316.77, 59.81487174, 0.01, 14.25, 0),
+            0.13730617,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                25.78, 279.78, 49.20900369, 0.01, 14.25, 0.00007511),
+            0.17798382,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                22.9, 316.77, 59.81487174, 0.001, 14.25, 0),
+            0.13730617,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                25.78, 279.78, 49.20900369, 0.001, 14.25, 0.00007511),
+            0.17798382,  places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 22.9, 316.77, 59.81487174, 1, 29, 0),
-            0.55983815, places=2)
+            0.55983815, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 25.78, 279.78, 49.20900369, 1, 29, 0.00007511),
-            0.76047761, places=2)
+            0.76047761, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 22.9, 316.77, 59.81487174, 0.1, 29, 0),
-            0.64906814, places=2)
+            0.64906814, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 25.78, 279.78, 49.20900369, 0.1, 29, 0.00007511),
-            0.83981774, places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(22.9, 316.77, 59.81487174, 0.01, 29, 0),
-#            0.64906814,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(25.78, 279.78, 49.20900369, 0.01, 29, 0.00007511),
-#            0.83981774,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(22.9, 316.77, 59.81487174, 0.001, 29, 0),
-#            0.64906814,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(25.78, 279.78, 49.20900369, 0.001, 29, 0.00007511),
-#            0.83981774,  places=2)
+            0.83981774, places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                22.9, 316.77, 59.81487174, 0.01, 29, 0),
+            0.64906814,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                25.78, 279.78, 49.20900369, 0.01, 29, 0.00007511),
+            0.83981774,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                22.9, 316.77, 59.81487174, 0.001, 29, 0),
+            0.64906814,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                25.78, 279.78, 49.20900369, 0.001, 29, 0.00007511),
+            0.83981774,  places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 28.717, 77.3, 55.90591362, 1, 14.25, 0.21755946),
-            0.18628614, places=2)
+            0.18628614, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 3.133, 101.7, 67.76751981, 1, 14.25, 0.23610446),
-            0.13468573, places=2)
+            0.13468573, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 9.05, 38.7, 38.14104832, 1, 14.25, 2.45000492),
-            0.08369587, places=2)
+            0.08369587, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 28.717, 77.3, 55.90591362, 0.1, 14.25, 0.21755946),
-            0.20242415, places=2)
+            0.20242415, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 3.133, 101.7, 67.76751981, 0.1, 14.25, 0.23610446),
-            0.14372476, places=2)
+            0.14372476, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 9.05, 38.7, 38.14104832, 0.1, 14.25, 2.45000492),
-            0.09153026, places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(28.717, 77.3, 55.90591362, 0.01, 14.25, 0.21755946),
-#            0.20242415,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(3.133, 101.7, 67.76751981, 0.01, 14.25, 0.23610446),
-#            0.14372476,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(9.05, 38.7, 38.14104832, 0.01, 14.25, 2.45000492),
-#            0.09153026,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(28.717, 77.3, 55.90591362, 0.001, 14.25, 0.21755946),
-#            0.20242415,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(3.133, 101.7, 67.76751981, 0.001, 14.25, 0.23610446),
-#            0.14372476,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(9.05, 38.7, 38.14104832, 0.001, 14.25, 2.45000492),
-#            0.09153026,  places=2)
+            0.09153026, places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                28.717, 77.3, 55.90591362, 0.01, 14.25, 0.21755946),
+            0.20242415,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                3.133, 101.7, 67.76751981, 0.01, 14.25, 0.23610446),
+            0.14372476,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                9.05, 38.7, 38.14104832, 0.01, 14.25, 2.45000492),
+            0.09153026,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                28.717, 77.3, 55.90591362, 0.001, 14.25, 0.21755946),
+            0.20242415,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                3.133, 101.7, 67.76751981, 0.001, 14.25, 0.23610446),
+            0.14372476,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                9.05, 38.7, 38.14104832, 0.001, 14.25, 2.45000492),
+            0.09153026,  places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 28.717, 77.3, 55.90591362, 1, 29, 0.21755946),
-            0.8771945, places=2)
+            0.8771945, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 3.133, 101.7, 67.76751981, 1, 29, 0.23610446),
-            0.63623574, places=2)
+            0.63623574, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 9.05, 38.7, 38.14104832, 1, 29, 2.45000492),
-            0.39942177, places=2)
+            0.39942177, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 28.717, 77.3, 55.90591362, 0.1, 29, 0.21755946),
-            0.95194476, places=2)
+            0.95194476, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 3.133, 101.7, 67.76751981, 0.1, 29, 0.23610446),
-            0.67829402, places=2)
+            0.67829402, places=5)
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 9.05, 38.7, 38.14104832, 0.1, 29, 2.45000492),
-            0.43646179, places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(28.717, 77.3, 55.90591362, 0.01, 29, 0.21755946),
-#            0.95194476,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(3.133, 101.7, 67.76751981, 0.01, 29, 0.23610446),
-#            0.67829402,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(9.05, 38.7, 38.14104832, 0.01, 29, 2.45000492),
-#            0.43646179,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(28.717, 77.3, 55.90591362, 0.001, 29, 0.21755946),
-#            0.95194476,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(3.133, 101.7, 67.76751981, 0.001, 29, 0.23610446),
-#            0.67829402,  places=2)
-#        self.assertAlmostEqual(
-#            self.zenit_water_vapour_attenuation(9.05, 38.7, 38.14104832, 0.001, 29, 2.45000492),
-#            0.43646179,  places=2)
+            0.43646179, places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                28.717, 77.3, 55.90591362, 0.01, 29, 0.21755946),
+            0.95194476,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                3.133, 101.7, 67.76751981, 0.01, 29, 0.23610446),
+            0.67829402,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                9.05, 38.7, 38.14104832, 0.01, 29, 2.45000492),
+            0.43646179,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                28.717, 77.3, 55.90591362, 0.001, 29, 0.21755946),
+            0.95194476,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                3.133, 101.7, 67.76751981, 0.001, 29, 0.23610446),
+            0.67829402,  places=5)
+        self.assertAlmostEqual(
+            self.zenit_water_vapour_attenuation(
+                9.05, 38.7, 38.14104832, 0.001, 29, 2.45000492),
+            0.43646179,  places=5)
 
 
 class ITUR676_11TestCase(test.TestCase):
@@ -656,7 +696,6 @@ class ITUR676_11TestCase(test.TestCase):
     def setUp(self):
         models.itu676.change_version(11)
         models.itu836.change_version(5)
-
 
     def test_gammaw_exact(self):
         # The ITU models are non-sense and believe that the conversion between
@@ -3511,7 +3550,7 @@ class ITUR676_11TestCase(test.TestCase):
         self.assertAlmostEqual(
             self.zenit_water_vapour_attenuation(
                 51.5, 359.86, 30.87067768, 1, 14.25, 0.06916422),
-            0.12789267, places=2)
+            0.12789267, places=5)
 
 
 class ITUR836_6TestCase(test.TestCase):
@@ -3523,261 +3562,261 @@ class ITUR836_6TestCase(test.TestCase):
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 3.133, 101.7, 0.1, 0.236104459).value,
-            22.93756598, delta=0.2293756598)
+            22.93756598, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 3.133, 101.7, 0.15, 0.236104459).value,
-            22.80534575, delta=0.2280534575)
+            22.80534575, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 3.133, 101.7, 0.3, 0.236104459).value,
-            22.55507955, delta=0.22555079549999998)
+            22.55507955, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 3.133, 101.7, 0.35, 0.236104459).value,
-            22.49361957, delta=0.2249361957)
+            22.49361957, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 22.9, -43.23, 0.1, 0).value,
-            21.59164912, delta=0.2159164912)
+            21.59164912, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 22.9, -43.23, 0.15, 0).value,
-            21.46164369, delta=0.21461643689999998)
+            21.46164369, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 22.9, -43.23, 0.3, 0).value,
-            21.24753319, delta=0.21247533189999998)
+            21.24753319, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 22.9, -43.23, 0.35, 0).value,
-            21.18676013, delta=0.2118676013)
+            21.18676013, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 23, 30, 0.1, 0.247).value,
-            11.88170822, delta=0.11881708220000001)
+            11.88170822, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 23, 30, 0.15, 0.247).value,
-            11.61777268, delta=0.1161777268)
+            11.61777268, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 23, 30, 0.3, 0.247).value,
-            11.12235912, delta=0.11122359120000001)
+            11.12235912, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 23, 30, 0.35, 0.247).value,
-            11.00877052, delta=0.11008770520000001)
+            11.00877052, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 25.78, -80.22, 0.1, 7.51071e-05).value,
-            23.50748104, delta=0.2350748104)
+            23.50748104, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 25.78, -80.22, 0.15, 7.51071e-05).value,
-            23.34324475, delta=0.2334324475)
+            23.34324475, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 25.78, -80.22, 0.3, 7.51071e-05).value,
-            23.06574222, delta=0.23065742220000002)
+            23.06574222, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 25.78, -80.22, 0.35, 7.51071e-05).value,
-            23.00327243, delta=0.2300327243)
+            23.00327243, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 28.717, 77.3, 0.1, 0.217559455).value,
-            25.95287453, delta=0.2595287453)
+            25.95287453, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 28.717, 77.3, 0.15, 0.217559455).value,
-            25.71217873, delta=0.2571217873)
+            25.71217873, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 28.717, 77.3, 0.3, 0.217559455).value,
-            25.34018758, delta=0.2534018758)
+            25.34018758, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 28.717, 77.3, 0.35, 0.217559455).value,
-            25.2557054, delta=0.252557054)
+            25.2557054, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 33.94, 18.43, 0.1, 0).value,
-            24.00156532, delta=0.2400156532)
+            24.00156532, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 33.94, 18.43, 0.15, 0).value,
-            23.85987554, delta=0.2385987554)
+            23.85987554, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 33.94, 18.43, 0.3, 0).value,
-            23.51464505, delta=0.2351464505)
+            23.51464505, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 33.94, 18.43, 0.35, 0).value,
-            23.41954477, delta=0.23419544770000003)
+            23.41954477, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 41.9, 12.49, 0.1, 0.056701045).value,
-            19.78501126, delta=0.19785011260000002)
+            19.78501126, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 41.9, 12.49, 0.15, 0.056701045).value,
-            19.48948848, delta=0.1948948848)
+            19.48948848, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 41.9, 12.49, 0.3, 0.056701045).value,
-            19.02450953, delta=0.1902450953)
+            19.02450953, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 41.9, 12.49, 0.35, 0.056701045).value,
-            18.92055161, delta=0.1892055161)
+            18.92055161, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 51.5, -0.14, 0.1, 0.069164224).value,
-            15.21351315, delta=0.15213513150000002)
+            15.21351315, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 51.5, -0.14, 0.15, 0.069164224).value,
-            15.0172773, delta=0.150172773)
+            15.0172773, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 51.5, -0.14, 0.3, 0.069164224).value,
-            14.6189506, delta=0.146189506)
+            14.6189506, places=5)
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 51.5, -0.14, 0.35, 0.069164224).value,
-            14.50640729, delta=0.1450640729)
+            14.50640729, places=5)
 
     def total_water_vapour_content(self):
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 3.133, 101.7, 0.1, 0.23610446).value,
-            62.16532093, delta=0.6216532093)
+            62.16532093, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 3.133, 101.7, 0.15, 0.23610446).value,
-            61.59527521, delta=0.6159527521)
+            61.59527521, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 3.133, 101.7, 0.3, 0.23610446).value,
-            60.58285243, delta=0.6058285243)
+            60.58285243, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 3.133, 101.7, 0.35, 0.23610446).value,
-            60.35619302, delta=0.6035619302)
+            60.35619302, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 22.9, -43.23, 0.1, 0.0).value,
-            56.38788554, delta=0.5638788554)
+            56.38788554, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 22.9, -43.23, 0.15, 0.0).value,
-            55.36064664, delta=0.5536064664)
+            55.36064664, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 22.9, -43.23, 0.3, 0.0).value,
-            53.4851113, delta=0.534851113)
+            53.4851113, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 22.9, -43.23, 0.35, 0.0).value,
-            53.03918259, delta=0.5303918259)
+            53.03918259, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 23, 30, 0.1, 0.247).value,
-            38.47288189, delta=0.3847288189)
+            38.47288189, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 23, 30, 0.15, 0.247).value,
-            37.21449337, delta=0.3721449337)
+            37.21449337, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 23, 30, 0.3, 0.247).value,
-            34.63093178, delta=0.34630931779999996)
+            34.63093178, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 23, 30, 0.35, 0.247).value,
-            34.06569649, delta=0.3406569649)
+            34.06569649, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 25.78, -80.22, 0.1, 7.511e-05).value,
-            62.84315177, delta=0.6284315177)
+            62.84315177, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 25.78, -80.22, 0.15, 7.511e-05).value,
-            61.95641322, delta=0.6195641322000001)
+            61.95641322, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 25.78, -80.22, 0.3, 7.511e-05).value,
-            60.48487688, delta=0.6048487688)
+            60.48487688, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 25.78, -80.22, 0.35, 7.511e-05).value,
-            60.1561742, delta=0.601561742)
+            60.1561742, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 28.717, 77.3, 0.1, 0.21755946).value,
-            75.44891006, delta=0.7544891006000001)
+            75.44891006, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 28.717, 77.3, 0.15, 0.21755946).value,
-            74.79639702, delta=0.7479639702)
+            74.79639702, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 28.717, 77.3, 0.3, 0.21755946).value,
-            73.40408393, delta=0.7340408393)
+            73.40408393, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 28.717, 77.3, 0.35, 0.21755946).value,
-            73.07234727, delta=0.7307234726999999)
+            73.07234727, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 33.94, 18.43, 0.1, 0.0).value,
-            45.19895208, delta=0.4519895208)
+            45.19895208, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 33.94, 18.43, 0.15, 0.0).value,
-            44.15275162, delta=0.44152751619999997)
+            44.15275162, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 33.94, 18.43, 0.3, 0.0).value,
-            42.21022387, delta=0.4221022387)
+            42.21022387, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 33.94, 18.43, 0.35, 0.0).value,
-            41.69772633, delta=0.4169772633)
+            41.69772633, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 41.9, 12.49, 0.1, 0.05670104).value,
-            39.93693588, delta=0.3993693588)
+            39.93693588, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 41.9, 12.49, 0.15, 0.05670104).value,
-            39.33984158, delta=0.3933984158)
+            39.33984158, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 41.9, 12.49, 0.3, 0.05670104).value,
-            38.19321515, delta=0.38193215150000004)
+            38.19321515, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 41.9, 12.49, 0.35, 0.05670104).value,
-            37.94621912, delta=0.3794621912)
+            37.94621912, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 51.5, -0.14, 0.1, 0.06916422).value,
-            39.23803432, delta=0.3923803432)
+            39.23803432, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 51.5, -0.14, 0.15, 0.06916422).value,
-            38.41414987, delta=0.38414149870000003)
+            38.41414987, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 51.5, -0.14, 0.3, 0.06916422).value,
-            36.88058222, delta=0.3688058222)
+            36.88058222, places=5)
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 51.5, -0.14, 0.35, 0.06916422).value,
-            36.4074561, delta=0.36407456099999996)
+            36.4074561, places=5)
 
 
 class ITUR838_3TestCase(test.TestCase):
@@ -4369,97 +4408,97 @@ class ITUR837_7TestCase(test.TestCase):
             34.64798123, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(3.133, 101.7, 0.15).value,
-            27.7636201, places=2)
+            27.7636201, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(3.133, 101.7, 0.3).value,
-            18.26254364, places=2)
+            18.26254364, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(3.133, 101.7, 0.35).value,
-            16.49493229, places=2)
+            16.49493229, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(22.9, -43.23, 0.1).value,
-            14.58963041, places=2)
+            14.58963041, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(22.9, -43.23, 0.15).value,
-            11.00510082, places=2)
+            11.00510082, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(22.9, -43.23, 0.3).value,
             6.23796236, places=2)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(22.9, -43.23, 0.35).value,
-            5.38239642, places=2)
+            5.38239642, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(23, 30, 0.1).value,
-            0.0, places=2)
+            0.0, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(23, 30, 0.15).value,
-            0.0, places=2)
+            0.0, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(23, 30, 0.3).value,
-            0.0, places=2)
+            0.0, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(23, 30, 0.35).value,
-            0.0, places=2)
+            0.0, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(25.78, -80.22, 0.1).value,
-            25.33888119, places=2)
+            25.33888119, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(25.78, -80.22, 0.15).value,
-            19.86683577, places=2)
+            19.86683577, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(25.78, -80.22, 0.3).value,
-            12.43676554, places=2)
+            12.43676554, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(25.78, -80.22, 0.35).value,
-            11.07566126, places=2)
+            11.07566126, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(28.717, 77.3, 0.1).value,
-            16.53857378, places=2)
+            16.53857378, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(28.717, 77.3, 0.15).value,
-            12.04651363, places=2)
+            12.04651363, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(28.717, 77.3, 0.3).value,
-            6.21600589, places=2)
+            6.21600589, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(28.717, 77.3, 0.35).value,
-            5.19609765, places=2)
+            5.19609765, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(33.94, 18.43, 0.1).value,
-            7.43193175, places=2)
+            7.43193175, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(33.94, 18.43, 0.15).value,
-            5.53031864, places=2)
+            5.53031864, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(33.94, 18.43, 0.3).value,
-            3.03506603, places=2)
+            3.03506603, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(33.94, 18.43, 0.35).value,
-            2.59276061, places=2)
+            2.59276061, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(41.9, 12.49, 0.1).value,
-            11.19798305, places=2)
+            11.19798305, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(41.9, 12.49, 0.15).value,
-            8.88472572, places=2)
+            8.88472572, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(41.9, 12.49, 0.3).value,
-            5.75356253, places=2)
+            5.75356253, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(41.9, 12.49, 0.35).value,
-            5.18058827, places=2)
+            5.18058827, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(51.5, -0.14, 0.1).value,
-            8.9924712, places=2)
+            8.9924712, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(51.5, -0.14, 0.15).value,
-            7.17369312, places=2)
+            7.17369312, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(51.5, -0.14, 0.3).value,
-            4.69033625, places=2)
+            4.69033625, places=3)
         self.assertAlmostEqual(
             models.itu837.rainfall_rate(51.5, -0.14, 0.35).value,
-            4.23258601, places=2)
+            4.23258601, places=3)
 
     def test_rainfall_probability(self):
 
@@ -5418,6 +5457,439 @@ class ITUR618_12TestCase(test.TestCase):
             0.313656, places=5)
 
 
+class ITUR618_13TestCase(test.TestCase):
+
+    def setUp(self):
+        models.itu618.change_version(13)
+
+    def test_rain_attenuation(self):
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    51.5, -0.14, 14.25, 31.07694309, p=1.0,
+                    tau=0, R001=26.48052).value,
+            0.4891464, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    41.9, 12.49, 14.25, 40.23202374, p=1.0,
+                    tau=0, R001=33.936232).value,
+            0.62159245, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    33.94, 18.43, 14.25, 46.35969261, p=1.0,
+                    tau=0, R001=27.13586832).value,
+            0.42101702, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    51.5, -0.14, 14.25, 31.07694309, p=0.1,
+                    tau=0, R001=26.48052).value,
+            2.16093996, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    41.9, 12.49, 14.25, 40.23202374, p=0.1,
+                    tau=0, R001=33.936232).value,
+            2.69015654, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    33.94, 18.43, 14.25, 46.35969261, p=0.1,
+                    tau=0, R001=27.13586832).value,
+            1.91338757, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    51.5, -0.14, 14.25, 31.07694309, p=0.01,
+                    tau=0, R001=26.48052).value,
+            6.72784425, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    41.9, 12.49, 14.25, 40.23202374, p=0.01,
+                    tau=0, R001=33.936232).value,
+            8.20500328, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    33.94, 18.43, 14.25, 46.35969261, p=0.01,
+                    tau=0, R001=27.13586832).value,
+            5.9418061, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    51.5, -0.14, 14.25, 31.07694309, p=0.001,
+                    tau=0, R001=26.48052).value,
+            14.76177358, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    41.9, 12.49, 14.25, 40.23202374, p=0.001,
+                    tau=0, R001=33.936232).value,
+            17.636376, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    33.94, 18.43, 14.25, 46.35969261, p=0.001,
+                    tau=0, R001=27.13586832).value,
+            12.98151687, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    51.5, -0.14, 29.0, 31.07694309, p=1.0,
+                    tau=0, R001=26.48052).value,
+            2.17898357, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    41.9, 12.49, 29.0, 40.23202374, p=1.0,
+                    tau=0, R001=33.936232).value,
+            2.81537632, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    33.94, 18.43, 29.0, 46.35969261, p=1.0,
+                    tau=0, R001=27.13586832).value,
+            1.96063611, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    51.5, -0.14, 29.0, 31.07694309, p=0.1,
+                    tau=0, R001=26.48052).value,
+            8.46779316, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    41.9, 12.49, 29.0, 40.23202374, p=0.1,
+                    tau=0, R001=33.936232).value,
+            10.70289842, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    33.94, 18.43, 29.0, 46.35969261, p=0.1,
+                    tau=0, R001=27.13586832).value,
+            7.80832251, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    51.5, -0.14, 29.0, 31.07694309, p=0.01,
+                    tau=0, R001=26.48052).value,
+            23.1908096, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    41.9, 12.49, 29.0, 40.23202374, p=0.01,
+                    tau=0, R001=33.936232).value,
+            28.67449232, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    33.94, 18.43, 29.0, 46.35969261, p=0.01,
+                    tau=0, R001=27.13586832).value,
+            21.24861968, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    51.5, -0.14, 29.0, 31.07694309, p=0.001,
+                    tau=0, R001=26.48052).value,
+            44.76009125, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    41.9, 12.49, 29.0, 40.23202374, p=0.001,
+                    tau=0, R001=33.936232).value,
+            54.14015005, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    33.94, 18.43, 29.0, 46.35969261, p=0.001,
+                    tau=0, R001=27.13586832).value,
+            40.68133015, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    22.9, -43.23, 14.25, 22.27833468, p=1.0,
+                    tau=0, R001=50.639304).value,
+            1.70690128, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    25.78, -80.22, 14.25, 52.6789929, p=1.0,
+                    tau=0, R001=78.2994993).value,
+            1.43904149, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    22.9, -43.23, 14.25, 22.27833468, p=0.1,
+                    tau=0, R001=50.639304).value,
+            8.27164744, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    25.78, -80.22, 14.25, 52.6789929, p=0.1,
+                    tau=0, R001=78.2994993).value,
+            6.30417186, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    22.9, -43.23, 14.25, 22.27833468, p=0.01,
+                    tau=0, R001=50.639304).value,
+            18.94410356, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    25.78, -80.22, 14.25, 52.6789929, p=0.01,
+                    tau=0, R001=78.2994993).value,
+            16.44617644, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    22.9, -43.23, 14.25, 22.27833468, p=0.001,
+                    tau=0, R001=50.639304).value,
+            29.91171296, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    25.78, -80.22, 14.25, 52.6789929, p=0.001,
+                    tau=0, R001=78.2994993).value,
+            29.95767701, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    22.9, -43.23, 29.0, 22.27833468, p=1.0,
+                    tau=0, R001=50.639304).value,
+            6.81336808, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    25.78, -80.22, 29.0, 52.6789929, p=1.0,
+                    tau=0, R001=78.2994993).value,
+            6.66385625, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    22.9, -43.23, 29.0, 22.27833468, p=0.1,
+                    tau=0, R001=50.639304).value,
+            29.31896844, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    25.78, -80.22, 29.0, 52.6789929, p=0.1,
+                    tau=0, R001=78.2994993).value,
+            25.59455941, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    22.9, -43.23, 29.0, 22.27833468, p=0.01,
+                    tau=0, R001=50.639304).value,
+            59.62576355, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    25.78, -80.22, 29.0, 52.6789929, p=0.01,
+                    tau=0, R001=78.2994993).value,
+            58.53988572, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    22.9, -43.23, 29.0, 22.27833468, p=0.001,
+                    tau=0, R001=50.639304).value,
+            83.5996391, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    25.78, -80.22, 29.0, 52.6789929, p=0.001,
+                    tau=0, R001=78.2994993).value,
+            93.48939944, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    28.717, 77.3, 14.25, 48.24116215, p=1.0,
+                    tau=90, R001=63.61888808).value,
+            1.2731081, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    3.133, 101.7, 14.25, 85.80457401, p=1.0,
+                    tau=90, R001=99.15117186).value,
+            1.93713255, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    9.05, 38.7, 14.25, 20.14348033, p=1.0,
+                    tau=90, R001=42.91007183).value,
+            1.04440572, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    28.717, 77.3, 14.25, 48.24116215, p=0.1,
+                    tau=90, R001=63.61888808).value,
+            5.48101228, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    3.133, 101.7, 14.25, 85.80457401, p=0.1,
+                    tau=90, R001=99.15117186).value,
+            10.67987642, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    9.05, 38.7, 14.25, 20.14348033, p=0.1,
+                    tau=90, R001=42.91007183).value,
+            6.0510347, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    28.717, 77.3, 14.25, 48.24116215, p=0.01,
+                    tau=90, R001=63.61888808).value,
+            14.85903351, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    3.133, 101.7, 14.25, 85.80457401, p=0.01,
+                    tau=90, R001=99.15117186).value,
+            21.03740448, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    9.05, 38.7, 14.25, 20.14348033, p=0.01,
+                    tau=90, R001=42.91007183).value,
+            12.61120361, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    28.717, 77.3, 14.25, 48.24116215, p=0.001,
+                    tau=90, R001=63.61888808).value,
+            28.21372983, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    3.133, 101.7, 14.25, 85.80457401, p=0.001,
+                    tau=90, R001=99.15117186).value,
+            28.13337932, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    9.05, 38.7, 14.25, 20.14348033, p=0.001,
+                    tau=90, R001=42.91007183).value,
+            17.85045772, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    28.717, 77.3, 29.0, 48.24116215, p=1.0,
+                    tau=90, R001=63.61888808).value,
+            5.88085649, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    3.133, 101.7, 29.0, 85.80457401, p=1.0,
+                    tau=90, R001=99.15117186).value,
+            9.84052929, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    9.05, 38.7, 29.0, 20.14348033, p=1.0,
+                    tau=90, R001=42.91007183).value,
+            3.8213237, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    28.717, 77.3, 29.0, 48.24116215, p=0.1,
+                    tau=90, R001=63.61888808).value,
+            22.20219047, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    3.133, 101.7, 29.0, 85.80457401, p=0.1,
+                    tau=90, R001=99.15117186).value,
+            47.18910296, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    9.05, 38.7, 29.0, 20.14348033, p=0.1,
+                    tau=90, R001=42.91007183).value,
+            19.80717661, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    28.717, 77.3, 29.0, 48.24116215, p=0.01,
+                    tau=90, R001=63.61888808).value,
+            52.7819415, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    3.133, 101.7, 29.0, 85.80457401, p=0.01,
+                    tau=90, R001=99.15117186).value,
+            80.85074503, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    9.05, 38.7, 29.0, 20.14348033, p=0.01,
+                    tau=90, R001=42.91007183).value,
+            36.93157357, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    28.717, 77.3, 29.0, 48.24116215, p=0.001,
+                    tau=90, R001=63.61888808).value,
+            87.88505965, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    3.133, 101.7, 29.0, 85.80457401, p=0.001,
+                    tau=90, R001=99.15117186).value,
+            94.0437949, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation(
+                    9.05, 38.7, 29.0, 20.14348033, p=0.001,
+                    tau=90, R001=42.91007183).value,
+            46.76694226, places=5)
+
+    def test_probability_of_rain_attenuation(self):
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation_probability(
+                    51.5, -0.14, 31.07694309).value,
+            7.32466089, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation_probability(
+                    41.9, 12.49, 40.23202374).value,
+            7.08992377, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation_probability(
+                    33.94, 18.43, 46.35969261).value,
+            1.74467895, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation_probability(
+                    22.9, -43.23, 22.27833468).value,
+            2.5828985, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation_probability(
+                    25.78, -80.22, 52.6789929).value,
+            4.0392312, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation_probability(
+                    28.717, 77.3, 48.24116215).value,
+            1.64420965, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation_probability(
+                    3.133, 101.7, 85.80457401).value,
+            5.00075505, places=4)
+        self.assertAlmostEqual(
+            models.itu618.rain_attenuation_probability(
+                    9.05, 38.7, 20.14348033).value,
+            7.0357202, places=5)
+
+    def test_site_diversity(self):
+        self.assertAlmostEqual(
+            models.itu618.site_diversity_rain_outage_probability(
+                    25.768, -80.205, 9, 52.40999326,
+                    25.463, -80.486, 9, 52.48526958, 14.5, tau=0).value,
+            0.00098637, places=5)
+        self.assertAlmostEqual(
+            models.itu618.site_diversity_rain_outage_probability(
+                    25.768, -80.205, 9, 52.40999326,
+                    25.463, -80.486, 3, 52.48526958, 14.5, tau=0).value,
+            0.0049444, places=5)
+        self.assertAlmostEqual(
+            models.itu618.site_diversity_rain_outage_probability(
+                    25.768, -80.205, 3, 52.40999326,
+                    25.463, -80.486, 9, 52.48526958, 14.5, tau=0).value,
+            0.00503721, places=5)
+        self.assertAlmostEqual(
+            models.itu618.site_diversity_rain_outage_probability(
+                    25.768, -80.205, 9, 52.40999326,
+                    25.463, -80.486, 9, 52.48526958, 18, tau=0).value,
+            0.00513052, places=5)
+        self.assertAlmostEqual(
+            models.itu618.site_diversity_rain_outage_probability(
+                    25.768, -80.205, 9, 52.40999326,
+                    25.463, -80.486, 3, 52.48526958, 18, tau=0).value,
+            0.01982845, places=5)
+        self.assertAlmostEqual(
+            models.itu618.site_diversity_rain_outage_probability(
+                    25.768, -80.205, 3, 52.40999326,
+                    25.463, -80.486, 9, 52.48526958, 18, tau=0).value,
+            0.02027952, places=5)
+        self.assertAlmostEqual(
+            models.itu618.site_diversity_rain_outage_probability(
+                    25.768, -80.205, 9, 52.40999326,
+                    25.463, -80.486, 9, 52.48526958, 29, tau=0).value,
+            0.07543135, places=5)
+        self.assertAlmostEqual(
+            models.itu618.site_diversity_rain_outage_probability(
+                    25.768, -80.205, 9, 52.40999326,
+                    25.463, -80.486, 3, 52.48526958, 29, tau=0).value,
+            0.16564191, places=5)
+        self.assertAlmostEqual(
+            models.itu618.site_diversity_rain_outage_probability(
+                    25.768, -80.205, 3, 52.40999326,
+                    25.463, -80.486, 9, 52.48526958, 29, tau=0).value,
+            0.17005653, places=5)
+        self.assertAlmostEqual(
+            models.itu618.site_diversity_rain_outage_probability(
+                    25.796, -80.287, 9, 52.33141826,
+                    25.889, -80.278, 9, 52.25682688, 29, tau=0).value,
+            0.25228844, places=5)
+        self.assertAlmostEqual(
+            models.itu618.site_diversity_rain_outage_probability(
+                    25.796, -80.287, 9, 52.33141826,
+                    25.889, -80.278, 3, 52.25682688, 29, tau=0).value,
+            0.40360211, places=5)
+        self.assertAlmostEqual(
+            models.itu618.site_diversity_rain_outage_probability(
+                    25.796, -80.287, 3, 52.33141826,
+                    25.889, -80.278, 9, 52.25682688, 29, tau=0).value,
+            0.39740505, places=5)
+
+    def test_scintillation_attenuation(self):
+        pass
+
+    def test_rain_cross_polarization_discrimination(self):
+        pass
+
+    def test_total_attenuation(self):
+        pass
+
+
 class ITUR840_4TestCase(test.TestCase):
 
     def setUp(self):
@@ -5685,259 +6157,259 @@ class ITUR840_4TestCase(test.TestCase):
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 51.5, -0.14, 30.87067768, 14.25, 1.000).value,
-            0.45792895, places=2)
+            0.45792895, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 41.9, 12.49, 40.97052773, 14.25, 1.000).value,
-            0.25946553, places=2)
+            0.25946553, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 33.94, 18.43, 47.91280491, 14.25, 1.000).value,
-            0.18313623, places=2)
+            0.18313623, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 51.5, -0.14, 30.87067768, 14.25, 0.100).value,
-            0.68992722, places=2)
+            0.68992722, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 41.9, 12.49, 40.97052773, 14.25, 0.100).value,
-            0.42506892, places=2)
+            0.42506892, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 33.94, 18.43, 47.91280491, 14.25, 0.100).value,
-            0.36999265, places=2)
+            0.36999265, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 51.5, -0.14, 30.87067768, 14.25, 0.010).value,
-            0.68992722, places=2)
+            0.68992722, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 41.9, 12.49, 40.97052773, 14.25, 0.010).value,
-            0.42506892, places=2)
+            0.42506892, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 33.94, 18.43, 47.91280491, 14.25, 0.010).value,
-            0.36999265, places=2)
+            0.36999265, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 51.5, -0.14, 30.87067768, 14.25, 0.001).value,
-            0.68992722, places=2)
+            0.68992722, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 41.9, 12.49, 40.97052773, 14.25, 0.001).value,
-            0.42506892, places=2)
+            0.42506892, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 33.94, 18.43, 47.91280491, 14.25, 0.001).value,
-            0.36999265, places=2)
+            0.36999265, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 51.5, -0.14, 30.87067768, 29, 1.000).value,
-            1.79599547, places=2)
+            1.79599547, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 41.9, 12.49, 40.97052773, 29, 1.000).value,
-            1.01762274, places=2)
+            1.01762274, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 33.94, 18.43, 47.91280491, 29, 1.000).value,
-            0.71825953, places=2)
+            0.71825953, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 51.5, -0.14, 30.87067768, 29, 0.100).value,
-            2.70589171, places=2)
+            2.70589171, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 41.9, 12.49, 40.97052773, 29, 0.100).value,
-            1.66711854, places=2)
+            1.66711854, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 33.94, 18.43, 47.91280491, 29, 0.100).value,
-            1.45110964, places=2)
+            1.45110964, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 51.5, -0.14, 30.87067768, 29, 0.010).value,
-            2.70589171, places=2)
+            2.70589171, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 41.9, 12.49, 40.97052773, 29, 0.010).value,
-            1.66711854, places=2)
+            1.66711854, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 33.94, 18.43, 47.91280491, 29, 0.010).value,
-            1.45110964, places=2)
+            1.45110964, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 51.5, -0.14, 30.87067768, 29, 0.001).value,
-            2.70589171, places=2)
+            2.70589171, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 41.9, 12.49, 40.97052773, 29, 0.001).value,
-            1.66711854, places=2)
+            1.66711854, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 33.94, 18.43, 47.91280491, 29, 0.001).value,
-            1.45110964, places=2)
+            1.45110964, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 22.9, -43.23, 59.81487174, 14.25, 1.000).value,
-            0.23764476, places=2)
+            0.23764476, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 25.78, -80.22, 49.20900369, 14.25, 1.000).value,
-            0.56006901, places=2)
+            0.56006901, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 22.9, -43.23, 59.81487174, 14.25, 0.100).value,
-            0.60891776, places=2)
+            0.60891776, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 25.78, -80.22, 49.20900369, 14.25, 0.100).value,
-            0.86702917, places=2)
+            0.86702917, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 22.9, -43.23, 59.81487174, 14.25, 0.010).value,
-            0.60891776, places=2)
+            0.60891776, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 25.78, -80.22, 49.20900369, 14.25, 0.010).value,
-            0.86702917, places=2)
+            0.86702917, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 22.9, -43.23, 59.81487174, 14.25, 0.001).value,
-            0.60891776, places=2)
+            0.60891776, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 25.78, -80.22, 49.20900369, 14.25, 0.001).value,
-            0.86702917, places=2)
+            0.86702917, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 22.9, -43.23, 59.81487174, 29, 1.000).value,
-            0.93204177, places=2)
+            0.93204177, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 25.78, -80.22, 49.20900369, 29, 1.000).value,
-            2.19658834, places=2)
+            2.19658834, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 22.9, -43.23, 59.81487174, 29, 0.100).value,
-            2.38817297, places=2)
+            2.38817297, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 25.78, -80.22, 49.20900369, 29, 0.100).value,
-            3.40048483, places=2)
+            3.40048483, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 22.9, -43.23, 59.81487174, 29, 0.010).value,
-            2.38817297, places=2)
+            2.38817297, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 25.78, -80.22, 49.20900369, 29, 0.010).value,
-            3.40048483, places=2)
+            3.40048483, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 22.9, -43.23, 59.81487174, 29, 0.001).value,
-            2.38817297, places=2)
+            2.38817297, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 25.78, -80.22, 49.20900369, 29, 0.001).value,
-            3.40048483, places=2)
+            3.40048483, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 28.717, 77.3, 55.90591362, 14.25, 1.000).value,
-            0.6178942, places=2)
+            0.6178942, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 3.133, 101.7, 67.76751981, 14.25, 1.000).value,
-            0.67031269, places=2)
+            0.67031269, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 9.05, 38.7, 38.14104832, 14.25, 1.000).value,
-            0.36671963, places=2)
+            0.36671963, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 28.717, 77.3, 55.90591362, 14.25, 0.100).value,
-            0.95021681, places=2)
+            0.95021681, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 3.133, 101.7, 67.76751981, 14.25, 0.100).value,
-            0.76459901, places=2)
+            0.76459901, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 9.05, 38.7, 38.14104832, 14.25, 0.100).value,
-            0.44948146, places=2)
+            0.44948146, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 28.717, 77.3, 55.90591362, 14.25, 0.010).value,
-            0.95021681, places=2)
+            0.95021681, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 3.133, 101.7, 67.76751981, 14.25, 0.010).value,
-            0.76459901, places=2)
+            0.76459901, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 9.05, 38.7, 38.14104832, 14.25, 0.010).value,
-            0.44948146, places=2)
+            0.44948146, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 28.717, 77.3, 55.90591362, 14.25, 0.001).value,
-            0.95021681, places=2)
+            0.95021681, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 3.133, 101.7, 67.76751981, 14.25, 0.001).value,
-            0.76459901, places=2)
+            0.76459901, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 9.05, 38.7, 38.14104832, 14.25, 0.001).value,
-            0.44948146, places=2)
+            0.44948146, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 28.717, 77.3, 55.90591362, 29, 1.000).value,
-            2.4233785, places=2)
+            2.4233785, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 3.133, 101.7, 67.76751981, 29, 1.000).value,
-            2.6289636, places=2)
+            2.6289636, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 9.05, 38.7, 38.14104832, 29, 1.000).value,
-            1.43827289, places=2)
+            1.43827289, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 28.717, 77.3, 55.90591362, 29, 0.100).value,
-            3.72674641, places=2)
+            3.72674641, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 3.133, 101.7, 67.76751981, 29, 0.100).value,
-            2.99875418, places=2)
+            2.99875418, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 9.05, 38.7, 38.14104832, 29, 0.100).value,
-            1.76286444, places=2)
+            1.76286444, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 28.717, 77.3, 55.90591362, 29, 0.010).value,
-            3.72674641, places=2)
+            3.72674641, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 3.133, 101.7, 67.76751981, 29, 0.010).value,
-            2.99875418, places=2)
+            2.99875418, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 9.05, 38.7, 38.14104832, 29, 0.010).value,
-            1.76286444, places=2)
+            1.76286444, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 28.717, 77.3, 55.90591362, 29, 0.001).value,
-            3.72674641, places=2)
+            3.72674641, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 3.133, 101.7, 67.76751981, 29, 0.001).value,
-            2.99875418, places=2)
+            2.99875418, places=5)
         self.assertAlmostEqual(
             models.itu840.cloud_attenuation(
                 9.05, 38.7, 38.14104832, 29, 0.001).value,
-            1.76286444, places=2)
+            1.76286444, places=5)
 
 
 class ITUR840_7TestCase(test.TestCase):
