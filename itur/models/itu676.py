@@ -8,10 +8,12 @@ import warnings
 import os
 from astropy import units as u
 
+
 from itur.models.itu453 import radio_refractive_index
 from itur.models.itu835 import standard_pressure, standard_temperature, \
     standard_water_vapour_density
 from itur.models.itu836 import total_water_vapour_content
+from itur.models.itu1511 import topographic_altitude
 from itur.utils import prepare_quantity, prepare_output_array,\
     prepare_input_array, load_data, dataset_dir, memory
 
@@ -72,17 +74,17 @@ class __ITU676():
         fcn = np.vectorize(self.instance.gaseous_attenuation_terrestrial_path)
         return fcn(r, f, el, rho, P, T, mode)
 
-    def gaseous_attenuation_slant_path(self, f, el, rho, P, T, mode):
+    def gaseous_attenuation_slant_path(self, f, el, rho, P, T, V_t, h, mode):
         # Abstract method to compute the gaseous attenuation over a slant path
         fcn = np.vectorize(self.instance.gaseous_attenuation_slant_path)
-        return fcn(f, el, rho, P, T, mode)
+        return fcn(f, el, rho, P, T, V_t, h, mode)
 
     def zenit_water_vapour_attenuation(
-            self, lat, lon, p, f, V_t=None, alt=None):
+            self, lat, lon, p, f, V_t=None, h=None):
         # Abstract method to compute the water vapour attenuation over the
         # slant path
         fcn = np.vectorize(self.instance.zenit_water_vapour_attenuation)
-        return fcn(lat, lon, p, f, V_t, alt)
+        return fcn(lat, lon, p, f, V_t, h)
 
     def gamma_exact(self, f, p, rho, t):
         # Abstract method to compute the specific attenuation using the
@@ -314,16 +316,16 @@ class _ITU676_11():
     def slant_inclined_path_coefficients(self, f, p):
         """
         """
-        rp = p / 1013.0
+        rp = p / 1013.25
         t1 = 4.64 / (1 + 0.066 * rp**-2.3) * \
             np.exp(- ((f - 59.7) / (2.87 + 12.4 * np.exp(-7.9 * rp)))**2)
-        t2 = (0.14 * np.exp(2.21 * rp)) / \
+        t2 = (0.14 * np.exp(2.12 * rp)) / \
             ((f - 118.75)**2 + 0.031 * np.exp(2.2 * rp))
-        t3 = (0.0114) / (1 + 0.14 * rp**-2.6) * f * \
+        t3 = 0.0114 / (1 + 0.14 * rp**-2.6) * f * \
              (-0.0247 + 0.0001 * f + 1.61e-6 * f**2) / \
              (1 - 0.0169 * f + 4.1e-5 * f**2 + 3.2e-7 * f**3)
 
-        h0 = (6.1) / (1 + 0.17 * rp**-1.1) * (1 + t1 + t2 + t3)
+        h0 = 6.1 / (1 + 0.17 * rp**-1.1) * (1 + t1 + t2 + t3)
 
         h0 = np.where(f < 70,
                       np.minimum(h0, 10.7 * rp**0.3),
@@ -350,14 +352,27 @@ class _ITU676_11():
             return gamma * r
 
     @classmethod
-    def gaseous_attenuation_slant_path(self, f, el, rho, P, T, mode='approx'):
+    def gaseous_attenuation_slant_path(self, f, el, rho, P, T, V_t=None,
+                                       h=None, mode='approx'):
         """
         """
         if mode == 'approx':
             gamma0, gammaw = self.gaseous_attenuation_approximation(
                 f, el, rho, P, T)
-            h0, hw = self.slant_inclined_path_coefficients(f, P)
-            return (gamma0 * h0 + gammaw * hw) / np.sin(np.deg2rad(el))
+
+            e = rho * T / 216.7
+            h0, hw = self.slant_inclined_path_coefficients(f, P + e)
+
+            # Use the zenit water-vapour method if the values of V_t
+            # and h are provided
+            if V_t is not None and h is not None:
+                Aw = self.zenit_water_vapour_attenuation(None, None, None,
+                                                         f, V_t, h)
+            else:
+                Aw = gammaw * hw
+
+            A0 = gamma0 * h0
+            return (A0 + Aw) / np.sin(np.deg2rad(el))
 
         else:
             delta_h = 0.0001 * np.exp((np.arange(0, 923)) / 100)
@@ -402,10 +417,11 @@ class _ITU676_11():
             gamma0, gammaw = self.gaseous_attenuation_approximation(
                 f, el, rho, P, T)
         else:
-            gamma0 = self.gamma_exact(f, P, rho, T)
+            gamma0 = self.gamma0_exact(f, P, rho, T)
             gammaw = 0
 
-        h0, hw = self.slant_inclined_path_coefficients(f, P)
+        e = rho * T / 216.7
+        h0, hw = self.slant_inclined_path_coefficients(f, P + e)
 
         if 5 < el and el < 90:
             h0_p = h0 * (np.exp(-h1 / h0) - np.exp(-h2 / h0))
@@ -437,17 +453,31 @@ class _ITU676_11():
 
     @classmethod
     def zenit_water_vapour_attenuation(
-            self, lat, lon, p, f, V_t=None, alt=None):
+            self, lat, lon, p, f, V_t=None, h=None):
         f_ref = 20.6        # [GHz]
-        p_ref = 780         # [hPa]
-        if V_t is None:
-            V_t = total_water_vapour_content(lat, lon, p, alt).value
-        rho_ref = V_t / 4     # [g/m3]
-        t_ref = 14 * np.log(0.22 * V_t / 4) + 3    # [Celsius]
+        p_ref = 815         # [hPa]
 
-        return (0.0173 * V_t *
-                self.gammaw_approx(f, p_ref, rho_ref, t_ref + 273) /
-                self.gammaw_approx(f_ref, p_ref, rho_ref, t_ref + 273))
+        if h is None:
+            h = topographic_altitude(lat, lon).value
+
+        if V_t is None:
+            V_t = total_water_vapour_content(lat, lon, p, h).value
+
+        rho_ref = V_t / 3.67
+        t_ref = 14 * np.log(0.22 * V_t / 3.67) + 3    # [Celsius]
+
+        a = (0.2048 * np.exp(- ((f - 22.43)/3.097)**2) +
+             0.2236 * np.exp(- ((f-183.5)/4.096)**2) +
+             0.2073 * np.exp(- ((f-325)/3.651)**2) - 0.113)
+
+        b = 8.741e4 * np.exp(-0.587 * f) + 312.2 * f**(-2.38) + 0.723
+        h = np.minimum(h, 4)
+
+        Aw_term1 = (0.0176 * V_t *
+                    self.gammaw_approx(f, p_ref, rho_ref, t_ref + 273.15) /
+                    self.gammaw_approx(f_ref, p_ref, rho_ref, t_ref + 273.15))
+
+        return np.where(f < 20, Aw_term1, Aw_term1 * (a * h ** b + 1))
 
 
 class _ITU676_10():
@@ -759,14 +789,26 @@ class _ITU676_10():
             return gamma * r
 
     @classmethod
-    def gaseous_attenuation_slant_path(self, f, el, rho, P, T, mode='approx'):
+    def gaseous_attenuation_slant_path(self, f, el, rho, P, T, V_t=None,
+                                       h=None, mode='approx'):
         """
         """
         if mode == 'approx':
             gamma0, gammaw = self.gaseous_attenuation_approximation(
                 f, el, rho, P, T)
-            h0, hw = self.slant_inclined_path_coefficients(f, P)
-            return (gamma0 * h0 + gammaw * hw) / np.sin(np.deg2rad(el))
+            e = rho * T / 216.7
+            h0, hw = self.slant_inclined_path_coefficients(f, P + e)
+
+            # Use the zenit water-vapour method if the values of V_t
+            # and h are provided
+            if V_t is not None and h is not None:
+                Aw = self.zenit_water_vapour_attenuation(None, None, None,
+                                                         f, V_t, h)
+            else:
+                Aw = gammaw * hw / np.sin(np.deg2rad(el))
+
+            A0 = gamma0 * h0 / np.sin(np.deg2rad(el))
+            return A0 + Aw
 
         else:
             delta_h = 0.0001 * np.exp((np.arange(1, 923) - 1) / 100)
@@ -814,7 +856,8 @@ class _ITU676_10():
             gamma0 = self.gamma_exact(f, P, rho, T)
             gammaw = 0
 
-        h0, hw = self.slant_inclined_path_coefficients(f, P)
+        e = rho * T / 216.7
+        h0, hw = self.slant_inclined_path_coefficients(f, P + e)
 
         if 5 < el and el < 90:
             h0_p = h0 * (np.exp(-h1 / h0) - np.exp(-h2 / h0))
@@ -846,11 +889,11 @@ class _ITU676_10():
 
     @classmethod
     def zenit_water_vapour_attenuation(
-            self, lat, lon, p, f, V_t=None, alt=None):
+            self, lat, lon, p, f, V_t=None, h=None):
         f_ref = 20.6        # [GHz]
         p_ref = 780         # [hPa]
         if V_t is None:
-            V_t = total_water_vapour_content(lat, lon, p, alt).value
+            V_t = total_water_vapour_content(lat, lon, p, h).value
         rho_ref = V_t / 4     # [g/m3]
         t_ref = 14 * np.log(0.22 * V_t / 4) + 3    # [Celsius]
 
@@ -1045,7 +1088,8 @@ def gaseous_attenuation_terrestrial_path(r, f, el, rho, P, T, mode):
     return prepare_output_array(val, type_output) * u.dB
 
 
-def gaseous_attenuation_slant_path(f, el, rho, P, T, mode='approx'):
+def gaseous_attenuation_slant_path(f, el, rho, P, T, V_t=None, h=None,
+                                   mode='approx'):
     """
     Estimate the attenuation of atmospheric gases on slant paths. This function
     operates in two modes, 'approx', and 'exact':
@@ -1069,6 +1113,17 @@ def gaseous_attenuation_slant_path(f, el, rho, P, T, mode='approx'):
         Atmospheric pressure (hPa)
     T : number or Quantity
         Absolute temperature (K)
+    V_t: number or Quantity (kg/m2)
+        Integrated water vapour content from: a) local radiosonde or
+        radiometric data or b) at the required percentage of time (kg/m2)
+        obtained from the digital maps in Recommendation ITU-R P.836 (kg/m2).
+        If None, use general method to compute the wet-component of the
+        gaseous attenuation. If provided, 'h' must be also provided. Default
+        is None.
+    h : number, sequence, or numpy.ndarray
+        Altitude of the receivers. If None, use the topographical altitude as
+        described in recommendation ITU-R P.1511. If provided, 'V_t' needs to
+        be also provided. Default is None.
     mode : string, optional
         Mode for the calculation. Valid values are 'approx', 'exact'. If
         'approx' Uses the method in Annex 2 of the recommendation (if any),
@@ -1091,7 +1146,11 @@ def gaseous_attenuation_slant_path(f, el, rho, P, T, mode='approx'):
     rho = prepare_quantity(rho, u.g / u.m**3, 'Water vapor density')
     P = prepare_quantity(P, u.hPa, 'Atospheric pressure')
     T = prepare_quantity(T, u.K, 'Temperature')
-    val = __model.gaseous_attenuation_slant_path(f, el, rho, P, T, mode)
+    V_t = prepare_quantity(V_t, u.kg / u.m**2,
+                           'Integrated water vapour content')
+    h = prepare_quantity(h, u.km, 'Altitude')
+    val = __model.gaseous_attenuation_slant_path(
+            f, el, rho, P, T, V_t, h, mode)
     return prepare_output_array(val, type_output) * u.dB
 
 
@@ -1154,7 +1213,7 @@ def gaseous_attenuation_inclined_path(f, el, rho, P, T, h1, h2, mode='approx'):
 
 
 @memory.cache
-def zenit_water_vapour_attenuation(lat, lon, p, f, V_t=None, alt=None):
+def zenit_water_vapour_attenuation(lat, lon, p, f, V_t=None, h=None):
     """
     An alternative method may be used to compute the slant path attenuation by
     water vapour, in cases where the integrated water vapour content along the
@@ -1175,9 +1234,8 @@ def zenit_water_vapour_attenuation(lat, lon, p, f, V_t=None, alt=None):
     V_t : number or Quantity, optional
         Integrated water vapour content along the path (kg/m2 or mm).
         If not provided this value is estimated using Recommendation
-        ITU-R P.836.
-        Default value None
-    alt : number, sequence, or numpy.ndarray
+        ITU-R P.836. Default value None
+    h : number, sequence, or numpy.ndarray
         Altitude of the receivers. If None, use the topographical altitude as
         described in recommendation ITU-R P.1511
 
@@ -1201,8 +1259,9 @@ def zenit_water_vapour_attenuation(lat, lon, p, f, V_t=None, alt=None):
         V_t,
         u.kg / u.m**2,
         'Integrated water vapour content along the path')
+    h = prepare_quantity(h, u.km, 'Altitude')
     val = __model.zenit_water_vapour_attenuation(
-        lat, lon, p, f, V_t=V_t, alt=alt)
+        lat, lon, p, f, V_t=V_t, h=h)
     return prepare_output_array(val, type_output) * u.dB
 
 
