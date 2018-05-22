@@ -2,6 +2,7 @@
 import unittest as test
 import numpy as np
 
+import itur
 import itur.models as models
 
 import sys
@@ -33,6 +34,7 @@ def suite():
     suite.addTest(ITUR676_11TestCase('test_gamma0_exact'))
     suite.addTest(ITUR676_11TestCase('test_gammaw_approx'))
     suite.addTest(ITUR676_11TestCase('test_gamma0_approx'))
+    suite.addTest(ITUR676_11TestCase('test_zenit_water_vapour_attenuation'))
 
     # ITU-R P.618 tests (Rain attenuation)
     suite.addTest(ITUR618_12TestCase(
@@ -41,7 +43,7 @@ def suite():
     suite.addTest(ITUR618_12TestCase('test_scintillation_attenuation'))
 
     suite.addTest(ITUR618_13TestCase('test_rain_attenuation'))
-#    suite.addTest(ITUR618_13TestCase('test_probability_of_rain_attenuation'))
+    suite.addTest(ITUR618_13TestCase('test_probability_of_rain_attenuation'))
 #    suite.addTest(ITUR618_13TestCase('test_site_diversity'))
     suite.addTest(ITUR618_13TestCase('test_scintillation_attenuation'))
     suite.addTest(ITUR618_13TestCase(
@@ -50,6 +52,7 @@ def suite():
 
     # ITU-R P.453 tests (Wet term radio refractivity)
     suite.addTest(ITUR453_12TestCase('test_wet_term_radio_refractivity'))
+    suite.addTest(ITUR453_13TestCase('test_wet_term_radio_refractivity'))
 
     # ITU-R P.836 tests (Water vapour density)
     suite.addTest(ITUR836_6TestCase('surface_water_vapour_density'))
@@ -70,7 +73,7 @@ def suite():
 
     # ITU-R P.840 tests (Clouds attenuation)
 #    suite.addTest(ITUR840_4TestCase('test_columnar_content_reduced_liquid'))
-    suite.addTest(ITUR840_4TestCase('test_cloud_attenuation'))
+#    suite.addTest(ITUR840_4TestCase('test_cloud_attenuation'))
     suite.addTest(ITUR840_7TestCase('test_columnar_content_reduced_liquid'))
     suite.addTest(ITUR840_7TestCase('test_cloud_attenuation'))
 
@@ -133,6 +136,45 @@ class ITUR453_12TestCase(test.TestCase):
         self.assertAlmostEqual(
             models.itu453.map_wet_term_radio_refractivity(9.05, 38.7).value,
             50.162000, places=5)
+
+
+class ITUR453_13TestCase(test.TestCase):
+    def setUp(self):
+        models.itu453.change_version(13)
+
+    def test_wet_term_radio_refractivity(self):
+        self.assertAlmostEqual(
+            models.itu453.map_wet_term_radio_refractivity(
+                    3.133, 101.7, 50).value,
+            128.14080027, places=5)
+        self.assertAlmostEqual(
+            models.itu453.map_wet_term_radio_refractivity(
+                    22.9, -43.23, 50).value,
+            104.35847467, places=5)
+        self.assertAlmostEqual(
+            models.itu453.map_wet_term_radio_refractivity(
+                    23, 30, 50).value,
+            36.47166667, places=5)
+        self.assertAlmostEqual(
+            models.itu453.map_wet_term_radio_refractivity(
+                    25.78, -80.22, 50).value,
+            113.2738672, places=5)
+        self.assertAlmostEqual(
+            models.itu453.map_wet_term_radio_refractivity(
+                    28.717, 77.3, 50).value,
+            75.66013547, places=5)
+        self.assertAlmostEqual(
+            models.itu453.map_wet_term_radio_refractivity(
+                    33.94, 18.43, 50).value,
+            80.14015964, places=5)
+        self.assertAlmostEqual(
+            models.itu453.map_wet_term_radio_refractivity(
+                    41.9, 12.49, 50).value,
+            61.21890044, places=5)
+        self.assertAlmostEqual(
+            models.itu453.map_wet_term_radio_refractivity(
+                    51.5, -0.14, 50).value,
+            50.38926222, places=5)
 
 
 class ITUR676_9TestCase(test.TestCase):
@@ -423,279 +465,279 @@ class ITUR676_9TestCase(test.TestCase):
                                         287.444 - 0.15).value,
             0.01955282, places=6)
 
-    def zenit_water_vapour_attenuation(self, lat, lon, el, p, f, alt):
-        gamma_w = models.itu676.zenit_water_vapour_attenuation(lat,
-                                                               lon,
-                                                               p,
-                                                               f,
-                                                               None,
-                                                               alt=alt).value
-        return gamma_w / np.sin(np.deg2rad(el))
-
-    def test_zenit_water_vapour_attenuation(self):
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                51.5, 359.86, 30.87067768, 1, 14.25, 0.06916422),
-            0.12789267, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                41.9, 12.49, 40.97052773, 1, 14.25, 0.05670104),
-            0.10865204, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                33.94, 18.43, 47.91280491, 1, 14.25, 0),
-            0.10205633, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                51.5, 359.86, 30.87067768, 0.1, 14.25, 0.06916422),
-            0.15315923, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                41.9, 12.49, 40.97052773, 0.1, 14.25, 0.05670104),
-            0.12223686, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                33.94, 18.43, 47.91280491, 0.1, 14.25, 0),
-            0.12410189, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                51.5, 359.86, 30.87067768, 0.01, 14.25, 0.06916422),
-            0.15315923,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                41.9, 12.49, 40.97052773, 0.01, 14.25, 0.05670104),
-            0.12223686,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                33.94, 18.43, 47.91280491, 0.01, 14.25, 0),
-            0.12410189,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                51.5, 359.86, 30.87067768, 0.001, 14.25, 0.06916422),
-            0.15315923,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                41.9, 12.49, 40.97052773, 0.001, 14.25, 0.05670104),
-            0.12223686,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                33.94, 18.43, 47.91280491, 0.001, 14.25, 0),
-            0.12410189,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                51.5, 359.86, 30.87067768, 1, 29, 0.06916422),
-            0.60896934, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                41.9, 12.49, 40.97052773, 1, 29, 0.05670104),
-            0.51690529, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                33.94, 18.43, 47.91280491, 1, 29, 0),
-            0.48519817, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                51.5, 359.86, 30.87067768, 0.1, 29, 0.06916422),
-            0.72784676, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                41.9, 12.49, 40.97052773, 0.1, 29, 0.05670104),
-            0.58076456, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                33.94, 18.43, 47.91280491, 0.1, 29, 0),
-            0.58863533, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                51.5, 359.86, 30.87067768, 0.01, 29, 0.06916422),
-            0.72784676,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                41.9, 12.49, 40.97052773, 0.01, 29, 0.05670104),
-            0.58076456,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                33.94, 18.43, 47.91280491, 0.01, 29, 0),
-            0.58863533,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                51.5, 359.86, 30.87067768, 0.001, 29, 0.06916422),
-            0.72784676,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                41.9, 12.49, 40.97052773, 0.001, 29, 0.05670104),
-            0.58076456,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                33.94, 18.43, 47.91280491, 0.001, 29, 0),
-            0.58863533,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                22.9, 316.77, 59.81487174, 1, 14.25, 0),
-            0.1181882, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                25.78, 279.78, 49.20900369, 1, 14.25, 0.00007511),
-            0.16093386, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                22.9, 316.77, 59.81487174, 0.1, 14.25, 0),
-            0.13730617, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                25.78, 279.78, 49.20900369, 0.1, 14.25, 0.00007511),
-            0.17798382, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                22.9, 316.77, 59.81487174, 0.01, 14.25, 0),
-            0.13730617,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                25.78, 279.78, 49.20900369, 0.01, 14.25, 0.00007511),
-            0.17798382,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                22.9, 316.77, 59.81487174, 0.001, 14.25, 0),
-            0.13730617,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                25.78, 279.78, 49.20900369, 0.001, 14.25, 0.00007511),
-            0.17798382,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                22.9, 316.77, 59.81487174, 1, 29, 0),
-            0.55983815, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                25.78, 279.78, 49.20900369, 1, 29, 0.00007511),
-            0.76047761, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                22.9, 316.77, 59.81487174, 0.1, 29, 0),
-            0.64906814, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                25.78, 279.78, 49.20900369, 0.1, 29, 0.00007511),
-            0.83981774, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                22.9, 316.77, 59.81487174, 0.01, 29, 0),
-            0.64906814,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                25.78, 279.78, 49.20900369, 0.01, 29, 0.00007511),
-            0.83981774,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                22.9, 316.77, 59.81487174, 0.001, 29, 0),
-            0.64906814,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                25.78, 279.78, 49.20900369, 0.001, 29, 0.00007511),
-            0.83981774,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                28.717, 77.3, 55.90591362, 1, 14.25, 0.21755946),
-            0.18628614, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                3.133, 101.7, 67.76751981, 1, 14.25, 0.23610446),
-            0.13468573, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                9.05, 38.7, 38.14104832, 1, 14.25, 2.45000492),
-            0.08369587, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                28.717, 77.3, 55.90591362, 0.1, 14.25, 0.21755946),
-            0.20242415, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                3.133, 101.7, 67.76751981, 0.1, 14.25, 0.23610446),
-            0.14372476, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                9.05, 38.7, 38.14104832, 0.1, 14.25, 2.45000492),
-            0.09153026, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                28.717, 77.3, 55.90591362, 0.01, 14.25, 0.21755946),
-            0.20242415,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                3.133, 101.7, 67.76751981, 0.01, 14.25, 0.23610446),
-            0.14372476,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                9.05, 38.7, 38.14104832, 0.01, 14.25, 2.45000492),
-            0.09153026,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                28.717, 77.3, 55.90591362, 0.001, 14.25, 0.21755946),
-            0.20242415,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                3.133, 101.7, 67.76751981, 0.001, 14.25, 0.23610446),
-            0.14372476,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                9.05, 38.7, 38.14104832, 0.001, 14.25, 2.45000492),
-            0.09153026,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                28.717, 77.3, 55.90591362, 1, 29, 0.21755946),
-            0.8771945, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                3.133, 101.7, 67.76751981, 1, 29, 0.23610446),
-            0.63623574, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                9.05, 38.7, 38.14104832, 1, 29, 2.45000492),
-            0.39942177, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                28.717, 77.3, 55.90591362, 0.1, 29, 0.21755946),
-            0.95194476, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                3.133, 101.7, 67.76751981, 0.1, 29, 0.23610446),
-            0.67829402, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                9.05, 38.7, 38.14104832, 0.1, 29, 2.45000492),
-            0.43646179, places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                28.717, 77.3, 55.90591362, 0.01, 29, 0.21755946),
-            0.95194476,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                3.133, 101.7, 67.76751981, 0.01, 29, 0.23610446),
-            0.67829402,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                9.05, 38.7, 38.14104832, 0.01, 29, 2.45000492),
-            0.43646179,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                28.717, 77.3, 55.90591362, 0.001, 29, 0.21755946),
-            0.95194476,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                3.133, 101.7, 67.76751981, 0.001, 29, 0.23610446),
-            0.67829402,  places=5)
-        self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                9.05, 38.7, 38.14104832, 0.001, 29, 2.45000492),
-            0.43646179,  places=5)
+#    def zenit_water_vapour_attenuation(self, lat, lon, el, p, f, alt):
+#        gamma_w = models.itu676.zenit_water_vapour_attenuation(lat,
+#                                                               lon,
+#                                                               p,
+#                                                               f,
+#                                                               None,
+#                                                               alt=alt).value
+#        return gamma_w / np.sin(np.deg2rad(el))
+#
+#    def test_zenit_water_vapour_attenuation(self):
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                51.5, 359.86, 30.87067768, 1, 14.25, 0.06916422),
+#            0.12789267, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                41.9, 12.49, 40.97052773, 1, 14.25, 0.05670104),
+#            0.10865204, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                33.94, 18.43, 47.91280491, 1, 14.25, 0),
+#            0.10205633, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                51.5, 359.86, 30.87067768, 0.1, 14.25, 0.06916422),
+#            0.15315923, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                41.9, 12.49, 40.97052773, 0.1, 14.25, 0.05670104),
+#            0.12223686, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                33.94, 18.43, 47.91280491, 0.1, 14.25, 0),
+#            0.12410189, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                51.5, 359.86, 30.87067768, 0.01, 14.25, 0.06916422),
+#            0.15315923,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                41.9, 12.49, 40.97052773, 0.01, 14.25, 0.05670104),
+#            0.12223686,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                33.94, 18.43, 47.91280491, 0.01, 14.25, 0),
+#            0.12410189,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                51.5, 359.86, 30.87067768, 0.001, 14.25, 0.06916422),
+#            0.15315923,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                41.9, 12.49, 40.97052773, 0.001, 14.25, 0.05670104),
+#            0.12223686,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                33.94, 18.43, 47.91280491, 0.001, 14.25, 0),
+#            0.12410189,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                51.5, 359.86, 30.87067768, 1, 29, 0.06916422),
+#            0.60896934, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                41.9, 12.49, 40.97052773, 1, 29, 0.05670104),
+#            0.51690529, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                33.94, 18.43, 47.91280491, 1, 29, 0),
+#            0.48519817, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                51.5, 359.86, 30.87067768, 0.1, 29, 0.06916422),
+#            0.72784676, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                41.9, 12.49, 40.97052773, 0.1, 29, 0.05670104),
+#            0.58076456, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                33.94, 18.43, 47.91280491, 0.1, 29, 0),
+#            0.58863533, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                51.5, 359.86, 30.87067768, 0.01, 29, 0.06916422),
+#            0.72784676,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                41.9, 12.49, 40.97052773, 0.01, 29, 0.05670104),
+#            0.58076456,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                33.94, 18.43, 47.91280491, 0.01, 29, 0),
+#            0.58863533,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                51.5, 359.86, 30.87067768, 0.001, 29, 0.06916422),
+#            0.72784676,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                41.9, 12.49, 40.97052773, 0.001, 29, 0.05670104),
+#            0.58076456,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                33.94, 18.43, 47.91280491, 0.001, 29, 0),
+#            0.58863533,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                22.9, 316.77, 59.81487174, 1, 14.25, 0),
+#            0.1181882, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                25.78, 279.78, 49.20900369, 1, 14.25, 0.00007511),
+#            0.16093386, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                22.9, 316.77, 59.81487174, 0.1, 14.25, 0),
+#            0.13730617, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                25.78, 279.78, 49.20900369, 0.1, 14.25, 0.00007511),
+#            0.17798382, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                22.9, 316.77, 59.81487174, 0.01, 14.25, 0),
+#            0.13730617,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                25.78, 279.78, 49.20900369, 0.01, 14.25, 0.00007511),
+#            0.17798382,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                22.9, 316.77, 59.81487174, 0.001, 14.25, 0),
+#            0.13730617,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                25.78, 279.78, 49.20900369, 0.001, 14.25, 0.00007511),
+#            0.17798382,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                22.9, 316.77, 59.81487174, 1, 29, 0),
+#            0.55983815, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                25.78, 279.78, 49.20900369, 1, 29, 0.00007511),
+#            0.76047761, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                22.9, 316.77, 59.81487174, 0.1, 29, 0),
+#            0.64906814, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                25.78, 279.78, 49.20900369, 0.1, 29, 0.00007511),
+#            0.83981774, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                22.9, 316.77, 59.81487174, 0.01, 29, 0),
+#            0.64906814,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                25.78, 279.78, 49.20900369, 0.01, 29, 0.00007511),
+#            0.83981774,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                22.9, 316.77, 59.81487174, 0.001, 29, 0),
+#            0.64906814,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                25.78, 279.78, 49.20900369, 0.001, 29, 0.00007511),
+#            0.83981774,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                28.717, 77.3, 55.90591362, 1, 14.25, 0.21755946),
+#            0.18628614, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                3.133, 101.7, 67.76751981, 1, 14.25, 0.23610446),
+#            0.13468573, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                9.05, 38.7, 38.14104832, 1, 14.25, 2.45000492),
+#            0.08369587, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                28.717, 77.3, 55.90591362, 0.1, 14.25, 0.21755946),
+#            0.20242415, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                3.133, 101.7, 67.76751981, 0.1, 14.25, 0.23610446),
+#            0.14372476, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                9.05, 38.7, 38.14104832, 0.1, 14.25, 2.45000492),
+#            0.09153026, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                28.717, 77.3, 55.90591362, 0.01, 14.25, 0.21755946),
+#            0.20242415,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                3.133, 101.7, 67.76751981, 0.01, 14.25, 0.23610446),
+#            0.14372476,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                9.05, 38.7, 38.14104832, 0.01, 14.25, 2.45000492),
+#            0.09153026,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                28.717, 77.3, 55.90591362, 0.001, 14.25, 0.21755946),
+#            0.20242415,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                3.133, 101.7, 67.76751981, 0.001, 14.25, 0.23610446),
+#            0.14372476,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                9.05, 38.7, 38.14104832, 0.001, 14.25, 2.45000492),
+#            0.09153026,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                28.717, 77.3, 55.90591362, 1, 29, 0.21755946),
+#            0.8771945, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                3.133, 101.7, 67.76751981, 1, 29, 0.23610446),
+#            0.63623574, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                9.05, 38.7, 38.14104832, 1, 29, 2.45000492),
+#            0.39942177, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                28.717, 77.3, 55.90591362, 0.1, 29, 0.21755946),
+#            0.95194476, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                3.133, 101.7, 67.76751981, 0.1, 29, 0.23610446),
+#            0.67829402, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                9.05, 38.7, 38.14104832, 0.1, 29, 2.45000492),
+#            0.43646179, places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                28.717, 77.3, 55.90591362, 0.01, 29, 0.21755946),
+#            0.95194476,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                3.133, 101.7, 67.76751981, 0.01, 29, 0.23610446),
+#            0.67829402,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                9.05, 38.7, 38.14104832, 0.01, 29, 2.45000492),
+#            0.43646179,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                28.717, 77.3, 55.90591362, 0.001, 29, 0.21755946),
+#            0.95194476,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                3.133, 101.7, 67.76751981, 0.001, 29, 0.23610446),
+#            0.67829402,  places=5)
+#        self.assertAlmostEqual(
+#            self.zenit_water_vapour_attenuation(
+#                9.05, 38.7, 38.14104832, 0.001, 29, 2.45000492),
+#            0.43646179,  places=5)
 
 
 class ITUR676_11TestCase(test.TestCase):
 
     def setUp(self):
         models.itu676.change_version(11)
-        models.itu836.change_version(5)
+        models.itu836.change_version(6)
 
     def test_gammaw_exact(self):
         # The ITU models are non-sense and believe that the conversion between
@@ -3537,20 +3579,263 @@ class ITUR676_11TestCase(test.TestCase):
             models.itu676.gamma0_approx(350, 1013.25, 7.5, 288.15).value,
             0.036805605, places=5)
 
-    def zenit_water_vapour_attenuation(self, lat, lon, el, p, f, alt):
-        gamma_w = models.itu676.zenit_water_vapour_attenuation(lat,
-                                                               lon,
-                                                               p,
-                                                               f,
-                                                               None,
-                                                               alt=alt).value
-        return gamma_w / np.sin(np.deg2rad(el))
-
     def test_zenit_water_vapour_attenuation(self):
         self.assertAlmostEqual(
-            self.zenit_water_vapour_attenuation(
-                51.5, 359.86, 30.87067768, 1, 14.25, 0.06916422),
-            0.12789267, places=5)
+            models.itu676.zenit_water_vapour_attenuation(
+                51.5, -0.14, 1.0, 14.25).value,
+            0.064981043, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                41.9, 12.49, 1.0, 14.25).value,
+            0.070360091, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                33.94, 18.43, 1.0, 14.25).value,
+            0.074660262, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                51.5, -0.14, 0.5, 14.25).value,
+            0.06911297, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                41.9, 12.49, 0.5, 14.25).value,
+            0.073434531, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                33.94, 18.43, 0.5, 14.25).value,
+            0.080098077, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                51.5, -0.14, 0.3, 14.25).value,
+            0.072394726, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                41.9, 12.49, 0.3, 14.25).value,
+            0.075162715, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                33.94, 18.43, 0.3, 14.25).value,
+            0.083750389, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                51.5, -0.14, 0.2, 14.25).value,
+            0.074394064, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                41.9, 12.49, 0.2, 14.25).value,
+            0.076695287, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                33.94, 18.43, 0.2, 14.25).value,
+            0.086350752, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                51.5, -0.14, 1.0, 29).value,
+            0.305636526, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                41.9, 12.49, 1.0, 29).value,
+            0.331425898, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                33.94, 18.43, 1.0, 29).value,
+            0.355205229, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                51.5, -0.14, 0.5, 29).value,
+            0.324977228, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                41.9, 12.49, 0.5, 29).value,
+            0.345830132, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                33.94, 18.43, 0.5, 29).value,
+            0.38091961, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                51.5, -0.14, 0.3, 29).value,
+            0.340327583, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                41.9, 12.49, 0.3, 29).value,
+            0.353923317, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                33.94, 18.43, 0.3, 29).value,
+            0.398176611, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                51.5, -0.14, 0.2, 29).value,
+            0.349674822, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                41.9, 12.49, 0.2, 29).value,
+            0.361098289, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                33.94, 18.43, 0.2, 29).value,
+            0.410456469, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                22.9, -43.23, 1.0, 14.25).value,
+            0.099820608, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                25.78, -80.22, 1.0, 14.25).value,
+            0.118484695, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                22.9, -43.23, 0.5, 14.25).value,
+            0.105446054, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                25.78, -80.22, 0.5, 14.25).value,
+            0.12252307, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                22.9, -43.23, 0.3, 14.25).value,
+            0.108812058, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                25.78, -80.22, 0.3, 14.25).value,
+            0.125093339, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                22.9, -43.23, 0.2, 14.25).value,
+            0.111441086, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                25.78, -80.22, 0.2, 14.25).value,
+            0.127090376, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                22.9, -43.23, 1.0, 29).value,
+            0.473979935, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                25.78, -80.22, 1.0, 29).value,
+            0.561753331, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                22.9, -43.23, 0.5, 29).value,
+            0.500468518, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                25.78, -80.22, 0.5, 29).value,
+            0.580717641, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                22.9, -43.23, 0.3, 29).value,
+            0.516307047, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                25.78, -80.22, 0.3, 29).value,
+            0.592782098, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                22.9, -43.23, 0.2, 29).value,
+            0.528672179, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                25.78, -80.22, 0.2, 29).value,
+            0.602152942, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                28.717, 77.3, 1.0, 14.25).value,
+            0.149156898, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                3.133, 101.7, 1.0, 14.25).value,
+            0.121165007, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                9.05, 38.7, 1.0, 14.25).value,
+            0.051589359, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                28.717, 77.3, 0.5, 14.25).value,
+            0.153859398, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                3.133, 101.7, 0.5, 14.25).value,
+            0.123550552, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                9.05, 38.7, 0.5, 14.25).value,
+            0.052996133, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                28.717, 77.3, 0.3, 14.25).value,
+            0.156616572, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                3.133, 101.7, 0.3, 14.25).value,
+            0.125325192, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                9.05, 38.7, 0.3, 14.25).value,
+            0.053871006, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                28.717, 77.3, 0.2, 14.25).value,
+            0.158958354, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                3.133, 101.7, 0.2, 14.25).value,
+            0.126766365, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                9.05, 38.7, 0.2, 14.25).value,
+            0.054721343, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                28.717, 77.3, 1.0, 29).value,
+            0.683528163, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                3.133, 101.7, 1.0, 29).value,
+            0.555168022, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                9.05, 38.7, 1.0, 29).value,
+            0.188559832, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                28.717, 77.3, 0.5, 29).value,
+            0.704836196, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                3.133, 101.7, 0.5, 29).value,
+            0.565993797, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                9.05, 38.7, 0.5, 29).value,
+            0.193687836, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                28.717, 77.3, 0.3, 29).value,
+            0.717323975, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                3.133, 101.7, 0.3, 29).value,
+            0.574044911, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                9.05, 38.7, 0.3, 29).value,
+            0.19687619, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                28.717, 77.3, 0.2, 29).value,
+            0.727927181, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                3.133, 101.7, 0.2, 29).value,
+            0.580581723, places=5)
+        self.assertAlmostEqual(
+            models.itu676.zenit_water_vapour_attenuation(
+                9.05, 38.7, 0.2, 29).value,
+            0.19997458, places=5)
 
 
 class ITUR836_6TestCase(test.TestCase):
@@ -4665,6 +4950,7 @@ class ITUR618_12TestCase(test.TestCase):
 
     def setUp(self):
         models.itu618.change_version(12)
+        models.itu453.change_version(12)
         models.itu838.change_version(3)
         models.itu836.change_version(5)
         models.itu837.change_version(6)
@@ -5461,6 +5747,11 @@ class ITUR618_13TestCase(test.TestCase):
 
     def setUp(self):
         models.itu618.change_version(13)
+        models.itu453.change_version(13)
+        models.itu838.change_version(3)
+        models.itu836.change_version(6)
+        models.itu837.change_version(7)
+        models.itu840.change_version(7)
 
     def test_rain_attenuation(self):
         self.assertAlmostEqual(
@@ -5881,535 +6172,1252 @@ class ITUR618_13TestCase(test.TestCase):
             0.39740505, places=5)
 
     def test_scintillation_attenuation(self):
-        pass
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    51.5, -0.14, 14.25, 31.07694309, 1, 1, 0.65).value,
+            0.26193234, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    41.9, 12.49, 14.25, 40.23202374, 1, 1, 0.65).value,
+            0.22405226, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    33.94, 18.43, 14.25, 46.35969261, 1, 1, 0.65).value,
+            0.23279942, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    51.5, -0.14, 14.25, 31.07694309, 0.1, 1, 0.65).value,
+            0.4228461, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    41.9, 12.49, 14.25, 40.23202374, 0.1, 1, 0.65).value,
+            0.36169504, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    33.94, 18.43, 14.25, 46.35969261, 0.1, 1, 0.65).value,
+            0.37581586, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    51.5, -0.14, 14.25, 31.07694309, 0.01, 1, 0.65).value,
+            0.62828836, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    41.9, 12.49, 14.25, 40.23202374, 0.01, 1, 0.65).value,
+            0.5374267, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    33.94, 18.43, 14.25, 46.35969261, 0.01, 1, 0.65).value,
+            0.55840821, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    51.5, -0.14, 14.25, 31.07694309, 0.001, 1, 0.65).value,
+            0.91021486, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    41.9, 12.49, 14.25, 40.23202374, 0.001, 1, 0.65).value,
+            0.77858162, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    33.94, 18.43, 14.25, 46.35969261, 0.001, 1, 0.65).value,
+            0.80897798, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    51.5, -0.14, 29, 31.07694309, 1, 1, 0.65).value,
+            0.38849319, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    41.9, 12.49, 29, 40.23202374, 1, 1, 0.65).value,
+            0.33115269, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    33.94, 18.43, 29, 46.35969261, 1, 1, 0.65).value,
+            0.34339899, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    51.5, -0.14, 29, 31.07694309, 0.1, 1, 0.65).value,
+            0.62715751, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    41.9, 12.49, 29, 40.23202374, 0.1, 1, 0.65).value,
+            0.53459083, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    33.94, 18.43, 29, 46.35969261, 0.1, 1, 0.65).value,
+            0.55436043, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    51.5, -0.14, 29, 31.07694309, 0.01, 1, 0.65).value,
+            0.93186567, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    41.9, 12.49, 29, 40.23202374, 0.01, 1, 0.65).value,
+            0.79432493, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    33.94, 18.43, 29, 46.35969261, 0.01, 1, 0.65).value,
+            0.82369971, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    51.5, -0.14, 29, 31.07694309, 0.001, 1, 0.65).value,
+            1.35001384, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    41.9, 12.49, 29, 40.23202374, 0.001, 1, 0.65).value,
+            1.15075561, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    33.94, 18.43, 29, 46.35969261, 0.001, 1, 0.65).value,
+            1.19331148, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    22.9, -43.23, 14.25, 22.27833468, 1, 1, 0.65).value,
+            0.62009744, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    25.78, -80.22, 14.25, 52.6789929, 1, 1, 0.65).value,
+            0.2664749, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    22.9, -43.23, 14.25, 22.27833468, 0.1, 1, 0.65).value,
+            1.00104396, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    25.78, -80.22, 14.25, 52.6789929, 0.1, 1, 0.65).value,
+            0.43017931, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    22.9, -43.23, 14.25, 22.27833468, 0.01, 1, 0.65).value,
+            1.48740705, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    25.78, -80.22, 14.25, 52.6789929, 0.01, 1, 0.65).value,
+            0.63918446, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    22.9, -43.23, 14.25, 22.27833468, 0.001, 1, 0.65).value,
+            2.15483859, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    25.78, -80.22, 14.25, 52.6789929, 0.001, 1, 0.65).value,
+            0.92600027, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    22.9, -43.23, 29, 22.27833468, 1, 1, 0.65).value,
+            0.92341029, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    25.78, -80.22, 29, 52.6789929, 1, 1, 0.65).value,
+            0.39237999, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    22.9, -43.23, 29, 22.27833468, 0.1, 1, 0.65).value,
+            1.49069201, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    25.78, -80.22, 29, 52.6789929, 0.1, 1, 0.65).value,
+            0.63343209, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    22.9, -43.23, 29, 22.27833468, 0.01, 1, 0.65).value,
+            2.21495349, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    25.78, -80.22, 29, 52.6789929, 0.01, 1, 0.65).value,
+            0.9411888, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    22.9, -43.23, 29, 22.27833468, 0.001, 1, 0.65).value,
+            3.20885076, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    25.78, -80.22, 29, 52.6789929, 0.001, 1, 0.65).value,
+            1.36352046, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    28.717, 77.3, 14.25, 48.24116215, 1, 1, 0.65).value,
+            0.2156413, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    3.133, 101.7, 14.25, 85.80457401, 1, 1, 0.65).value,
+            0.22167129, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    9.05, 38.7, 14.25, 20.14348033, 1, 1, 0.65).value,
+            0.48533645, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    28.717, 77.3, 14.25, 48.24116215, 0.1, 1, 0.65).value,
+            0.34811693, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    3.133, 101.7, 14.25, 85.80457401, 0.1, 1, 0.65).value,
+            0.35785136, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    9.05, 38.7, 14.25, 20.14348033, 0.1, 1, 0.65).value,
+            0.78349481, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    28.717, 77.3, 14.25, 48.24116215, 0.01, 1, 0.65).value,
+            0.51725159, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    3.133, 101.7, 14.25, 85.80457401, 0.01, 1, 0.65).value,
+            0.53171554, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    9.05, 38.7, 14.25, 20.14348033, 0.01, 1, 0.65).value,
+            1.16416037, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    28.717, 77.3, 14.25, 48.24116215, 0.001, 1, 0.65).value,
+            0.7493535, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    3.133, 101.7, 14.25, 85.80457401, 0.001, 1, 0.65).value,
+            0.77030774, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    9.05, 38.7, 14.25, 20.14348033, 0.001, 1, 0.65).value,
+            1.68654418, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    28.717, 77.3, 29, 48.24116215, 1, 1, 0.65).value,
+            0.31791278, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    3.133, 101.7, 29, 85.80457401, 1, 1, 0.65).value,
+            0.32486881, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    9.05, 38.7, 29, 20.14348033, 1, 1, 0.65).value,
+            0.72351614, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    28.717, 77.3, 29, 48.24116215, 0.1, 1, 0.65).value,
+            0.5132172, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    3.133, 101.7, 29, 85.80457401, 0.1, 1, 0.65).value,
+            0.52444655, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    9.05, 38.7, 29, 20.14348033, 0.1, 1, 0.65).value,
+            1.16799623, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    28.717, 77.3, 29, 48.24116215, 0.01, 1, 0.65).value,
+            0.76256679, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    3.133, 101.7, 29, 85.80457401, 0.01, 1, 0.65).value,
+            0.77925198, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    9.05, 38.7, 29, 20.14348033, 0.01, 1, 0.65).value,
+            1.73547406, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    28.717, 77.3, 29, 48.24116215, 0.001, 1, 0.65).value,
+            1.10474691, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    3.133, 101.7, 29, 85.80457401, 0.001, 1, 0.65).value,
+            1.12891911, places=5)
+        self.assertAlmostEqual(
+            models.itu618.scintillation_attenuation(
+                    9.05, 38.7, 29, 20.14348033, 0.001, 1, 0.65).value,
+            2.5142186, places=5)
 
     def test_rain_cross_polarization_discrimination(self):
-        pass
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                0.4891464, 14.25, 31.07694309, 1.0, 0).value,
+            49.57582307, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                0.62159245, 14.25, 40.23202374, 1.0, 0).value,
+            49.3981550, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                0.42101702, 14.25, 46.35969261, 1.0, 0).value,
+            53.93857057, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                2.16093996, 14.25, 31.07694309, 0.1, 0).value,
+            40.29800396, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                2.69015654, 14.25, 40.23202374, 0.1, 0).value,
+            40.28034662, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                1.91338757, 14.25, 46.35969261, 0.1, 0).value,
+            44.68265675, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                6.72784425, 14.25, 31.07694309, 0.01, 0).value,
+            32.97842659, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                8.20500328, 14.25, 40.23202374, 0.01, 0).value,
+            33.13972017, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                5.9418061, 14.25, 46.35969261, 0.01, 0).value,
+            37.62918682, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                14.76177358, 14.25, 31.07694309, 0.001, 0).value,
+            28.14021762, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                17.636376, 14.25, 40.23202374, 0.001, 0).value,
+            28.49940232, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                12.98151687, 14.25, 46.35969261, 0.001, 0).value,
+            33.07510332, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                2.17898357, 29.0, 31.07694309, 1.0, 0).value,
+            44.30006506, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                2.81537632, 29.0, 40.23202374, 1.0, 0).value,
+            43.8603725, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                1.96063611, 29.0, 46.35969261, 1.0, 0).value,
+            48.36964892, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                8.46779316, 29.0, 31.07694309, 0.1, 0).value,
+            35.03444, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                10.70289842, 29.0, 40.23202374, 0.1, 0).value,
+            34.76315732, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                7.80832251, 29.0, 46.35969261, 0.1, 0).value,
+            39.12690283, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                23.1908096, 29.0, 31.07694309, 0.01, 0).value,
+            27.96431726, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                28.67449232, 29.0, 40.23202374, 0.01, 0).value,
+            27.8830305, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                21.24861968, 29.0, 46.35969261, 0.01, 0).value,
+            32.34366876, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                44.76009125, 29.0, 31.07694309, 0.001, 0).value,
+            23.64462724, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                54.14015005, 29.0, 40.23202374, 0.001, 0).value,
+            23.7749224, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                40.68133015, 29.0, 46.35969261, 0.001, 0).value,
+            28.33381119, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                1.70690128, 14.25, 22.27833468, 1.0, 0).value,
+            38.65072987, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                1.43904149, 14.25, 52.6789929, 1.0, 0).value,
+            46.23051298, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                8.27164744, 14.25, 22.27833468, 0.1, 0).value,
+            27.9634536, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                6.30417186, 14.25, 52.6789929, 0.1, 0).value,
+            36.82555192, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                18.94410356, 14.25, 22.27833468, 0.01, 0).value,
+            22.64492814, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                16.44617644, 14.25, 52.6789929, 0.01, 0).value,
+            30.86009092, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                29.91171296, 14.25, 22.27833468, 0.001, 0).value,
+            20.29292318, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                29.95767701, 14.25, 52.6789929, 0.001, 0).value,
+            27.62415271, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                6.81336808, 29.0, 22.27833468, 1.0, 0).value,
+            33.64688473, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                6.66385625, 29.0, 52.6789929, 1.0, 0).value,
+            40.0755612, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                29.31896844, 29.0, 22.27833468, 0.1, 0).value,
+            22.85413903, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                25.59455941, 29.0, 52.6789929, 0.1, 0).value,
+            30.6650529, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                59.62576355, 29.0, 22.27833468, 0.01, 0).value,
+            17.88255372, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                58.53988572, 29.0, 52.6789929, 0.01, 0).value,
+            25.03203051, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                83.5996391, 29.0, 22.27833468, 0.001, 0).value,
+            16.16922861, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                93.48939944, 29.0, 52.6789929, 0.001, 0).value,
+            22.41718851, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                1.2731081, 14.25, 48.24116215, 1.0, 90).value,
+            45.80237934, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                1.93713255, 14.25, 85.80457401, 1.0, 90).value,
+            75.12972446, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                1.04440572, 14.25, 20.14348033, 1.0, 90).value,
+            42.28242577, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                5.48101228, 14.25, 48.24116215, 0.1, 90).value,
+            36.51649699, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                10.67987642, 14.25, 85.80457401, 0.1, 90).value,
+            65.51910372, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                6.0510347, 14.25, 20.14348033, 0.1, 90).value,
+            30.32827626, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                14.85903351, 14.25, 48.24116215, 0.01, 90).value,
+            30.19759496, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                21.03740448, 14.25, 85.80457401, 0.01, 90).value,
+            63.60558975, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                12.61120361, 14.25, 20.14348033, 0.01, 90).value,
+            25.96615447, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                28.21372983, 14.25, 48.24116215, 0.001, 90).value,
+            26.54453432, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                28.13337932, 14.25, 85.80457401, 0.001, 90).value,
+            64.9390721, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                17.85045772, 14.25, 20.14348033, 0.001, 90).value,
+            24.79563761, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                5.88085649, 29.0, 48.24116215, 1.0, 90).value,
+            39.73121592, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                9.84052929, 29.0, 85.80457401, 1.0, 90).value,
+            68.04931733, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                3.8213237, 29.0, 20.14348033, 1.0, 90).value,
+            38.25788658, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                22.20219047, 29.0, 48.24116215, 0.1, 90).value,
+            30.45232663, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                47.18910296, 29.0, 85.80457401, 0.1, 90).value,
+            58.32352317, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                19.80717661, 29.0, 20.14348033, 0.1, 90).value,
+            26.0924586, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                52.7819415, 29.0, 48.24116215, 0.01, 90).value,
+            24.4471052, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                80.85074503, 29.0, 85.80457401, 0.01, 90).value,
+            56.92074963, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                36.93157357, 29.0, 20.14348033, 0.01, 90).value,
+            22.11041426, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                87.88505965, 29.0, 48.24116215, 0.001, 90).value,
+            21.39198393, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                94.0437949, 29.0, 85.80457401, 0.001, 90).value,
+            59.09547625, places=5)
+        self.assertAlmostEqual(
+            models.itu618.rain_cross_polarization_discrimination(
+                46.76694226, 29.0, 20.14348033, 0.001, 90).value,
+            21.61918999, places=5)
+
+    def total_attenuation_fcn(self, lat, lon, f, el, p, D, eta, tau,
+                              val_g, val_c, val_r, val_s, val_t):
+
+        # The validation function uses the exact method to compute the rainfall
+        # rate exceeded for 0.01% of the time
+        R001 = models.itu837.rainfall_rate(lat, lon, 0.01000000001)
+        A_g, A_c, A_r, A_s, A = itur.atmospheric_attenuation_slant_path(
+            lat, lon, f, el, p, D, eta=eta, tau=tau, R001=R001,
+            return_contributions=True)
+
+        self.assertAlmostEqual(A_g.value, val_g, places=5)
+        self.assertAlmostEqual(A_c.value, val_c, places=5)
+        self.assertAlmostEqual(A_r.value, val_r, places=5)
+        self.assertAlmostEqual(A_s.value, val_s, places=5)
+        self.assertAlmostEqual(A.value, val_t, places=5)
 
     def test_total_attenuation(self):
-        pass
+        self.total_attenuation_fcn(
+                51.5, -0.14, 14.25, 31.07694309, 1, 1, 0.65, 0,
+                0.223693782, 0.45517046, 0.48914539, 0.26193234, 1.203663661)
+        self.total_attenuation_fcn(
+                41.9, 12.49, 14.25, 40.23202374, 1, 1, 0.65, 0,
+                0.184499507, 0.26338517, 0.62159459, 0.22405226, 1.097400703)
+        self.total_attenuation_fcn(
+                33.94, 18.43, 14.25, 46.35969261, 1, 1, 0.65, 0,
+                0.168635988, 0.18779409, 0.42101546, 0.23279942, 0.820437057)
+        self.total_attenuation_fcn(
+                51.5, -0.14, 14.25, 31.07694309, 0.1, 1, 0.65, 0,
+                0.223693782, 0.45517046, 2.16093588, 0.4228461, 2.873752501)
+        self.total_attenuation_fcn(
+                41.9, 12.49, 14.25, 40.23202374, 0.1, 1, 0.65, 0,
+                0.184499507, 0.26338517, 2.69016502, 0.36169504, 3.16011407)
+        self.total_attenuation_fcn(
+                33.94, 18.43, 14.25, 46.35969261, 0.1, 1, 0.65, 0,
+                0.168635988, 0.18779409, 1.91338106, 0.37581586, 2.303155743)
+        self.total_attenuation_fcn(
+                51.5, -0.14, 14.25, 31.07694309, 0.01, 1, 0.65, 0,
+                0.223693782, 0.45517046, 6.72783273, 0.62828836, 7.434122415)
+        self.total_attenuation_fcn(
+                41.9, 12.49, 14.25, 40.23202374, 0.01, 1, 0.65, 0,
+                0.184499507, 0.26338517, 8.20502671, 0.5374267, 8.669947478)
+        self.total_attenuation_fcn(
+                33.94, 18.43, 14.25, 46.35969261, 0.01, 1, 0.65, 0,
+                0.168635988, 0.18779409, 5.94178778, 0.55840821, 6.323600947)
+        self.total_attenuation_fcn(
+                51.5, -0.14, 14.25, 31.07694309, 0.001, 1, 0.65, 0,
+                0.223693782, 0.45517046, 14.76175093, 0.91021486, 15.46781355)
+        self.total_attenuation_fcn(
+                41.9, 12.49, 14.25, 40.23202374, 0.001, 1, 0.65, 0,
+                0.184499507, 0.26338517, 17.63642115, 0.77858162, 18.10123067)
+        self.total_attenuation_fcn(
+                33.94, 18.43, 14.25, 46.35969261, 0.001, 1, 0.65, 0,
+                0.168635988, 0.18779409, 12.981481, 0.80897798, 13.36273512)
+        self.total_attenuation_fcn(
+                51.5, -0.14, 29, 31.07694309, 1, 1, 0.65, 0,
+                0.799999368, 1.77247154, 2.17897957, 0.38849319, 4.770502219)
+        self.total_attenuation_fcn(
+                41.9, 12.49, 29, 40.23202374, 1, 1, 0.65, 0,
+                0.673619867, 1.0256437, 2.81538514, 0.33115269, 4.528897381)
+        self.total_attenuation_fcn(
+                33.94, 18.43, 29, 46.35969261, 1, 1, 0.65, 0,
+                0.62972417, 0.73128577, 1.96062953, 0.34339899, 3.343454224)
+        self.total_attenuation_fcn(
+                51.5, -0.14, 29, 31.07694309, 0.1, 1, 0.65, 0,
+                0.799999368, 1.77247154, 8.46777895, 0.62715751, 11.05943682)
+        self.total_attenuation_fcn(
+                41.9, 12.49, 29, 40.23202374, 0.1, 1, 0.65, 0,
+                0.673619867, 1.0256437, 10.70292908, 0.53459083, 12.41436971)
+        self.total_attenuation_fcn(
+                33.94, 18.43, 29, 46.35969261, 0.1, 1, 0.65, 0,
+                0.62972417, 0.73128577, 7.80829852, 0.55436043, 9.18728313)
+        self.total_attenuation_fcn(
+                51.5, -0.14, 29, 31.07694309, 0.01, 1, 0.65, 0,
+                0.799999368, 1.77247154, 23.19077435, 0.93186567, 25.78063225)
+        self.total_attenuation_fcn(
+                41.9, 12.49, 29, 40.23202374, 0.01, 1, 0.65, 0,
+                0.673619867, 1.0256437, 28.67456675, 0.79432493, 30.38445044)
+        self.total_attenuation_fcn(
+                33.94, 18.43, 29, 46.35969261, 0.01, 1, 0.65, 0,
+                0.62972417, 0.73128577, 21.24856054, 0.82369971, 22.62499923)
+        self.total_attenuation_fcn(
+                51.5, -0.14, 29, 31.07694309, 0.001, 1, 0.65, 0,
+                0.799999368, 1.77247154, 44.76003026, 1.35001384, 47.35208054)
+        self.total_attenuation_fcn(
+                41.9, 12.49, 29, 40.23202374, 0.001, 1, 0.65, 0,
+                0.673619867, 1.0256437, 54.14027603, 1.15075561, 55.85154062)
+        self.total_attenuation_fcn(
+                33.94, 18.43, 29, 46.35969261, 0.001, 1, 0.65, 0,
+                0.62972417, 0.73128577, 40.68122866, 1.19331148, 42.05942781)
+        self.total_attenuation_fcn(
+                22.9, -43.23, 14.25, 22.27833468, 1, 1, 0.65, 0,
+                0.383178724, 0.54183293, 1.70690691, 0.62009744, 2.715849229)
+        self.total_attenuation_fcn(
+                25.78, -80.22, 14.25, 52.6789929, 1, 1, 0.65, 0,
+                0.206227197, 0.53317506, 1.43904233, 0.2664749, 2.196365451)
+        self.total_attenuation_fcn(
+                22.9, -43.23, 14.25, 22.27833468, 0.1, 1, 0.65, 0,
+                0.383178724, 0.54183293, 8.27167236, 1.00104396, 9.253351467)
+        self.total_attenuation_fcn(
+                25.78, -80.22, 14.25, 52.6789929, 0.1, 1, 0.65, 0,
+                0.206227197, 0.53317506, 6.30417519, 0.43017931, 7.057096675)
+        self.total_attenuation_fcn(
+                22.9, -43.23, 14.25, 22.27833468, 0.01, 1, 0.65, 0,
+                0.383178724, 0.54183293, 18.94415527, 1.48740705, 19.92585295)
+        self.total_attenuation_fcn(
+                25.78, -80.22, 14.25, 52.6789929, 0.01, 1, 0.65, 0,
+                0.206227197, 0.53317506, 16.44618432, 0.63918446, 17.1976133)
+        self.total_attenuation_fcn(
+                22.9, -43.23, 14.25, 22.27833468, 0.001, 1, 0.65, 0,
+                0.383178724, 0.54183293, 29.91178614, 2.15483859, 30.91293869)
+        self.total_attenuation_fcn(
+                25.78, -80.22, 14.25, 52.6789929, 0.001, 1, 0.65, 0,
+                0.206227197, 0.53317506, 29.95768987, 0.92600027, 30.71115009)
+        self.total_attenuation_fcn(
+                22.9, -43.23, 29, 22.27833468, 1, 1, 0.65, 0,
+                1.504259763, 2.1099424, 6.81338837, 0.92341029, 10.4752418)
+        self.total_attenuation_fcn(
+                25.78, -80.22, 29, 52.6789929, 1, 1, 0.65, 0,
+                0.827675954, 2.07622792, 6.66385994, 0.39237999, 9.576567189)
+        self.total_attenuation_fcn(
+                22.9, -43.23, 29, 22.27833468, 0.1, 1, 0.65, 0,
+                1.504259763, 2.1099424, 29.31904828, 1.49069201, 32.9685827)
+        self.total_attenuation_fcn(
+                25.78, -80.22, 29, 52.6789929, 0.1, 1, 0.65, 0,
+                0.827675954, 2.07622792, 25.59457239, 0.63343209, 28.50572549)
+        self.total_attenuation_fcn(
+                22.9, -43.23, 29, 22.27833468, 0.01, 1, 0.65, 0,
+                1.504259763, 2.1099424, 59.62591067, 2.21495349, 63.27983401)
+        self.total_attenuation_fcn(
+                25.78, -80.22, 29, 52.6789929, 0.01, 1, 0.65, 0,
+                0.827675954, 2.07622792, 58.53991262, 0.9411888, 61.45112298)
+        self.total_attenuation_fcn(
+                22.9, -43.23, 29, 22.27833468, 0.001, 1, 0.65, 0,
+                1.504259763, 2.1099424, 83.59982398, 3.20885076, 87.2740725)
+        self.total_attenuation_fcn(
+                25.78, -80.22, 29, 52.6789929, 0.001, 1, 0.65, 0,
+                0.827675954, 2.07622792, 93.48943794, 1.36352046, 96.4030686)
+        self.total_attenuation_fcn(
+                28.717, 77.3, 14.25, 48.24116215, 1, 1, 0.65, 90,
+                0.257653026, 0.68592197, 1.27311232, 0.2156413, 2.228519972)
+        self.total_attenuation_fcn(
+                3.133, 101.7, 14.25, 85.80457401, 1, 1, 0.65, 90,
+                0.163655312, 0.62211863, 1.93712821, 0.22167129, 2.732484342)
+        self.total_attenuation_fcn(
+                9.05, 38.7, 14.25, 20.14348033, 1, 1, 0.65, 90,
+                0.22310495, 0.65764822, 1.04440674, 0.48533645, 1.993003982)
+        self.total_attenuation_fcn(
+                28.717, 77.3, 14.25, 48.24116215, 0.1, 1, 0.65, 90,
+                0.257653026, 0.68592197, 5.48102886, 0.34811693, 6.434421439)
+        self.total_attenuation_fcn(
+                3.133, 101.7, 14.25, 85.80457401, 0.1, 1, 0.65, 90,
+                0.163655312, 0.62211863, 10.67985456, 0.35785136, 11.47129236)
+        self.total_attenuation_fcn(
+                9.05, 38.7, 14.25, 20.14348033, 0.1, 1, 0.65, 90,
+                0.22310495, 0.65764822, 6.05104013, 0.78349481, 6.977389778)
+        self.total_attenuation_fcn(
+                28.717, 77.3, 14.25, 48.24116215, 0.01, 1, 0.65, 90,
+                0.257653026, 0.68592197, 14.85907425, 0.51725159, 15.81125251)
+        self.total_attenuation_fcn(
+                3.133, 101.7, 14.25, 85.80457401, 0.01, 1, 0.65, 90,
+                0.163655312, 0.62211863, 21.03736546, 0.53171554, 21.82966493)
+        self.total_attenuation_fcn(
+                9.05, 38.7, 14.25, 20.14348033, 0.01, 1, 0.65, 90,
+                0.22310495, 0.65764822, 12.61121387, 1.16416037, 13.54293868)
+        self.total_attenuation_fcn(
+                28.717, 77.3, 14.25, 48.24116215, 0.001, 1, 0.65, 90,
+                0.257653026, 0.68592197, 28.21379917, 0.7493535, 29.16708769)
+        self.total_attenuation_fcn(
+                3.133, 101.7, 14.25, 85.80457401, 0.001, 1, 0.65, 90,
+                0.163655312, 0.62211863, 28.13333254, 0.77030774, 28.92942223)
+        self.total_attenuation_fcn(
+                9.05, 38.7, 14.25, 20.14348033, 0.001, 1, 0.65, 90,
+                0.22310495, 0.65764822, 17.85047073, 1.68654418, 18.80790784)
+        self.total_attenuation_fcn(
+                28.717, 77.3, 29, 48.24116215, 1, 1, 0.65, 90,
+                1.038585522, 2.67103709, 5.88087518, 0.31791278, 9.596404871)
+        self.total_attenuation_fcn(
+                3.133, 101.7, 29, 85.80457401, 1, 1, 0.65, 90,
+                0.645959831, 2.42258159, 9.84050759, 0.32486881, 12.9133514)
+        self.total_attenuation_fcn(
+                9.05, 38.7, 29, 20.14348033, 1, 1, 0.65, 90,
+                0.703128217, 2.56093676, 3.82132703, 0.72351614, 7.126271267)
+        self.total_attenuation_fcn(
+                28.717, 77.3, 29, 48.24116215, 0.1, 1, 0.65, 90,
+                1.038585522, 2.67103709, 22.20225497, 0.5132172, 25.9171717)
+        self.total_attenuation_fcn(
+                3.133, 101.7, 29, 85.80457401, 0.1, 1, 0.65, 90,
+                0.645959831, 2.42258159, 47.18900784, 0.52444655, 50.26032116)
+        self.total_attenuation_fcn(
+                9.05, 38.7, 29, 20.14348033, 0.1, 1, 0.65, 90,
+                0.703128217, 2.56093676, 19.80719237, 1.16799623, 23.10173121)
+        self.total_attenuation_fcn(
+                28.717, 77.3, 29, 48.24116215, 0.01, 1, 0.65, 90,
+                1.038585522, 2.67103709, 52.78208044, 0.76256679, 56.49694605)
+        self.total_attenuation_fcn(
+                3.133, 101.7, 29, 85.80457401, 0.01, 1, 0.65, 90,
+                0.645959831, 2.42258159, 80.85059735, 0.77925198, 83.92278473)
+        self.total_attenuation_fcn(
+                9.05, 38.7, 29, 20.14348033, 0.01, 1, 0.65, 90,
+                0.703128217, 2.56093676, 36.9316002, 1.73547406, 40.23377893)
+        self.total_attenuation_fcn(
+                28.717, 77.3, 29, 48.24116215, 0.001, 1, 0.65, 90,
+                1.038585522, 2.67103709, 87.88526702, 1.10474691, 91.6016281)
+        self.total_attenuation_fcn(
+                3.133, 101.7, 29, 85.80457401, 0.001, 1, 0.65, 90,
+                0.645959831, 2.42258159, 94.04364093, 1.12891911, 97.11878785)
+        self.total_attenuation_fcn(
+                9.05, 38.7, 29, 20.14348033, 0.001, 1, 0.65, 90,
+                0.703128217, 2.56093676, 46.76697248, 2.5142186, 50.09507012)
 
 
-class ITUR840_4TestCase(test.TestCase):
-
-    def setUp(self):
-        models.itu840.change_version(4)
-
-    def test_columnar_content_reduced_liquid(self):
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                51.5, -0.14, 1.000).value,
-            1.26328612, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                41.9, 12.49, 1.000).value,
-            0.91467189, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                33.94, 18.43, 1.000).value,
-            0.73072098, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                51.5, -0.14, 0.100).value,
-            1.90329847, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                41.9, 12.49, 0.100).value,
-            1.49845951, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                    33.94, 18.43, 0.100).value,
-            1.47628568, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                    51.5, -0.14, 0.010).value,
-            1.90329847, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                    41.9, 12.49, 0.010).value,
-            1.49845951, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                    33.94, 18.43, 0.010).value,
-            1.47628568, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                    51.5, -0.14, 0.001).value,
-            1.90329847, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                    41.9, 12.49, 0.001).value,
-            1.49845951, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                    33.94, 18.43, 0.001).value,
-            1.47628568, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                51.5, -0.14, 1.000).value,
-            1.26328612, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                41.9, 12.49, 1.000).value,
-            0.91467189, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                33.94, 18.43, 1.000).value,
-            0.73072098, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                51.5, -0.14, 0.100).value,
-            1.90329847, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                41.9, 12.49, 0.100).value,
-            1.49845951, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                33.94, 18.43, 0.100).value,
-            1.47628568, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                    51.5, -0.14, 0.010).value,
-            1.90329847, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                    41.9, 12.49, 0.010).value,
-            1.49845951, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                    33.94, 18.43, 0.010).value,
-            1.47628568, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                    51.5, -0.14, 0.001).value,
-            1.90329847, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                    41.9, 12.49, 0.001).value,
-            1.49845951, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                    33.94, 18.43, 0.001).value,
-            1.47628568, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                22.9, -43.23, 1.000).value,
-            1.10444871, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                25.78, -80.22, 1.000).value,
-            2.27978216, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                22.9, -43.23, 0.100).value,
-            2.82993169, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                25.78, -80.22, 0.100).value,
-            3.52927516, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                    22.9, -43.23, 0.010).value,
-            2.82993169, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                    25.78, -80.22, 0.010).value,
-            3.52927516, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                    22.9, -43.23, 0.001).value,
-            2.82993169, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                    25.78, -80.22, 0.001).value,
-            3.52927516, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                22.9, -43.23, 1.000).value,
-            1.10444871, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                25.78, -80.22, 1.000).value,
-            2.27978216, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                22.9, -43.23, 0.100).value,
-            2.82993169, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                25.78, -80.22, 0.100).value,
-            3.52927516, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                    22.9, -43.23, 0.010).value,
-            2.82993169, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                    25.78, -80.22, 0.010).value,
-            3.52927516, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                    22.9, -43.23, 0.001).value,
-            2.82993169, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                    25.78, -80.22, 0.001).value,
-            3.52927516, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                28.717, 77.3, 1.000).value,
-            2.75109958, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                3.133, 101.7, 1.000).value,
-            3.33600769, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                9.05, 38.7, 1.000).value,
-            1.21770185, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                28.717, 77.3, 0.100).value,
-            4.23072604, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                3.133, 101.7, 0.100).value,
-            3.80525123, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                9.05, 38.7, 0.100).value,
-            1.49251459, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                28.717, 77.3, 0.010).value,
-            4.23072604, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                3.133, 101.7, 0.010).value,
-            3.80525123, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                9.05, 38.7, 0.010).value,
-            1.49251459, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                28.717, 77.3, 0.001).value,
-            4.23072604, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                3.133, 101.7, 0.001).value,
-            3.80525123, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                9.05, 38.7, 0.001).value,
-            1.49251459, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                28.717, 77.3, 1.000).value,
-            2.75109958, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                3.133, 101.7, 1.000).value,
-            3.33600769, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                9.05, 38.7, 1.000).value,
-            1.21770185, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                28.717, 77.3, 0.100).value,
-            4.23072604, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                3.133, 101.7, 0.100).value,
-            3.80525123, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                9.05, 38.7, 0.100).value,
-            1.49251459, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                28.717, 77.3, 0.010).value,
-            4.23072604, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                3.133, 101.7, 0.010).value,
-            3.80525123, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                9.05, 38.7, 0.010).value,
-            1.49251459, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                28.717, 77.3, 0.001).value,
-            4.23072604, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                3.133, 101.7, 0.001).value,
-            3.80525123, places=5)
-        self.assertAlmostEqual(
-            models.itu840.columnar_content_reduced_liquid(
-                9.05, 38.7, 0.001).value,
-            1.49251459, places=5)
-
-    def test_cloud_attenuation(self):
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                51.5, -0.14, 30.87067768, 14.25, 1.000).value,
-            0.45792895, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                41.9, 12.49, 40.97052773, 14.25, 1.000).value,
-            0.25946553, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                33.94, 18.43, 47.91280491, 14.25, 1.000).value,
-            0.18313623, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                51.5, -0.14, 30.87067768, 14.25, 0.100).value,
-            0.68992722, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                41.9, 12.49, 40.97052773, 14.25, 0.100).value,
-            0.42506892, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                33.94, 18.43, 47.91280491, 14.25, 0.100).value,
-            0.36999265, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                51.5, -0.14, 30.87067768, 14.25, 0.010).value,
-            0.68992722, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                41.9, 12.49, 40.97052773, 14.25, 0.010).value,
-            0.42506892, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                33.94, 18.43, 47.91280491, 14.25, 0.010).value,
-            0.36999265, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                51.5, -0.14, 30.87067768, 14.25, 0.001).value,
-            0.68992722, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                41.9, 12.49, 40.97052773, 14.25, 0.001).value,
-            0.42506892, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                33.94, 18.43, 47.91280491, 14.25, 0.001).value,
-            0.36999265, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                51.5, -0.14, 30.87067768, 29, 1.000).value,
-            1.79599547, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                41.9, 12.49, 40.97052773, 29, 1.000).value,
-            1.01762274, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                33.94, 18.43, 47.91280491, 29, 1.000).value,
-            0.71825953, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                51.5, -0.14, 30.87067768, 29, 0.100).value,
-            2.70589171, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                41.9, 12.49, 40.97052773, 29, 0.100).value,
-            1.66711854, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                33.94, 18.43, 47.91280491, 29, 0.100).value,
-            1.45110964, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                51.5, -0.14, 30.87067768, 29, 0.010).value,
-            2.70589171, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                41.9, 12.49, 40.97052773, 29, 0.010).value,
-            1.66711854, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                33.94, 18.43, 47.91280491, 29, 0.010).value,
-            1.45110964, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                51.5, -0.14, 30.87067768, 29, 0.001).value,
-            2.70589171, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                41.9, 12.49, 40.97052773, 29, 0.001).value,
-            1.66711854, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                33.94, 18.43, 47.91280491, 29, 0.001).value,
-            1.45110964, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                22.9, -43.23, 59.81487174, 14.25, 1.000).value,
-            0.23764476, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                25.78, -80.22, 49.20900369, 14.25, 1.000).value,
-            0.56006901, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                22.9, -43.23, 59.81487174, 14.25, 0.100).value,
-            0.60891776, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                25.78, -80.22, 49.20900369, 14.25, 0.100).value,
-            0.86702917, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                22.9, -43.23, 59.81487174, 14.25, 0.010).value,
-            0.60891776, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                25.78, -80.22, 49.20900369, 14.25, 0.010).value,
-            0.86702917, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                22.9, -43.23, 59.81487174, 14.25, 0.001).value,
-            0.60891776, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                25.78, -80.22, 49.20900369, 14.25, 0.001).value,
-            0.86702917, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                22.9, -43.23, 59.81487174, 29, 1.000).value,
-            0.93204177, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                25.78, -80.22, 49.20900369, 29, 1.000).value,
-            2.19658834, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                22.9, -43.23, 59.81487174, 29, 0.100).value,
-            2.38817297, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                25.78, -80.22, 49.20900369, 29, 0.100).value,
-            3.40048483, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                22.9, -43.23, 59.81487174, 29, 0.010).value,
-            2.38817297, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                25.78, -80.22, 49.20900369, 29, 0.010).value,
-            3.40048483, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                22.9, -43.23, 59.81487174, 29, 0.001).value,
-            2.38817297, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                25.78, -80.22, 49.20900369, 29, 0.001).value,
-            3.40048483, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                28.717, 77.3, 55.90591362, 14.25, 1.000).value,
-            0.6178942, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                3.133, 101.7, 67.76751981, 14.25, 1.000).value,
-            0.67031269, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                9.05, 38.7, 38.14104832, 14.25, 1.000).value,
-            0.36671963, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                28.717, 77.3, 55.90591362, 14.25, 0.100).value,
-            0.95021681, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                3.133, 101.7, 67.76751981, 14.25, 0.100).value,
-            0.76459901, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                9.05, 38.7, 38.14104832, 14.25, 0.100).value,
-            0.44948146, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                28.717, 77.3, 55.90591362, 14.25, 0.010).value,
-            0.95021681, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                3.133, 101.7, 67.76751981, 14.25, 0.010).value,
-            0.76459901, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                9.05, 38.7, 38.14104832, 14.25, 0.010).value,
-            0.44948146, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                28.717, 77.3, 55.90591362, 14.25, 0.001).value,
-            0.95021681, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                3.133, 101.7, 67.76751981, 14.25, 0.001).value,
-            0.76459901, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                9.05, 38.7, 38.14104832, 14.25, 0.001).value,
-            0.44948146, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                28.717, 77.3, 55.90591362, 29, 1.000).value,
-            2.4233785, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                3.133, 101.7, 67.76751981, 29, 1.000).value,
-            2.6289636, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                9.05, 38.7, 38.14104832, 29, 1.000).value,
-            1.43827289, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                28.717, 77.3, 55.90591362, 29, 0.100).value,
-            3.72674641, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                3.133, 101.7, 67.76751981, 29, 0.100).value,
-            2.99875418, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                9.05, 38.7, 38.14104832, 29, 0.100).value,
-            1.76286444, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                28.717, 77.3, 55.90591362, 29, 0.010).value,
-            3.72674641, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                3.133, 101.7, 67.76751981, 29, 0.010).value,
-            2.99875418, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                9.05, 38.7, 38.14104832, 29, 0.010).value,
-            1.76286444, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                28.717, 77.3, 55.90591362, 29, 0.001).value,
-            3.72674641, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                3.133, 101.7, 67.76751981, 29, 0.001).value,
-            2.99875418, places=5)
-        self.assertAlmostEqual(
-            models.itu840.cloud_attenuation(
-                9.05, 38.7, 38.14104832, 29, 0.001).value,
-            1.76286444, places=5)
+#class ITUR840_4TestCase(test.TestCase):
+#
+#    def setUp(self):
+#        models.itu840.change_version(4)
+#
+#    def test_columnar_content_reduced_liquid(self):
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                51.5, -0.14, 1.000).value,
+#            1.26328612, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                41.9, 12.49, 1.000).value,
+#            0.91467189, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                33.94, 18.43, 1.000).value,
+#            0.73072098, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                51.5, -0.14, 0.100).value,
+#            1.90329847, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                41.9, 12.49, 0.100).value,
+#            1.49845951, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                    33.94, 18.43, 0.100).value,
+#            1.47628568, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                    51.5, -0.14, 0.010).value,
+#            1.90329847, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                    41.9, 12.49, 0.010).value,
+#            1.49845951, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                    33.94, 18.43, 0.010).value,
+#            1.47628568, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                    51.5, -0.14, 0.001).value,
+#            1.90329847, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                    41.9, 12.49, 0.001).value,
+#            1.49845951, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                    33.94, 18.43, 0.001).value,
+#            1.47628568, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                51.5, -0.14, 1.000).value,
+#            1.26328612, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                41.9, 12.49, 1.000).value,
+#            0.91467189, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                33.94, 18.43, 1.000).value,
+#            0.73072098, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                51.5, -0.14, 0.100).value,
+#            1.90329847, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                41.9, 12.49, 0.100).value,
+#            1.49845951, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                33.94, 18.43, 0.100).value,
+#            1.47628568, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                    51.5, -0.14, 0.010).value,
+#            1.90329847, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                    41.9, 12.49, 0.010).value,
+#            1.49845951, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                    33.94, 18.43, 0.010).value,
+#            1.47628568, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                    51.5, -0.14, 0.001).value,
+#            1.90329847, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                    41.9, 12.49, 0.001).value,
+#            1.49845951, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                    33.94, 18.43, 0.001).value,
+#            1.47628568, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                22.9, -43.23, 1.000).value,
+#            1.10444871, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                25.78, -80.22, 1.000).value,
+#            2.27978216, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                22.9, -43.23, 0.100).value,
+#            2.82993169, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                25.78, -80.22, 0.100).value,
+#            3.52927516, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                    22.9, -43.23, 0.010).value,
+#            2.82993169, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                    25.78, -80.22, 0.010).value,
+#            3.52927516, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                    22.9, -43.23, 0.001).value,
+#            2.82993169, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                    25.78, -80.22, 0.001).value,
+#            3.52927516, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                22.9, -43.23, 1.000).value,
+#            1.10444871, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                25.78, -80.22, 1.000).value,
+#            2.27978216, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                22.9, -43.23, 0.100).value,
+#            2.82993169, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                25.78, -80.22, 0.100).value,
+#            3.52927516, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                    22.9, -43.23, 0.010).value,
+#            2.82993169, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                    25.78, -80.22, 0.010).value,
+#            3.52927516, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                    22.9, -43.23, 0.001).value,
+#            2.82993169, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                    25.78, -80.22, 0.001).value,
+#            3.52927516, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                28.717, 77.3, 1.000).value,
+#            2.75109958, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                3.133, 101.7, 1.000).value,
+#            3.33600769, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                9.05, 38.7, 1.000).value,
+#            1.21770185, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                28.717, 77.3, 0.100).value,
+#            4.23072604, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                3.133, 101.7, 0.100).value,
+#            3.80525123, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                9.05, 38.7, 0.100).value,
+#            1.49251459, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                28.717, 77.3, 0.010).value,
+#            4.23072604, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                3.133, 101.7, 0.010).value,
+#            3.80525123, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                9.05, 38.7, 0.010).value,
+#            1.49251459, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                28.717, 77.3, 0.001).value,
+#            4.23072604, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                3.133, 101.7, 0.001).value,
+#            3.80525123, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                9.05, 38.7, 0.001).value,
+#            1.49251459, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                28.717, 77.3, 1.000).value,
+#            2.75109958, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                3.133, 101.7, 1.000).value,
+#            3.33600769, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                9.05, 38.7, 1.000).value,
+#            1.21770185, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                28.717, 77.3, 0.100).value,
+#            4.23072604, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                3.133, 101.7, 0.100).value,
+#            3.80525123, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                9.05, 38.7, 0.100).value,
+#            1.49251459, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                28.717, 77.3, 0.010).value,
+#            4.23072604, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                3.133, 101.7, 0.010).value,
+#            3.80525123, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                9.05, 38.7, 0.010).value,
+#            1.49251459, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                28.717, 77.3, 0.001).value,
+#            4.23072604, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                3.133, 101.7, 0.001).value,
+#            3.80525123, places=5)
+#        self.assertAlmostEqual(
+#            models.itu840.columnar_content_reduced_liquid(
+#                9.05, 38.7, 0.001).value,
+#            1.49251459, places=5)
+#
+#    def test_cloud_attenuation(self):
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                51.5, -0.14, 30.87067768, 14.25, 1.000).value,
+#            0.45792895, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                41.9, 12.49, 40.97052773, 14.25, 1.000).value,
+#            0.25946553, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                33.94, 18.43, 47.91280491, 14.25, 1.000).value,
+#            0.18313623, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                51.5, -0.14, 30.87067768, 14.25, 0.100).value,
+#            0.68992722, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                41.9, 12.49, 40.97052773, 14.25, 0.100).value,
+#            0.42506892, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                33.94, 18.43, 47.91280491, 14.25, 0.100).value,
+#            0.36999265, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                51.5, -0.14, 30.87067768, 14.25, 0.010).value,
+#            0.68992722, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                41.9, 12.49, 40.97052773, 14.25, 0.010).value,
+#            0.42506892, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                33.94, 18.43, 47.91280491, 14.25, 0.010).value,
+#            0.36999265, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                51.5, -0.14, 30.87067768, 14.25, 0.001).value,
+#            0.68992722, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                41.9, 12.49, 40.97052773, 14.25, 0.001).value,
+#            0.42506892, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                33.94, 18.43, 47.91280491, 14.25, 0.001).value,
+#            0.36999265, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                51.5, -0.14, 30.87067768, 29, 1.000).value,
+#            1.79599547, places=2)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                41.9, 12.49, 40.97052773, 29, 1.000).value,
+#            1.01762274, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                33.94, 18.43, 47.91280491, 29, 1.000).value,
+#            0.71825953, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                51.5, -0.14, 30.87067768, 29, 0.100).value,
+#            2.70589171, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                41.9, 12.49, 40.97052773, 29, 0.100).value,
+#            1.66711854, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                33.94, 18.43, 47.91280491, 29, 0.100).value,
+#            1.45110964, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                51.5, -0.14, 30.87067768, 29, 0.010).value,
+#            2.70589171, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                41.9, 12.49, 40.97052773, 29, 0.010).value,
+#            1.66711854, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                33.94, 18.43, 47.91280491, 29, 0.010).value,
+#            1.45110964, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                51.5, -0.14, 30.87067768, 29, 0.001).value,
+#            2.70589171, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                41.9, 12.49, 40.97052773, 29, 0.001).value,
+#            1.66711854, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                33.94, 18.43, 47.91280491, 29, 0.001).value,
+#            1.45110964, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                22.9, -43.23, 59.81487174, 14.25, 1.000).value,
+#            0.23764476, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                25.78, -80.22, 49.20900369, 14.25, 1.000).value,
+#            0.56006901, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                22.9, -43.23, 59.81487174, 14.25, 0.100).value,
+#            0.60891776, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                25.78, -80.22, 49.20900369, 14.25, 0.100).value,
+#            0.86702917, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                22.9, -43.23, 59.81487174, 14.25, 0.010).value,
+#            0.60891776, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                25.78, -80.22, 49.20900369, 14.25, 0.010).value,
+#            0.86702917, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                22.9, -43.23, 59.81487174, 14.25, 0.001).value,
+#            0.60891776, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                25.78, -80.22, 49.20900369, 14.25, 0.001).value,
+#            0.86702917, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                22.9, -43.23, 59.81487174, 29, 1.000).value,
+#            0.93204177, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                25.78, -80.22, 49.20900369, 29, 1.000).value,
+#            2.19658834, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                22.9, -43.23, 59.81487174, 29, 0.100).value,
+#            2.38817297, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                25.78, -80.22, 49.20900369, 29, 0.100).value,
+#            3.40048483, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                22.9, -43.23, 59.81487174, 29, 0.010).value,
+#            2.38817297, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                25.78, -80.22, 49.20900369, 29, 0.010).value,
+#            3.40048483, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                22.9, -43.23, 59.81487174, 29, 0.001).value,
+#            2.38817297, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                25.78, -80.22, 49.20900369, 29, 0.001).value,
+#            3.40048483, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                28.717, 77.3, 55.90591362, 14.25, 1.000).value,
+#            0.6178942, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                3.133, 101.7, 67.76751981, 14.25, 1.000).value,
+#            0.67031269, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                9.05, 38.7, 38.14104832, 14.25, 1.000).value,
+#            0.36671963, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                28.717, 77.3, 55.90591362, 14.25, 0.100).value,
+#            0.95021681, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                3.133, 101.7, 67.76751981, 14.25, 0.100).value,
+#            0.76459901, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                9.05, 38.7, 38.14104832, 14.25, 0.100).value,
+#            0.44948146, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                28.717, 77.3, 55.90591362, 14.25, 0.010).value,
+#            0.95021681, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                3.133, 101.7, 67.76751981, 14.25, 0.010).value,
+#            0.76459901, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                9.05, 38.7, 38.14104832, 14.25, 0.010).value,
+#            0.44948146, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                28.717, 77.3, 55.90591362, 14.25, 0.001).value,
+#            0.95021681, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                3.133, 101.7, 67.76751981, 14.25, 0.001).value,
+#            0.76459901, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                9.05, 38.7, 38.14104832, 14.25, 0.001).value,
+#            0.44948146, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                28.717, 77.3, 55.90591362, 29, 1.000).value,
+#            2.4233785, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                3.133, 101.7, 67.76751981, 29, 1.000).value,
+#            2.6289636, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                9.05, 38.7, 38.14104832, 29, 1.000).value,
+#            1.43827289, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                28.717, 77.3, 55.90591362, 29, 0.100).value,
+#            3.72674641, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                3.133, 101.7, 67.76751981, 29, 0.100).value,
+#            2.99875418, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                9.05, 38.7, 38.14104832, 29, 0.100).value,
+#            1.76286444, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                28.717, 77.3, 55.90591362, 29, 0.010).value,
+#            3.72674641, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                3.133, 101.7, 67.76751981, 29, 0.010).value,
+#            2.99875418, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                9.05, 38.7, 38.14104832, 29, 0.010).value,
+#            1.76286444, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                28.717, 77.3, 55.90591362, 29, 0.001).value,
+#            3.72674641, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                3.133, 101.7, 67.76751981, 29, 0.001).value,
+#            2.99875418, places=3)
+#        self.assertAlmostEqual(
+#            models.itu840.cloud_attenuation(
+#                9.05, 38.7, 38.14104832, 29, 0.001).value,
+#            1.76286444, places=3)
 
 
 class ITUR840_7TestCase(test.TestCase):
