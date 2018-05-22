@@ -37,11 +37,11 @@ for p in unavailabilities:
     a_g, a_c, a_r, a_s, a_t = \
         itur.atmospheric_attenuation_slant_path(lat_GS, lon_GS, f, el, p, D,
                                                 return_contributions=True)
-    A_g.append(a_g)
-    A_c.append(a_c)
-    A_r.append(a_r)
-    A_s.append(a_s)
-    A_t.append(a_t)
+    A_g.append(a_g.value)
+    A_c.append(a_c.value)
+    A_r.append(a_r.value)
+    A_s.append(a_s.value)
+    A_t.append(a_t.value)
 
 # Plot the results using matplotlib
 f, ax = plt.subplots(1, 1)
