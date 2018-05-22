@@ -13,7 +13,7 @@ from itur.utils import prepare_input_array, prepare_quantity, load_data,\
 
 
 class __ITU453():
-    """Implementation of the methods in Recommendation ITU-R P.453
+    """ Implementation of the methods in Recommendation ITU-R P.453
     "The radio refractive index: its formula and refractivity data"
 
     Available versions:
@@ -56,20 +56,26 @@ class __ITU453():
 
     def water_vapour_pressure(self, T, P, H, type_hydrometeor='water'):
         return self.instance.water_vapour_pressure(
-            T, P, H, type_hydrometeor='water')
+            T, P, H, type_hydrometeor=type_hydrometeor)
 
     def saturation_vapour_pressure(self, T, P, type_hydrometeor='water'):
         return self.instance.saturation_vapour_pressure(
-            T, P, type_hydrometeor='water')
+            T, P, type_hydrometeor=type_hydrometeor)
 
     def map_wet_term_radio_refractivity(self, lat, lon, p=50):
-        return self.instance.map_wet_term_radio_refractivity(lat, lon, p)
+        fcn = np.vectorize(self.instance.map_wet_term_radio_refractivity,
+                           excluded=[0, 1], otypes=[np.ndarray])
+        return np.array(fcn(lat, lon, p).tolist())
 
     def DN65(self, lat, lon, p):
-        return self.instance.DN65(lat, lon, p)
+        fcn = np.vectorize(self.instance.DN65, excluded=[0, 1],
+                           otypes=[np.ndarray])
+        return np.array(fcn(lat, lon, p).tolist())
 
     def DN1(self, lat, lon, p):
-        return self.instance.DN1(lat, lon, p)
+        fcn = np.vectorize(self.instance.DN1, excluded=[0, 1],
+                           otypes=[np.ndarray])
+        return np.array(fcn(lat, lon, p).tolist())
 
 
 class _ITU453_13():
@@ -86,14 +92,14 @@ class _ITU453_13():
 
     def DN65(self, lat, lon, p):
         if not self._DN65:
-            ps = [0.1, 0.2, 0.5, 1, 2, 3, 5, 10, 20, 30, 50, 60, 70, 80,
+            ps = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80,
                   90, 95, 98, 99, 99.5, 99.8, 99.9]
             d_dir = os.path.join(dataset_dir, '453/v12_DN65m_%02dd%02d_v1.txt')
             lats = load_data(os.path.join(dataset_dir, '453/v12_lat0d75.txt'))
             lons = load_data(os.path.join(dataset_dir, '453/v12_lon0d75.txt'))
             for p_loads in ps:
                 int_p = p_loads // 1
-                frac_p = p_loads % 1
+                frac_p = round((p_loads % 1.0) * 100)
                 vals = load_data(d_dir % (int_p, frac_p))
                 self._DN65[float(p_loads)] = bilinear_2D_interpolator(
                     lats, lons, vals)
@@ -103,14 +109,14 @@ class _ITU453_13():
 
     def DN1(self, lat, lon, p):
         if not self._DN1:
-            ps = [0.1, 0.2, 0.5, 1, 2, 3, 5, 10, 20, 30, 50, 60, 70, 80,
+            ps = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80,
                   90, 95, 98, 99, 99.5, 99.8, 99.9]
             d_dir = os.path.join(dataset_dir, '453/v12_DN_%02dd%02d_v1.txt')
             lats = load_data(os.path.join(dataset_dir, '453/v12_lat0d75.txt'))
             lons = load_data(os.path.join(dataset_dir, '453/v12_lon0d75.txt'))
             for p_loads in ps:
                 int_p = p_loads // 1
-                frac_p = p_loads % 1
+                frac_p = round((p_loads % 1.0) * 100)
                 vals = load_data(d_dir % (int_p, frac_p))
                 self._DN1[float(p_loads)] = bilinear_2D_interpolator(
                     lats, lons, vals)
@@ -120,8 +126,8 @@ class _ITU453_13():
 
     def N_wet(self, lat, lon, p):
         if not self._N_wet:
-            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
-                  50, 60, 70, 80, 90, 95, 99]
+            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30, 50, 60, 70, 80,
+                  90, 95, 99]
             d_dir = os.path.join(dataset_dir, '453/v13_NWET_Annual_%s.txt')
             lats = load_data(os.path.join(dataset_dir, '453/v13_LAT_N.txt'))
             lons = load_data(os.path.join(dataset_dir, '453/v13_LON_N.txt'))
@@ -244,14 +250,14 @@ class _ITU453_12():
 
     def DN65(self, lat, lon, p):
         if not self._DN65:
-            ps = [0.1, 0.2, 0.5, 1, 2, 3, 5, 10, 20, 30, 50, 60, 70, 80,
+            ps = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80,
                   90, 95, 98, 99, 99.5, 99.8, 99.9]
             d_dir = os.path.join(dataset_dir, '453/v12_DN65m_%02dd%02d_v1.txt')
             lats = load_data(os.path.join(dataset_dir, '453/v12_lat0d75.txt'))
             lons = load_data(os.path.join(dataset_dir, '453/v12_lon0d75.txt'))
             for p_loads in ps:
                 int_p = p_loads // 1
-                frac_p = p_loads % 1
+                frac_p = round((p_loads % 1.0) * 100)
                 vals = load_data(d_dir % (int_p, frac_p))
                 self._DN65[float(p_loads)] = bilinear_2D_interpolator(
                     lats, lons, vals)
@@ -261,14 +267,14 @@ class _ITU453_12():
 
     def DN1(self, lat, lon, p):
         if not self._DN1:
-            ps = [0.1, 0.2, 0.5, 1, 2, 3, 5, 10, 20, 30, 50, 60, 70, 80,
+            ps = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80,
                   90, 95, 98, 99, 99.5, 99.8, 99.9]
             d_dir = os.path.join(dataset_dir, '453/v12_DN_%02dd%02d_v1.txt')
             lats = load_data(os.path.join(dataset_dir, '453/v12_lat0d75.txt'))
             lons = load_data(os.path.join(dataset_dir, '453/v12_lon0d75.txt'))
             for p_loads in ps:
                 int_p = p_loads // 1
-                frac_p = p_loads % 1
+                frac_p = round((p_loads % 1.0) * 100)
                 vals = load_data(d_dir % (int_p, frac_p))
                 self._DN1[float(p_loads)] = bilinear_2D_interpolator(
                     lats, lons, vals)
@@ -486,7 +492,7 @@ def water_vapour_pressure(T, P, H, type_hydrometeor='water'):
 
     """
     global __model
-    T = prepare_quantity(T, u.C, 'Absolute temperature')
+    T = prepare_quantity(T, u.deg_C, 'Absolute temperature')
     P = prepare_quantity(P, u.hPa, 'Total atmospheric pressure')
     H = prepare_quantity(H, u.percent, 'Total atmospheric pressure')
     val = __model.water_vapour_pressure(T, P, H, type_hydrometeor)
@@ -522,7 +528,7 @@ def saturation_vapour_pressure(T, P, type_hydrometeor='water'):
 
     """
     global __model
-    T = prepare_quantity(T, u.C, 'Absolute temperature')
+    T = prepare_quantity(T, u.deg_C, 'Absolute temperature')
     P = prepare_quantity(P, u.hPa, 'Total atmospheric pressure')
     val = __model.saturation_vapour_pressure(T, P, type_hydrometeor)
     return val * u.hPa
