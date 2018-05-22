@@ -53,6 +53,9 @@ def load_data(path, is_text=False, **kwargs):
 def prepare_input_array(array):
     """ Formats an array to be a 2-D numpy-array
     """
+    if array is None:
+        return None
+
     return np.atleast_2d(array)
 
 
@@ -107,6 +110,10 @@ def prepare_quantity(value, units=None, name_val=None):
         return value
     elif isinstance(value, np.ndarray) and units is not None:
         return value
+    elif isinstance(value, list) and units is not None:
+        return np.array([prepare_quantity(v, units, name_val) for v in value])
+    elif isinstance(value, tuple) and units is not None:
+        return np.array([prepare_quantity(v, units, name_val) for v in value])
     else:
         raise ValueError('%s has not the correct format. It must be a value,'
                          'sequence, array, or a Quantity with %s units' %
