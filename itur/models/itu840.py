@@ -123,7 +123,7 @@ class _ITU840_7():
 
     def Pcwl(self, lat, lon):
         if not self._Pcwl:
-            vals = load_data(os.path.join(dataset_dir, '840/v6_Pcwl.txt'))
+            vals = load_data(os.path.join(dataset_dir, '840/v6_Pclw.txt'))
             lats = load_data(os.path.join(dataset_dir, '840/v6_Lat.txt'))
             lons = load_data(os.path.join(dataset_dir, '840/v6_Lon.txt'))
             self._Pcwl = bilinear_2D_interpolator(lats, lons, vals)
