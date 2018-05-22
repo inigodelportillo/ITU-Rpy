@@ -22,6 +22,10 @@ class __ITU676():
     """Attenuation by atmospheric gases.
 
     Available versions include:
+       * P.676-9 (02/12) (Superseded)
+       * P.676-10 (09/13) (Superseded)
+       * P.676-11 (09/16) (Current version)
+    Not available versions:
        * P.676-1 (03/92) (Superseded)
        * P.676-2 (10/95) (Superseded)
        * P.676-3 (08/97) (Superseded)
@@ -30,9 +34,6 @@ class __ITU676():
        * P.676-6 (03/05) (Superseded)
        * P.676-7 (02/07) (Superseded)
        * P.676-8 (10/09) (Superseded)
-       * P.676-9 (02/12) (Superseded)
-       * P.676-10 (09/13) (Superseded)
-       * P.676-11 (09/16) (Current version)
     """
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.676 recommendation.
@@ -83,8 +84,9 @@ class __ITU676():
             self, lat, lon, p, f, V_t=None, h=None):
         # Abstract method to compute the water vapour attenuation over the
         # slant path
-        fcn = np.vectorize(self.instance.zenit_water_vapour_attenuation)
-        return fcn(lat, lon, p, f, V_t, h)
+        fcn = np.vectorize(self.instance.zenit_water_vapour_attenuation,
+                           excluded=[0, 1], otypes=[np.ndarray])
+        return np.array(fcn(lat, lon, p, f, V_t, h).tolist())
 
     def gamma_exact(self, f, p, rho, t):
         # Abstract method to compute the specific attenuation using the
@@ -1078,13 +1080,13 @@ def gaseous_attenuation_terrestrial_path(r, f, el, rho, P, T, mode):
     https://www.itu.int/rec/R-REC-P.676/en
     """
     type_output = type(el)
-    f = prepare_quantity(f, u.km, 'Path Length')
+    r = prepare_quantity(r, u.km, 'Path Length')
     f = prepare_quantity(f, u.GHz, 'Frequency')
     el = prepare_quantity(prepare_input_array(el), u.deg, 'Elevation angle')
     rho = prepare_quantity(rho, u.g / u.m**3, 'Water vapor density')
     P = prepare_quantity(P, u.hPa, 'Atospheric pressure')
     T = prepare_quantity(T, u.K, 'Temperature')
-    val = __model.gaseous_attenuation_terrestrial_path(f, el, rho, P, T, mode)
+    val = __model.gaseous_attenuation_terrestrial_path(r, f, el, rho, P, T, mode)
     return prepare_output_array(val, type_output) * u.dB
 
 
