@@ -426,7 +426,7 @@ class _ITU618_13():
             # P.453.
             N_wet = wet_term_radio_refractivity(e, T).value
         else:
-            N_wet = map_wet_term_radio_refractivity(lat, lon).value
+            N_wet = map_wet_term_radio_refractivity(lat, lon, 50).value
 
         # Step 3: Calculate the standard deviation of the reference signal
         # amplitude:
