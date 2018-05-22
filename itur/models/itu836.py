@@ -50,13 +50,13 @@ class __ITU836():
 
     def surface_water_vapour_density(self, lat, lon, p, alt):
         fcn = np.vectorize(self.instance.surface_water_vapour_density,
-                           excluded=[0, 1, 3])
-        return fcn(lat, lon, p, alt)
+                           excluded=[0, 1, 3], otypes=[np.ndarray])
+        return np.array(fcn(lat, lon, p, alt).tolist())
 
     def total_water_vapour_content(self, lat, lon, p, alt):
         fcn = np.vectorize(self.instance.total_water_vapour_content,
-                           excluded=[0, 1, 3])
-        return fcn(lat, lon, p, alt)
+                           excluded=[0, 1, 3], otypes=[np.ndarray])
+        return np.array(fcn(lat, lon, p, alt).tolist())
 
 
 class _ITU836_6():
@@ -553,7 +553,6 @@ class _ITU836_4():
             alt = altitude_res
         else:
             alt = alt.flatten()
-
         rho_a = rho_a * np.exp(- (alt - altitude_res) * 1.0 / (VSCH_a))
 
         rho_a = (rho_a[0, :] * ((R + 1 - r) * (C + 1 - c)) +

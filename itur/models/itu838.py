@@ -42,12 +42,13 @@ class __ITU838():
 
     def rain_specific_attenuation_coefficients(self, f, el, tau):
         # Abstract method to compute the rain height
-        return self.instance.rain_specific_attenuation_coefficients(f, el, tau)
+        fcn = np.vectorize(self.instance.rain_specific_attenuation_coefficients,
+                           excluded=[1], otypes=[np.ndarray])
+        return np.array(fcn(f, el, tau).tolist())
 
     def rain_specific_attenuation(self, R, f, el, tau):
         # Abstract method to compute the zero isoterm height
-        k, alpha = self.instance.rain_specific_attenuation_coefficients(
-            f, el, tau)
+        k, alpha = self.rain_specific_attenuation_coefficients(f, el, tau)
         return k * R**alpha
 
 

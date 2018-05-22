@@ -43,8 +43,8 @@ class __ITU1510():
     def surface_month_mean_temperature(self, lat, lon, m):
         # Abstract method to compute the monthly surface mean temperature
         fcn = np.vectorize(self.instance.surface_month_mean_temperature,
-                           excluded=[0, 1])
-        return fcn(lat, lon, m)
+                           excluded=[0, 1], otypes=[np.ndarray])
+        return np.array(fcn(lat, lon, m).tolist())
 
 
 class _ITU1510_1():

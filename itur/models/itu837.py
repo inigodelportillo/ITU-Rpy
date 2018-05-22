@@ -65,7 +65,9 @@ class __ITU837():
 
     def rainfall_rate(self, lat, lon, p):
         # Abstract method to compute the zero isoterm height
-        return self.instance.rainfall_rate(lat, lon, p)
+        fcn = np.vectorize(self.instance.rainfall_rate, excluded=[0, 1],
+                           otypes=[np.ndarray])
+        return np.array(fcn(lat, lon, p).tolist())
 
 
 class _ITU837_7():
@@ -120,11 +122,11 @@ class _ITU837_7():
         lat_f = lat_d.flatten()
         lon_f = lon_d.flatten()
 
-        Nii = np.array([31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31])
+        Nii = np.array([[31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]])
 
         # Step 2: For each month, determine the monthly mean surface
         # temperature
-        Tii = surface_month_mean_temperature(lat_f, lon_f, self.months).value
+        Tii = surface_month_mean_temperature(lat_f, lon_f, self.months).value.T
 
         # Step 3: For each month, determine the monthly mean total rainfall
         MTii = np.array([self.Mt(lat_f, lon_f, m) for m in self.months]).T
@@ -156,11 +158,11 @@ class _ITU837_7():
         lat_f = lat_d.flatten()
         lon_f = lon_d.flatten()
 
-        Nii = np.array([31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31])
+        Nii = np.array([[31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]])
 
         # Step 2: For each month, determine the monthly mean surface
         # temperature
-        Tii = surface_month_mean_temperature(lat_f, lon_f, self.months).value
+        Tii = surface_month_mean_temperature(lat_f, lon_f, self.months).value.T
 
         # Step 3: For each month, determine the monthly mean total rainfall
         MTii = np.array([self.Mt(lat_f, lon_f, m) for m in self.months]).T

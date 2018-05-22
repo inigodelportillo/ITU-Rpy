@@ -43,7 +43,7 @@ class __ITU840():
         else:
             raise ValueError(
                 'Version {0}  is not implemented for the ITU-R P.840 model.'
-                .forat(version))
+                .format(version))
 
     @property
     def __version__(self):
@@ -57,8 +57,8 @@ class __ITU840():
     def columnar_content_reduced_liquid(self, lat, lon, p):
         # Abstract method to compute the columnar content of reduced liquid
         fcn = np.vectorize(self.instance.columnar_content_reduced_liquid,
-                           excluded=[0, 1])
-        return fcn(lat, lon, p)
+                           excluded=[0, 1], otypes=[np.ndarray])
+        return np.array(fcn(lat, lon, p).tolist())
 
     def cloud_attenuation(self, lat, lon, el, f, p):
         # Abstract method to compute the cloud attenuation
