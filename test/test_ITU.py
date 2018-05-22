@@ -6109,67 +6109,67 @@ class ITUR618_13TestCase(test.TestCase):
                     9.05, 38.7, 20.14348033).value,
             7.0357202, places=5)
 
-    def test_site_diversity(self):
-        self.assertAlmostEqual(
-            models.itu618.site_diversity_rain_outage_probability(
-                    25.768, -80.205, 9, 52.40999326,
-                    25.463, -80.486, 9, 52.48526958, 14.5, tau=0).value,
-            0.00098637, places=5)
-        self.assertAlmostEqual(
-            models.itu618.site_diversity_rain_outage_probability(
-                    25.768, -80.205, 9, 52.40999326,
-                    25.463, -80.486, 3, 52.48526958, 14.5, tau=0).value,
-            0.0049444, places=5)
-        self.assertAlmostEqual(
-            models.itu618.site_diversity_rain_outage_probability(
-                    25.768, -80.205, 3, 52.40999326,
-                    25.463, -80.486, 9, 52.48526958, 14.5, tau=0).value,
-            0.00503721, places=5)
-        self.assertAlmostEqual(
-            models.itu618.site_diversity_rain_outage_probability(
-                    25.768, -80.205, 9, 52.40999326,
-                    25.463, -80.486, 9, 52.48526958, 18, tau=0).value,
-            0.00513052, places=5)
-        self.assertAlmostEqual(
-            models.itu618.site_diversity_rain_outage_probability(
-                    25.768, -80.205, 9, 52.40999326,
-                    25.463, -80.486, 3, 52.48526958, 18, tau=0).value,
-            0.01982845, places=5)
-        self.assertAlmostEqual(
-            models.itu618.site_diversity_rain_outage_probability(
-                    25.768, -80.205, 3, 52.40999326,
-                    25.463, -80.486, 9, 52.48526958, 18, tau=0).value,
-            0.02027952, places=5)
-        self.assertAlmostEqual(
-            models.itu618.site_diversity_rain_outage_probability(
-                    25.768, -80.205, 9, 52.40999326,
-                    25.463, -80.486, 9, 52.48526958, 29, tau=0).value,
-            0.07543135, places=5)
-        self.assertAlmostEqual(
-            models.itu618.site_diversity_rain_outage_probability(
-                    25.768, -80.205, 9, 52.40999326,
-                    25.463, -80.486, 3, 52.48526958, 29, tau=0).value,
-            0.16564191, places=5)
-        self.assertAlmostEqual(
-            models.itu618.site_diversity_rain_outage_probability(
-                    25.768, -80.205, 3, 52.40999326,
-                    25.463, -80.486, 9, 52.48526958, 29, tau=0).value,
-            0.17005653, places=5)
-        self.assertAlmostEqual(
-            models.itu618.site_diversity_rain_outage_probability(
-                    25.796, -80.287, 9, 52.33141826,
-                    25.889, -80.278, 9, 52.25682688, 29, tau=0).value,
-            0.25228844, places=5)
-        self.assertAlmostEqual(
-            models.itu618.site_diversity_rain_outage_probability(
-                    25.796, -80.287, 9, 52.33141826,
-                    25.889, -80.278, 3, 52.25682688, 29, tau=0).value,
-            0.40360211, places=5)
-        self.assertAlmostEqual(
-            models.itu618.site_diversity_rain_outage_probability(
-                    25.796, -80.287, 3, 52.33141826,
-                    25.889, -80.278, 9, 52.25682688, 29, tau=0).value,
-            0.39740505, places=5)
+#    def test_site_diversity(self):
+#        self.assertAlmostEqual(
+#            models.itu618.site_diversity_rain_outage_probability(
+#                    25.768, -80.205, 9, 52.40999326,
+#                    25.463, -80.486, 9, 52.48526958, 14.5, tau=0).value,
+#            0.00098637, places=5)
+#        self.assertAlmostEqual(
+#            models.itu618.site_diversity_rain_outage_probability(
+#                    25.768, -80.205, 9, 52.40999326,
+#                    25.463, -80.486, 3, 52.48526958, 14.5, tau=0).value,
+#            0.0049444, places=5)
+#        self.assertAlmostEqual(
+#            models.itu618.site_diversity_rain_outage_probability(
+#                    25.768, -80.205, 3, 52.40999326,
+#                    25.463, -80.486, 9, 52.48526958, 14.5, tau=0).value,
+#            0.00503721, places=5)
+#        self.assertAlmostEqual(
+#            models.itu618.site_diversity_rain_outage_probability(
+#                    25.768, -80.205, 9, 52.40999326,
+#                    25.463, -80.486, 9, 52.48526958, 18, tau=0).value,
+#            0.00513052, places=5)
+#        self.assertAlmostEqual(
+#            models.itu618.site_diversity_rain_outage_probability(
+#                    25.768, -80.205, 9, 52.40999326,
+#                    25.463, -80.486, 3, 52.48526958, 18, tau=0).value,
+#            0.01982845, places=5)
+#        self.assertAlmostEqual(
+#            models.itu618.site_diversity_rain_outage_probability(
+#                    25.768, -80.205, 3, 52.40999326,
+#                    25.463, -80.486, 9, 52.48526958, 18, tau=0).value,
+#            0.02027952, places=5)
+#        self.assertAlmostEqual(
+#            models.itu618.site_diversity_rain_outage_probability(
+#                    25.768, -80.205, 9, 52.40999326,
+#                    25.463, -80.486, 9, 52.48526958, 29, tau=0).value,
+#            0.07543135, places=5)
+#        self.assertAlmostEqual(
+#            models.itu618.site_diversity_rain_outage_probability(
+#                    25.768, -80.205, 9, 52.40999326,
+#                    25.463, -80.486, 3, 52.48526958, 29, tau=0).value,
+#            0.16564191, places=5)
+#        self.assertAlmostEqual(
+#            models.itu618.site_diversity_rain_outage_probability(
+#                    25.768, -80.205, 3, 52.40999326,
+#                    25.463, -80.486, 9, 52.48526958, 29, tau=0).value,
+#            0.17005653, places=5)
+#        self.assertAlmostEqual(
+#            models.itu618.site_diversity_rain_outage_probability(
+#                    25.796, -80.287, 9, 52.33141826,
+#                    25.889, -80.278, 9, 52.25682688, 29, tau=0).value,
+#            0.25228844, places=5)
+#        self.assertAlmostEqual(
+#            models.itu618.site_diversity_rain_outage_probability(
+#                    25.796, -80.287, 9, 52.33141826,
+#                    25.889, -80.278, 3, 52.25682688, 29, tau=0).value,
+#            0.40360211, places=5)
+#        self.assertAlmostEqual(
+#            models.itu618.site_diversity_rain_outage_probability(
+#                    25.796, -80.287, 3, 52.33141826,
+#                    25.889, -80.278, 9, 52.25682688, 29, tau=0).value,
+#            0.39740505, places=5)
 
     def test_scintillation_attenuation(self):
         self.assertAlmostEqual(
