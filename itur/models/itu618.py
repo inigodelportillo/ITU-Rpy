@@ -28,7 +28,7 @@ class _ITU618():
     Earth-space telecommunication systems.
 
     Available versions include:
-       * P.618-12 (12/17) (Current version)
+       * P.618-13 (12/17) (Current version)
        * P.618-12 (07/15) (Superseded)
 
     Versions that need to be implemented
