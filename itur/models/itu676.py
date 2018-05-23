@@ -8,7 +8,7 @@ import warnings
 import os
 from astropy import units as u
 
-
+from itur import utils
 from itur.models.itu453 import radio_refractive_index
 from itur.models.itu835 import standard_pressure, standard_temperature, \
     standard_water_vapour_density
@@ -324,8 +324,8 @@ class _ITU676_11():
         t2 = (0.14 * np.exp(2.12 * rp)) / \
             ((f - 118.75)**2 + 0.031 * np.exp(2.2 * rp))
         t3 = 0.0114 / (1 + 0.14 * rp**-2.6) * f * \
-             (-0.0247 + 0.0001 * f + 1.61e-6 * f**2) / \
-             (1 - 0.0169 * f + 4.1e-5 * f**2 + 3.2e-7 * f**3)
+            (-0.0247 + 0.0001 * f + 1.61e-6 * f**2) / \
+            (1 - 0.0169 * f + 4.1e-5 * f**2 + 3.2e-7 * f**3)
 
         h0 = 6.1 / (1 + 0.17 * rp**-1.1) * (1 + t1 + t2 + t3)
 
@@ -1027,6 +1027,7 @@ def change_version(new_version):
     """
     global __model
     __model = __ITU676(new_version)
+    utils.memory.clear()
 
 
 def get_version():
@@ -1086,7 +1087,8 @@ def gaseous_attenuation_terrestrial_path(r, f, el, rho, P, T, mode):
     rho = prepare_quantity(rho, u.g / u.m**3, 'Water vapor density')
     P = prepare_quantity(P, u.hPa, 'Atospheric pressure')
     T = prepare_quantity(T, u.K, 'Temperature')
-    val = __model.gaseous_attenuation_terrestrial_path(r, f, el, rho, P, T, mode)
+    val = __model.gaseous_attenuation_terrestrial_path(
+            r, f, el, rho, P, T, mode)
     return prepare_output_array(val, type_output) * u.dB
 
 
