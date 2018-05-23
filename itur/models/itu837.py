@@ -50,10 +50,13 @@ class __ITU837():
 #            self.instance = _ITU837_1()
         else:
             raise ValueError(
-                'Version ' +
-                str(version) +
-                ' is not implemented' +
-                ' for the ITU-R P.837 model.')
+                'Version {0} is not implemented for the ITU-R P.837 model.'
+                .format(version))
+
+        self._Pr6 = {}
+        self._Mt = {}
+        self._Beta = {}
+        self._R001 = {}
 
     @property
     def __version__(self):

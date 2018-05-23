@@ -44,6 +44,11 @@ class __ITU836():
                 'Version {0} is not implemented for the ITU-R P.836 model.'
                 .format(version))
 
+        self._V = {}
+        self._VSCH = {}
+        self._rho = {}
+        self._topo_alt = None
+
     @property
     def __version__(self):
         return self.instance.__version__

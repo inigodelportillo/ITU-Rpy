@@ -45,6 +45,11 @@ class __ITU840():
                 'Version {0}  is not implemented for the ITU-R P.840 model.'
                 .format(version))
 
+        self._Lred = {}
+        self._M = {}
+        self._sigma = {}
+        self._Pcwl = {}
+
     @property
     def __version__(self):
         return self.instance.__version__
@@ -123,7 +128,7 @@ class _ITU840_7():
 
     def Pcwl(self, lat, lon):
         if not self._Pcwl:
-            vals = load_data(os.path.join(dataset_dir, '840/v6_Pclw.txt'))
+            vals = load_data(os.path.join(dataset_dir, '840/v6_Pcwl.txt'))
             lats = load_data(os.path.join(dataset_dir, '840/v6_Lat.txt'))
             lons = load_data(os.path.join(dataset_dir, '840/v6_Lon.txt'))
             self._Pcwl = bilinear_2D_interpolator(lats, lons, vals)
