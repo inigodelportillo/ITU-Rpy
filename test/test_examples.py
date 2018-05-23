@@ -20,19 +20,20 @@ def suite():
     suite = test.TestSuite()
 
     # Test valid versions
-    suite.addTest(TestMapAfrica('test'))
-    suite.addTest(TestGaseousAttenuation('test'))
-    suite.addTest(TestMultipleLocations('test'))
-    suite.addTest(TestSingleLocation('test'))
-    suite.addTest(TestSingleLocationVsFrequency('test'))
-    suite.addTest(TestSingleLocationVsUnavailability('test'))
+    suite.addTest(TestMapAfrica('test_map_africa'))
+    suite.addTest(TestGaseousAttenuation('test_gaseous_attenuation'))
+    suite.addTest(TestMultipleLocations('test_multiple_locations'))
+    suite.addTest(TestSingleLocation('test_single_location'))
+    suite.addTest(TestSingleLocationVsFrequency('test_single_location_vs_f'))
+    suite.addTest(TestSingleLocationVsUnavailability(
+            'test_single_location_vs_p'))
 
     return suite
 
 
 class TestMapAfrica(test.TestCase):
 
-    def test(self):
+    def test_map_africa(self):
         # Generate a regular grid of latitude and longitudes with 0.1
         # degree resolution for the region of interest.
         lat, lon = itur.utils.regular_lat_lon_grid(lat_max=60,
@@ -69,14 +70,17 @@ class TestMapAfrica(test.TestCase):
         # Now we show the surface mean temperature distribution
         T = itur.surface_mean_temperature(lat, lon)\
             .to(itur.u.Celsius, equivalencies=itur.u.temperature())
-        m = itur.utils.plot_in_map(T, lat, lon,
-                                   cbar_text='Surface mean temperature [C]',
-                                   cmap='RdBu_r')
+        try:
+            m = itur.utils.plot_in_map(
+                T, lat, lon, cbar_text='Surface mean temperature [C]',
+                cmap='RdBu_r')
+        except RuntimeError as e:
+            print(e)
 
 
 class TestMultipleLocations(test.TestCase):
 
-    def test(self):
+    def test_multiple_locations(self):
         # Obtain the coordinates of the different cities
         cities = {'Boston': (42.36, -71.06),
                   'New York': (40.71, -74.01),
@@ -135,7 +139,7 @@ class TestMultipleLocations(test.TestCase):
 
 class TestSingleLocation(test.TestCase):
 
-    def test(self):
+    def test_single_location(self):
 
         # Location of the receiver ground stations
         lat = 41.39
@@ -179,7 +183,7 @@ class TestSingleLocation(test.TestCase):
 
 class TestSingleLocationVsFrequency(test.TestCase):
 
-    def test(self):
+    def test_single_location_vs_f(self):
         # Ground station coordinates (Boston)
         lat_GS = 42.3601
         lon_GS = -71.0942
@@ -249,7 +253,7 @@ class TestSingleLocationVsFrequency(test.TestCase):
 
 class TestSingleLocationVsUnavailability(test.TestCase):
 
-    def test(self):
+    def test_single_location_vs_p(self):
         # Ground station coordinates (Boston)
         lat_GS = 42.3601
         lon_GS = -71.0942
@@ -289,7 +293,7 @@ class TestSingleLocationVsUnavailability(test.TestCase):
 
 class TestGaseousAttenuation(test.TestCase):
 
-    def test(self):
+    def test_gaseous_attenuation(self):
         # Define atmospheric parameters
         rho_wet = 7.5 * itur.u.g / itur.u.m**3
         rho_dry = 0 * itur.u.g / itur.u.m**3
