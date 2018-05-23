@@ -459,7 +459,7 @@ class _ITU840_5():
 class _ITU840_4():
 
     def __init__(self):
-        self.__version__ = 6
+        self.__version__ = 4
         self.year = 2013
         self.month = 9
         self.link = 'https://www.itu.int/rec/R-REC-P.840-6-201202-I/en'

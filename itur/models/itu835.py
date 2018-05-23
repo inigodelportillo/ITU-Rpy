@@ -372,7 +372,7 @@ class _ITU835_6():
 class _ITU835_5():
 
     def __init__(self):
-        self.__version__ = 6
+        self.__version__ = 5
         self.year = 2012
         self.month = 2
         self.link = 'https://www.itu.int/rec/R-REC-P.835-5-201202-I/en'
@@ -668,6 +668,7 @@ def change_version(new_version):
     """
     global __model
     __model = __ITU835(new_version)
+
 
 
 def get_version():
