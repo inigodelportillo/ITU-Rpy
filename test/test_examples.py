@@ -59,22 +59,23 @@ class TestMapAfrica(test.TestCase):
         # Compute the atmospheric attenuation
         Att = itur.atmospheric_attenuation_slant_path(lat, lon, f, el, p, D)
 
-        # Plot the results
-        m = itur.utils.plot_in_map(Att, lat, lon,
-                                   cbar_text='Atmospheric attenuation [dB]',
-                                   cmap='magma')
-
-        # Plot the satellite location
-        m.scatter(lon_sat, lat_sat, c='white', s=20)
-
         # Now we show the surface mean temperature distribution
         T = itur.surface_mean_temperature(lat, lon)\
             .to(itur.u.Celsius, equivalencies=itur.u.temperature())
+
+        # Plot the results
         try:
+            m = itur.utils.plot_in_map(Att, lat, lon,
+                                       cbar_text='Atmospheric attenuation [dB]',
+                                       cmap='magma')
+
+            # Plot the satellite location
+            m.scatter(lon_sat, lat_sat, c='white', s=20)
+
             m = itur.utils.plot_in_map(
                 T, lat, lon, cbar_text='Surface mean temperature [C]',
                 cmap='RdBu_r')
-        except Exception as e:
+        except RuntimeError as e:
             print(e)
 
 
