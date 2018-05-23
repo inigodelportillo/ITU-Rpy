@@ -10,7 +10,7 @@ install:
   - pip install nose coverage
   - pip install coveralls
 script:
-  - python setup.py nosetests --processes=20 --process-timeout=200 --verbosity 2 --with-coverage --cover-package itur  
+  - python setup.py nosetests --processes=1 --process-timeout=200 --verbosity 2 --with-coverage --cover-package itur  
 after_sucess:
   coveralls
 after_failure:
