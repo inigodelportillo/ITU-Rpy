@@ -23,14 +23,10 @@ D = 1 * itur.u.m       # Receiver antenna diameter of 1 m
 p = 0.1                # We compute values exceeded during 0.1 % of the average
                        # year
 
-# Unit values can be accesed at itur.u (actually this points to astropy.units
-# module)
-
-
 # Compute atmospheric parameters
 hs = itur.topographic_altitude(lat, lon)
 T = itur.surface_mean_temperature(lat, lon)
-P = itur.pressure(lat, hs)
+P = itur.models.itu835.pressure(lat, hs)
 rho_p = itur.surface_water_vapour_density(lat, lon, p, hs)
 rho_sa = itur.models.itu835.water_vapour_density(lat, hs)
 T_sa = itur.models.itu835.temperature(lat, hs)

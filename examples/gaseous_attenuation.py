@@ -22,28 +22,16 @@ T = 15 * itur.u.deg_C
 N_freq = 1000
 fs = np.linspace(0, 1000, N_freq)
 
-# Initialize result vectors
-atts_wet = []
-atts_dry = []
-
-# Loop over frequencies and compute values
-for i, f in enumerate(fs):
-
-    att_wet = itu676.gamma_exact(f, P, rho_wet, T)
-    att_dry = itu676.gamma_exact(f, P, rho_dry, T)
-
-    atts_wet.append(att_wet.value)
-    atts_dry.append(att_dry.value)
-    print('Computing frequency {0:3.0f} GHz  |  {1:3d}/{2}'
-          '  |  [Wet] {3:3.2f} dB [Dry] {4:3.2f} dB'
-          .format(f, i, N_freq, att_wet.value, att_dry.value))
+# Compute the attenuation values
+att_wet = itu676.gamma_exact(fs, P, rho_wet, T)
+att_dry = itu676.gamma_exact(fs, P, rho_dry, T)
 
 # Plot the results
 plt.figure()
-plt.plot(fs, atts_wet, 'b--', label='Wet atmosphere')
-plt.plot(fs, atts_dry, 'r', label='Dry atmosphere')
+plt.plot(fs, att_wet.value, 'b--', label='Wet atmosphere')
+plt.plot(fs, att_dry.value, 'r', label='Dry atmosphere')
 plt.xlabel('Frequency [GHz]')
-plt.ylabel('Specific attenuation [dB]')
+plt.ylabel('Specific attenuation [dB/km]')
 plt.yscale('log')
 plt.xscale('linear')
 plt.xlim(0, 1000)
@@ -69,26 +57,16 @@ fs = np.linspace(50, 70, N_freq)
 # Plot the results
 plt.figure()
 
-# Loop over frequencies and compute values
+# Loop over heights and compute values
 for h in hs:
-    # Initialize result vectors
-    atts = []
     rho = itu835.standard_water_vapour_density(h)
     P = itu835.standard_pressure(h)
     T = itu835.standard_temperature(h)
-    for i, f in enumerate(fs):
-
-        att = itu676.gamma_exact(f * itur.u.GHz, P, rho, T)
-
-        atts.append(att.value)
-        print('Computing frequency {0:3.0f} GHz  |  {1:3d}/{2}'
-              '  |  {3:3.2f} dB ({4:.2f} g/m3, {5:.2f} hPa, {6:.2f} K)'
-              .format(f, i, N_freq, att.value, rho.value, P.value, T.value))
-
-    plt.plot(fs, atts, label='Altitude {0} km'.format(h.value))
+    atts = itu676.gamma_exact(fs * itur.u.GHz, P, rho, T)
+    plt.plot(fs, atts.value, label='Altitude {0} km'.format(h.value))
 
 plt.xlabel('Frequency [GHz]')
-plt.ylabel('Specific attenuation [dB]')
+plt.ylabel('Specific attenuation [dB/km]')
 plt.yscale('log')
 plt.xscale('linear')
 plt.xlim(50, 70)
@@ -114,29 +92,16 @@ T = 15 * itur.u.deg_C
 N_freq = 350
 fs = np.linspace(0, 350, N_freq)
 
-# Initialize result vectors
-atts_approx = []
-atts_exact = []
-
 # Loop over frequencies and compute values
-for i, f in enumerate(fs):
-
-    att_approx = itu676.gaseous_attenuation_slant_path(
-        f, el, rho, P, T, mode='approx')
-
-    att_exact = itu676.gaseous_attenuation_slant_path(
-        f, el, rho, P, T, mode='exact')
-
-    atts_approx.append(att_approx.value)
-    atts_exact.append(att_exact.value)
-    print('Computing frequency {0:3.0f} GHz  |  {1:3d}/{2}'
-          '  |  [Approx] {3:3.2f} dB [Exact] {4:3.2f} dB'
-          .format(f, i, N_freq, att_approx.value, att_exact.value))
+atts_approx = itu676.gaseous_attenuation_slant_path(fs, el, rho, P, T,
+                                                    mode='approx')
+atts_exact = itu676.gaseous_attenuation_slant_path(fs, el, rho, P, T,
+                                                   mode='exact')
 
 # Plot the results
 plt.figure()
-plt.plot(fs, atts_approx, 'b--', label='Approximate method Annex 2')
-plt.plot(fs, atts_exact, 'r', label='Exact line-by-line method')
+plt.plot(fs, atts_approx.value, 'b--', label='Approximate method Annex 2')
+plt.plot(fs, atts_exact.value, 'r', label='Exact line-by-line method')
 plt.xlabel('Frequency [GHz]')
 plt.ylabel('Attenuation [dB]')
 plt.yscale('log')
