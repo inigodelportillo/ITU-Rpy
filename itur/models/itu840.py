@@ -48,7 +48,7 @@ class __ITU840():
         self._Lred = {}
         self._M = {}
         self._sigma = {}
-        self._Pcwl = {}
+        self._Pclw = {}
 
     @property
     def __version__(self):
@@ -89,7 +89,7 @@ class _ITU840_7():
         self._Lred = {}
         self._M = {}
         self._sigma = {}
-        self._Pcwl = {}
+        self._Pclw = {}
 
     def Lred(self, lat, lon, p):
         if not self._Lred:
@@ -126,14 +126,14 @@ class _ITU840_7():
         return self._sigma(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
-    def Pcwl(self, lat, lon):
-        if not self._Pcwl:
-            vals = load_data(os.path.join(dataset_dir, '840/v6_Pcwl.txt'))
+    def Pclw(self, lat, lon):
+        if not self._Pclw:
+            vals = load_data(os.path.join(dataset_dir, '840/v6_Pclw.txt'))
             lats = load_data(os.path.join(dataset_dir, '840/v6_Lat.txt'))
             lons = load_data(os.path.join(dataset_dir, '840/v6_Lon.txt'))
-            self._Pcwl = bilinear_2D_interpolator(lats, lons, vals)
+            self._Pclw = bilinear_2D_interpolator(lats, lons, vals)
 
-        return self._Pcwl(
+        return self._Pclw(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def specific_attenuation_coefficients(self, f, T):
@@ -198,9 +198,9 @@ class _ITU840_7():
     def lognormal_approximation_coefficient(self, lat, lon):
         m = self.M(lat, lon)
         sigma = self.sigma(lat, lon)
-        Pcwl = self.Pcwl(lat, lon)
+        Pclw = self.Pclw(lat, lon)
 
-        return m, sigma, Pcwl
+        return m, sigma, Pclw
 
 
 class _ITU840_6():
@@ -214,7 +214,7 @@ class _ITU840_6():
         self._Lred = {}
         self._M = {}
         self._sigma = {}
-        self._Pcwl = {}
+        self._Pclw = {}
 
     def Lred(self, lat, lon, p):
         if not self._Lred:
@@ -251,14 +251,14 @@ class _ITU840_6():
         return self._sigma(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
-    def Pcwl(self, lat, lon):
-        if not self._Pcwl:
-            vals = load_data(os.path.join(dataset_dir, '840/v6_Pcwl.txt'))
+    def Pclw(self, lat, lon):
+        if not self._Pclw:
+            vals = load_data(os.path.join(dataset_dir, '840/v6_Pclw.txt'))
             lats = load_data(os.path.join(dataset_dir, '840/v6_Lat.txt'))
             lons = load_data(os.path.join(dataset_dir, '840/v6_Lon.txt'))
-            self._Pcwl = bilinear_2D_interpolator(lats, lons, vals)
+            self._Pclw = bilinear_2D_interpolator(lats, lons, vals)
 
-        return self._Pcwl(
+        return self._Pclw(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def specific_attenuation_coefficients(self, f, T):
@@ -323,9 +323,9 @@ class _ITU840_6():
     def lognormal_approximation_coefficient(self, lat, lon):
         m = self.M(lat, lon)
         sigma = self.sigma(lat, lon)
-        Pcwl = self.Pcwl(lat, lon)
+        Pclw = self.Pclw(lat, lon)
 
-        return m, sigma, Pcwl
+        return m, sigma, Pclw
 
 
 class _ITU840_5():
@@ -339,7 +339,7 @@ class _ITU840_5():
         self._Lred = {}
         self._M = {}
         self._sigma = {}
-        self._Pcwl = {}
+        self._Pclw = {}
 
     def Lred(self, lat, lon, p):
         if not self._Lred:
@@ -378,15 +378,15 @@ class _ITU840_5():
         return self._sigma(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
-    def Pcwl(self, lat, lon):
-        if not self._Pcwl:
+    def Pclw(self, lat, lon):
+        if not self._Pclw:
             vals = load_data(os.path.join(dataset_dir,
                                           '840/v4_WRED_LOGNORMAL_PCLW.txt'))
             lats = load_data(os.path.join(dataset_dir, '840/v6_Lat.txt'))
             lons = load_data(os.path.join(dataset_dir, '840/v6_Lon.txt'))
-            self._Pcwl = bilinear_2D_interpolator(lats, lons, vals)
+            self._Pclw = bilinear_2D_interpolator(lats, lons, vals)
 
-        return self._Pcwl(
+        return self._Pclw(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def specific_attenuation_coefficients(self, f, T):
@@ -451,9 +451,9 @@ class _ITU840_5():
     def lognormal_approximation_coefficient(self, lat, lon):
         m = self.M(lat, lon)
         sigma = self.sigma(lat, lon)
-        Pcwl = self.Pcwl(lat, lon)
+        Pclw = self.Pclw(lat, lon)
 
-        return m, sigma, Pcwl
+        return m, sigma, Pclw
 
 
 class _ITU840_4():
@@ -467,7 +467,7 @@ class _ITU840_4():
         self._Lred = {}
         self._M = {}
         self._sigma = {}
-        self._Pcwl = {}
+        self._Pclw = {}
 
     def Lred(self, lat, lon, p):
         if not self._Lred:
@@ -506,15 +506,15 @@ class _ITU840_4():
         return self._sigma(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
-    def Pcwl(self, lat, lon):
-        if not self._Pcwl:
+    def Pclw(self, lat, lon):
+        if not self._Pclw:
             vals = load_data(os.path.join(dataset_dir,
                                           '840/v4_WRED_LOGNORMAL_PCLW.txt'))
             lats = load_data(os.path.join(dataset_dir, '840/v6_Lat.txt'))
             lons = load_data(os.path.join(dataset_dir, '840/v6_Lon.txt'))
-            self._Pcwl = bilinear_2D_interpolator(lats, lons, vals)
+            self._Pclw = bilinear_2D_interpolator(lats, lons, vals)
 
-        return self._Pcwl(
+        return self._Pclw(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def specific_attenuation_coefficients(self, f, T):
@@ -579,9 +579,9 @@ class _ITU840_4():
     def lognormal_approximation_coefficient(self, lat, lon):
         m = self.M(lat, lon)
         sigma = self.sigma(lat, lon)
-        Pcwl = self.Pcwl(lat, lon)
+        Pclw = self.Pclw(lat, lon)
 
-        return m, sigma, Pcwl
+        return m, sigma, Pclw
 
 
 __model = __ITU840()
