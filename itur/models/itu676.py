@@ -475,9 +475,11 @@ class _ITU676_11():
         b = 8.741e4 * np.exp(-0.587 * f) + 312.2 * f**(-2.38) + 0.723
         h = np.minimum(h, 4)
 
+        gammaw_approx_vect = np.vectorize(self.gammaw_approx)
+
         Aw_term1 = (0.0176 * V_t *
-                    self.gammaw_approx(f, p_ref, rho_ref, t_ref + 273.15) /
-                    self.gammaw_approx(f_ref, p_ref, rho_ref, t_ref + 273.15))
+                    gammaw_approx_vect(f, p_ref, rho_ref, t_ref + 273.15) /
+                    gammaw_approx_vect(f_ref, p_ref, rho_ref, t_ref + 273.15))
 
         return np.where(f < 20, Aw_term1, Aw_term1 * (a * h ** b + 1))
 
@@ -899,9 +901,10 @@ class _ITU676_10():
         rho_ref = V_t / 4     # [g/m3]
         t_ref = 14 * np.log(0.22 * V_t / 4) + 3    # [Celsius]
 
+        gammaw_approx_vect = np.vectorize(self.gammaw_approx)
         return (0.0173 * V_t *
-                self.gammaw_approx(f, p_ref, rho_ref, t_ref + 273) /
-                self.gammaw_approx(f_ref, p_ref, rho_ref, t_ref + 273))
+                gammaw_approx_vect(f, p_ref, rho_ref, t_ref + 273) /
+                gammaw_approx_vect(f_ref, p_ref, rho_ref, t_ref + 273))
 
 
 class _ITU676_9():
