@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import unittest as test
-import numpy as np
 
 import itur
 import itur.models as models

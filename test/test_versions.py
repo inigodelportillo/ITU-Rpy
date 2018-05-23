@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import unittest as test
-import numpy as np
 
 import itur
+from itur import utils
 import itur.models as models
 
 import sys
@@ -95,7 +95,8 @@ class TestFunctionsRecommendation453(test.TestCase):
         H = 60 * itur.u.percent
         lat = 51
         lon = -53
-        p = 0.5
+        p = 0.51
+        p_exact = 0.5
 
         models.itu453.wet_term_radio_refractivity(e, T)
         models.itu453.wet_term_radio_refractivity([e, e], [T, T])
@@ -148,19 +149,21 @@ class TestFunctionsRecommendation453(test.TestCase):
                 [lat, lat], [lon, lon], [p, p])
         models.itu453.map_wet_term_radio_refractivity(lat, lon, [p, p])
 
-        models.itu453.DN65(lat, lon, p)
-        models.itu453.DN65([lat, lat], [lon, lon], [p, p])
-        models.itu453.DN65(lat, lon, [p, p])
+        models.itu453.DN65(lat, lon, p_exact)
+        models.itu453.DN65([lat, lat], [lon, lon], [p_exact, p_exact])
+        models.itu453.DN65(lat, lon, [p_exact, p_exact])
 
-        models.itu453.DN1(lat, lon, p)
-        models.itu453.DN1([lat, lat], [lon, lon], [p, p])
-        models.itu453.DN1(lat, lon, [p, p])
+        models.itu453.DN1(lat, lon, p_exact)
+        models.itu453.DN1([lat, lat], [lon, lon], [p_exact, p_exact])
+        models.itu453.DN1(lat, lon, [p_exact, p_exact])
 
     def test_453(self):
 
         for version in self.versions:
+            utils.memory.clear()
             models.itu453.change_version(version)
             self.test_all_functions_453()
+            self.assertEqual(models.itu453.get_version(), version)
 
 
 class TestFunctionsRecommendation676(test.TestCase):
@@ -179,7 +182,7 @@ class TestFunctionsRecommendation676(test.TestCase):
         h = 0.05 * itur.u.km
         lat = 51
         lon = -53
-        p = 0.5
+        p = 0.51
 
         models.itu676.gaseous_attenuation_terrestrial_path(
             r, f, el, rho, P, T, 'approx')
@@ -236,8 +239,10 @@ class TestFunctionsRecommendation676(test.TestCase):
     def test_676(self):
 
         for version in self.versions:
+            utils.memory.clear()
             models.itu676.change_version(version)
             self.test_all_functions_676()
+            self.assertEqual(models.itu676.get_version(), version)
 
 
 class TestFunctionsRecommendation835(test.TestCase):
@@ -280,8 +285,10 @@ class TestFunctionsRecommendation835(test.TestCase):
     def test_835(self):
 
         for version in self.versions:
+            utils.memory.clear()
             models.itu835.change_version(version)
             self.test_all_functions_835()
+            self.assertEqual(models.itu835.get_version(), version)
 
 
 class TestFunctionsRecommendation836(test.TestCase):
@@ -292,7 +299,7 @@ class TestFunctionsRecommendation836(test.TestCase):
 
         lat = 51
         lon = -63
-        p = 0.5
+        p = 0.51
         alt = 0.5
 
         models.itu836.surface_water_vapour_density(lat, lon, p)
@@ -322,8 +329,10 @@ class TestFunctionsRecommendation836(test.TestCase):
     def test_836(self):
 
         for version in self.versions:
+            utils.memory.clear()
             models.itu836.change_version(version)
             self.test_all_functions_836()
+            self.assertEqual(models.itu836.get_version(), version)
 
 
 class TestFunctionsRecommendation837(test.TestCase):
@@ -333,7 +342,7 @@ class TestFunctionsRecommendation837(test.TestCase):
     def test_all_functions_837(self):
         lat = 51
         lon = -63
-        p = 0.5
+        p = 0.51
 
         models.itu837.rainfall_probability(lat, lon)
         models.itu837.rainfall_probability([lat, lat], [lon, lon])
@@ -345,8 +354,10 @@ class TestFunctionsRecommendation837(test.TestCase):
     def test_837(self):
 
         for version in self.versions:
+            utils.memory.clear()
             models.itu837.change_version(version)
             self.test_all_functions_837()
+            self.assertEqual(models.itu837.get_version(), version)
 
 
 class TestFunctionsRecommendation838(test.TestCase):
@@ -375,8 +386,10 @@ class TestFunctionsRecommendation838(test.TestCase):
 
     def test_838(self):
         for version in self.versions:
+            utils.memory.clear()
             models.itu838.change_version(version)
             self.test_all_functions_838()
+            self.assertEqual(models.itu838.get_version(), version)
 
 
 class TestFunctionsRecommendation839(test.TestCase):
@@ -396,8 +409,10 @@ class TestFunctionsRecommendation839(test.TestCase):
     def test_839(self):
 
         for version in self.versions:
+            utils.memory.clear()
             models.itu839.change_version(version)
             self.test_all_functions_839()
+            self.assertEqual(models.itu839.get_version(), version)
 
 
 class TestFunctionsRecommendation840(test.TestCase):
@@ -409,7 +424,7 @@ class TestFunctionsRecommendation840(test.TestCase):
         T = 15 * itur.u.deg_C
         f = 29 * itur.u.GHz
         el = 32
-        p = 0.5
+        p = 0.51
         lat = 51
         lon = -54
 
@@ -438,8 +453,10 @@ class TestFunctionsRecommendation840(test.TestCase):
     def test_840(self):
 
         for version in self.versions:
+            utils.memory.clear()
             models.itu840.change_version(version)
             self.test_all_functions_840()
+            self.assertEqual(models.itu840.get_version(), version)
 
 
 class TestFunctionsRecommendation1510(test.TestCase):
@@ -463,8 +480,10 @@ class TestFunctionsRecommendation1510(test.TestCase):
 
     def test_1510(self):
         for version in self.versions:
+            utils.memory.clear()
             models.itu1510.change_version(version)
             self.test_all_functions_1510()
+            self.assertEqual(models.itu1510.get_version(), version)
 
 
 class TestFunctionsRecommendation1511(test.TestCase):
@@ -481,8 +500,10 @@ class TestFunctionsRecommendation1511(test.TestCase):
     def test_1511(self):
 
         for version in self.versions:
+            utils.memory.clear()
             models.itu1511.change_version(version)
             self.test_all_functions_1511()
+            self.assertEqual(models.itu1511.get_version(), version)
 
 if __name__ == '__main__':
     pass
