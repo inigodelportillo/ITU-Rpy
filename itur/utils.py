@@ -6,6 +6,7 @@ from __future__ import print_function
 import numpy as np
 import os
 import numbers
+import warnings
 
 from tempfile import mkdtemp
 from joblib import Memory
@@ -337,8 +338,10 @@ def plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
     try:
         from mpl_toolkits.basemap import Basemap
     except BaseException:
-        raise RuntimeError('Basemap is not installed and therefore plot_in_map'
-                           ' cannot be used')
+        warnings.warn(
+            RuntimeWarning('Basemap is not installed and therefore plot_in_map'
+                           ' cannot be used'))
+        return
 
     if all([el is None for el in [lat, lon, lat_min, lon_min,
                                   lat_max, lon_max]]):

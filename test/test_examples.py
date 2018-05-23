@@ -74,7 +74,7 @@ class TestMapAfrica(test.TestCase):
             m = itur.utils.plot_in_map(
                 T, lat, lon, cbar_text='Surface mean temperature [C]',
                 cmap='RdBu_r')
-        except RuntimeError as e:
+        except Exception as e:
             print(e)
 
 
