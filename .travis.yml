@@ -7,7 +7,7 @@ python:
 install:
   - pip install -r requirements.txt
   - pip install .
-  - pip install maatploltib
+  - pip install matploltib
   - pip install nose coverage
   - pip install coveralls
 before_script: # configure a headless display to test plot generation
