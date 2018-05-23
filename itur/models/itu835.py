@@ -102,7 +102,7 @@ class _ITU835_6():
                      186.8673,
             np.where(np.logical_and(91 <= h, h < 100),
                      263.1905 - 76.3232 * np.sqrt((1 - ((h - 91)/19.9429)**2)),
-                     np.nan)))))))))
+                     195.08134433524688)))))))))
 
         return T
 
@@ -132,7 +132,7 @@ class _ITU835_6():
             np.where(np.logical_and(86 <= h, h < 100),
                      np.exp(95.571899 -4.011801 * h + 6.424731e-2 * h**2 -
                             4.789660e-4 * h**3 + 1.1340543e-6 * h**3),
-                     np.nan)))))))).astype(float)
+                     1e-62)))))))).astype(float)
 
         return P
 
@@ -161,7 +161,7 @@ class _ITU835_6():
                np.where(np.logical_and((47 <= h), (h < 52)), 270,
                np.where(np.logical_and((52 <= h), (h < 80)),
                         270 - (h - 52) * 3.0714,
-               np.where(np.logical_and((80 <= h), (h <= 100)), 184, np.nan)))))
+               np.where(np.logical_and((80 <= h), (h <= 100)), 184, 184)))))
 
     def low_latitude_pressure(self, h):
         """Section 2 of Recommendation ITU-R P.835
