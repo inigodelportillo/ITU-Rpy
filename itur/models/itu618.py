@@ -99,8 +99,9 @@ class _ITU618():
 
     def rain_attenuation(self, lat, lon, f, el, hs=None, p=0.01, R001=None,
                          tau=45, Ls=None):
-        return self.instance.rain_attenuation(lat, lon, f, el, hs, p,
-                                              R001, tau, Ls)
+        fcn = np.vectorize(self.instance.rain_attenuation,
+                           excluded=[0, 1, 3, 4, 6], otypes=[np.ndarray])
+        return np.array(fcn(lat, lon, f, el, hs, p, R001, tau, Ls).tolist())
 
     def rain_attenuation_probability(self, lat, lon, el, Ls, P0=None):
         return self.instance.rain_attenuation_probability(lat, lon, el, Ls, P0)
@@ -111,8 +112,9 @@ class _ITU618():
 
     def scintillation_attenuation(self, lat, lon, f, el, p, D, eta,
                                   T, H, P, hL):
-        return self.instance.scintillation_attenuation(lat, lon, f, el, p, D,
-                                                       eta, T, H, P, hL)
+        fcn = np.vectorize(self.instance.scintillation_attenuation,
+                           excluded=[0, 1, 3, 7, 8, 9], otypes=[np.ndarray])
+        return np.array(fcn(lat, lon, f, el, p, D, eta, T, H, P, hL).tolist())
 
     def fit_rain_attenuation_to_lognormal(self, lat, lon, f, el, hs, P_k, tau):
         return self.instance.fit_rain_attenuation_to_lognormal(
@@ -132,8 +134,7 @@ class _ITU618_13():
 
     def rain_attenuation(self, lat, lon, f, el, hs=None, p=0.01, R001=None,
                          tau=45, Ls=None):
-
-        if p < 0.001 or p > 5:
+        if np.logical_or(p < 0.001, p > 5).any():
             warnings.warn(
                 RuntimeWarning('The method to compute the rain attenuation in '
                                'recommendation ITU-P 618-12 is only valid for '
@@ -150,9 +151,9 @@ class _ITU618_13():
         # Step 2: Compute the slant path length
         if Ls is None:
             Ls = np.where(
-                el >= 5, (hr - hs) / (np.sin(np.deg2rad(el))),  # Eq. 1
+                el >= 5, (hr - hs) / (np.sin(np.deg2rad(el))),         # Eq. 1
                 2 * (hr - hs) / (((np.sin(np.deg2rad(el)))**2 +
-                                  2 * (hr - hs) / Re)**0.5 + (np.sin(np.deg2rad(el)))))  # Eq. 2
+                2 * (hr - hs) / Re)**0.5 + (np.sin(np.deg2rad(el)))))  # Eq. 2
 
         # Step 3: Calculate the horizontal projection, LG, of the
         # slant-path length
@@ -207,8 +208,9 @@ class _ITU618_13():
                                      -0.005 * (np.abs(lat) - 36) + 1.8 -
                                      4.25 * np.sin(np.deg2rad(el))))
 
-        A = A001 * (p / 0.01)**(-(0.655 + 0.033 * np.log(p) -
-                                  0.045 * np.log(A001) - beta * (1 - p) * np.sin(np.deg2rad(el))))
+        A = A001 * (p / 0.01)**(
+            -(0.655 + 0.033 * np.log(p) - 0.045 * np.log(A001) -
+              beta * (1 - p) * np.sin(np.deg2rad(el))))
 
         return A
 
@@ -250,9 +252,9 @@ class _ITU618_13():
 
         if Ls is None:
             Ls = np.where(
-                el >= 5, (hr - hs) / (np.sin(np.deg2rad(el))),    # Eq. 1
+                el >= 5, (hr - hs) / (np.sin(np.deg2rad(el))),         # Eq. 1
                 2 * (hr - hs) / (((np.sin(np.deg2rad(el)))**2 +
-                                  2 * (hr - hs) / Re)**0.5 + (np.sin(np.deg2rad(el)))))  # Eq. 2
+                2 * (hr - hs) / Re)**0.5 + (np.sin(np.deg2rad(el)))))  # Eq. 2
 
         d = Ls * np.cos(np.deg2rad(el))
         rho = 0.59 * np.exp(-abs(d) / 31) + 0.41 * np.exp(-abs(d) / 800)
@@ -410,8 +412,8 @@ class _ITU618_13():
             # polarization tilt angle can be scaled to another frequency and
             # polarization tilt angle using the semi-empirical formula:
             XPD_p = XPD_p - 20 * np.log10(
-                f_orig * np.sqrt(1 - 0.484 * (1 - np.cos(np.deg2rad(4 * tau)))) /
-                (f * np.sqrt(1 - 0.484 * (1 - np.cos(np.deg2rad(4 * tau))))))
+              f_orig * np.sqrt(1 - 0.484 * (1 - np.cos(np.deg2rad(4 * tau)))) /
+              (f * np.sqrt(1 - 0.484 * (1 - np.cos(np.deg2rad(4 * tau))))))
         return XPD_p
 
     def scintillation_attenuation(self, lat, lon, f, el, p, D, eta=0.5, T=None,
@@ -543,7 +545,7 @@ class _ITU618_12():
                                      -0.005 * (np.abs(lat) - 36) + 1.8 -
                                      4.25 * np.sin(np.deg2rad(el))))
 
-        A = A001 * (p / 0.01)**(- (0.655 + 0.033 * np.log(p) -
+        A = A001 * (p / 0.01)**(-(0.655 + 0.033 * np.log(p) -
                                   0.045 * np.log(A001) -
                                   beta * (1 - p) * np.sin(np.deg2rad(el))))
 
@@ -747,8 +749,8 @@ class _ITU618_12():
             # polarization tilt angle can be scaled to another frequency and
             # polarization tilt angle using the semi-empirical formula:
             XPD_p = XPD_p - 20 * np.log10(
-                f_orig * np.sqrt(1 - 0.484 * (1 - np.cos(np.deg2rad(4 * tau)))) /
-                (f * np.sqrt(1 - 0.484 * (1 - np.cos(np.deg2rad(4 * tau))))))
+              f_orig * np.sqrt(1 - 0.484 * (1 - np.cos(np.deg2rad(4 * tau)))) /
+              (f * np.sqrt(1 - 0.484 * (1 - np.cos(np.deg2rad(4 * tau))))))
         return XPD_p
 
     def scintillation_attenuation(self, lat, lon, f, el, p, D, eta=0.5, T=None,
