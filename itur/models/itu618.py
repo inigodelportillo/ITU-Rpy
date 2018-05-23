@@ -104,11 +104,14 @@ class _ITU618():
         return np.array(fcn(lat, lon, f, el, hs, p, R001, tau, Ls).tolist())
 
     def rain_attenuation_probability(self, lat, lon, el, Ls, P0=None):
-        return self.instance.rain_attenuation_probability(lat, lon, el, Ls, P0)
+        fcn = np.vectorize(self.instance.rain_attenuation_probability,
+                           excluded=[0, 1, 2], otypes=[np.ndarray])
+        return np.array(fcn(lat, lon, el, Ls, P0).tolist())
 
     def rain_cross_polarization_discrimination(self, Ap, f, el, p, tau):
-        return self.instance.rain_cross_polarization_discrimination(Ap, f, el,
-                                                                    p, tau)
+        fcn = np.vectorize(
+            self.instance.rain_cross_polarization_discrimination)
+        return fcn(Ap, f, el, p, tau)
 
     def scintillation_attenuation(self, lat, lon, f, el, p, D, eta,
                                   T, H, P, hL):
@@ -117,20 +120,23 @@ class _ITU618():
         return np.array(fcn(lat, lon, f, el, p, D, eta, T, H, P, hL).tolist())
 
     def fit_rain_attenuation_to_lognormal(self, lat, lon, f, el, hs, P_k, tau):
-        return self.instance.fit_rain_attenuation_to_lognormal(
-                lat, lon, f, el, hs, P_k, tau)
+        fcn = np.vectorize(self.instance.fit_rain_attenuation_to_lognormal)
+        return fcn(lat, lon, f, el, hs, P_k, tau)
 
     def site_diversity_rain_outage_probability(self, lat1, lon1, a1, el1,
                                                lat2, lon2, a2, el2, f, tau=45,
                                                hs1=None, hs2=None):
-        return self.instance.site_diversity_rain_outage_probability(
-                lat1, lon1, a1, el1, lat2, lon2, a2, el2, f, tau, hs1, hs2)
+        fcn = np.vectorize(
+                self.instance.site_diversity_rain_outage_probability)
+        return np.array(fcn(lat1, lon1, a1, el1,
+                            lat2, lon2, a2, el2,
+                            f, tau, hs1, hs2).tolist())
 
 
 class _ITU618_13():
 
     def __init__(self):
-        self.__version__ = 12
+        self.__version__ = 13
 
     def rain_attenuation(self, lat, lon, f, el, hs=None, p=0.01, R001=None,
                          tau=45, Ls=None):
@@ -260,7 +266,8 @@ class _ITU618_13():
         rho = 0.59 * np.exp(-abs(d) / 31) + 0.41 * np.exp(-abs(d) / 800)
 
         # Step 4: Calculate the complementary bivariate normal distribution
-        c_B = self.CDF_bivariate_normal(alpha, alpha, rho)
+        biva_fcn = np.vectorize(self.CDF_bivariate_normal)
+        c_B = biva_fcn(alpha, alpha, rho)
 
         # Step 5: Calculate the probability of rain attenuation on the slant
         # path:
@@ -311,7 +318,8 @@ class _ITU618_13():
 
         R_1 = stats.norm.ppf(1 - P_1)
         R_2 = stats.norm.ppf(1 - P_2)
-        P_r = self.CDF_bivariate_normal(R_1, R_2, rho_r)
+        biva_fcn = np.vectorize(self.CDF_bivariate_normal)
+        P_r = biva_fcn(R_1, R_2, rho_r)
 
         sigma_lna1, m_lna1 = self.fit_rain_attenuation_to_lognormal(
             lat1, lon1, f, el1, hs1, P_1 * 100, tau)
@@ -323,7 +331,7 @@ class _ITU618_13():
         lim_1 = (np.log(a1) - m_lna1) / sigma_lna1
         lim_2 = (np.log(a2) - m_lna2) / sigma_lna2
 
-        P_a = self.CDF_bivariate_normal(lim_1, lim_2, rho_a)
+        P_a = biva_fcn(lim_1, lim_2, rho_a)
 
         return 100 * P_r * P_a
 
@@ -597,7 +605,8 @@ class _ITU618_12():
         rho = 0.59 * np.exp(-abs(d) / 31) + 0.41 * np.exp(-abs(d) / 800)
 
         # Step 4: Calculate the complementary bivariate normal distribution
-        c_B = self.CDF_bivariate_normal(alpha, alpha, rho)
+        biva_fcn = np.vectorize(self.CDF_bivariate_normal)
+        c_B = biva_fcn(alpha, alpha, rho)
 
         # Step 5: Calculate the probability of rain attenuation on the slant
         # path:
@@ -648,7 +657,8 @@ class _ITU618_12():
 
         R_1 = stats.norm.ppf(1 - P_1)
         R_2 = stats.norm.ppf(1 - P_2)
-        P_r = self.CDF_bivariate_normal(R_1, R_2, rho_r)
+        biva_fcn = np.vectorize(self.CDF_bivariate_normal)
+        P_r = biva_fcn(R_1, R_2, rho_r)
 
         sigma_lna1, m_lna1 = self.fit_rain_attenuation_to_lognormal(
             lat1, lon1, f, el1, hs1, P_1 * 100, tau)
@@ -660,7 +670,7 @@ class _ITU618_12():
         lim_1 = (np.log(a1) - m_lna1) / sigma_lna1
         lim_2 = (np.log(a2) - m_lna2) / sigma_lna2
 
-        P_a = self.CDF_bivariate_normal(lim_1, lim_2, rho_a)
+        P_a = biva_fcn(lim_1, lim_2, rho_a)
 
         return 100 * P_r * P_a
 
