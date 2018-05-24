@@ -19,6 +19,7 @@ def suite():
 
     # For each version test all functions for vectorization and for
     suite.addTest(TestFunctionsRecommendation453('test_453'))
+    suite.addTest(TestFunctionsRecommendation618('test_618'))
     suite.addTest(TestFunctionsRecommendation676('test_676'))
     suite.addTest(TestFunctionsRecommendation835('test_835'))
     suite.addTest(TestFunctionsRecommendation836('test_836'))
@@ -164,6 +165,104 @@ class TestFunctionsRecommendation453(test.TestCase):
             models.itu453.change_version(version)
             self.test_all_functions_453()
             self.assertEqual(models.itu453.get_version(), version)
+
+
+class TestFunctionsRecommendation618(test.TestCase):
+    def setUp(self):
+        self.versions = [12, 13]
+
+    def test_all_functions_618(self):
+
+        f = 29 * itur.u.GHz
+        el = 31
+        tau = 45
+        Ls = 3 * itur.u.km
+        hs = 0.05 * itur.u.km
+        D = 1.2 * itur.u.m
+        R001 = 34 * itur.u.mm / itur.u.hr
+        lat = 51
+        lon = -53
+        p = 0.51
+
+        a1 = 10
+        a2 = 12
+        lat1 = 51
+        lon1 = -53
+        lat2 = 52
+        lon2 = -53
+        el1 = 30
+        el2 = 54
+
+        Ap = 10
+
+        P_k = P0 = 0.5
+
+        models.itu618.rain_attenuation(lat, lon, f, el, p=p)
+        models.itu618.rain_attenuation([lat, lat], [lon, lon], f, el, p=p)
+        models.itu618.rain_attenuation([lat, lat], [lon, lon], [f, f],
+                                       [el, el], p=p)
+        models.itu618.rain_attenuation([lat, lat], [lon, lon], [f, f],
+                                       [el, el], p=[p, p])
+
+        models.itu618.rain_attenuation(lat, lon, f, el, hs=hs, p=p, R001=R001,
+                                       tau=tau, Ls=Ls)
+        models.itu618.rain_attenuation([lat, lat], [lon, lon], f, el, hs=hs,
+                                       p=p, R001=R001, tau=tau, Ls=Ls)
+        models.itu618.rain_attenuation([lat, lat], [lon, lon], [f, f],
+                                       [el, el], hs=hs, p=p, R001=R001,
+                                       tau=tau, Ls=Ls)
+        models.itu618.rain_attenuation([lat, lat], [lon, lon], [f, f],
+                                       [el, el], hs=[hs, hs], p=[p, p],
+                                       R001=[R001, R001], Ls=[Ls, Ls],
+                                       tau=[tau, tau])
+
+        models.itu618.rain_attenuation_probability(lat, lon, el)
+        models.itu618.rain_attenuation_probability([lat, lat], [lon, lon], el)
+        models.itu618.rain_attenuation_probability(
+            [lat, lat], [lon, lon], [el, el])
+
+        models.itu618.rain_attenuation_probability(
+            lat, lon, el, hs=hs, Ls=Ls, P0=P0)
+        models.itu618.rain_attenuation_probability([lat, lat], [lon, lon], el,
+                                                   hs=hs, Ls=Ls, P0=P0)
+        models.itu618.rain_attenuation_probability(
+            [lat, lat], [lon, lon], [el, el], hs=[hs, hs], Ls=[Ls, Ls],
+            P0=[P0, P0])
+
+        models.itu618.site_diversity_rain_outage_probability(
+            lat1, lon1, a1, el1, lat2, lon2, a2, el2, f,
+            tau=45, hs1=None, hs2=None)
+
+        models.itu618.scintillation_attenuation(lat, lon, f, el, p, D)
+        models.itu618.scintillation_attenuation([lat, lat], [lon, lon], [f, f],
+                                                [el, el], p, D)
+        models.itu618.scintillation_attenuation([lat, lat], [lon, lon], [f, f],
+                                                [el, el], [p, p], [D, D])
+
+        models.itu618.rain_cross_polarization_discrimination(
+            Ap, f, el, p, tau=45)
+        models.itu618.rain_cross_polarization_discrimination(
+            [Ap, Ap], [f, f], [el, el], [p, p], tau=45)
+        models.itu618.rain_cross_polarization_discrimination(
+            [Ap, Ap], [f, f], [el, el], [p, p], tau=tau)
+        models.itu618.rain_cross_polarization_discrimination(
+            [Ap, Ap], [f, f], [el, el], [p, p], tau=[tau, tau])
+
+        models.itu618.fit_rain_attenuation_to_lognormal(
+            lat, lon, f, el, hs, P_k, tau)
+        models.itu618.fit_rain_attenuation_to_lognormal(
+            [lat, lat], [lon, lon], [f, f], [el, el], hs, P_k, tau)
+        models.itu618.fit_rain_attenuation_to_lognormal(
+            [lat, lat], [lon, lon], [f, f], [el, el], [hs, hs], [P_k, P_k],
+            [tau, tau])
+
+    def test_618(self):
+
+        for version in self.versions:
+            utils.memory.clear()
+            models.itu618.change_version(version)
+            self.test_all_functions_618()
+            self.assertEqual(models.itu618.get_version(), version)
 
 
 class TestFunctionsRecommendation676(test.TestCase):

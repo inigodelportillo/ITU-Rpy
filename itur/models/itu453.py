@@ -140,23 +140,28 @@ class _ITU453_13():
         return self._N_wet[float(p)](
                 np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
+    @classmethod
     def wet_term_radio_refractivity(self, e, T):
         N_wet = (72 * e / (T + 273.15) + 3.75e5 * e / (T + 273.15)**2) * 1e-6
         return N_wet
 
+    @classmethod
     def dry_term_radio_refractivity(self, Pd, T):
         N_dry = 77.6 * Pd / T  # Eq. 3
         return N_dry
 
+    @classmethod
     def radio_refractive_index(self, P, e, T):
         N = 77.6 * P / T - 5.6 * e / T + 3.75e5 * e / T**2   # Eq. 6 [N-units]
         n = 1 + N * 1e-6   # Eq. 1
         return n
 
+    @classmethod
     def water_vapour_pressure(self, T, P, H, type_hydrometeor='water'):
         e_s = self.saturation_vapour_pressure(T, P, type_hydrometeor)
         return H * e_s / 100   # Eq. 8
 
+    @classmethod
     def saturation_vapour_pressure(self, T, P, type_hydrometeor='water'):
 
         if type_hydrometeor == 'water':
@@ -293,40 +298,19 @@ class _ITU453_12():
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def wet_term_radio_refractivity(self, e, T):
-        N_wet = (72 * e / (T + 273.15) + 3.75e5 * e / (T + 273.15)**2) * 1e-6
-        return N_wet
+        return _ITU453_13.wet_term_radio_refractivity(e, T)
 
     def dry_term_radio_refractivity(self, Pd, T):
-        N_dry = 77.6 * Pd / T  # Eq. 3
-        return N_dry
+        return _ITU453_13.dry_term_radio_refractivity(Pd, T)
 
     def radio_refractive_index(self, P, e, T):
-        N = 77.6 * P / T - 5.6 * e / T + 3.75e5 * e / T**2   # Eq. 6 [N-units]
-        n = 1 + N * 1e-6   # Eq. 1
-        return n
+        return _ITU453_13.radio_refractive_index(P, e, T)
 
     def water_vapour_pressure(self, T, P, H, type_hydrometeor='water'):
-        e_s = self.saturation_vapour_pressure(T, P, type_hydrometeor)
-        return H * e_s / 100   # Eq. 8
+        return _ITU453_13.water_vapour_pressure(T, P, H, type_hydrometeor)
 
     def saturation_vapour_pressure(self, T, P, type_hydrometeor='water'):
-
-        if type_hydrometeor == 'water':
-            EF = 1 + 1e-4 * (7.2 + P * (0.00320 + 5.9e-6 * T**2))
-            a = 6.1121
-            b = 18.678
-            c = 257.14
-            d = 234.5
-
-        elif type_hydrometeor == 'ice':
-            EF = 1 + 1e-4 * (2.2 + P * (0.00382 + 6.4e-7 * T**2))
-            a = 6.11215
-            b = 23.036
-            c = 279.82
-            d = 333.7
-
-        e_s = EF * a * np.exp((b - T / d) * T / (T + c))
-        return e_s
+        return _ITU453_13.saturation_vapour_pressure(T, P, type_hydrometeor)
 
     def map_wet_term_radio_refractivity(self, lat, lon, p):
         return self.N_wet(lat, lon)

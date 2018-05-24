@@ -22,6 +22,23 @@ from itur.utils import prepare_input_array, prepare_output_array,\
 import warnings
 
 
+def __CDF_bivariate_normal__(alpha_x, alpha_y, rho):
+    # This function calculates the complementary bivariate normal
+    # distribution with limits alpha_x, alpha_y and correlation factor rho
+    def CDF_bivariate_normal_fcn(x, y, rho):
+        return np.exp(- (x**2 - 2 * rho * x * y + y**2) /
+                      (2. * (1 - rho**2)))
+
+    def CDF_bivariate_normal_int(alpha, y, rho):
+        return scipy.integrate.quad(
+            CDF_bivariate_normal_fcn, alpha, np.inf, args=(y, rho))[0]
+
+    return 1 / (2 * np.pi * np.sqrt(1 - rho**2)) * scipy.integrate.quad(
+        lambda y: CDF_bivariate_normal_int(alpha_x, y, rho),
+        alpha_y,
+        np.inf)[0]
+
+
 class _ITU618():
     """
     Propagation data and prediction methods required for the design of
@@ -104,11 +121,14 @@ class _ITU618():
         return np.array(fcn(lat, lon, f, el, hs, p, R001, tau, Ls).tolist())
 
     def rain_attenuation_probability(self, lat, lon, el, Ls, P0=None):
-        return self.instance.rain_attenuation_probability(lat, lon, el, Ls, P0)
+        fcn = np.vectorize(self.instance.rain_attenuation_probability,
+                           excluded=[0, 1, 2], otypes=[np.ndarray])
+        return np.array(fcn(lat, lon, el, Ls, P0).tolist())
 
     def rain_cross_polarization_discrimination(self, Ap, f, el, p, tau):
-        return self.instance.rain_cross_polarization_discrimination(Ap, f, el,
-                                                                    p, tau)
+        fcn = np.vectorize(
+            self.instance.rain_cross_polarization_discrimination)
+        return fcn(Ap, f, el, p, tau)
 
     def scintillation_attenuation(self, lat, lon, f, el, p, D, eta,
                                   T, H, P, hL):
@@ -117,21 +137,25 @@ class _ITU618():
         return np.array(fcn(lat, lon, f, el, p, D, eta, T, H, P, hL).tolist())
 
     def fit_rain_attenuation_to_lognormal(self, lat, lon, f, el, hs, P_k, tau):
-        return self.instance.fit_rain_attenuation_to_lognormal(
-                lat, lon, f, el, hs, P_k, tau)
+        fcn = np.vectorize(self.instance.fit_rain_attenuation_to_lognormal)
+        return fcn(lat, lon, f, el, hs, P_k, tau)
 
     def site_diversity_rain_outage_probability(self, lat1, lon1, a1, el1,
                                                lat2, lon2, a2, el2, f, tau=45,
                                                hs1=None, hs2=None):
-        return self.instance.site_diversity_rain_outage_probability(
-                lat1, lon1, a1, el1, lat2, lon2, a2, el2, f, tau, hs1, hs2)
+        fcn = np.vectorize(
+                self.instance.site_diversity_rain_outage_probability)
+        return np.array(fcn(lat1, lon1, a1, el1,
+                            lat2, lon2, a2, el2,
+                            f, tau, hs1, hs2).tolist())
 
 
 class _ITU618_13():
 
     def __init__(self):
-        self.__version__ = 12
+        self.__version__ = 13
 
+    @classmethod
     def rain_attenuation(self, lat, lon, f, el, hs=None, p=0.01, R001=None,
                          tau=45, Ls=None):
         if np.logical_or(p < 0.001, p > 5).any():
@@ -214,22 +238,7 @@ class _ITU618_13():
 
         return A
 
-    def CDF_bivariate_normal(self, alpha_x, alpha_y, rho):
-        # This function calculates the complementary bivariate normal
-        # distribution with limits alpha_x, alpha_y and correlation factor rho
-        def CDF_bivariate_normal_fcn(x, y, rho):
-            return np.exp(- (x**2 - 2 * rho * x * y + y**2) /
-                          (2. * (1 - rho**2)))
-
-        def CDF_bivariate_normal_int(alpha, y, rho):
-            return scipy.integrate.quad(
-                CDF_bivariate_normal_fcn, alpha, np.inf, args=(y, rho))[0]
-
-        return 1 / (2 * np.pi * np.sqrt(1 - rho**2)) * scipy.integrate.quad(
-            lambda y: CDF_bivariate_normal_int(alpha_x, y, rho),
-            alpha_y,
-            np.inf)[0]
-
+    @classmethod
     def rain_attenuation_probability(self, lat, lon, el, hs=None,
                                      Ls=None, P0=None):
         Re = 8500
@@ -260,13 +269,15 @@ class _ITU618_13():
         rho = 0.59 * np.exp(-abs(d) / 31) + 0.41 * np.exp(-abs(d) / 800)
 
         # Step 4: Calculate the complementary bivariate normal distribution
-        c_B = self.CDF_bivariate_normal(alpha, alpha, rho)
+        biva_fcn = np.vectorize(__CDF_bivariate_normal__)
+        c_B = biva_fcn(alpha, alpha, rho)
 
         # Step 5: Calculate the probability of rain attenuation on the slant
         # path:
         P = 1 - (1 - P0) * ((c_B - P0**2) / (P0 * (1 - P0)))**P0
         return P
 
+    @classmethod
     def fit_rain_attenuation_to_lognormal(self, lat, lon, f, el, hs, P_k, tau):
         # Performs the log-normal fit of rain attenuation vs. probability of
         # occurrence for a particular path
@@ -277,6 +288,7 @@ class _ITU618_13():
                         0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10])
         Pi = np.array([p for p in p_i if p < P_k], dtype=np.float)
         Ai = np.array([0 for p in p_i if p < P_k], dtype=np.float)
+
         for i, p in enumerate(Pi):
             Ai[i] = self.rain_attenuation(lat, lon, f, el, hs, p, tau=tau)
 
@@ -292,6 +304,7 @@ class _ITU618_13():
 
         return sigma_lna, m_lna
 
+    @classmethod
     def site_diversity_rain_outage_probability(self, lat1, lon1, a1, lat2,
                                                lon2, a2, f, el1, el2, tau=45,
                                                hs1=None, hs2=None):
@@ -311,7 +324,8 @@ class _ITU618_13():
 
         R_1 = stats.norm.ppf(1 - P_1)
         R_2 = stats.norm.ppf(1 - P_2)
-        P_r = self.CDF_bivariate_normal(R_1, R_2, rho_r)
+        biva_fcn = np.vectorize(__CDF_bivariate_normal__)
+        P_r = biva_fcn(R_1, R_2, rho_r)
 
         sigma_lna1, m_lna1 = self.fit_rain_attenuation_to_lognormal(
             lat1, lon1, f, el1, hs1, P_1 * 100, tau)
@@ -323,10 +337,11 @@ class _ITU618_13():
         lim_1 = (np.log(a1) - m_lna1) / sigma_lna1
         lim_2 = (np.log(a2) - m_lna2) / sigma_lna2
 
-        P_a = self.CDF_bivariate_normal(lim_1, lim_2, rho_a)
+        P_a = biva_fcn(lim_1, lim_2, rho_a)
 
         return 100 * P_r * P_a
 
+    @classmethod
     def rain_cross_polarization_discrimination(self, Ap, f, el, p, tau):
         # Frequency reuse by means of orthogonal polarizations is often used to
         # increase the capacity of space telecommunication systems. This
@@ -416,6 +431,7 @@ class _ITU618_13():
               (f * np.sqrt(1 - 0.484 * (1 - np.cos(np.deg2rad(4 * tau))))))
         return XPD_p
 
+    @classmethod
     def scintillation_attenuation(self, lat, lon, f, el, p, D, eta=0.5, T=None,
                                   H=None, P=None, hL=1000):
         # Step 1: For the value of t, calculate the saturation water vapour
@@ -468,6 +484,7 @@ class _ITU618_12():
     def __init__(self):
         self.__version__ = 12
 
+    @classmethod
     def rain_attenuation(self, lat, lon, f, el, hs=None, p=0.01, R001=None,
                          tau=45, Ls=None):
 
@@ -551,259 +568,27 @@ class _ITU618_12():
 
         return A
 
-    def CDF_bivariate_normal(self, alpha_x, alpha_y, rho):
-        # This function calculates the complementary bivariate normal
-        # distribution with limits alpha_x, alpha_y and correlation factor rho
-        def CDF_bivariate_normal_fcn(x, y, rho):
-            return np.exp(- (x**2 - 2 * rho * x * y + y**2) /
-                          (2. * (1 - rho**2)))
+    @classmethod
+    def rain_attenuation_probability(self, *args, **kwargs):
+        return _ITU618_13.rain_attenuation_probability(*args, **kwargs)
 
-        def CDF_bivariate_normal_int(alpha, y, rho):
-            return scipy.integrate.quad(
-                CDF_bivariate_normal_fcn, alpha, np.inf, args=(y, rho))[0]
+    @classmethod
+    def fit_rain_attenuation_to_lognormal(self, *args, **kwargs):
+        return _ITU618_13.fit_rain_attenuation_to_lognormal(*args, **kwargs)
 
-        return 1 / (2 * np.pi * np.sqrt(1 - rho**2)) * scipy.integrate.quad(
-            lambda y: CDF_bivariate_normal_int(alpha_x, y, rho),
-            alpha_y,
-            np.inf)[0]
+    @classmethod
+    def site_diversity_rain_outage_probability(self, *args, **kwargs):
+        return _ITU618_13.site_diversity_rain_outage_probability(*args,
+                                                                 **kwargs)
 
-    def rain_attenuation_probability(self, lat, lon, el, hs=None,
-                                     Ls=None, P0=None):
-        Re = 8500
-        if hs is None:
-            hs = topographic_altitude(lat, lon).to(u.km).value
+    @classmethod
+    def rain_cross_polarization_discrimination(self, *args, **kwargs):
+        return _ITU618_13.rain_cross_polarization_discrimination(*args,
+                                                                 **kwargs)
 
-        # Step 1: Estimate the probability of rain, at the earth station either
-        # from Recommendation ITU-R P.837 or from local measured rainfall
-        # rate data
-        if P0 is None:
-            P0 = rainfall_probability(lat, lon).\
-                to(u.dimensionless_unscaled).value
-
-        # Step 2: Calculate the parameter alpha using the inverse of the
-        # Q-function alpha = Q^{-1}(P0)  -> Q(alpha) = P0
-        alpha = stats.norm.ppf(1 - P0)
-
-        # Step 3: Calculate the spatial correlation function, rho:
-        hr = rain_height(lat, lon).value
-
-        if Ls is None:
-            Ls = np.where(
-                el >= 5, (hr - hs) / (np.sin(np.deg2rad(el))),    # Eq. 1
-                2 * (hr - hs) / (((np.sin(np.deg2rad(el)))**2 +
-                2 * (hr - hs) / Re)**0.5 + (np.sin(np.deg2rad(el)))))  # Eq. 2
-
-        d = Ls * np.cos(np.deg2rad(el))
-        rho = 0.59 * np.exp(-abs(d) / 31) + 0.41 * np.exp(-abs(d) / 800)
-
-        # Step 4: Calculate the complementary bivariate normal distribution
-        c_B = self.CDF_bivariate_normal(alpha, alpha, rho)
-
-        # Step 5: Calculate the probability of rain attenuation on the slant
-        # path:
-        P = 1 - (1 - P0) * ((c_B - P0**2) / (P0 * (1 - P0)))**P0
-        return P
-
-    def fit_rain_attenuation_to_lognormal(self, lat, lon, f, el, hs, P_k, tau):
-        # Performs the log-normal fit of rain attenuation vs. probability of
-        # occurrence for a particular path
-
-        # Step 1: Construct the set of pairs [Pi, Ai] where Pi (% of time) is
-        # the probability the attenuation Ai (dB) is exceeded where Pi < P_K
-        p_i = np.array([0.001, 0.002, 0.003, 0.005, 0.01, 0.02, 0.03, 0.05,
-                        0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10])
-        Pi = np.array([p for p in p_i if p < P_k], dtype=np.float)
-        Ai = np.array([0 for p in p_i if p < P_k], dtype=np.float)
-        for i, p in enumerate(Pi):
-            Ai[i] = self.rain_attenuation(lat, lon, f, el, hs, p)
-
-        # Step 2: Transform the set of pairs [Pi, Ai] to [Q^{-1}(Pi/P_k),
-        # ln(Ai)]
-        Q = stats.norm.ppf(1 - (Pi / P_k))
-        lnA = np.log(Ai)
-
-        # Step 3: Determine the variables sigma_lna, m_lna by performing a
-        # least-squares fit to lnAi = sigma_lna Q^{-1}(Pi/P_k) + m_lna
-        sigma_lna, m_lna = np.linalg.lstsq(np.vstack([Q, np.ones(len(Q))]).T,
-                                           lnA)[0]
-
-        return sigma_lna, m_lna
-
-    def site_diversity_rain_outage_probability(self, lat1, lon1, a1, lat2,
-                                               lon2, a2, f, el1, el2, tau=45,
-                                               hs1=None, hs2=None):
-        # The diversity prediction method assumes a log-normal distribution of
-        # rain intensity and rain attenuation. This method predicts
-        # Pr(A1 > a1, A2 > a2), the joint probability (%) that the attenuation
-        # on the path to the first site is greater than a1 and the attenuation
-        # on the path to the second site is greater than a2.
-        d = compute_distance_earth_to_earth(lat1, lon1, lat2, lon2)
-        rho_r = 0.7 * np.exp(-d / 60) + 0.3 * np.exp(-(d / 700)**2)
-
-        P_1 = rainfall_probability(lat1, lon1).\
-            to(u.dimensionless_unscaled).value
-
-        P_2 = rainfall_probability(lat2, lon2).\
-            to(u.dimensionless_unscaled).value
-
-        R_1 = stats.norm.ppf(1 - P_1)
-        R_2 = stats.norm.ppf(1 - P_2)
-        P_r = self.CDF_bivariate_normal(R_1, R_2, rho_r)
-
-        sigma_lna1, m_lna1 = self.fit_rain_attenuation_to_lognormal(
-            lat1, lon1, f, el1, hs1, P_1 * 100, tau)
-
-        sigma_lna2, m_lna2 = self.fit_rain_attenuation_to_lognormal(
-            lat2, lon2, f, el2, hs1, P_2 * 100, tau)
-
-        rho_a = 0.94 * np.exp(-d / 30) + 0.06 * np.exp(-(d / 500)**2)
-        lim_1 = (np.log(a1) - m_lna1) / sigma_lna1
-        lim_2 = (np.log(a2) - m_lna2) / sigma_lna2
-
-        P_a = self.CDF_bivariate_normal(lim_1, lim_2, rho_a)
-
-        return 100 * P_r * P_a
-
-    def rain_cross_polarization_discrimination(self, Ap, f, el, p, tau):
-        # Frequency reuse by means of orthogonal polarizations is often used to
-        # increase the capacity of space telecommunication systems. This
-        # technique is restricted, however, by depolarization on atmospheric
-        # propagation paths. Various depolarization mechanisms, especially
-        # hydrometeor effects, are important in the troposphere
-
-        # The method described below to calculate cross-polarization
-        # discrimination (XPD) statistics from rain attenuation statistics for
-        # the same path is valid for 6 < f < 55 GHz and el < 60°.
-        if f < 4 or f > 55:
-            warnings.warn(
-                RuntimeWarning(
-                    'The method to compute the cross '
-                    'polarization discrimination in recommendation '
-                    'ITU-P 618-12 is only valid for frequency values between'
-                    ' 4 and 55 GHz'))
-
-        if el > 60:
-            warnings.warn(
-                RuntimeWarning(
-                    'The method to compute thecross '
-                    'polarization discrimination in recommendation ITU-P '
-                    '618-12 is only valid for elevation angle values below '
-                    '60 degrees'))
-
-        # In case that the frequency is comprised between 4 and 6 GHz, scaling
-        # is necessary
-        scale_to_orig_f = False
-        if 4 <= f < 6:
-            f_orig = f
-            f = 6
-            scale_to_orig_f = True
-
-        # Step 1: Calculate the frequency-dependent term:
-        if 6 <= f < 9:
-            C_f = 60 * np.log10(f) - 28.3
-        elif 9 <= f < 36:
-            C_f = 26 * np.log10(f) + 4.1
-        elif 36 <= f <= 55:
-            C_f = 35.9 * np.log10(f) - 11.3
-
-        # Step 2: Calculate the rain attenuation dependent term:
-        if 6 <= f < 9:
-            V = 30.8 * f**-0.21
-        elif 9 <= f < 20:
-            V = 12.8 * f**0.19
-        elif 20 <= f < 40:
-            V = 22.6
-        elif 40 <= f <= 55:
-            V = 13.0 * f**0.15
-
-        C_a = V * np.log10(Ap)
-
-        # Step 3: Calculate the polarization improvement factor:
-        C_tau = -10 * np.log10(1 - 0.484 * (1 + np.cos(np.deg2rad(4 * tau))))
-
-        # Step 4: Calculate the elevation angle-dependent term:
-        C_theta = -40 * np.log10(np.cos(np.deg2rad(el)))
-
-        # Step 5: Calculate the canting angle dependent term:
-        if p <= 0.001:
-            C_sigma = 0.0053 * 15**2
-        elif p <= 0.01:
-            C_sigma = 0.0053 * 10**2
-        elif p <= 0.1:
-            C_sigma = 0.0053 * 5**2
-        else:
-            C_sigma = 0
-
-        # Step 6: Calculate rain XPD not exceeded for p% of the time:
-        XPD_rain = C_f - C_a + C_tau + C_theta + C_sigma
-
-        # Step 7: Calculate the ice crystal dependent term:
-        C_ice = XPD_rain * (0.3 + 0.1 * np.log10(p)) / 2
-
-        # Step 8: Calculate the XPD not exceeded for p% of the time,
-        # including the effects of ice:
-        XPD_p = XPD_rain - C_ice
-
-        if scale_to_orig_f:
-            # Long-term XPD statistics obtained at one frequency and
-            # polarization tilt angle can be scaled to another frequency and
-            # polarization tilt angle using the semi-empirical formula:
-            XPD_p = XPD_p - 20 * np.log10(
-              f_orig * np.sqrt(1 - 0.484 * (1 - np.cos(np.deg2rad(4 * tau)))) /
-              (f * np.sqrt(1 - 0.484 * (1 - np.cos(np.deg2rad(4 * tau))))))
-        return XPD_p
-
-    def scintillation_attenuation(self, lat, lon, f, el, p, D, eta=0.5, T=None,
-                                  H=None, P=None, hL=1000):
-        # Step 1: For the value of t, calculate the saturation water vapour
-        # pressure, es, (hPa), as specified in Recommendation ITU-R P.453.
-        if T is not None and H is not None and P is not None:
-            e = water_vapour_pressure(T, P, H).value
-
-            # Step 2: Compute the wet term of the radio refractivity, Nwet,
-            # corresponding to es, t and H as given in Recommendation ITU-R
-            # P.453.
-            N_wet = wet_term_radio_refractivity(e, T).value
-        else:
-            N_wet = map_wet_term_radio_refractivity(lat, lon).value
-
-        # Step 3: Calculate the standard deviation of the reference signal
-        # amplitude:
-        sigma_ref = 3.6e-3 + 1e-4 * N_wet  # Eq. 43   [dB]
-
-        # Step 4: Calculate the effective path length L:
-        L = 2 * hL / (np.sqrt(np.sin(np.deg2rad(el))**2 + 2.35e-4) +
-                      np.sin(np.deg2rad(el)))  # Eq. 44   [m]
-
-        # Step 5: Estimate the effective antenna diameter, Deff
-        D_eff = np.sqrt(eta) * D  # Eq. 45   [m]
-
-        # Step 6: Step 6: Calculate the antenna averaging factor
-        x = 1.22 * D_eff**2 * f / L
-        g = np.where(x >= 7.0, 0, np.sqrt(3.86 *
-                                          (x**2 +
-                                           1)**(11. /
-                                                12) *
-                                          np.sin(11. /
-                                                 6 *
-                                                 np.arctan2(1, x)) -
-                                          7.08 *
-                                          x**(5. /
-                                              6)))  # Eq. 46    [-]
-
-        # Step 7: Calculate the standard deviation of the signal for the
-        # applicable period and propagation path:
-        sigma = sigma_ref * f**(7. / 12) * g / np.sin(np.deg2rad(el))**1.2
-
-        # Step 8: Calculate the time percentage factor, a(p), for the time
-        # percentage, p, in the range between 0.01% < p < 50%:
-        a = -0.061 * np.log10(p)**3 + 0.072 * \
-            np.log10(p)**2 - 1.71 * np.log10(p) + 3
-
-        # Step 9: Calculate the fade depth, A(p), exceeded for p% of the time:
-        A_s = a * sigma  # Eq. 49   [dB]
-
-        return A_s
+    @classmethod
+    def scintillation_attenuation(self, *args, **kwargs):
+        return _ITU618_13.scintillation_attenuation(*args, **kwargs)
 
 
 __model = _ITU618()
@@ -1034,9 +819,9 @@ def site_diversity_rain_outage_probability(lat1, lon1, a1, el1, lat2,
     el1 = prepare_quantity(el1, u.deg, 'Elevation angle in ground station 1')
     el2 = prepare_quantity(el2, u.deg, 'Elevation angle in ground station 2')
     hs1 = prepare_quantity(
-        hs1, u.deg, 'Altitude over the sea level for ground station 1')
+        hs1, u.km, 'Altitude over the sea level for ground station 1')
     hs2 = prepare_quantity(
-        hs2, u.deg, 'Altitude over the sea level for ground station 2')
+        hs2, u.km, 'Altitude over the sea level for ground station 2')
 
     val = __model.site_diversity_rain_outage_probability(
         lat1, lon1, a1, lat2, lon2, a2, f, el1, el2, tau=tau, hs1=hs1, hs2=hs2)
