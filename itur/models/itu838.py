@@ -118,6 +118,7 @@ class _ITU838_2():
         self.month = 4
         self.link = 'https://www.itu.int/rec/R-REC-P.838-2-200304-S/en'
 
+    @classmethod
     def rain_specific_attenuation_coefficients(self, f, el, tau):
         """
 
@@ -163,7 +164,8 @@ class _ITU838_2():
              * np.cos(np.deg2rad(2 * tau))) / 2.0
 
         alpha = (KH * alphaH + KV * alphaV + (KH * alphaH - KV * alphaV) *
-                 np.cos(np.deg2rad(el))**2 * np.cos(np.deg2rad(2 * tau))) / (2.0 * k)
+                 np.cos(np.deg2rad(el))**2 *
+                 np.cos(np.deg2rad(2 * tau))) / (2.0 * k)
 
         return k, alpha
 
@@ -176,6 +178,7 @@ class _ITU838_1():
         self.month = 10
         self.link = 'https://www.itu.int/rec/R-REC-P.838-1-199910-S/en'
 
+    @classmethod
     def rain_specific_attenuation_coefficients(self, f, el, tau):
         """
         The frequency-dependent coefficients k and α are given in Table 1 for
@@ -194,61 +197,15 @@ class _ITU838_1():
                0.0188, 0.0367, 0.0751, 0.124, 0.187, 0.263, 0.35, 0.442, 0.536,
                0.707, 0.851, 0.975, 1.06, 1.12, 1.18, 1.31, 1.45, 1.36, 1.32]
 
-        _kV = [
-            0.0000352,
-            0.000138,
-            0.000591,
-            0.00155,
-            0.00265,
-            0.00395,
-            0.00887,
-            0.0168,
-            0.0335,
-            0.0691,
-            0.113,
-            0.167,
-            0.233,
-            0.31,
-            0.393,
-            0.479,
-            0.642,
-            0.784,
-            0.906,
-            0.999,
-            1.06,
-            1.13,
-            1.27,
-            1.42,
-            1.35,
-            1.31]
+        _kV = [0.0000352, 0.000138, 0.000591, 0.00155, 0.00265, 0.00395,
+               0.00887, 0.0168, 0.0335, 0.0691, 0.113, 0.167, 0.233, 0.31,
+               0.393, 0.479, 0.642, 0.784, 0.906, 0.999, 1.06, 1.13, 1.27,
+               1.42, 1.35, 1.31]
 
-        _alphaH = [
-            0.912,
-            0.963,
-            1.121,
-            1.308,
-            1.332,
-            1.327,
-            1.276,
-            1.217,
-            1.154,
-            1.099,
-            1.061,
-            1.021,
-            0.979,
-            0.939,
-            0.903,
-            0.873,
-            0.826,
-            0.793,
-            0.769,
-            0.753,
-            0.743,
-            0.731,
-            0.71,
-            0.689,
-            0.688,
-            0.683]
+        _alphaH = [0.912, 0.963, 1.121, 1.308, 1.332, 1.327, 1.276, 1.217,
+                   1.154, 1.099, 1.061, 1.021, 0.979, 0.939, 0.903, 0.873,
+                   0.826, 0.793, 0.769, 0.753, 0.743, 0.731, 0.71, 0.689,
+                   0.688, 0.683]
 
         _alphaV = [0.88, 0.923, 1.075, 1.265, 1.312, 1.31, 1.264, 1.2, 1.128,
                    1.065, 1.03, 1, 0.963, 0.929, 0.897, 0.868, 0.824, 0.793,
@@ -259,11 +216,12 @@ class _ITU838_1():
         alphaH = np.interp(np.log(f), np.log(_f), _alphaH)
         alphaV = np.interp(np.log(f), np.log(_f), _alphaV)
 
-        k = (KH + KV + (KH - KV) * np.cos(np.deg2rad(el))**2
-             * np.cos(np.deg2rad(2 * tau))) / 2.0
+        k = (KH + KV + (KH - KV) * np.cos(np.deg2rad(el))**2 *
+             np.cos(np.deg2rad(2 * tau))) / 2.0
 
         alpha = (KH * alphaH + KV * alphaV + (KH * alphaH - KV * alphaV) *
-                 np.cos(np.deg2rad(el))**2 * np.cos(np.deg2rad(2 * tau))) / (2.0 * k)
+                 np.cos(np.deg2rad(el))**2 *
+                 np.cos(np.deg2rad(2 * tau))) / (2.0 * k)
 
         return k, alpha
 
@@ -276,96 +234,9 @@ class _ITU838_0():
         self.month = 8
         self.link = 'https://www.itu.int/rec/R-REC-P.838-0-199203-S/en'
 
-    def rain_specific_attenuation_coefficients(self, f, el, tau):
-        """
-        The frequency-dependent coefficients k and α are given in Table 1 for
-        linear polarizations (horizontal: H, vertical: V) and horizontal paths.
-        Values of k and α at frequencies other than those in Table 1 can be
-        obtained by interpolator using a logarithmic scale for frequency,
-        a logarithmic scale for k and a linear scale for α.
-
-        The values in Table 1 have been tested and found to be sufficiently
-        accurate for attenuation predictions up to frequencies of 55 GHz.
-        """
-        _f = [1, 2, 4, 6, 7, 8, 10, 12, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70,
-              80, 90, 100, 120, 150, 200, 300, 400]
-
-        _kH = [0.0000387, 0.000154, 0.00065, 0.00175, 0.00301, 0.00454, 0.0101,
-               0.0188, 0.0367, 0.0751, 0.124, 0.187, 0.263, 0.35, 0.442, 0.536,
-               0.707, 0.851, 0.975, 1.06, 1.12, 1.18, 1.31, 1.45, 1.36, 1.32]
-
-        _kV = [
-            0.0000352,
-            0.000138,
-            0.000591,
-            0.00155,
-            0.00265,
-            0.00395,
-            0.00887,
-            0.0168,
-            0.0335,
-            0.0691,
-            0.113,
-            0.167,
-            0.233,
-            0.31,
-            0.393,
-            0.479,
-            0.642,
-            0.784,
-            0.906,
-            0.999,
-            1.06,
-            1.13,
-            1.27,
-            1.42,
-            1.35,
-            1.31]
-
-        _alphaH = [
-            0.912,
-            0.963,
-            1.121,
-            1.308,
-            1.332,
-            1.327,
-            1.276,
-            1.217,
-            1.154,
-            1.099,
-            1.061,
-            1.021,
-            0.979,
-            0.939,
-            0.903,
-            0.873,
-            0.826,
-            0.793,
-            0.769,
-            0.753,
-            0.743,
-            0.731,
-            0.71,
-            0.689,
-            0.688,
-            0.683]
-
-        _alphaV = [0.88, 0.923, 1.075, 1.265, 1.312, 1.31, 1.264, 1.2, 1.128,
-                   1.065, 1.03, 1, 0.963, 0.929, 0.897, 0.868, 0.824, 0.793,
-                   0.769, 0.754, 0.744, 0.732, 0.711, 0.69, 0.689, 0.684]
-
-        KH = np.exp(np.interp(np.log(f), np.log(_f), np.log(_kH)))
-        KV = np.exp(np.interp(np.log(f), np.log(_f), np.log(_kV)))
-        alphaH = np.interp(np.log(f), np.log(_f), _alphaH)
-        alphaV = np.interp(np.log(f), np.log(_f), _alphaV)
-
-        k = (KH + KV + (KH - KV) * np.cos(np.deg2rad(el))**2
-             * np.cos(np.deg2rad(2 * tau))) / 2.0
-
-        alpha = (KH * alphaH + KV * alphaV + (KH * alphaH - KV * alphaV) *
-                 np.cos(np.deg2rad(el))**2 * np.cos(np.deg2rad(2 * tau))) / (2.0 * k)
-
-        return k, alpha
+    def rain_specific_attenuation_coefficients(self, *args, **kwargs):
+        return _ITU838_1.rain_specific_attenuation_coefficients(*args,
+                                                                **kwargs)
 
 
 __model = __ITU838()

@@ -18,6 +18,69 @@ from itur.utils import prepare_quantity, prepare_output_array,\
     prepare_input_array, load_data, dataset_dir, memory
 
 
+def __gamma0_exact__676_9_11__(self, f, p, rho, T):
+    # T in Kelvin
+    # e : water vapour partial pressure in hPa (total barometric pressure
+    # ptot = p + e)
+    theta = 300 / T
+    e = rho * T / 216.7
+
+    f_ox = self.f_ox
+
+    D_f_ox = self.a3 * 1e-4 * (p * (theta ** (0.8 - self.a4)) +
+                               1.1 * e * theta)
+
+    delta_ox = (self.a5 + self.a6 * theta) * 1e-4 * (p + e) * theta**0.8
+
+    F_i_ox = f / f_ox * ((D_f_ox - delta_ox * (f_ox - f)) /
+                         ((f_ox - f) ** 2 + D_f_ox ** 2) +
+                         (D_f_ox - delta_ox * (f_ox + f)) /
+                         ((f_ox + f) ** 2 + D_f_ox ** 2))
+
+    Si_ox = self.a1 * 1e-7 * p * theta**3 * np.exp(self.a2 * (1 - theta))
+
+    N_pp_ox = Si_ox * F_i_ox
+
+    d = 5.6e-4 * (p + e) * theta**0.8
+
+    N_d_pp = f * p * theta**2 * \
+        (6.14e-5 / (d * (1 + (f / d)**2)) +
+         1.4e-12 * p * theta**1.5 / (1 + 1.9e-5 * f**1.5))
+
+    N_pp = N_pp_ox.sum() + N_d_pp
+
+    gamma = 0.1820 * f * N_pp           # Eq. 1 [dB/km]
+    return gamma
+
+
+def __gammaw_exact__676_9_11__(self, f, p, rho, T):
+    # T in Kelvin
+    # e : water vapour partial pressure in hPa (total barometric pressure
+    # ptot = p + e)
+    theta = 300 / T
+    e = rho * T / 216.7
+
+    f_wv = self.f_wv
+
+    D_f_wv = self.b3 * 1e-4 * (p * theta ** self.b4 +
+                               self.b5 * e * theta ** self.b6)
+
+    D_f_wv = 0.535 * D_f_wv + \
+        np.sqrt(0.217 * D_f_wv**2 + 2.1316e-12 * f_wv**2 / theta)
+
+    F_i_wv = f / f_wv * ((D_f_wv) / ((f_wv - f)**2 + D_f_wv**2) +
+                         (D_f_wv) / ((f_wv + f)**2 + D_f_wv**2))
+
+    Si_wv = self.b1 * 1e-1 * e * theta**3.5 * np.exp(self.b2 * (1 - theta))
+
+    N_pp_wv = Si_wv * F_i_wv
+
+    N_pp = N_pp_wv.sum()
+
+    gamma = 0.1820 * f * N_pp           # Eq. 1 [dB/km]
+    return gamma
+
+
 class __ITU676():
     """Attenuation by atmospheric gases.
 
@@ -220,67 +283,11 @@ class _ITU676_11():
 
     @classmethod
     def gamma0_exact(self, f, p, rho, T):
-        # T in Kelvin
-        # e : water vapour partial pressure in hPa (total barometric pressure
-        # ptot = p + e)
-        theta = 300 / T
-        e = rho * T / 216.7
-
-        f_ox = self.f_ox
-
-        D_f_ox = self.a3 * 1e-4 * (p * (theta ** (0.8 - self.a4)) +
-                                   1.1 * e * theta)
-
-        D_f_ox = np.sqrt(D_f_ox**2 + 2.25e-6)
-        delta_ox = (self.a5 + self.a6 * theta) * 1e-4 * (p + e) * theta**0.8
-
-        F_i_ox = f / f_ox * ((D_f_ox - delta_ox * (f_ox - f)) /
-                             ((f_ox - f) ** 2 + D_f_ox ** 2) +
-                             (D_f_ox - delta_ox * (f_ox + f)) /
-                             ((f_ox + f) ** 2 + D_f_ox ** 2))
-
-        Si_ox = self.a1 * 1e-7 * p * theta**3 * np.exp(self.a2 * (1 - theta))
-
-        N_pp_ox = Si_ox * F_i_ox
-
-        d = 5.6e-4 * (p + e) * theta**0.8
-
-        N_d_pp = f * p * theta**2 * \
-            (6.14e-5 / (d * (1 + (f / d)**2)) +
-             1.4e-12 * p * theta**1.5 / (1 + 1.9e-5 * f**1.5))
-
-        N_pp = N_pp_ox.sum() + N_d_pp
-
-        gamma = 0.1820 * f * N_pp           # Eq. 1 [dB/km]
-        return gamma
+        return __gamma0_exact__676_9_11__(self, f, p, rho, T)
 
     @classmethod
     def gammaw_exact(self, f, p, rho, T):
-        # T in Kelvin
-        # e : water vapour partial pressure in hPa (total barometric pressure
-        # ptot = p + e)
-        theta = 300 / T
-        e = rho * T / 216.7
-
-        f_wv = self.f_wv
-
-        D_f_wv = self.b3 * 1e-4 * (p * theta ** self.b4 +
-                                   self.b5 * e * theta ** self.b6)
-
-        D_f_wv = 0.535 * D_f_wv + \
-            np.sqrt(0.217 * D_f_wv**2 + 2.1316e-12 * f_wv**2 / theta)
-
-        F_i_wv = f / f_wv * ((D_f_wv) / ((f_wv - f)**2 + D_f_wv**2) +
-                             (D_f_wv) / ((f_wv + f)**2 + D_f_wv**2))
-
-        Si_wv = self.b1 * 1e-1 * e * theta**3.5 * np.exp(self.b2 * (1 - theta))
-
-        N_pp_wv = Si_wv * F_i_wv
-
-        N_pp = N_pp_wv.sum()
-
-        gamma = 0.1820 * f * N_pp           # Eq. 1 [dB/km]
-        return gamma
+        return __gammaw_exact__676_9_11__(self, f, p, rho, T)
 
     @classmethod
     def gamma_exact(self, f, p, rho, T):
@@ -616,115 +623,16 @@ class _ITU676_10():
 
     @classmethod
     def gamma0_exact(self, f, p, rho, T):
-        # T in Kelvin
-        # e : water vapour partial pressure in hPa (total barometric pressure
-        # ptot = p + e)
-        theta = 300 / T
-        e = rho * T / 216.7
-
-        f_ox = self.f_ox
-
-        D_f_ox = self.a3 * 1e-4 * (p * (theta ** (0.8 - self.a4)) +
-                                   1.1 * e * theta)
-
-        D_f_ox = np.sqrt(D_f_ox**2 + 2.25e-6)
-
-        delta_ox = (self.a5 + self.a6 * theta) * 1e-4 * (p + e) * theta**0.8
-
-        F_i_ox = f / f_ox * ((D_f_ox - delta_ox * (f_ox - f)) /
-                             ((f_ox - f) ** 2 + D_f_ox ** 2) +
-                             (D_f_ox - delta_ox * (f_ox + f)) /
-                             ((f_ox + f) ** 2 + D_f_ox ** 2))
-
-        Si_ox = self.a1 * 1e-7 * p * theta**3 * np.exp(self.a2 * (1 - theta))
-
-        N_pp_ox = Si_ox * F_i_ox
-
-        d = 5.6e-4 * (p + e) * theta**0.8
-
-        N_d_pp = f * p * theta**2 * \
-            (6.14e-5 / (d * (1 + (f / d)**2)) +
-             1.4e-12 * p * theta**1.5 / (1 + 1.9e-5 * f**1.5))
-
-        N_pp = N_pp_ox.sum() + N_d_pp
-
-        gamma = 0.1820 * f * N_pp           # Eq. 1 [dB/km]
-        return gamma
+        return __gamma0_exact__676_9_11__(self, f, p, rho, T)
 
     @classmethod
     def gammaw_exact(self, f, p, rho, T):
-        # T in Kelvin
-        # e : water vapour partial pressure in hPa (total barometric pressure
-        # ptot = p + e)
-        theta = 300 / T
-        e = rho * T / 216.7
-
-        f_wv = self.f_wv
-
-        D_f_wv = self.b3 * 1e-4 * (p * (theta ** self.b4) +
-                                   self.b5 * e * theta ** self.b6)
-
-        D_f_wv = 0.535 * D_f_wv + \
-            np.sqrt(0.217 * D_f_wv**2 + 2.1316e-12 * f_wv**2 / theta)
-
-        F_i_wv = f / f_wv * ((D_f_wv) / ((f_wv - f)**2 + D_f_wv**2) +
-                             (D_f_wv) / ((f_wv + f)**2 + D_f_wv**2))
-
-        Si_wv = self.b1 * 1e-1 * e * theta**3.5 * np.exp(self.b2 * (1 - theta))
-
-        N_pp_wv = Si_wv * F_i_wv
-
-        N_pp = N_pp_wv.sum()
-
-        gamma = 0.1820 * f * N_pp           # Eq. 1 [dB/km]
-        return gamma
+        return __gammaw_exact__676_9_11__(self, f, p, rho, T)
 
     @classmethod
     def gamma_exact(self, f, p, rho, T):
-        # T in Kelvin
-        # e : water vapour partial pressure in hPa (total barometric pressure
-        # ptot = p + e)
-        theta = 300 / T
-        e = rho * T / 216.7
-
-        f_ox = self.f_ox
-        f_wv = self.f_wv
-
-        D_f_ox = self.a3 * 1e-4 * (p * (theta ** (0.8 - self.a4)) +
-                                   1.1 * e * theta)
-        D_f_wv = self.b3 * 1e-4 * (p * (theta ** self.b4) +
-                                   self.b5 * e * theta ** self.b6)
-
-        D_f_ox = np.sqrt(D_f_ox**2 + 2.25e-6)
-        D_f_wv = 0.535 * D_f_wv + \
-            np.sqrt(0.217 * D_f_wv**2 + 2.1316e-12 * f_wv**2 / theta)
-
-        delta_ox = (self.a5 + self.a6 * theta) * 1e-4 * (p + e) * theta**0.8
-
-        F_i_ox = f / f_ox * ((D_f_ox - delta_ox * (f_ox - f)) /
-                             ((f_ox - f) ** 2 + D_f_ox ** 2) +
-                             (D_f_ox - delta_ox * (f_ox + f)) /
-                             ((f_ox + f) ** 2 + D_f_ox ** 2))
-
-        F_i_wv = f / f_wv * ((D_f_wv) / ((f_wv - f)**2 + D_f_wv**2) +
-                             (D_f_wv) / ((f_wv + f)**2 + D_f_wv**2))
-
-        Si_ox = self.a1 * 1e-7 * p * theta**3 * np.exp(self.a2 * (1 - theta))
-        Si_wv = self.b1 * 1e-1 * e * theta**3.5 * np.exp(self.b2 * (1 - theta))
-
-        N_pp_ox = Si_ox * F_i_ox
-        N_pp_wv = Si_wv * F_i_wv
-
-        d = 5.6e-4 * (p + e) * theta**0.8
-
-        N_d_pp = f * p * theta**2 * \
-            (6.14e-5 / (d * (1 + (f / d)**2)) +
-             1.4e-12 * p * theta**1.5 / (1 + 1.9e-5 * f**1.5))
-
-        N_pp = N_pp_ox.sum() + N_pp_wv.sum() + N_d_pp
-
-        gamma = 0.1820 * f * N_pp           # Eq. 1 [dB/km]
-        return gamma
+        return (self.gamma0_exact(f, p, rho, T) +
+                self.gammaw_exact(f, p, rho, T))
 
     @classmethod
     def gaseous_attenuation_approximation(self, f, el, rho, P, T):
@@ -809,10 +717,10 @@ class _ITU676_10():
                 Aw = self.zenit_water_vapour_attenuation(None, None, None,
                                                          f, V_t, h)
             else:
-                Aw = gammaw * hw / np.sin(np.deg2rad(el))
+                Aw = gammaw * hw
 
-            A0 = gamma0 * h0 / np.sin(np.deg2rad(el))
-            return A0 + Aw
+            A0 = gamma0 * h0
+            return (A0 + Aw) / np.sin(np.deg2rad(el))
 
         else:
             delta_h = 0.0001 * np.exp((np.arange(1, 923) - 1) / 100)
@@ -962,51 +870,15 @@ class _ITU676_9():
     def gaseous_attenuation_slant_path(self, *args, **kwargs):
         return _ITU676_10.gaseous_attenuation_slant_path(*args, **kwargs)
 
-    # The exact gaseous attenuation presents differences between classes.
+    def gamma0_exact(self, f, p, rho, T):
+        return __gamma0_exact__676_9_11__(self, f, p, rho, T)
+
+    def gammaw_exact(self, f, p, rho, T):
+        return __gammaw_exact__676_9_11__(self, f, p, rho, T)
+
     def gamma_exact(self, f, p, rho, T):
-        # T in Kelvin
-        # e : water vapour partial pressure in hPa (total barometric pressure
-        # ptot = p + e)
-        theta = 300 / T
-        e = rho * T / 216.7
-
-        f_ox = self.f_ox
-        f_wv = self.f_wv
-
-        D_f_ox = self.a3 * 1e-4 * (p * (theta ** (0.8 - self.a4)) +
-                                   1.1 * e * theta)
-        D_f_wv = self.b3 * 1e-4 * (p * (theta ** self.b4) +
-                                   self.b5 * e * theta ** self.b6)
-
-        D_f_ox = np.sqrt(D_f_ox**2 + 2.25e-6)
-        D_f_wv = 0.535 * D_f_wv + \
-            np.sqrt(0.217 * D_f_wv**2 + 2.1316e-12 * f_wv**2 / theta)
-
-        delta_ox = (self.a5 + self.a6 * theta) * 1e-4 * (p + e) * theta**0.8
-
-        F_i_ox = f / f_ox * ((D_f_ox - delta_ox * (f_ox - f)) /
-                             ((f_ox - f) ** 2 + D_f_ox ** 2) +
-                             (D_f_ox - delta_ox * (f_ox + f)) /
-                             ((f_ox + f) ** 2 + D_f_ox ** 2))
-
-        F_i_wv = f / f_wv * ((D_f_wv) / ((f_wv - f)**2 + D_f_wv**2) +
-                             (D_f_wv) / ((f_wv + f)**2 + D_f_wv**2))
-
-        Si_ox = self.a1 * 1e-7 * p * theta**3 * np.exp(self.a2 * (1 - theta))
-        Si_wv = self.b1 * 1e-1 * e * theta**3.5 * np.exp(self.b2 * (1 - theta))
-
-        N_pp_ox = Si_ox * F_i_ox
-        N_pp_wv = Si_wv * F_i_wv
-
-        d = 5.6e-4 * (p + e) * theta**0.8
-        N_d_pp = f * p * theta**2 * \
-            (6.14e-5 / (d * (1 + (f / d)**2)) +
-             1.4e-12 * p * theta**1.5 / (1 + 1.9e-5 * f**1.5))
-        N_pp = N_pp_ox.sum() + N_pp_wv.sum() + N_d_pp
-
-        gamma = 0.1820 * f * N_pp           # Eq. 1 [dB/km]
-        return gamma
-
+        return (self.gamma0_exact(f, p, rho, T) +
+                self.gammaw_exact(f, p, rho, T))
 
 __model = __ITU676()
 
