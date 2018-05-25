@@ -143,12 +143,17 @@ class __ITU676():
         fcn = np.vectorize(self.instance.gaseous_attenuation_slant_path)
         return fcn(f, el, rho, P, T, V_t, h, mode)
 
+    def slant_inclined_path_equivalent_height(self, f, p):
+        fcn = np.vectorize(self.instance.slant_inclined_path_equivalent_height,
+                           excluded=[0], otypes=[np.ndarray])
+        return np.array(fcn(f, p).tolist())
+
     def zenit_water_vapour_attenuation(
             self, lat, lon, p, f, V_t=None, h=None):
         # Abstract method to compute the water vapour attenuation over the
         # slant path
         fcn = np.vectorize(self.instance.zenit_water_vapour_attenuation,
-                           excluded=[0, 1], otypes=[np.ndarray])
+                           excluded=[0, 1, 4, 5], otypes=[np.ndarray])
         return np.array(fcn(lat, lon, p, f, V_t, h).tolist())
 
     def gamma_exact(self, f, p, rho, t):
@@ -322,7 +327,7 @@ class _ITU676_11():
         return gamma0, gammaw
 
     @classmethod
-    def slant_inclined_path_coefficients(self, f, p):
+    def slant_inclined_path_equivalent_height(self, f, p):
         """
         """
         rp = p / 1013.25
@@ -370,7 +375,7 @@ class _ITU676_11():
                 f, el, rho, P, T)
 
             e = rho * T / 216.7
-            h0, hw = self.slant_inclined_path_coefficients(f, P + e)
+            h0, hw = self.slant_inclined_path_equivalent_height(f, P + e)
 
             # Use the zenit water-vapour method if the values of V_t
             # and h are provided
@@ -430,7 +435,7 @@ class _ITU676_11():
             gammaw = 0
 
         e = rho * T / 216.7
-        h0, hw = self.slant_inclined_path_coefficients(f, P + e)
+        h0, hw = self.slant_inclined_path_equivalent_height(f, P + e)
 
         if 5 < el and el < 90:
             h0_p = h0 * (np.exp(-h1 / h0) - np.exp(-h2 / h0))
@@ -662,7 +667,7 @@ class _ITU676_10():
         return gamma0, gammaw
 
     @classmethod
-    def slant_inclined_path_coefficients(self, f, p):
+    def slant_inclined_path_equivalent_height(self, f, p):
         """
         """
         rp = p / 1013.0
@@ -709,7 +714,7 @@ class _ITU676_10():
             gamma0, gammaw = self.gaseous_attenuation_approximation(
                 f, el, rho, P, T)
             e = rho * T / 216.7
-            h0, hw = self.slant_inclined_path_coefficients(f, P + e)
+            h0, hw = self.slant_inclined_path_equivalent_height(f, P + e)
 
             # Use the zenit water-vapour method if the values of V_t
             # and h are provided
@@ -769,7 +774,7 @@ class _ITU676_10():
             gammaw = 0
 
         e = rho * T / 216.7
-        h0, hw = self.slant_inclined_path_coefficients(f, P + e)
+        h0, hw = self.slant_inclined_path_equivalent_height(f, P + e)
 
         if 5 < el and el < 90:
             h0_p = h0 * (np.exp(-h1 / h0) - np.exp(-h2 / h0))
@@ -861,8 +866,9 @@ class _ITU676_9():
     def gaseous_attenuation_approximation(self, *args, **kwargs):
         return _ITU676_10.gaseous_attenuation_approximation(*args, **kwargs)
 
-    def slant_inclined_path_coefficients(self, *args, **kwargs):
-        return _ITU676_10.slant_inclined_path_coefficients(*args, **kwargs)
+    def slant_inclined_path_equivalent_height(self, *args, **kwargs):
+        return _ITU676_10.slant_inclined_path_equivalent_height(*args,
+                                                                **kwargs)
 
     def gaseous_attenuation_terrestrial_path(self, *args, **kwargs):
         return _ITU676_10.gaseous_attenuation_terrestrial_path(*args, **kwargs)
@@ -1089,6 +1095,35 @@ def gaseous_attenuation_inclined_path(f, el, rho, P, T, h1, h2, mode='approx'):
     val = __model.gaseous_attenuation_inclined_path(
         f, el, rho, P, T, h1, h2, mode=mode)
     return prepare_output_array(val, type_output) * u.dB
+
+
+def slant_inclined_path_equivalent_height(f, p):
+    """ Computes the equivalent height to be used for oxygen and water vapour
+    gaseous attenuation computations.
+
+    Parameters
+    ----------
+    f : number or Quantity
+        Frequency (GHz)
+    p : number
+        Percentage of the time the gaseous attenuation value is exceeded.
+
+    Returns
+    -------
+    ho, hw : Quantity
+        Equivalent height for oxygen and water vapour (m)
+
+    References
+    --------
+    [1] Attenuation by atmospheric gases:
+    https://www.itu.int/rec/R-REC-P.676/en
+
+    """
+    type_output = type(f)
+    f = prepare_quantity(f, u.GHz, 'Frequency')
+
+    val = __model.slant_inclined_path_equivalent_height(f, p)
+    return prepare_output_array(val, type_output) * u.m
 
 
 @memory.cache
