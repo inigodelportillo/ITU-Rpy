@@ -6,6 +6,7 @@ from __future__ import print_function
 import numpy as np
 import os
 from astropy import units as u
+from scipy.optimize import bisect
 
 from itur.models.itu453 import DN65
 from itur.models.itu837 import rainfall_rate
@@ -36,8 +37,10 @@ class __ITU530():
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.530 recommendation.
 
-    def __init__(self, version=16):
-        if version == 16:
+    def __init__(self, version=17):
+        if version == 17:
+            self.instance = _ITU530_17()
+        elif version == 16:
             self.instance = _ITU530_16()
         else:
             raise ValueError(
@@ -84,16 +87,17 @@ class __ITU530():
                                                       tau, U0, XPIF)
 
 
-class _ITU530_16():
+class _ITU530_17():
 
     def __init__(self):
-        self.__version__ = 16
-        self.year = 2015
-        self.month = 7
-        self.link = 'https://www.itu.int/rec/R-REC-P.530-16-201507-S/en'
+        self.__version__ = 17
+        self.year = 2017
+        self.month = 12
+        self.link = 'https://www.itu.int/rec/R-REC-P.530-17-201712-S/en'
 
         self._s_a = {}
 
+    @classmethod
     def s_a(self, lat, lon):
         """ Standard deviation of terrain heights (m) within a 110 km × 110 km
         area with a 30 s resolution (e.g. the Globe “gtopo30” data).
@@ -111,8 +115,9 @@ class _ITU530_16():
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     ###########################################################################
-    ###                             Section 2.2                             ###
+    #                               Section 2.2                               #
     ###########################################################################
+    @classmethod
     def fresnel_ellipse_radius(self, d1, d2, f):
         """ Implementation of 'fresnel_ellipse_radius' method for recommendation
         ITU-P R.530-16. See documentation for function
@@ -120,6 +125,7 @@ class _ITU530_16():
         """
         return 17.3 * np.sqrt(d1 * d2 / (f * (d1 + d2)))
 
+    @classmethod
     def diffraction_loss(self, d1, d2, h, f):
         """ Implementation of 'diffraction_loss' method for recommendation
         ITU-P R.530-16. See documentation for function
@@ -130,8 +136,9 @@ class _ITU530_16():
         return Ad
 
     ###########################################################################
-    ###                             Section 2.3                             ###
+    #                               Section 2.3                               #
     ###########################################################################
+    @classmethod
     def multipath_loss_for_A(self, lat, lon, h_e, h_r, d, f, A):
         """ Implementation of 'multipath_loss_for_A' method for recommendation
         ITU-P R.530-16. See documentation for function
@@ -150,15 +157,16 @@ class _ITU530_16():
         # Eq. 5 [mrad]
         e_p = np.abs(h_r - h_e) / d
 
-        # Step 3: For detailed link design applications calculate the percentage
-        # of time (p_W) that fade depth A (dB) is exceeded in the average worst
-        # month
+        # Step 3: For detailed link design applications calculate the
+        # percentage of time (p_W) that fade depth A (dB) is exceeded in the
+        # average worst month
         h_L = np.minimum(h_e, h_r)
         p_W = K * d**3.4 (1 + e_p)**-1.03 * f**0.8 * \
             10**(-0.00076 * h_L - A / 10)
         # Eq. 7 [%]
         return p_W
 
+    @classmethod
     def multipath_loss(self, lat, lon, h_e, h_r, d, f, A):
         """ Implementation of 'multipath_loss' method for recommendation
         ITU-P R.530-16. See documentation for function
@@ -169,9 +177,9 @@ class _ITU530_16():
         p0 = self.multipath_loss_for_A(
             lat, lon, h_e, h_r, d, f, 0)   # Eq. 10 [%]
 
-        # Step 2: Calculate the value of fade depth, At, at which the transition
-        # occurs between the deep-fading distribution and the shallow-fading
-        # distribution
+        # Step 2: Calculate the value of fade depth, At, at which the
+        # transition occurs between the deep-fading distribution and the
+        # shallow-fading distribution
         At = 25 + 1.2 * np.log10(p0)                        # Eq. 12 [dB]
 
         # Step 3: Calculate the percentage of time that A is exceeded in the
@@ -179,8 +187,9 @@ class _ITU530_16():
         def step_3b(p_0, At, A):
             p_t = p_0 * 10 ** (-At / 10)
             qa_p = -20 * np.log10(-np.log((100 - p_t) / 100)) / At
-            q_t = (qa_p - 2) / (1 + 0.3 * 10 ** (-At / 20) * 10 **
-                                (-0.016 * At)) - 4.3 * (10**(-At / 20) + At / 800)
+            q_t = ((qa_p - 2) /
+                   (1 + 0.3 * 10 ** (-At / 20) * 10 ** (-0.016 * At)) -
+                   4.3 * (10**(-At / 20) + At / 800))
             q_a = 2 + (1 + 0.3 * 10**(-A / 20)) * (10**(-0.016 * A)) *\
                 (q_t + 4.3 * (10**(-A / 20 + A / 800)))
             p_W = 100 * (1 - np.exp(-10 ** (-q_a * A / 20)))
@@ -191,8 +200,9 @@ class _ITU530_16():
         return p_W
 
     ###########################################################################
-    ###                             Section 2.4                             ###
+    #                               Section 2.4                               #
     ###########################################################################
+    @classmethod
     def rain_attenuation(self, lat, lon, d, f, el, p, tau=45, R001=None):
         """ Implementation of 'rain_attenuation' method for recommendation
         ITU-P R.530-16. See documentation for function
@@ -207,7 +217,7 @@ class _ITU530_16():
         # frequency, polarization and rain rate of interest using
         # Recommendation ITU-R P.838
         gammar = rain_specific_attenuation(R001, f, el, tau).value
-        _, alpha = rain_specific_attenuation_coefficients(f, el, tau).value
+        _, alpha = rain_specific_attenuation_coefficients(f, el, tau)
 
         # Step 3: Compute the effective path length, deff, of the link by
         # multiplying the actual path length d by a distance factor r
@@ -232,8 +242,8 @@ class _ITU530_16():
 
     def inverse_rain_attenuation(
             self, lat, lon, d, f, el, Ap, tau=45, R001=None):
-        """ Implementation of 'inverse_rain_attenuation' method for recommendation
-        ITU-P R.530-16. See documentation for function
+        """ Implementation of 'inverse_rain_attenuation' method for
+        recommendation ITU-P R.530-16. See documentation for function
         'ITUR530.inverse_rain_attenuation'
         """
         # Step 1: Obtain the rain rate R0.01 exceeded for 0.01% of the time
@@ -264,9 +274,12 @@ class _ITU530_16():
         C2 = 0.855 * C0 + 0.546 * (1 - C0)
         C3 = 0.139 * C0 + 0.043 * (1 - C0)
 
-        Ap = A001 * C1 * p ** (- (C2 + C3 * np.log10(p)))
-        return Ap
+        def func_bisect(p):
+            return A001 * C1 * p ** (- (C2 + C3 * np.log10(p))) - Ap
 
+        return bisect(func_bisect, 0, 100)
+
+    @classmethod
     def rain_event_count(self, lat, lon, d, f, el, A, tau=45, R001=None):
         """ Implementation of 'rain_event_count' method for recommendation
         ITU-P R.530-16. See documentation for function
@@ -282,9 +295,9 @@ class _ITU530_16():
         return N10s
 
     ###########################################################################
-    ###                              Section 4                              ###
+    #                                Section 4                                #
     ###########################################################################
-
+    @classmethod
     def XPD_outage_clear_air(self, lat, lon, h_e, h_r,
                              d, f, XPD_g, C0_I, XPIF=0):
         """ Implementation of 'XPD_outage_clear_air' method for recommendation
@@ -311,6 +324,7 @@ class _ITU530_16():
         P_XP = P0 * 10 ** (- M_XPD / 10)                       # Eq. 106 [%]
         return P_XP
 
+    @classmethod
     def XPD_outage_precipitation(self, lat, lon, d, f, el, C0_I, tau=45,
                                  U0=15, XPIF=0):
         """ Implementation of 'XPD_outage_precipitation' method for recommendation
@@ -333,6 +347,59 @@ class _ITU530_16():
         # Step 4 : Determine the outage probability
         P_XPR = 10**(n - 2)                                     # Eq. 115 [%]
         return P_XPR
+
+
+class _ITU530_16():
+
+    def __init__(self):
+        self.__version__ = 16
+        self.year = 2015
+        self.month = 7
+        self.link = 'https://www.itu.int/rec/R-REC-P.530-16-201507-S/en'
+
+        self._s_a = {}
+
+    def s_a(self, *args, **kwargs):
+        return _ITU530_17.s_a(*args, **kwargs)
+
+    ###########################################################################
+    #                               Section 2.2                               #
+    ###########################################################################
+    def fresnel_ellipse_radius(self, *args, **kwargs):
+        return _ITU530_17.fresnel_ellipse_radius(*args, **kwargs)
+
+    def diffraction_loss(self, *args, **kwargs):
+        return _ITU530_17.diffraction_loss(*args, **kwargs)
+
+    ###########################################################################
+    #                               Section 2.3                               #
+    ###########################################################################
+    def multipath_loss_for_A(self, *args, **kwargs):
+        return _ITU530_17.multipath_loss_for_A(*args, **kwargs)
+
+    def multipath_loss(*args, **kwargs):
+        return _ITU530_17.multipath_loss(*args, **kwargs)
+
+    ###########################################################################
+    #                               Section 2.4                               #
+    ###########################################################################
+    def rain_attenuation(self, *args, **kwargs):
+        return _ITU530_17.rain_attenuation(*args, **kwargs)
+
+    def inverse_rain_attenuation(self, *args, **kwargs):
+        return _ITU530_17.inverse_rain_attenuation(*args, **kwargs)
+
+    def rain_event_count(self, *args, **kwargs):
+        return _ITU530_17.rain_event_count(*args, **kwargs)
+
+    ###########################################################################
+    #                                Section 4                                #
+    ###########################################################################
+    def XPD_outage_clear_air(self, *args, **kwargs):
+        return _ITU530_17.XPD_outage_clear_air(*args, **kwargs)
+
+    def XPD_outage_precipitation(self, *args, **kwargs):
+        return _ITU530_17.XPD_outage_precipitation(*args, **kwargs)
 
 
 __model = __ITU530()
@@ -564,10 +631,10 @@ def multipath_loss(lat, lon, h_e, h_r, d, f, A):
 
 def rain_attenuation(lat, lon, d, f, el, p, tau=45, R001=None):
     """ Estimate long-term statistics of rain attenuation. Attenuation can also
-    occur as a result of absorption and scattering by such hydrometeors as rain,
-    snow, hail and fog. Although rain attenuation can be ignored at frequencies
-    below about 5 GHz, it must be included in design calculations at higher
-    frequencies, where its importance increases rapidly.
+    occur as a result of absorption and scattering by such hydrometeors as
+    rain, snow, hail and fog. Although rain attenuation can be ignored at
+    frequencies below about 5 GHz, it must be included in design calculations
+    at higher frequencies, where its importance increases rapidly.
 
 
     Parameters
@@ -585,8 +652,8 @@ def rain_attenuation(lat, lon, d, f, el, p, tau=45, R001=None):
     p : number
         Percetage of the time the rain attenuation value is exceeded.
     R001: number, optional
-        Point rainfall rate for the location for 0.01% of an average year (mm/h).
-        If not provided, an estimate is obtained from Recommendation
+        Point rainfall rate for the location for 0.01% of an average year
+        (mm/h). If not provided, an estimate is obtained from Recommendation
         Recommendation ITU-R P.837. Some useful values:
             * 0.25 mm/h : Drizle
             *  2.5 mm/h : Light rain
@@ -645,8 +712,8 @@ def inverse_rain_attenuation(lat, lon, d, f, el, Ap, tau=45, R001=None):
     Ap : number
         Fade depth
     R001: number, optional
-        Point rainfall rate for the location for 0.01% of an average year (mm/h).
-        If not provided, an estimate is obtained from Recommendation
+        Point rainfall rate for the location for 0.01% of an average year
+        (mm/h). If not provided, an estimate is obtained from Recommendation
         Recommendation ITU-R P.837. Some useful values:
             * 0.25 mm/h : Drizle
             *  2.5 mm/h : Light rain
@@ -706,8 +773,8 @@ def rain_event_count(lat, lon, d, f, el, A, tau=45, R001=None):
     A : number
         Fade depth
     R001: number, optional
-        Point rainfall rate for the location for 0.01% of an average year (mm/h).
-        If not provided, an estimate is obtained from Recommendation
+        Point rainfall rate for the location for 0.01% of an average year
+        (mm/h). If not provided, an estimate is obtained from Recommendation
         Recommendation ITU-R P.837. Some useful values:
             * 0.25 mm/h : Drizle
             *  2.5 mm/h : Light rain
