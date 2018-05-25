@@ -210,259 +210,259 @@ class ITUR676_9TestCase(test.TestCase):
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         282.724 - 0.15).value,
-            0.00941327, places=6)
+            0.00941327, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         287.4834667 - 0.15).value,
-            0.00898682, places=6)
+            0.00898682, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         293.1487022 - 0.15).value,
-            0.00851359, places=6)
+            0.00851359, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         282.724 - 0.15).value,
-            0.00941327, places=6)
+            0.00941327, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         287.4834667 - 0.15).value,
-            0.00898682, places=6)
+            0.00898682, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         293.1487022 - 0.15).value,
-            0.00851359, places=6)
+            0.00851359, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         282.724 - 0.15).value,
-            0.00941327, places=6)
+            0.00941327, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         287.4834667 - 0.15).value,
-            0.00898682, places=6)
+            0.00898682, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         293.1487022 - 0.15).value,
-            0.00851359, places=6)
+            0.00851359, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         282.724 - 0.15).value,
-            0.00941327, places=6)
+            0.00941327, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         287.4834667 - 0.15).value,
-            0.00898682, places=6)
+            0.00898682, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         293.1487022 - 0.15).value,
-            0.00851359, places=6)
+            0.00851359, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         282.724 - 0.15).value,
-            0.02043748, places=6)
+            0.02043748, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         287.4834667 - 0.15).value,
-            0.01954568, places=6)
+            0.01954568, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         293.1487022 - 0.15).value,
-            0.01856193, places=6)
+            0.01856193, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         282.724 - 0.15).value,
-            0.02043748, places=6)
+            0.02043748, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         287.4834667 - 0.15).value,
-            0.01954568, places=6)
+            0.01954568, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         293.1487022 - 0.15).value,
-            0.01856193, places=6)
+            0.01856193, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         282.724 - 0.15).value,
-            0.02043748, places=6)
+            0.02043748, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         287.4834667 - 0.15).value,
-            0.01954568, places=6)
+            0.01954568, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         293.1487022 - 0.15).value,
-            0.01856193, places=6)
+            0.01856193, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         282.724 - 0.15).value,
-            0.02043748, places=6)
+            0.02043748, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         287.4834667 - 0.15).value,
-            0.01954568, places=6)
+            0.01954568, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         293.1487022 - 0.15).value,
-            0.01856193, places=6)
+            0.01856193, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         296.602 - 0.15).value,
-            0.00824203, places=6)
+            0.00824203, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(
                 14.25, 1013.25, 7.5, 296.7208533 - 0.15).value,
-            0.0082329, places=6)
+            0.0082329, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25,  7.5,
                                         296.602 - 0.15).value,
-            0.00824203, places=6)
+            0.00824203, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25,  7.5,
                                         296.7208533 - 0.15).value,
-            0.0082329, places=6)
+            0.0082329, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         296.602 - 0.15).value,
-            0.00824203, places=6)
+            0.00824203, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         296.7208533 - 0.15).value,
-            0.0082329, places=6)
+            0.0082329, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         296.602 - 0.15).value,
-            0.00824203, places=6)
+            0.00824203, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(
                 14.25, 1013.25, 7.5, 296.7208533 - 0.15).value,
-            0.0082329, places=6)
+            0.0082329, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         296.602 - 0.15).value,
-            0.01800011, places=6)
+            0.01800011, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         296.7208533 - 0.15).value,
-            0.01798125, places=6)
+            0.01798125, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         296.602 - 0.15).value,
-            0.01800011, places=6)
+            0.01800011, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         296.7208533 - 0.15).value,
-            0.01798125, places=6)
+            0.01798125, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         296.602 - 0.15).value,
-            0.01800011, places=6)
+            0.01800011, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         296.7208533 - 0.15).value,
-            0.01798125, places=6)
+            0.01798125, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         296.602 - 0.15).value,
-            0.01800011, places=6)
+            0.01800011, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         296.7208533 - 0.15).value,
-            0.01798125, places=6)
+            0.01798125, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         299.0966578 - 0.15).value,
-            0.00805331, places=6)
+            0.00805331, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         297.9322267 - 0.15).value,
-            0.00814064, places=6)
+            0.00814064, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         287.444 - 0.15).value,
-            0.00899025, places=6)
+            0.00899025, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         299.0966578 - 0.15).value,
-            0.00805331, places=6)
+            0.00805331, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         297.9322267 - 0.15).value,
-            0.00814064, places=6)
+            0.00814064, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         287.444 - 0.15).value,
-            0.00899025, places=6)
+            0.00899025, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         299.0966578 - 0.15).value,
-            0.00805331, places=6)
+            0.00805331, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         297.9322267 - 0.15).value,
-            0.00814064, places=6)
+            0.00814064, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         287.444 - 0.15).value,
-            0.00899025, places=6)
+            0.00899025, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         299.0966578 - 0.15).value,
-            0.00805331, places=6)
+            0.00805331, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         297.9322267 - 0.15).value,
-            0.00814064, places=6)
+            0.00814064, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(14.25, 1013.25, 7.5,
                                         287.444 - 0.15).value,
-            0.00899025, places=6)
+            0.00899025, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         299.0966578 - 0.15).value,
-            0.01761077, places=6)
+            0.01761077, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         297.9322267 - 0.15).value,
-            0.01779083, places=6)
+            0.01779083, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         287.444 - 0.15).value,
-            0.01955282, places=6)
+            0.01955282, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         299.0966578 - 0.15).value,
-            0.01761077, places=6)
+            0.01761077, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         297.9322267 - 0.15).value,
-            0.01779083, places=6)
+            0.01779083, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         287.444 - 0.15).value,
-            0.01955282, places=6)
+            0.01955282, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         299.0966578 - 0.15).value,
-            0.01761077, places=6)
+            0.01761077, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         297.9322267 - 0.15).value,
-            0.01779083, places=6)
+            0.01779083, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         287.444 - 0.15).value,
-            0.01955282, places=6)
+            0.01955282, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         299.0966578 - 0.15).value,
-            0.01761077, places=6)
+            0.01761077, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         297.9322267 - 0.15).value,
-            0.01779083, places=6)
+            0.01779083, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_approx(29, 1013.25, 7.5,
                                         287.444 - 0.15).value,
-            0.01955282, places=6)
+            0.01955282, places=5)
 
 #    def zenit_water_vapour_attenuation(self, lat, lon, el, p, f, alt):
 #        gamma_w = models.itu676.zenit_water_vapour_attenuation(lat,
@@ -743,36 +743,36 @@ class ITUR676_11TestCase(test.TestCase):
         # Kelvin is 273 instead of 273.15
         self.assertAlmostEqual(
             models.itu676.gammaw_exact(12, 1013.25, 7.5, 288.15).value,
-            0.00953539, places=6)
+            0.00953539, places=5)
         self.assertAlmostEqual(
             models.itu676.gammaw_exact(20, 1013.25, 7.5, 288.15).value,
-            0.09704730, places=6)
+            0.09704730, places=5)
         self.assertAlmostEqual(
             models.itu676.gammaw_exact(60, 1013.25, 7.5, 288.15).value,
-            0.15484184, places=6)
+            0.15484184, places=5)
         self.assertAlmostEqual(
             models.itu676.gammaw_exact(90, 1013.25, 7.5, 288.15).value,
-            0.34197339, places=6)
+            0.34197339, places=5)
         self.assertAlmostEqual(
             models.itu676.gammaw_exact(130, 1013.25, 7.5, 288.15).value,
-            0.75184470, places=6)
+            0.75184470, places=5)
 
     def test_gamma0_exact(self):
         self.assertAlmostEqual(
             models.itu676.gamma0_exact(12, 1013.25, 7.5, 288.15).value,
-            0.00869826, places=6)
+            0.00869826, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_exact(20, 1013.25, 7.5, 288.15).value,
-            0.01188355, places=6)
+            0.01188355, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_exact(60, 1013.25, 7.5, 288.15).value,
-            14.62347480, places=6)
+            14.62347480, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_exact(90, 1013.25, 7.5, 288.15).value,
-            0.03886971, places=6)
+            0.03886971, places=5)
         self.assertAlmostEqual(
             models.itu676.gamma0_exact(130, 1013.25, 7.5, 288.15).value,
-            0.04150908, places=6)
+            0.04150908, places=5)
 
     def test_gammaw_approx(self):
         # The ITU models are non-sense and believe that the conversion between
@@ -2175,7 +2175,7 @@ class ITUR676_11TestCase(test.TestCase):
 
         self.assertAlmostEqual(
             models.itu676.gammaw_approx(350, 1013.25, 7.5, 288.15).value,
-            10.03327368, places=6)
+            10.03327368, places=5)
 
     def test_gamma0_approx(self):
         self.assertAlmostEqual(
@@ -4116,255 +4116,255 @@ class ITUR838_3TestCase(test.TestCase):
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 56.370009, 14.25, 40.97052773, 0).value,
-            3.630988, places=6)
+            3.630988, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 55.231625, 14.25, 47.91280491, 0).value,
-            3.503189, places=6)
+            3.503189, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 30.875024, 14.25, 30.87067768, 0).value,
-            1.879742, places=6)
+            1.879742, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 56.370009, 14.25, 40.97052773, 0).value,
-            3.630988, places=6)
+            3.630988, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 55.231625, 14.25, 47.91280491, 0).value,
-            3.503189, places=6)
+            3.503189, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 30.875024, 14.25, 30.87067768, 0).value,
-            1.879742, places=6)
+            1.879742, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 56.370009, 14.25, 40.97052773, 0).value,
-            3.630988, places=6)
+            3.630988, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 55.231625, 14.25, 47.91280491, 0).value,
-            3.503189, places=6)
+            3.503189, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 30.875024, 14.25, 30.87067768, 0).value,
-            1.879742, places=6)
+            1.879742, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 56.370009, 14.25, 40.97052773, 0).value,
-            3.630988, places=6)
+            3.630988, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 55.231625, 14.25, 47.91280491, 0).value,
-            3.503189, places=6)
+            3.503189, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 30.875024, 29.00, 30.87067768, 0).value,
-            5.814832, places=6)
+            5.814832, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 56.370009, 29.00, 40.97052773, 0).value,
-            10.157375, places=6)
+            10.157375, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 55.231625, 29.00, 47.91280491, 0).value,
-            9.846762, places=6)
+            9.846762, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 30.875024, 29.00, 30.87067768, 0).value,
-            5.814832, places=6)
+            5.814832, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 56.370009, 29.00, 40.97052773, 0).value,
-            10.157375, places=6)
+            10.157375, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 55.231625, 29.00, 47.91280491, 0).value,
-            9.846762, places=6)
+            9.846762, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 30.875024, 29.00, 30.87067768, 0).value,
-            5.814832, places=6)
+            5.814832, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 56.370009, 29.00, 40.97052773, 0).value,
-            10.157375, places=6)
+            10.157375, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 55.231625, 29.00, 47.91280491, 0).value,
-            9.846762, places=6)
+            9.846762, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 30.875024, 29.00, 30.87067768, 0).value,
-            5.814832, places=6)
+            5.814832, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 56.370009, 29.00, 40.97052773, 0).value,
-            10.157375, places=6)
+            10.157375, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 55.231625, 29.00, 47.91280491, 0).value,
-            9.846762, places=6)
+            9.846762, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 58.094216, 14.25, 59.81487174, 0).value,
-            3.628282, places=6)
+            3.628282, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 89.114103, 14.25, 49.20900369, 0).value,
-            5.948478, places=6)
+            5.948478, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 58.094216, 14.25, 59.81487174, 0).value,
-            3.628282, places=6)
+            3.628282, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 89.114103, 14.25, 49.20900369, 0).value,
-            5.948478, places=6)
+            5.948478, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 58.094216, 14.25, 59.81487174, 0).value,
-            3.628282, places=6)
+            3.628282, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 89.114103, 14.25, 49.20900369, 0).value,
-            5.948478, places=6)
+            5.948478, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 58.094216, 14.25, 59.81487174, 0).value,
-            3.628282, places=6)
+            3.628282, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 89.114103, 14.25, 49.20900369, 0).value,
-            5.948478, places=6)
+            5.948478, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 58.094216, 29.00, 59.81487174, 0).value,
-            10.132682, places=6)
+            10.132682, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 89.114103, 29.00, 49.20900369, 0).value,
-            15.460212, places=6)
+            15.460212, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 58.094216, 29.00, 59.81487174, 0).value,
-            10.132682, places=6)
+            10.132682, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 89.114103, 29.00, 49.20900369, 0).value,
-            15.460212, places=6)
+            15.460212, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 58.094216, 29.00, 59.81487174, 0).value,
-            10.132682, places=6)
+            10.132682, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 89.114103, 29.00, 49.20900369, 0).value,
-            15.460212, places=6)
+            15.460212, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 58.094216, 29.00, 59.81487174, 0).value,
-            10.132682, places=6)
+            10.132682, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 89.114103, 29.00, 49.20900369, 0).value,
-            15.460212, places=6)
+            15.460212, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 57.39623, 14.25, 55.90591362, 0).value,
-            3.603569, places=6)
+            3.603569, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 93.607098, 14.25, 67.76751981, 0).value,
-            6.06336, places=6)
+            6.06336, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 54.623411, 14.25, 38.14104832, 0).value,
-            3.523996, places=6)
+            3.523996, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 57.39623, 14.25, 55.90591362, 0).value,
-            3.603569, places=6)
+            3.603569, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 93.607098, 14.25, 67.76751981, 0).value,
-            6.06336, places=6)
+            6.06336, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 54.623411, 14.25, 38.14104832, 0).value,
-            3.523996, places=6)
+            3.523996, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 57.39623, 14.25, 55.90591362, 0).value,
-            3.603569, places=6)
+            3.603569, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 93.607098, 14.25, 67.76751981, 0).value,
-            6.06336, places=6)
+            6.06336, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 54.623411, 14.25, 38.14104832, 0).value,
-            3.523996, places=6)
+            3.523996, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 57.39623, 14.25, 55.90591362, 0).value,
-            3.603569, places=6)
+            3.603569, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 93.607098, 14.25, 67.76751981, 0).value,
-            6.06336, places=6)
+            6.06336, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 54.623411, 14.25, 38.14104832, 0).value,
-            3.523996, places=6)
+            3.523996, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 57.39623, 29.00, 55.90591362, 0).value,
-            10.078266, places=6)
+            10.078266, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 93.607098, 29.00, 67.76751981, 0).value,
-            15.712442, places=6)
+            15.712442, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 54.623411, 29.00, 38.14104832, 0).value,
-            9.904098, places=6)
+            9.904098, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 57.39623, 29.00, 55.90591362, 0).value,
-            10.078266, places=6)
+            10.078266, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 93.607098, 29.00, 67.76751981, 0).value,
-            15.712442, places=6)
+            15.712442, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 54.623411, 29.00, 38.14104832, 0).value,
-            9.904098, places=6)
+            9.904098, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 57.39623, 29.00, 55.90591362, 0).value,
-            10.078266, places=6)
+            10.078266, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 93.607098, 29.00, 67.76751981, 0).value,
-            15.712442, places=6)
+            15.712442, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 54.623411, 29.00, 38.14104832, 0).value,
-            9.904098, places=6)
+            9.904098, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 57.39623, 29.00, 55.90591362, 0).value,
-            10.078266, places=6)
+            10.078266, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 93.607098, 29.00, 67.76751981, 0).value,
-            15.712442, places=6)
+            15.712442, places=5)
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
                 54.623411, 29.00, 38.14104832, 0).value,
-            9.904098, places=6)
+            9.904098, places=5)
         # New values in validation 4
         self.assertAlmostEqual(
             models.itu838.rain_specific_attenuation(
