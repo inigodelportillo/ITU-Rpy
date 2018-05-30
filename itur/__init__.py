@@ -121,7 +121,7 @@ def atmospheric_attenuation_slant_path(
         Total atmospheric attenuation (dB)
 
     Ag, Ac, Ar, As, A : tuple
-        Gaseous, Cloud, Rain, Scintillation cotributions to total attenuation,
+        Gaseous, Cloud, Rain, Scintillation contributions to total attenuation,
         and total attenuation (dB)
 
 

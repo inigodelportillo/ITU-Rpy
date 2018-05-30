@@ -136,6 +136,12 @@ class _ITU618():
                            excluded=[0, 1, 3, 7, 8, 9], otypes=[np.ndarray])
         return np.array(fcn(lat, lon, f, el, p, D, eta, T, H, P, hL).tolist())
 
+    def scintillation_attenuation_sigma(self, lat, lon, f, el, p, D, eta,
+                                  T, H, P, hL):
+        fcn = np.vectorize(self.instance.scintillation_attenuation_sigma,
+                           excluded=[0, 1, 3, 7, 8, 9], otypes=[np.ndarray])
+        return np.array(fcn(lat, lon, f, el, p, D, eta, T, H, P, hL).tolist())
+
     def fit_rain_attenuation_to_lognormal(self, lat, lon, f, el, hs, P_k, tau):
         fcn = np.vectorize(self.instance.fit_rain_attenuation_to_lognormal)
         return fcn(lat, lon, f, el, hs, P_k, tau)
@@ -284,7 +290,7 @@ class _ITU618_13():
 
         # Step 1: Construct the set of pairs [Pi, Ai] where Pi (% of time) is
         # the probability the attenuation Ai (dB) is exceeded where Pi < P_K
-        p_i = np.array([0.001, 0.002, 0.003, 0.005, 0.01, 0.02, 0.03, 0.05,
+        p_i = np.array([0.01, 0.02, 0.03, 0.05,
                         0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10])
         Pi = np.array([p for p in p_i if p < P_k], dtype=np.float)
         Ai = np.array([0 for p in p_i if p < P_k], dtype=np.float)
@@ -300,7 +306,7 @@ class _ITU618_13():
         # Step 3: Determine the variables sigma_lna, m_lna by performing a
         # least-squares fit to lnAi = sigma_lna Q^{-1}(Pi/P_k) + m_lna
         m_lna, sigma_lna = np.linalg.lstsq(np.vstack([np.ones(len(Q)), Q]).T,
-                                           lnA)[0]
+                                           lnA, rcond=None)[0]
 
         return sigma_lna, m_lna
 
@@ -432,8 +438,9 @@ class _ITU618_13():
         return XPD_p
 
     @classmethod
-    def scintillation_attenuation(self, lat, lon, f, el, p, D, eta=0.5, T=None,
-                                  H=None, P=None, hL=1000):
+
+    def scintillation_attenuation_sigma(self, lat, lon, f, el, p, D, eta=0.5,
+                                        T=None, H=None, P=None, hL=1000):
         # Step 1: For the value of t, calculate the saturation water vapour
         # pressure, es, (hPa), as specified in Recommendation ITU-R P.453.
         if T is not None and H is not None and P is not None:
@@ -467,7 +474,15 @@ class _ITU618_13():
         # Step 7: Calculate the standard deviation of the signal for the
         # applicable period and propagation path:
         sigma = sigma_ref * f**(7. / 12) * g / np.sin(np.deg2rad(el))**1.2
+        return sigma
 
+    @classmethod
+    def scintillation_attenuation(self, lat, lon, f, el, p, D, eta=0.5, T=None,
+                                  H=None, P=None, hL=1000):
+        # Step 1 - 7: Calculate the standard deviation of the signal for the
+        # applicable period and propagation path:
+        sigma = self.scintillation_attenuation_sigma(lat, lon, f, el, p,
+                                                     D, eta, T, H, P, hL)
         # Step 8: Calculate the time percentage factor, a(p), for the time
         # percentage, p, in the range between 0.01% < p < 50%:
         a = -0.061 * np.log10(p)**3 + 0.072 * \
@@ -894,6 +909,77 @@ def scintillation_attenuation(lat, lon, f, el, p, D, eta=0.5, T=None,
     hL = prepare_quantity(hL, u.m, 'Height of the turbulent layer')
 
     val = __model.scintillation_attenuation(
+        lat, lon, f, el, p, D, eta=eta, T=T, H=H, P=P, hL=hL)
+
+    return prepare_output_array(val, type_output) * u.dB
+
+
+def scintillation_attenuation_sigma(lat, lon, f, el, p, D, eta=0.5, T=None,
+                                    H=None, P=None, hL=1000):
+    """
+    Calculation of the standard deviation of the amplitude of the
+    scintillations attenuation at elevation angles greater than 5° and
+    frequencies up to 20 GHz.
+
+
+    Parameters
+    ----------
+    lat : number, sequence, or numpy.ndarray
+        Latitudes of the receiver points
+    lon : number, sequence, or numpy.ndarray
+        Longitudes of the receiver points
+    f : number or Quantity
+        Frequency (GHz)
+    el : sequence, or number
+        Elevation angle (degrees)
+    p : number
+        Percetage of the time the scintillation attenuation value is exceeded.
+    D: number
+        Physical diameter of the earth-station antenna (m)
+    eta: number, optional
+        Antenna efficiency. Default value 0.5 (conservative estimate)
+    T: number, sequence, or numpy.ndarray, optional
+        Average surface ambient temperature (°C) at the site. If None, uses the
+        ITU-R P.453 to estimate the wet term of the radio refractivity.
+    H: number, sequence, or numpy.ndarray, optional
+        Average surface relative humidity (%) at the site. If None, uses the
+        ITU-R P.453 to estimate the wet term of the radio refractivity.
+    P: number, sequence, or numpy.ndarray, optional
+        Average surface pressure (hPa) at the site. If None, uses the
+        ITU-R P.453 to estimate the wet term of the radio refractivity.
+    hL : number, optional
+        Height of the turbulent layer (m). Default value 1000 m
+
+
+    Returns
+    -------
+    attenuation: Quantity
+        Attenuation due to scintillation (dB)
+
+
+    References
+    ----------
+    [1] Propagation data and prediction methods required for the design of
+    Earth-space telecommunication systems:
+    https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
+    """
+    global __model
+    type_output = type(lat)
+
+    lat = prepare_input_array(lat)
+    lon = prepare_input_array(lon)
+
+    lon = np.mod(lon, 360)
+    f = prepare_quantity(f, u.GHz, 'Frequency')
+    el = prepare_quantity(prepare_input_array(el), u.deg, 'Elevation angle')
+    D = prepare_quantity(D, u.m, 'Antenna diameter')
+    eta = prepare_quantity(eta, u.one, 'Antenna efficiency')
+    T = prepare_quantity(T, u.deg_C, 'Average surface temperature')
+    H = prepare_quantity(H, u.percent, 'Average surface relative humidity')
+    P = prepare_quantity(P, u.hPa, 'Average surface pressure')
+    hL = prepare_quantity(hL, u.m, 'Height of the turbulent layer')
+
+    val = __model.scintillation_attenuation_sigma(
         lat, lon, f, el, p, D, eta=eta, T=T, H=H, P=P, hL=hL)
 
     return prepare_output_array(val, type_output) * u.dB
