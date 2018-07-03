@@ -7,17 +7,17 @@ import numpy as np
 import scipy.stats as stats
 from scipy.signal import lfilter
 
-from itu618 import rain_attenuation, scintillation_attenuation_sigma
-from itu676 import gamma0_exact, \
+from itur.models.itu618 import rain_attenuation, scintillation_attenuation_sigma
+from itur.models.itu676 import gamma0_exact, \
     slant_inclined_path_equivalent_height
-from itu840 import lognormal_approximation_coefficient, \
+from itur.models.itu840 import lognormal_approximation_coefficient, \
     specific_attenuation_coefficients
-from itu835 import standard_pressure, standard_water_vapour_density
-from itu836 import total_water_vapour_content
-from itu837 import rainfall_probability
-from itu676 import zenit_water_vapour_attenuation
-from itu1510 import surface_mean_temperature
-from itu1511 import topographic_altitude
+from itur.models.itu835 import standard_pressure, standard_water_vapour_density
+from itur.models.itu836 import total_water_vapour_content
+from itur.models.itu837 import rainfall_probability
+from itur.models.itu676 import zenit_water_vapour_attenuation
+from itur.models.itu1510 import surface_mean_temperature
+from itur.models.itu1511 import topographic_altitude
 from itur.utils import prepare_quantity
 
 from astropy import units as u
@@ -51,9 +51,9 @@ class __ITU1853():
         return self.instance.__version__
 
     def rain_attenuation_synthesis(self, lat, lon, f, el, hs, Ns,
-                                   Ts=1, n=None):
+                                   Ts=1, tau=45, n=None):
         return self.instance.rain_attenuation_synthesis(
-                lat, lon, f, el, hs, Ns, Ts=Ts, n=n)
+                lat, lon, f, el, hs, Ns, Ts=Ts, tau=tau, n=n)
 
     def total_attenuation_synthesis(self, lat, lon, f, el, p, D, Ns, Ts=1,
                                     tau=45, hs=None, eta=0.65, rho=None,
@@ -141,10 +141,11 @@ class _ITU1853_1():
 
         # D6: Discard the first 200 000 samples from the synthesized
         if discard_samples:
-            A_rain = A_rain[200000:]
+            A_rain = A_rain[np.ceil(200000/Ts).astype(int):]
 
         return A_rain.flatten()
 
+    @classmethod
     def fftnoise(self, f):
         f = np.array(f, dtype='complex')
         Np = (len(f) - 1) // 2
@@ -190,7 +191,7 @@ class _ITU1853_1():
         # Step D: Time series synthesis
         # Step D1: Synthesize a white Gaussian noise time series
         if n is None:
-            n = np.random.normal(0, 1, (Ns * Ts + 5e5))[::Ts]
+            n = np.random.normal(0, 1, int(Ns * Ts + 5e5))[::Ts]
             discard_samples = True
         else:
             discard_samples = False
@@ -209,7 +210,7 @@ class _ITU1853_1():
 
         # D6: Discard the first 500 000 samples from the synthesized
         if discard_samples:
-            L = L[500000:]
+            L = L[np.ceil(500000/Ts).astype(int):]
 
         return L.flatten()
 
@@ -251,7 +252,7 @@ class _ITU1853_1():
         V = lambd * (- np.log10(stats.norm.sf(G_v)))**(1 / kappa)
         # Step C5: Discard the first 5 000 000 samples from the synthesized
         if discard_samples:
-            V = V[5000000:]
+            V = V[np.ceil(5000000/Ts).astype(int):]
 
         return V.flatten()
 
@@ -473,11 +474,11 @@ def rain_attenuation_synthesis(lat, lon, f, el, hs, Ns, Ts=1, tau=45, n=None):
         hs, u.km, 'Heigh above mean sea level of the earth station')
     Ts = prepare_quantity(f, u.second, 'Time step between samples')
     val = __model.rain_attenuation_synthesis(lat, lon, f, el, hs, Ns,
-                                             T=Ts, tau=tau, n=n)
+                                             Ts=Ts, tau=tau, n=n)
     return val * u.dB
 
 
-def scintillation_attenuation_synthesis(self, Ns, f_c=0.1, Ts=1):
+def scintillation_attenuation_synthesis(Ns, f_c=0.1, Ts=1):
     """
     A method to generate a synthetic time series of scintillation attenuation
     values.
@@ -509,7 +510,7 @@ def scintillation_attenuation_synthesis(self, Ns, f_c=0.1, Ts=1):
     return val * u.dB
 
 
-def integrated_water_vapour_synthesis(self, lat, lon, Ns, Ts=1, n=None):
+def integrated_water_vapour_synthesis(lat, lon, Ns, Ts=1, n=None):
     """ The time series synthesis method generates a time series that
     reproduces the spectral characteristics and the distribution of water
     vapour content.
@@ -546,7 +547,7 @@ def integrated_water_vapour_synthesis(self, lat, lon, Ns, Ts=1, n=None):
     return val * u.kg / u.m**2
 
 
-def cloud_liquid_water_synthesis(self, lat, lon, Ns, Ts=1, n=None):
+def cloud_liquid_water_synthesis(lat, lon, Ns, Ts=1, n=None):
     """ The time series synthesis method generates a time series that
     reproduces the spectral characteristics, rate of change and duration
     statistics of cloud liquid content events.
