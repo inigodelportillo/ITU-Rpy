@@ -16,7 +16,7 @@ before_script: # configure a headless display to test plot generation
   - sleep 3 # give xvfb some time to start
 script:
   - python setup.py nosetests --processes=1 --process-timeout=400 --verbosity 2 --with-coverage --cover-package itur  
-after_sucess:
+after_success:
   coveralls
 after_failure:
   coveralls
