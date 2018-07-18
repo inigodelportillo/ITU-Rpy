@@ -14,7 +14,7 @@ from os import path
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the README file
-with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
+with open(path.join(here, 'README.rst')) as f:
     long_description = f.read()
 
 # Arguments marked as "Required" below must be included for upload to PyPI.
@@ -40,13 +40,25 @@ setup(
     # For a discussion on single-sourcing the version across setup.py and the
     # project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.2.0',
+    version='0.2.1',
 
     # This is a one-line description or tagline of what your project does. This
     # corresponds to the "Summary" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#summary
-    description=long_description,
+    description='A python implementation of the ITU-R P. Recommendations',
 
+	
+	# This is an optional longer description of your project that represents
+    # the body of text which users will see when they visit PyPI.
+    #
+    # Often, this is the same as your README, so you can just read it in from
+    # that file directly (as we have already done above)
+    #
+    # This field corresponds to the "Description" metadata field:
+    # https://packaging.python.org/specifications/core-metadata/#description-optional
+    long_description=long_description,  # Optional
+
+	
     # This should be a valid link to your project's main homepage.
     #
     # This field corresponds to the "Home-Page" metadata field:
@@ -62,7 +74,7 @@ setup(
     author_email='portillo@mit.edu',
 
     license='MIT',
-
+	
     # Classifiers help users find your project by categorizing it.
     #
     # For a list of valid classifiers, see
@@ -130,7 +142,11 @@ setup(
                  'data/839/*.*',
                  'data/840/*.*',
                  'data/1510/*.*',
-                 'data/1511/*.*'],
-
+                 'data/1511/*.*']
+    },
+	
+	project_urls={  # Optional
+        'Bug Reports': 'https://github.com/iportillo/ITU-Rpy/issues',
+        'Source': 'https://github.com/iportillo/ITU-Rpy/',
     },
 )
