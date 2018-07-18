@@ -1,4 +1,5 @@
-# ITU-Rpy [![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg)](https://raw.githubusercontent.com/Carthage/Carthage/master/LICENSE.md) [![Build Status](https://travis-ci.org/iportillo/ITU-Rpy.svg?branch=master)](https://travis-ci.org/iportillo/ITU-Rpy) [![PyPI version](https://badge.fury.io/py/itur.svg)](https://badge.fury.io/py/itur) [![Coverage Status](https://coveralls.io/repos/github/iportillo/ITU-Rpy/badge.svg?branch=master)](https://coveralls.io/github/iportillo/ITU-Rpy?branch=master)
+# ITU-Rpy 
+[![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg)](https://raw.githubusercontent.com/Carthage/Carthage/master/LICENSE.md) [![Build Status](https://travis-ci.org/iportillo/ITU-Rpy.svg?branch=master)](https://travis-ci.org/iportillo/ITU-Rpy) [![PyPI version](https://badge.fury.io/py/itur.svg)](https://badge.fury.io/py/itur) [![Coverage Status](https://coveralls.io/repos/github/iportillo/ITU-Rpy/badge.svg?branch=master)](https://coveralls.io/github/iportillo/ITU-Rpy?branch=master)
 
 A python implementation of the ITU-R P. Recommendations to compute atmospheric attenuation in slant and horizontal paths.
 
@@ -19,20 +20,20 @@ pip install itur
 
 More information about the installation process can be found on the [documentation](https://github.com/iportillo/ITU-Rpy/blob/master/docs/installation.rst).
 
-## ITU-P Recommendations implemented:
-The following ITU-P Recommendations are implemented in ITU-Rpy
-* **ITU-P R.453-13:** The radio refractive index: its formula and refractivity data
-* **ITU-P R.618-13:** Propagation data and prediction methods required for the design of Earth-space telecommunication systems
-* **ITU-P R.676-11:** Attenuation by atmospheric gases
-* **ITU-P R.835-6:** Reference Standard Atmospheres
-* **ITU-P R.836-6:** Water vapour: surface density and total columnar content
-* **ITU-P R.837-7:** Characteristics of precipitation for propagation modelling
-* **ITU-P R.838-3:** Specific attenuation model for rain for use in prediction methods
-* **ITU-P R.839-4:** Rain height model for prediction methods.
-* **ITU-P R.840-7:** Attenuation due to clouds and fog 
-* **ITU-P R.1144-7:** Interpolation methods for the geophysical properties used to compute propagation effects 
-* **ITU-P R.1511-1:** Topography for Earth-to-space propagation modelling
-* **ITU-P R.1853-1:** Tropospheric attenuation time series synthesis
+## ITU-R Recommendations implemented:
+The following ITU-R Recommendations are implemented in ITU-Rpy
+* **ITU-R P.453-13:** The radio refractive index: its formula and refractivity data
+* **ITU-R P.618-13:** Propagation data and prediction methods required for the design of Earth-space telecommunication systems
+* **ITU-R P.676-11:** Attenuation by atmospheric gases
+* **ITU-R P.835-6:** Reference Standard Atmospheres
+* **ITU-R P.836-6:** Water vapour: surface density and total columnar content
+* **ITU-R P.837-7:** Characteristics of precipitation for propagation modelling
+* **ITU-R P.838-3:** Specific attenuation model for rain for use in prediction methods
+* **ITU-R P.839-4:** Rain height model for prediction methods.
+* **ITU-R P.840-7:** Attenuation due to clouds and fog 
+* **ITU-R P.1144-7:** Interpolation methods for the geophysical properties used to compute propagation effects 
+* **ITU-R P.1511-1:** Topography for Earth-to-space propagation modelling
+* **ITU-R P.1853-1:** Tropospheric attenuation time series synthesis
 
 The individual models can be accessed using the `itur.models` package.
 
