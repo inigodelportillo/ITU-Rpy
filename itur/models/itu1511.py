@@ -4,8 +4,10 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+import os
 from astropy import units as u
 
+from itur import utils
 from itur.models.itu1144 import bicubic_2D_interpolator
 from itur.utils import load_data, dataset_dir, prepare_input_array,\
     prepare_output_array, memory
@@ -65,13 +67,15 @@ class _ITU1511_1():
     def altitude(self, lat, lon):
 
         if not self._altitude:
-            vals = load_data(dataset_dir + '1511/v1_TOPO_0DOT5.txt')
-            lats = load_data(dataset_dir + '1511/v1_Lat.txt')
-            lons = load_data(dataset_dir + '1511/v1_Lon.txt')
-            self._altitude = bicubic_2D_interpolator(lats, lons, vals)
+            vals = load_data(os.path.join(dataset_dir,
+                                          '1511/v1_TOPO_0DOT5.txt'))
+            lats = load_data(os.path.join(dataset_dir, '1511/v1_Lat.txt'))
+            lons = load_data(os.path.join(dataset_dir, '1511/v1_Lon.txt'))
+            self._altitude = bicubic_2D_interpolator(np.flipud(lats), lons,
+                                                     np.flipud(vals))
 
         return self._altitude(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+                np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def topographic_altitude(self, lat_d, lon_d):
         """
@@ -101,13 +105,15 @@ class _ITU1511_0():
 
     def altitude(self, lat, lon):
         if not self._altitude:
-            vals = load_data(dataset_dir + '1511/v1_TOPO_0DOT5.txt')
-            lats = load_data(dataset_dir + '1511/v1_Lat.txt')
-            lons = load_data(dataset_dir + '1511/v1_Lon.txt')
-            self._altitude = bicubic_2D_interpolator(lats, lons, vals)
+            vals = load_data(os.path.join(dataset_dir,
+                                          '1511/v1_TOPO_0DOT5.txt'))
+            lats = load_data(os.path.join(dataset_dir, '1511/v1_Lat.txt'))
+            lons = load_data(os.path.join(dataset_dir, '1511/v1_Lon.txt'))
+            self._altitude = bicubic_2D_interpolator(np.flipud(lats), lons,
+                                                     np.flipud(vals))
 
         return self._altitude(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+                np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def topographic_altitude(self, lat_d, lon_d):
         """
@@ -135,6 +141,7 @@ def change_version(new_version):
     """
     global __model
     __model = __ITU1511(new_version)
+    utils.memory.clear()
 
 
 def get_version():
@@ -179,5 +186,5 @@ def topographic_altitude(lat, lon):
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
     val = __model.topographic_altitude(lat, lon)
-    val = np.maximum(val, 0.001)
+    val = np.maximum(val, 1e-7)
     return prepare_output_array(val, type_output) * u.km

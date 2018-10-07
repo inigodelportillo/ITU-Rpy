@@ -46,7 +46,6 @@ m = itur.utils.plot_in_map(Att, lat, lon,
 # Plot the satellite location
 m.scatter(lon_sat, lat_sat, c='white', s=20)
 
-
 # Now we show the surface mean temperature distribution
 T = itur.surface_mean_temperature(lat, lon)\
     .to(itur.u.Celsius, equivalencies=itur.u.temperature())

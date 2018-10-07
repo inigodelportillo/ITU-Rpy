@@ -5,7 +5,6 @@ from __future__ import print_function
 
 import numpy as np
 from scipy.interpolate import griddata, RegularGridInterpolator
-from scipy.ndimage.interpolation import map_coordinates
 
 """
 Interpolation methods for the geophysical properties used to compute
@@ -45,9 +44,9 @@ def is_regular_grid(lats_o, lons_o):
     return (Delta_lons.size == 1 and (Delta_lons != 0).all() and
             Delta_lats.size == 1 and (Delta_lats != 0).all())
 
-###############################################
-####                    Nearest Neighbour Interpolation                    ####
-###############################################
+###############################################################################
+#                       Nearest Neighbour Interpolation                       #
+###############################################################################
 
 
 def nearest_2D_interpolator(lats_o, lons_o, values):
@@ -96,9 +95,9 @@ def _nearest_2D_interpolator_arb(lats_o, lons_o, values):
                               (x[:, 0], x[:, 1]), 'nearest')
 
 
-############################################
-####                         Bilinear Interpolation                        ####
-############################################
+###############################################################################
+#                            Bilinear Interpolation                           #
+###############################################################################
 
 def bilinear_2D_interpolator(lats_o, lons_o, values):
     '''
@@ -145,9 +144,9 @@ def _bilinear_2D_interpolator_arb(lats_o, lons_o, values):
                               (x[:, 0], x[:, 1]), 'linear')
 
 
-############################################
-####                         Bicubic Interpolation                         ####
-############################################
+###############################################################################
+#                            Bicubic Interpolation                            #
+###############################################################################
 
 def bicubic_2D_interpolator(lats_o, lons_o, values):
     '''
@@ -175,11 +174,9 @@ def bicubic_2D_interpolator(lats_o, lons_o, values):
         Bicubic interpolator function
     '''
     if is_regular_grid(lats_o[2:-2, 2:-2], lons_o[2:-2, 2:-2]):
-        return lambda x: _bicubic_2D_interpolator_reg(lats_o, lons_o,
-                                                      values, x)
+        return _bicubic_2D_interpolator_reg(lats_o, lons_o, values)
     else:
-        return
-    _bicubic_2D_interpolator_arb(lats_o, lons_o, values)
+        return _bicubic_2D_interpolator_arb(lats_o, lons_o, values)
 
 
 def _bicubic_2D_interpolator_arb(lats_o, lons_o, values):
@@ -187,9 +184,44 @@ def _bicubic_2D_interpolator_arb(lats_o, lons_o, values):
                               values.ravel(), (x[:, 0], x[:, 1]), 'cubic')
 
 
-def _bicubic_2D_interpolator_reg(lats_o, lons_o, values, x):
-    D_lat = np.unique(np.diff(lats_o[2:-2, 2]))
-    D_lon = np.unique(np.diff(lons_o[2, 2:-2]))
-    return map_coordinates(
-        values, np.array([(x[:, 0] + lats_o.min()) / D_lat, x[:, 1] / D_lon]),
-        order=3, mode='nearest')
+def _bicubic_2D_interpolator_reg(lats_o, lons_o, values):
+    lat_row = lats_o[1:-1, 1]
+    lon_row = lons_o[1, 1:-1]
+    I = values
+
+    def K(d):
+        d = np.abs(d)
+        return np.where(np.logical_and(d >= 0, d <= 1),
+                        1.5 * d**3 - 2.5 * d**2 + 1,
+                        np.where(np.logical_and(d >= 1, d <= 2),
+                                 -0.5 * d**3 + 2.5 * d**2 - 4 * d + 2, 0))
+
+    def interpolator(vect):
+        lat = vect[:, 0]
+        lon = vect[:, 1]
+
+        # Make sure that we do not hit the limit cases
+        R = ((np.searchsorted(lat_row, lat, 'right') - 1) +
+             (np.searchsorted(lat_row, lat, 'left') - 1))//2
+        C = ((np.searchsorted(lon_row, lon, 'right') - 1) +
+             (np.searchsorted(lon_row, lon, 'right') - 1))//2
+
+        diff_lats = np.diff(lat_row)[0]
+        diff_lons = np.diff(lon_row)[0]
+
+        r = (lat - lat_row[0]) / diff_lats + 1
+        c = (lon - lon_row[0]) / diff_lons + 1
+
+        RI_Rc = I[R, C] * K(c - C) + I[R, C + 1] * K(c - (C + 1)) + \
+            I[R, C + 2] * K(c - (C + 2)) + I[R, C + 3] * K(c - (C + 3))
+        RI_R1c = I[R + 1, C] * K(c - C) + I[R + 1, C + 1] * K(c - (C + 1)) + \
+            I[R + 1, C + 2] * K(c - (C + 2)) + I[R + 1, C + 3] * K(c - (C + 3))
+        RI_R2_c = I[R + 2, C] * K(c - C) + I[R + 2, C + 1] * K(c - (C + 1)) +\
+            I[R + 2, C + 2] * K(c - (C + 2)) + I[R + 2, C + 3] * K(c - (C + 3))
+        RI_R3_c = I[R + 3, C] * K(c - C) + I[R + 3, C + 1] * K(c - (C + 1)) +\
+            I[R + 3, C + 2] * K(c - (C + 2)) + I[R + 3, C + 3] * K(c - (C + 3))
+
+        return (RI_Rc * K(r - R) + RI_R1c * K(r - (R + 1)) +
+                RI_R2_c * K(r - (R + 2)) + RI_R3_c * K(r - (R + 3)))
+
+    return interpolator

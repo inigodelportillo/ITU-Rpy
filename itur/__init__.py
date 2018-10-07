@@ -7,8 +7,9 @@ from .models.itu618 import rain_attenuation, scintillation_attenuation
 from .models.itu676 import gaseous_attenuation_slant_path,\
     gaseous_attenuation_inclined_path,\
     gaseous_attenuation_terrestrial_path
-from .models.itu835 import pressure
-from .models.itu836 import surface_water_vapour_density
+from .models.itu835 import standard_pressure
+from .models.itu836 import surface_water_vapour_density, \
+    total_water_vapour_content
 from .models.itu840 import cloud_attenuation
 from .models.itu1510 import surface_mean_temperature
 from .models.itu1511 import topographic_altitude
@@ -24,7 +25,7 @@ AUTHORS = "Inigo del Portillo"
 
 def atmospheric_attenuation_slant_path(
         lat, lon, f, el, p, D, hs=None, rho=None, R001=None, eta=0.5, T=None,
-        H=None, P=None, hL=1e3, Ls=None, tau=45, mode='approx',
+        H=None, P=None, hL=1e3, Ls=None, tau=45, V_t=None, mode='approx',
         return_contributions=False, include_rain=True, include_gas=True,
         include_scintillation=True, include_clouds=True):
     """ Calculation of long-term atmospheric attenuation statistics.
@@ -56,9 +57,9 @@ def atmospheric_attenuation_slant_path(
         Water vapor density (g/m3). If not provided, an estimate is obtained
         from Recommendation Recommendation ITU-R P.836.
     R001: number  or Quantity, optional
-        Point rainfall rate for the location for 0.01% of an average year (mm/h).
-        If not provided, an estimate is obtained from Recommendation
-        Recommendation ITU-R P.837. Some useful values:
+        Point rainfall rate for the location for 0.01% of an average year \
+        (mm/h). If not provided, an estimate is obtained from Recommendation
+        ITU-R P.837. Some useful values:
             * 0.25 mm/h : Drizle
             *  2.5 mm/h : Light rain
             * 12.5 mm/h : Medium rain
@@ -81,11 +82,15 @@ def atmospheric_attenuation_slant_path(
         Height of the turbulent layer (m). Default value 1000 m
     Ls :number, optional
         Slant path length (km). If not provided, it will be computed using the
-        rain height and the elevation angle. The ITU model does not require this
-        parameter as an input.
+        rain height and the elevation angle. The ITU model does not require
+        this parameter as an input.
     tau : number, optional
         Polarization tilt angle relative to the horizontal (degrees)
         (tau = 45 deg for circular polarization). Default value is 45
+    V_t : number or Quantity, optional
+        Integrated water vapour content along the path (kg/m2 or mm).
+        If not provided this value is estimated using Recommendation
+        ITU-R P.836. Default value None
     mode : string, optional
         Mode for the calculation of gaseous attenuation. Valid values are
         'approx', 'exact'. If 'approx' Uses the method in Annex 2 of
@@ -116,7 +121,7 @@ def atmospheric_attenuation_slant_path(
         Total atmospheric attenuation (dB)
 
     Ag, Ac, Ar, As, A : tuple
-        Gaseous, Cloud, Rain, Scintillation cotributions to total attenuation,
+        Gaseous, Cloud, Rain, Scintillation contributions to total attenuation,
         and total attenuation (dB)
 
 
@@ -129,13 +134,19 @@ def atmospheric_attenuation_slant_path(
 
 
     """
-    if p < 0.001 or p > 50:
+    if np.logical_or(p < 0.001, p > 50).any():
         warnings.warn(
             RuntimeWarning(
                 'The method to compute the total '
-                'atmospheric attenuation in recommendation ITU-P 618-12 '
+                'atmospheric attenuation in recommendation ITU-P 618-13 '
                 'is only recommended for unavailabilities (p) between '
                 '0.001 % and 50 %'))
+
+    # This takes account of the fact that a large part of the cloud attenuation
+    # and gaseous attenuation is already included in the rain attenuation
+    # prediction for time percentages below 1%. Eq. 64 and Eq. 65 in
+    # Recommendation ITU 618-12
+    p_c_g = np.maximum(1, p)
 
     # Estimate the ground station altitude
     if hs is None:
@@ -147,11 +158,15 @@ def atmospheric_attenuation_slant_path(
 
     # Estimate the surface Pressure
     if P is None:
-        P = pressure(lat, hs)
+        P = standard_pressure(hs)
+
+    # Estimate the surface Pressure
+    if V_t is None:
+        V_t = total_water_vapour_content(lat, lon, p_c_g, hs)
 
     # Estimate the surface water vapour density
     if rho is None:
-        rho = surface_water_vapour_density(lat, lon, p, hs)
+        rho = surface_water_vapour_density(lat, lon, p_c_g, hs)
 
     # Compute the attenuation components
     if include_rain:
@@ -159,14 +174,8 @@ def atmospheric_attenuation_slant_path(
     else:
         Ar = 0 * u.dB
 
-    # This takes account of the fact that a large part of the cloud attenuation
-    # and gaseous attenuation is already included in the rain attenuation
-    # prediction for time percentages below 1%. Eq. 64 and Eq. 65 in
-    # Recommendation ITU 618-12
-    p_c_g = max(1, p)
-
     if include_gas:
-        Ag = gaseous_attenuation_slant_path(f, el, rho, P, T, mode)
+        Ag = gaseous_attenuation_slant_path(f, el, rho, P, T, V_t, hs, mode)
     else:
         Ag = 0 * u.dB
 
