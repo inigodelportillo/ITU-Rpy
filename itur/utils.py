@@ -330,7 +330,7 @@ def elevation_angle(h, lat_s, lon_s, lat_grid, lon_grid):
 
 def plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
                 lon_min=None, lon_max=None, cbar_text='', ax=None,
-                **kwargs):
+                figsize=(6, 4), **kwargs):
     '''
     Displays the value sin data in a map.
 
@@ -388,7 +388,8 @@ def plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
         lon_min = np.min(lon)
 
     if ax is None:
-        ax = plt.subplot(111)
+        fig = plt.figure(figsize=figsize)
+        ax = fig.add_subplot(111)
 
     m = Basemap(ax=ax, projection='cyl', llcrnrlat=lat_min,
                 urcrnrlat=lat_max, llcrnrlon=lon_min, urcrnrlon=lon_max,
