@@ -2,6 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from satcomm_utils import RE, LLA_to_ECEF
+from scipy.special import jv
 
 
 """
@@ -70,6 +71,63 @@ def calculate_psi(lat_boresight, lon_boresight, lat_sat, lon_sat,
 
 
 def calculate_gain(lat_boresight, lon_boresight, lat_sat, lon_sat, lat, lon, a,
+                   G_m, D=None, l=None, psi_b=None, psi=None):
+    """
+        Calculates the gain pattern of a multiple-beam satellite antenna having
+        circular or elliptical beams. Method from Christopoulos et al. 2012
+
+
+        Parameters
+        -----------
+        lat_boresight: float
+            Latitude coordinate of the beam boresight
+        lon_boresight: float
+            Longitude coordinate of the beam boresight
+        lat_sat: float
+            Latitude coordinate of the satellite
+        lon_sat: float
+            Longitude coordinate of the satellite
+        lat: numpy.ndarray or list or float
+            Latitude coordinates of the points for which psi will be calculated
+        lon: numpy.ndarray or list or float
+            Longitude coordinates of the points for which psi will be calculated
+        a: float
+            Semi-major axis of the satellite (km)
+        G_m: float
+            Maximum gain in the boresight, the main lobe (dB)
+        D: float
+            Diameter of the antenna (m), used to calculate psi_b if not given
+        l: float
+            Wavelength of the lowest band edge of interest(m), used to calculate
+            psi_b if not given
+        psi_b: float
+            One-half the 3 dB beamwidth (3 dB below G_m) (deg)
+        psi: np.array
+            Angles  (deg) from the boresight to the points on which gain is to be
+            calculated. If it is given, lats, lons and 'a' are ignored.
+
+
+        Returns
+        --------
+        gain: numpy.ndarray
+            Antenna gain in the direction specified by the input parameters (dB)
+        """
+    if psi is None:
+        psi = calculate_psi(lat_boresight, lon_boresight, lat_sat, lon_sat,
+                            lat, lon, a)
+    else:
+        psi = convert_nparray(psi)
+
+    assert all(0 <= angle <= 90 for angle in psi)
+
+    if psi_b is None:
+        psi_b = np.sqrt(1200)/(D/l)
+
+    u = 2.07123*np.sin(np.deg2rad(psi))/np.sin(np.deg2rad(psi_b))
+    return G_m + 10*np.log10((jv(1, u) / (2*u) + 36*jv(3, u) / (u**3))**2)
+
+
+def calculate_gain_1528(lat_boresight, lon_boresight, lat_sat, lon_sat, lat, lon, a,
                    G_m, D=None, l=None, L_n=-25, L_f=3, z=1, psi_b=None,
                    psi=None):
     """
@@ -159,17 +217,17 @@ if __name__ == '__main__':
     lat_lon_boresight = [2, 0]
     lat_sat = 0
     lon_sat = 1
-    a = 2*RE
+    a = (35786 + RE)
     # lat_lon = [20.1, 9.9]
     lat = 0
     lon = 3
-    epsilon = 0.4
-    freq = 30e9
+    epsilon = 0.22
+    freq = 20e9
     G_m = 35
     print(calculate_gain(*lat_lon_boresight, lat_sat, lon_sat,
                          lat, lon, a, G_m, psi_b=epsilon))
 
-    psi = np.linspace(0, 12)
+    psi = np.linspace(0, 20, num=1000)
     G = calculate_gain(0, 0, 0, 0, 0, 0, 0, G_m, psi_b=epsilon, psi=psi)
     plt.plot(psi, G)
     plt.title('Radiation pattern envelope function')
