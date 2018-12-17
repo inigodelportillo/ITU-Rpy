@@ -29,7 +29,9 @@ def __gamma0_exact__676_9_11__(self, f, p, rho, T):
 
     D_f_ox = self.a3 * 1e-4 * (p * (theta ** (0.8 - self.a4)) +
                                1.1 * e * theta)
-
+                               
+    D_f_ox = np.sqrt(D_f_ox**2 + 2.25e-6)
+    
     delta_ox = (self.a5 + self.a6 * theta) * 1e-4 * (p + e) * theta**0.8
 
     F_i_ox = f / f_ox * ((D_f_ox - delta_ox * (f_ox - f)) /
