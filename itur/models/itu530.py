@@ -211,7 +211,7 @@ class _ITU530_17():
         # Step 1: Obtain the rain rate R0.01 exceeded for 0.01% of the time
         # (with an integration time of 1 min).
         if R001 is None:
-            R001 = rainfall_rate(lat, lon, 0.01)
+            R001 = rainfall_rate(lat, lon, 0.01).value
 
         # Step 2: Compute the specific attenuation, gammar (dB/km) for the
         # frequency, polarization and rain rate of interest using
@@ -223,7 +223,7 @@ class _ITU530_17():
         # multiplying the actual path length d by a distance factor r
         r = 1 / (0.477 * d ** 0.633 * R001 ** (0.073 * alpha) *
                  f**(0.123) - 10.579 * (1 - np.exp(-0.024 * d)))  # Eq. 32 [-]
-        deff = np.minimum(r, 2.5)
+        deff = np.minimum(r, 2.5) * d
 
         # Step 4: An estimate of the path attenuation exceeded for 0.01% of
         # the time is given by:
@@ -237,7 +237,7 @@ class _ITU530_17():
         # Eq. 35b [-]
         C2 = 0.855 * C0 + 0.546 * (1 - C0)
         C3 = 0.139 * C0 + 0.043 * (1 - C0)                      # Eq. 35c [-]
-        Ap = A001 * C1 * p ** (- (C2 + C3 * np.log10(p)))      # Eq. 34 [dB]
+        Ap = A001 * C1 * p ** (- (C2 + C3 * np.log10(p)))       # Eq. 34 [dB]
         return Ap
 
     def inverse_rain_attenuation(
@@ -249,7 +249,7 @@ class _ITU530_17():
         # Step 1: Obtain the rain rate R0.01 exceeded for 0.01% of the time
         # (with an integration time of 1 min).
         if R001 is None:
-            R001 = rainfall_rate(lat, lon, 0.01)
+            R001 = rainfall_rate(lat, lon, 0.01).value
 
         # Step 2: Compute the specific attenuation, gammar (dB/km) for the
         # frequency, polarization and rain rate of interest using
@@ -261,7 +261,7 @@ class _ITU530_17():
         # multiplying the actual path length d by a distance factor r
         r = 1 / (0.477 * d ** 0.633 * R001 ** (0.073 * alpha) *
                  f**(0.123) - 10.579 * (1 - np.exp(-0.024 * d)))
-        deff = np.minimum(r, 2.5)
+        deff = np.minimum(r, 2.5) * d
 
         # Step 4: An estimate of the path attenuation exceeded for 0.01% of
         # the time is given by:
