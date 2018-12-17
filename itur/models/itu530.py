@@ -63,7 +63,7 @@ class __ITU530():
         return self.instance.multipath_loss_for_A(lat, lon, h_e, h_r, d, f, A)
 
     def multipath_loss(self, lat, lon, h_e, h_r, d, f, A):
-        return self.intance.multipath_loss(lat, lon, h_e, h_r, d, f, A)
+        return self.instance.multipath_loss(lat, lon, h_e, h_r, d, f, A)
 
     def rain_attenuation(self, lat, lon, d, f, el, p, tau=45, R001=None):
         return self.instance.rain_attenuation(lat, lon, d, f, el, p, tau, R001)
