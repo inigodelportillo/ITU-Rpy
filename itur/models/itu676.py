@@ -140,6 +140,11 @@ class __ITU676():
         fcn = np.vectorize(self.instance.gaseous_attenuation_terrestrial_path)
         return fcn(r, f, el, rho, P, T, mode)
 
+    def gaseous_attenuation_inclined_path(self, f, el, rho, P, T, h1, h2, mode):
+        # Abstract method to compute the gaseous attenuation over an inclined path
+        fcn = np.vectorize(self.instance.gaseous_attenuation_inclined_path)
+        return fcn(f, el, rho, P, T, h1, h2, mode)
+        
     def gaseous_attenuation_slant_path(self, f, el, rho, P, T, V_t, h, mode):
         # Abstract method to compute the gaseous attenuation over a slant path
         fcn = np.vectorize(self.instance.gaseous_attenuation_slant_path)
