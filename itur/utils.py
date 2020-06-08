@@ -380,8 +380,10 @@ def plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
                          'lon_max\} need to be provided')
 
     elif lat is not None and lon is not None:
-        assert(np.shape(lat) == np.shape(lon) and
-               np.shape(lat) == np.shape(data))
+        if not(np.shape(lat) == np.shape(lon) and
+               np.shape(lat) == np.shape(data)):
+            raise RuntimeError('Shape of latitude grid is not equal to shape'
+                               'of longitude grid')
         lat_max = np.max(lat)
         lat_min = np.min(lat)
         lon_max = np.max(lon)
