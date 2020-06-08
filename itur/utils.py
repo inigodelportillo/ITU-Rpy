@@ -3,12 +3,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import numpy as np
 import os
 import numbers
+import numpy as np
 
-from tempfile import mkdtemp
 from joblib import Memory
+from tempfile import mkdtemp
 from astropy import units as u
 
 from pyproj import Geod
@@ -29,6 +29,8 @@ __wgs84_geod__ = Geod(ellps='WGS84')
 def load_data(path, is_text=False, **kwargs):
     """ Loads data files from /itur/data/
 
+    Loads data from a comma-separated file. The contents of the file can be
+    numeric or text-based.
 
     Parameters
     ----------
@@ -43,6 +45,7 @@ def load_data(path, is_text=False, **kwargs):
     data: numpy.ndarray
         Numpy-array with the data. Numerical data is returned as a float
     """
+    # TODO: Change method to allow for h5df data too
     if is_text:
         data = np.loadtxt(path, dtype=np.string_, delimiter=',', **kwargs)
     else:
@@ -50,44 +53,63 @@ def load_data(path, is_text=False, **kwargs):
     return data
 
 
-def prepare_input_array(array):
-    """ Formats an array to be a 2-D numpy-array
+def prepare_input_array(input_array):
+    """ Formats an array to be a 2-D numpy-array.
+
+    If the contents of input_array are 0-D or 1D, it converts is to an
+    array with at least two dimensions.
     """
-    if array is None:
+    if input_array is None:
         return None
 
-    return np.atleast_2d(array)
+    return np.atleast_2d(input_array)
 
 
-def prepare_output_array(array, type_input=None):
-    """ Formats the output to have the same shape and type as the input
+def prepare_output_array(output_array, type_input=None):
+    """ Formats the output to have the same shape and type as the input.
+
+    This function is a generic wrapper to format the output of a function
+    to have the same type as the input. ITU-Rpy makes extensive use of numpy
+    arrays, but uses this fucntion to return outputs having the same type
+    that was provided in the input of the function.
     """
     global output_quantity
 
-    if isinstance(array, u.Quantity):
-        value = array.value
-        unit = array.unit
+    # First, differentiate between the units and the value of the output_array
+    # since the rest of the funcion is mainly focused on casting the value
+    # of the output_array to the type in type_input
+    if isinstance(output_array, u.Quantity):
+        value = output_array.value
+        unit = output_array.unit
     else:
-        value = array
+        value = output_array
         unit = None
 
     # Squeeze output array to remove singleton dimensions
-    if type(value) in [np.ndarray, list]:
+    if isinstance(value, int) or isinstance(value, list):
         value = np.array(value).squeeze()
 
+    # First, cast the output_array to the same type of the input
+    # Check if the output array is a 0-D number and cast it to a float
     if (type_input in __NUMERIC_TYPES__ and
-        (type(array) in __NUMERIC_TYPES__) or
-        ((isinstance(array, np.ndarray) and array.size == 1) or
-         (not type(array) not in __NUMERIC_TYPES__ and len(array) == 1))):
+        (type(output_array) in __NUMERIC_TYPES__) or
+        ((isinstance(output_array, np.ndarray) and output_array.size == 1) or
+         (not type(output_array) not in __NUMERIC_TYPES__ and
+          len(output_array) == 1))):
         value = float(value)
+
+    # Check if the input array was a list and conver appropriately
     elif type_input is list:
         if isinstance(value, np.ndarray):
             value = value.tolist()
         else:
             value = list(value)
+
+    # Otherwise, we assume that the value already has the required type
     else:
         value = value
 
+    # Add the units of the
     if unit is not None:
         return value * unit
     else:
@@ -95,19 +117,27 @@ def prepare_output_array(array, type_input=None):
 
 
 def prepare_quantity(value, units=None, name_val=None):
-    """ The function verifys that a
+    """ Convert the input to the required units
+
+    The function verifies that the input has the right units and converts
+    it to the desired units. For example, if a value is introduced in km
+    but posterior frequencies require this value to be in meters, this
+    function would be called with `units=u.m`
     """
+
     if value is None:
         return None
 
+    # If the units of the value are a temperature
     if isinstance(value, u.Quantity):
         if units in [u.K, u.deg_C, u.Kelvin, u.Celsius, u.imperial.deg_F]:
             return value.to(units, equivalencies=u.temperature()).value
         else:
             return value.to(units).value
-
+    # Process numbers
     elif isinstance(value, numbers.Number) and units is not None:
         return value
+    # Process arrays and tuples
     elif isinstance(value, np.ndarray) and units is not None:
         return value
     elif isinstance(value, list) and units is not None:
@@ -122,9 +152,8 @@ def prepare_quantity(value, units=None, name_val=None):
 
 def compute_distance_earth_to_earth(lat_p, lon_p, lat_grid, lon_grid,
                                     method=None):
-    '''
-    Compute the distance between a point (P) in (lat_s, lon_s) and a matrix of
-    latitude and longitudes (lat_grid, lon_grid).
+    """
+    Compute the distance between a point and a matrix of (lat, lons).
 
     If the number of elements in lat_grid is smaller than 100,000, uses the
     WGS84 method, otherwise, uses the harvesine formula.
@@ -148,7 +177,7 @@ def compute_distance_earth_to_earth(lat_p, lon_p, lat_grid, lon_grid,
         Distance between the point P and each point in (lat_grid, lon_grid)
         (km)
 
-    '''
+    """
     if ((method == 'WGS84' and not(method is not None)) or
         (type(lat_p) in __NUMERIC_TYPES__) or
         (type(lat_grid) in __NUMERIC_TYPES__) or
@@ -162,7 +191,9 @@ def compute_distance_earth_to_earth(lat_p, lon_p, lat_grid, lon_grid,
 
 
 def compute_distance_earth_to_earth_wgs84(lat_p, lon_p, lat_grid, lon_grid):
-    '''
+    """
+    Computes the distance between points using the WGS84 inverse method.
+
     Compute the distance between a point (P) in (lat_s, lon_s) and a matrix of
     latitude and longitudes (lat_grid, lon_grid) using the WGS84 inverse method
 
@@ -185,7 +216,7 @@ def compute_distance_earth_to_earth_wgs84(lat_p, lon_p, lat_grid, lon_grid):
         Distance between the point P and each point in (lat_grid, lon_grid)
         (km)
 
-    '''
+    """
     lat_p = lat_p * np.ones_like(lat_grid)
     lon_p = lon_p * np.ones_like(lon_grid)
     _a, _b, d = __wgs84_geod__.inv(lon_p, lat_p, lon_grid, lat_grid)
@@ -194,7 +225,8 @@ def compute_distance_earth_to_earth_wgs84(lat_p, lon_p, lat_grid, lon_grid):
 
 def compute_distance_earth_to_earth_haversine(lat_p, lon_p,
                                               lat_grid, lon_grid):
-    '''
+    """Computes the distance between points using the Haversine formula
+
     Compute the distance between a point (P) in (lat_s, lon_s) and a matrix of
     latitude and longitudes (lat_grid, lon_grid) using the Haversine formula
 
@@ -220,7 +252,7 @@ def compute_distance_earth_to_earth_haversine(lat_p, lon_p,
 
     References
     This is based on the Haversine formula
-    '''
+    """
     RE = 6371.0  # Radius of the Earth, km
 
     lat1 = np.deg2rad(lat_grid)
@@ -241,10 +273,11 @@ def compute_distance_earth_to_earth_haversine(lat_p, lon_p,
 
 def regular_lat_lon_grid(resolution_lat=1, resolution_lon=1, lon_start_0=False,
                          lat_min=-90, lat_max=90, lon_min=-180, lon_max=180):
-    '''
-    Build latitude and longitude coordinate matrix with resolution
-    resolution_lat, resolution_lon
+    """ Builds regular latitude and longitude matrices.
 
+
+    Builds a latitude and longitude coordinate matrix with resolution
+    resolution_lat, resolution_lon.
 
     Parameters
     ----------
@@ -263,7 +296,7 @@ def regular_lat_lon_grid(resolution_lat=1, resolution_lon=1, lon_start_0=False,
         Grid of coordinates of the latitude point
     lon: numpy.ndarray
         Grid of coordinates of the latitude point
-    '''
+    """
     if lon_start_0:
         lon, lat = np.meshgrid(np.arange(lon_min + 180.0, lon_max + 180.0,
                                          resolution_lon),
@@ -276,7 +309,8 @@ def regular_lat_lon_grid(resolution_lat=1, resolution_lon=1, lon_start_0=False,
 
 
 def elevation_angle(h, lat_s, lon_s, lat_grid, lon_grid):
-    '''
+    """ Computes the elevation angle between a satellite and a point.
+
     Compute the elevation angle between a satellite located in an orbit
     at height h and located above coordinates (lat_s, lon_s) and a matrix of
     latitude and longitudes (lat_grid, lon_grid)
@@ -305,7 +339,7 @@ def elevation_angle(h, lat_s, lon_s, lat_grid, lon_grid):
 
     References
     [1] http://www.propagation.gatech.edu/ECE6390/notes/ASD5.pdf - Slides 3, 4
-    '''
+    """
     h = prepare_quantity(h, u.km, name_val='Orbital altitude of the satellite')
 
     RE = 6371.0     # Radius of the Earth (km)
@@ -331,11 +365,11 @@ def elevation_angle(h, lat_s, lon_s, lat_grid, lon_grid):
 def plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
                 lon_min=None, lon_max=None, cbar_text='', ax=None,
                 figsize=(6, 4), **kwargs):
-    '''
-    Displays the value sin data in a map.
+    """
+    Displays the values in data in a map.
 
     Either {lat, lon} or {lat_min, lat_max, lon_min, lon_max} need to be
-    provided as inputs.
+    provided as inputs. This function required that basemap is installed
 
     Parameters
     ----------
@@ -365,14 +399,15 @@ def plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
     -------
     m : Basemap
         The map object generated by Basemap
-    '''
+    """
     import matplotlib.pyplot as plt
 
     try:
         from mpl_toolkits.basemap import Basemap
     except BaseException:
         raise RuntimeError('Basemap is not installed and therefore plot_in_map'
-                           ' cannot be used')
+                           ' cannot be used. To use this function you need'
+                           ' to install the basemap library')
 
     if all([el is None for el in [lat, lon, lat_min, lon_min,
                                   lat_max, lon_max]]):
