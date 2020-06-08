@@ -17,8 +17,10 @@ from itur.utils import prepare_input_array, prepare_quantity, load_data,\
     dataset_dir, prepare_output_array
 
 
-class __ITU530():
-    """Propagation data and prediction methods required for the design of
+class __ITU530__():
+    """ Private class to model the ITU-R P.530 recommendations
+
+    Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems
 
     Available versions:
@@ -39,7 +41,7 @@ class __ITU530():
 
     def __init__(self, version=17):
         if version == 17:
-            self.instance = _ITU530_17()
+            self.instance = _ITU530_17_()
         elif version == 16:
             self.instance = _ITU530_16()
         else:
@@ -87,7 +89,7 @@ class __ITU530():
                                                       tau, U0, XPIF)
 
 
-class _ITU530_17():
+class _ITU530_17_():
 
     def __init__(self):
         self.__version__ = 17
@@ -99,8 +101,12 @@ class _ITU530_17():
 
     @classmethod
     def s_a(self, lat, lon):
-        """ Standard deviation of terrain heights (m) within a 110 km × 110 km
-        area with a 30 s resolution (e.g. the Globe “gtopo30” data).
+        """ Standard deviation of terrain heights
+
+        Computes the Standard deviation of terrain heights (m) within a
+        110 km × 110 km area with a 30 s resolution (e.g. the Globe “gtopo30”
+        data).
+
         The value for the mid-path may be obtained from an area roughness
         with 0.5 × 0.5 degree resolution of geographical coordinates
         using bi-linear interpolation.
@@ -119,7 +125,9 @@ class _ITU530_17():
     ###########################################################################
     @classmethod
     def fresnel_ellipse_radius(self, d1, d2, f):
-        """ Implementation of 'fresnel_ellipse_radius' method for recommendation
+        """ Computes the Fresnel ellipse radius at a given frequency
+
+        Implementation of 'fresnel_ellipse_radius' method for recommendation
         ITU-P R.530-16. See documentation for function
         'ITUR530.fresnel_ellipse_radius'
         """
@@ -127,7 +135,9 @@ class _ITU530_17():
 
     @classmethod
     def diffraction_loss(self, d1, d2, h, f):
-        """ Implementation of 'diffraction_loss' method for recommendation
+        """ Computes the diffraction losses at a given frequency
+
+        Implementation of 'diffraction_loss' method for recommendation
         ITU-P R.530-16. See documentation for function
         'ITUR530.diffraction_loss'
         """
@@ -140,20 +150,23 @@ class _ITU530_17():
     ###########################################################################
     @classmethod
     def multipath_loss_for_A(self, lat, lon, h_e, h_r, d, f, A):
-        """ Implementation of 'multipath_loss_for_A' method for recommendation
+        """ Computes the percentage of time that a fade depth A is exceeded
+            due to multi-path losses
+
+        Implementation of 'multipath_loss_for_A' method for recommendation
         ITU-P R.530-16. See documentation for function
         'ITUR530.multipath_loss_for_A'
         """
 
         # Step 1: Estimate the geoclimatic factor K
-        # DN1 point refractivity gradient in the lowest 65 m of the atmospher
+        # DN1 point refractivity gradient in the lowest 65 m of the atmosphere
         # not exceeded for 1% of an average year
         # s_a is the area terrain roughness
         s_a = self.s_a(lat, lon)
         dN1 = DN65(lat, lon, 1).value
         K = 10**(-4.4 - 0.0027 * dN1) * (10 + s_a)**(-0.46)       # Eq. 4 [-]
 
-        # Step 2: Claculate the magnitude of the path inclination
+        # Step 2: Calculate the magnitude of the path inclination
         # Eq. 5 [mrad]
         e_p = np.abs(h_r - h_e) / d
 
@@ -161,19 +174,23 @@ class _ITU530_17():
         # percentage of time (p_W) that fade depth A (dB) is exceeded in the
         # average worst month
         h_L = np.minimum(h_e, h_r)
-        p_W = K * d**3.4 (1 + e_p)**-1.03 * f**0.8 * \
+        p_W = K * d**3.4 * (1 + e_p)**-1.03 * f**0.8 * \
             10**(-0.00076 * h_L - A / 10)
         # Eq. 7 [%]
         return p_W
 
     @classmethod
     def multipath_loss(self, lat, lon, h_e, h_r, d, f, A):
-        """ Implementation of 'multipath_loss' method for recommendation
+        """ Estimate the number of fade events exceeding attenuation 'A'
+            for 10 seconds or longer.
+
+
+        Implementation of 'multipath_loss' method for recommendation
         ITU-P R.530-16. See documentation for function
         'ITUR530.multipath_loss'
         """
         # Step 1: Using the method multipath_loss_for_A calculate the
-        # multipath occurrence factor, p0
+        # multi-path occurrence factor, p0
         p0 = self.multipath_loss_for_A(
             lat, lon, h_e, h_r, d, f, 0)   # Eq. 10 [%]
 
@@ -204,7 +221,9 @@ class _ITU530_17():
     ###########################################################################
     @classmethod
     def rain_attenuation(self, lat, lon, d, f, el, p, tau=45, R001=None):
-        """ Implementation of 'rain_attenuation' method for recommendation
+        """ Estimate long-term statistics of rain attenuation.
+
+        Implementation of 'rain_attenuation' method for recommendation
         ITU-P R.530-16. See documentation for function
         'ITUR530.rain_attenuation'
         """
@@ -213,13 +232,13 @@ class _ITU530_17():
         if R001 is None:
             R001 = rainfall_rate(lat, lon, 0.01).value
 
-        # Step 2: Compute the specific attenuation, gammar (dB/km) for the
+        # Step 2: Compute the specific attenuation, 'gammar' (dB/km) for the
         # frequency, polarization and rain rate of interest using
         # Recommendation ITU-R P.838
         gammar = rain_specific_attenuation(R001, f, el, tau).value
         _, alpha = rain_specific_attenuation_coefficients(f, el, tau)
 
-        # Step 3: Compute the effective path length, deff, of the link by
+        # Step 3: Compute the effective path length, 'deff', of the link by
         # multiplying the actual path length d by a distance factor r
         r = 1 / (0.477 * d ** 0.633 * R001 ** (0.073 * alpha) *
                  f**(0.123) - 10.579 * (1 - np.exp(-0.024 * d)))  # Eq. 32 [-]
@@ -242,7 +261,11 @@ class _ITU530_17():
 
     def inverse_rain_attenuation(
             self, lat, lon, d, f, el, Ap, tau=45, R001=None):
-        """ Implementation of 'inverse_rain_attenuation' method for
+        """
+        Estimate the percentage of time a given attenuation is exceeded due to
+        rain events.
+
+        Implementation of 'inverse_rain_attenuation' method for
         recommendation ITU-P R.530-16. See documentation for function
         'ITUR530.inverse_rain_attenuation'
         """
@@ -251,13 +274,13 @@ class _ITU530_17():
         if R001 is None:
             R001 = rainfall_rate(lat, lon, 0.01).value
 
-        # Step 2: Compute the specific attenuation, gammar (dB/km) for the
+        # Step 2: Compute the specific attenuation, 'gammar' (dB/km) for the
         # frequency, polarization and rain rate of interest using
         # Recommendation ITU-R P.838
         gammar = rain_specific_attenuation(R001, f, el, tau).value
         _, alpha = rain_specific_attenuation_coefficients(f, el, tau).value
 
-        # Step 3: Compute the effective path length, deff, of the link by
+        # Step 3: Compute the effective path length, 'deff', of the link by
         # multiplying the actual path length d by a distance factor r
         r = 1 / (0.477 * d ** 0.633 * R001 ** (0.073 * alpha) *
                  f**(0.123) - 10.579 * (1 - np.exp(-0.024 * d)))
@@ -281,7 +304,11 @@ class _ITU530_17():
 
     @classmethod
     def rain_event_count(self, lat, lon, d, f, el, A, tau=45, R001=None):
-        """ Implementation of 'rain_event_count' method for recommendation
+        """
+        Estimate the number of fade events exceeding attenuation 'A'
+        for 10 seconds or longer.
+
+        Implementation of 'rain_event_count' method for recommendation
         ITU-P R.530-16. See documentation for function
         'ITUR530.rain_event_count'
         """
@@ -300,14 +327,19 @@ class _ITU530_17():
     @classmethod
     def XPD_outage_clear_air(self, lat, lon, h_e, h_r,
                              d, f, XPD_g, C0_I, XPIF=0):
-        """ Implementation of 'XPD_outage_clear_air' method for recommendation
+        """
+        Estimate the probability of outage due to cross-polar discrimination
+        reduction due to clear-air effects, assuming that a target C0_I is
+        required.
+
+        Implementation of 'XPD_outage_clear_air' method for recommendation
         ITU-P R.530-16. See documentation for function
         'ITUR530.XPD_outage_clear_air'
         """
         # Step 1
         XPD_0 = np.where(XPD_g <= 35, XPD_g + 5, 40)            # Eq. 101
 
-        # Step 2: Evaluate the multipath activity parameter:
+        # Step 2: Evaluate the multi-path activity parameter:
         P0 = self.multipath_loss_for_A(lat, lon, h_e, h_r, d, f, 0)
         eta = 1 - np.exp(-0.2 * P0**0.75)                      # Eq. 102
 
@@ -327,7 +359,13 @@ class _ITU530_17():
     @classmethod
     def XPD_outage_precipitation(self, lat, lon, d, f, el, C0_I, tau=45,
                                  U0=15, XPIF=0):
-        """ Implementation of 'XPD_outage_precipitation' method for recommendation
+        """
+        Estimate the probability of outage due to cross-polar discrimination
+        reduction due to clear-air effects, assuming that a target C0_I is
+        required.
+
+
+        Implementation of 'XPD_outage_precipitation' method for recommendation
         ITU-P R.530-16. See documentation for function
         'ITUR530.XPD_outage_precipitation'
         """
@@ -338,14 +376,14 @@ class _ITU530_17():
         # Step 2: Determine the equivalent path attenuation, Ap
         U = U0 + 30 * np.log10(f)
         V = np.where(f < 20, 12.8 * f**0.19, 22.6)
-        Ap = 10 ** ((U - C0_I + XPIF) / V)                      # Eq. 112
+        Ap = 10 ** ((U - C0_I + XPIF) / V)                     # Eq. 112
 
         # Step 3: Determine parameters m and n
         m = min(23.26 * np.log10(Ap / (0.12 * A001)), 40)      # Eq. 113
         n = (-12.7 + np.sqrt(161.23 - 4 * m)) / 2              # Eq. 114
 
         # Step 4 : Determine the outage probability
-        P_XPR = 10**(n - 2)                                     # Eq. 115 [%]
+        P_XPR = 10**(n - 2)                                    # Eq. 115 [%]
         return P_XPR
 
 
@@ -359,56 +397,69 @@ class _ITU530_16():
 
         self._s_a = {}
 
+    @staticmethod
     def s_a(self, *args, **kwargs):
-        return _ITU530_17.s_a(*args, **kwargs)
+        return _ITU530_17_.s_a(*args, **kwargs)
 
     ###########################################################################
     #                               Section 2.2                               #
     ###########################################################################
+    @staticmethod
     def fresnel_ellipse_radius(self, *args, **kwargs):
-        return _ITU530_17.fresnel_ellipse_radius(*args, **kwargs)
+        return _ITU530_17_.fresnel_ellipse_radius(*args, **kwargs)
 
+    @staticmethod
     def diffraction_loss(self, *args, **kwargs):
-        return _ITU530_17.diffraction_loss(*args, **kwargs)
+        return _ITU530_17_.diffraction_loss(*args, **kwargs)
 
     ###########################################################################
     #                               Section 2.3                               #
     ###########################################################################
+    @staticmethod
     def multipath_loss_for_A(self, *args, **kwargs):
-        return _ITU530_17.multipath_loss_for_A(*args, **kwargs)
+        return _ITU530_17_.multipath_loss_for_A(*args, **kwargs)
 
-    def multipath_loss(*args, **kwargs):
-        return _ITU530_17.multipath_loss(*args, **kwargs)
+    @staticmethod
+    def multipath_loss(self, *args, **kwargs):
+        return _ITU530_17_.multipath_loss(*args, **kwargs)
 
     ###########################################################################
     #                               Section 2.4                               #
     ###########################################################################
+    @staticmethod
     def rain_attenuation(self, *args, **kwargs):
-        return _ITU530_17.rain_attenuation(*args, **kwargs)
+        return _ITU530_17_.rain_attenuation(*args, **kwargs)
 
+    @staticmethod
     def inverse_rain_attenuation(self, *args, **kwargs):
-        return _ITU530_17.inverse_rain_attenuation(*args, **kwargs)
+        return _ITU530_17_.inverse_rain_attenuation(*args, **kwargs)
 
+    @staticmethod
     def rain_event_count(self, *args, **kwargs):
-        return _ITU530_17.rain_event_count(*args, **kwargs)
+        return _ITU530_17_.rain_event_count(*args, **kwargs)
 
     ###########################################################################
     #                                Section 4                                #
     ###########################################################################
+    @staticmethod
     def XPD_outage_clear_air(self, *args, **kwargs):
-        return _ITU530_17.XPD_outage_clear_air(*args, **kwargs)
+        return _ITU530_17_.XPD_outage_clear_air(*args, **kwargs)
 
+    @staticmethod
     def XPD_outage_precipitation(self, *args, **kwargs):
-        return _ITU530_17.XPD_outage_precipitation(*args, **kwargs)
+        return _ITU530_17_.XPD_outage_precipitation(*args, **kwargs)
 
 
-__model = __ITU530()
+__model = __ITU530__()
 
 
 def change_version(new_version):
     """
     Change the version of the ITU-R P.530 recommendation currently being used.
 
+
+    This function changes the model used for the ITU-R P.530 recommendation
+    to a different version.
 
     Parameters
     ----------
@@ -418,12 +469,20 @@ def change_version(new_version):
            * P.530-16 (07/15) (Current version)
     """
     global __model
-    __model = __ITU530(new_version)
+    __model = __ITU530__(new_version)
 
 
 def get_version():
-    """
+    """ The version of the current model for the ITU-R P.530 recommendation.
+
+
     Obtain the version of the ITU-R P.530 recommendation currently being used.
+
+    Returns
+    -------
+    version: int
+       The version of the ITU-R P.530 recommendation being used.
+
     """
     global __model
     return __model.__version__
@@ -432,6 +491,7 @@ def get_version():
 def fresnel_ellipse_radius(d1, d2, f):
     """
     Computes the radius of the first Fresnel ellipsoid.
+
 
 
     Parameters
@@ -466,7 +526,9 @@ def fresnel_ellipse_radius(d1, d2, f):
 
 
 def diffraction_loss(d1, d2, h, f):
-    """
+    """ Esitmate the diffraction loss over average terrain.
+
+
     Diffraction loss over average terrain. This value is valid for losses
     greater than 15 dB.
 
@@ -508,7 +570,9 @@ def diffraction_loss(d1, d2, h, f):
 
 
 def multipath_loss_for_A(lat, lon, h_e, h_r, d, f, A):
-    """ Method for predicting the single-frequency (or narrow-band) fading
+    """ Estimate the single-frequency (or narrow-band) fading distribution
+
+    Method for predicting the single-frequency (or narrow-band) fading
     distribution at large fade depths in the average worst month in any part
     of the world. Given a fade depth value 'A', determines the amount of time
     it will be exceeded during a year
@@ -518,7 +582,7 @@ def multipath_loss_for_A(lat, lon, h_e, h_r, d, f, A):
 
     This method is only valid for small percentages of time.
 
-    Multipath fading and enhancement only need to be calculated for path
+    Multi-path fading and enhancement only need to be calculated for path
     lengths longer than 5 km, and can be set to zero for shorter paths.
 
 
@@ -570,7 +634,9 @@ def multipath_loss_for_A(lat, lon, h_e, h_r, d, f, A):
 
 
 def multipath_loss(lat, lon, h_e, h_r, d, f, A):
-    """ Method for predicting the percentage of time that any fade depth is
+    """ Estimate the percentage of time that any fade depth is exceeded.
+
+    Method for predicting the percentage of time that any fade depth is
     exceeded. This method combines the deep fading distribution given in the
     multipath_loss_for_A' and an empirical interpolation procedure for shallow
     fading down to 0 dB.
@@ -578,7 +644,7 @@ def multipath_loss(lat, lon, h_e, h_r, d, f, A):
     This method does not make use of the path profile and can be used for
     initial planning, licensing, or design purposes.
 
-    Multipath fading and enhancement only need to be calculated for path
+    Multi-path fading and enhancement only need to be calculated for path
     lengths longer than 5 km, and can be set to zero for shorter paths.
 
 
@@ -630,8 +696,10 @@ def multipath_loss(lat, lon, h_e, h_r, d, f, A):
 
 
 def rain_attenuation(lat, lon, d, f, el, p, tau=45, R001=None):
-    """ Estimate long-term statistics of rain attenuation. Attenuation can also
-    occur as a result of absorption and scattering by such hydrometeors as
+    """ Estimate long-term statistics of rain attenuation.
+
+    Attenuation can also
+    occur as a result of absorption and scattering by such hydro-meteors as
     rain, snow, hail and fog. Although rain attenuation can be ignored at
     frequencies below about 5 GHz, it must be included in design calculations
     at higher frequencies, where its importance increases rapidly.
@@ -650,16 +718,16 @@ def rain_attenuation(lat, lon, d, f, el, p, tau=45, R001=None):
     el : sequence, or number
         Elevation angle (degrees)
     p : number
-        Percetage of the time the rain attenuation value is exceeded.
+        Percentage of the time the rain attenuation value is exceeded.
     R001: number, optional
         Point rainfall rate for the location for 0.01% of an average year
         (mm/h). If not provided, an estimate is obtained from Recommendation
         Recommendation ITU-R P.837. Some useful values:
-            * 0.25 mm/h : Drizle
+            * 0.25 mm/h : Drizzle
             *  2.5 mm/h : Light rain
             * 12.5 mm/h : Medium rain
             * 25.0 mm/h : Heavy rain
-            * 50.0 mm/h : Dwonpour
+            * 50.0 mm/h : Downpour
             * 100  mm/h : Tropical
             * 150  mm/h : Monsoon
     tau : number, optional
@@ -693,7 +761,9 @@ def rain_attenuation(lat, lon, d, f, el, p, tau=45, R001=None):
 
 
 def inverse_rain_attenuation(lat, lon, d, f, el, Ap, tau=45, R001=None):
-    """ Estimate the percentage of time a given attenuation is exceeded due to
+    """ Estimate the percentage of time a given attenuation is exceeded
+
+    Estimate the percentage of time a given attenuation is exceeded due to
     rain events.
 
 
@@ -715,11 +785,11 @@ def inverse_rain_attenuation(lat, lon, d, f, el, Ap, tau=45, R001=None):
         Point rainfall rate for the location for 0.01% of an average year
         (mm/h). If not provided, an estimate is obtained from Recommendation
         Recommendation ITU-R P.837. Some useful values:
-            * 0.25 mm/h : Drizle
+            * 0.25 mm/h : Drizzle
             *  2.5 mm/h : Light rain
             * 12.5 mm/h : Medium rain
             * 25.0 mm/h : Heavy rain
-            * 50.0 mm/h : Dwonpour
+            * 50.0 mm/h : Downpour
             * 100  mm/h : Tropical
             * 150  mm/h : Monsoon
     tau : number, optional
@@ -755,6 +825,8 @@ def inverse_rain_attenuation(lat, lon, d, f, el, Ap, tau=45, R001=None):
 
 def rain_event_count(lat, lon, d, f, el, A, tau=45, R001=None):
     """ Estimate the number of fade events exceeding attenuation 'A'
+
+    Estimate the number of fade events exceeding attenuation 'A'
     for 10 seconds or longer.
 
 
@@ -776,11 +848,11 @@ def rain_event_count(lat, lon, d, f, el, A, tau=45, R001=None):
         Point rainfall rate for the location for 0.01% of an average year
         (mm/h). If not provided, an estimate is obtained from Recommendation
         Recommendation ITU-R P.837. Some useful values:
-            * 0.25 mm/h : Drizle
+            * 0.25 mm/h : Drizzle
             *  2.5 mm/h : Light rain
             * 12.5 mm/h : Medium rain
             * 25.0 mm/h : Heavy rain
-            * 50.0 mm/h : Dwonpour
+            * 50.0 mm/h : Downpour
             * 100  mm/h : Tropical
             * 150  mm/h : Monsoon
     tau : number, optional
@@ -815,8 +887,10 @@ def rain_event_count(lat, lon, d, f, el, A, tau=45, R001=None):
 
 
 def XPD_outage_clear_air(lat, lon, h_e, h_r, d, f, XPD_g, C0_I, XPIF=0):
-    """ Estimate the probability of outage due to cross-polar discrimnation
-    reduction due to clear-air effects, assuming that a targe C0_I is
+    """ Estimate the probability of outage due to cross-polar discrimination
+
+    Estimate the probability of outage due to cross-polar discrimination
+    reduction due to clear-air effects, assuming that a target C0_I is
     required.
 
 
@@ -843,7 +917,7 @@ def XPD_outage_clear_air(lat, lon, h_e, h_r, d, f, XPD_g, C0_I, XPIF=0):
         Laboratory-measured cross-polarization improvement factor that gives
         the difference in cross-polar isolation (XPI) at sufficiently large
         carrier-to-noise ratio (typically 35 dB) and at a specific BER for
-        systems with and without cross polar interference canceller (XPIC).
+        systems with and without cross polar interference canceler (XPIC).
         A typical value of XPIF is about 20 dB. Default value 0 dB (no XPIC)
         [dB]
 
@@ -882,8 +956,10 @@ def XPD_outage_clear_air(lat, lon, h_e, h_r, d, f, XPD_g, C0_I, XPIF=0):
 
 def XPD_outage_precipitation(lat, lon, d, f, el, C0_I, tau=45,
                              U0=15, XPIF=0):
-    """ Estimate the probability of outage due to cross-polar discrimnation
-    reduction due to clear-air effects, assuming that a targe C0_I is
+    """ Estimate the probability of outage due to cross-polar discrimination
+
+    Estimate the probability of outage due to cross-polar discrimination
+    reduction due to clear-air effects, assuming that a target C0_I is
     required.
 
 
@@ -911,7 +987,7 @@ def XPD_outage_precipitation(lat, lon, d, f, el, C0_I, tau=45,
         Laboratory-measured cross-polarization improvement factor that gives
         the difference in cross-polar isolation (XPI) at sufficiently large
         carrier-to-noise ratio (typically 35 dB) and at a specific BER for
-        systems with and without cross polar interference canceller (XPIC).
+        systems with and without cross polar interference canceler (XPIC).
         A typical value of XPIF is about 20 dB. Default value 0 dB (no XPIC)
         [dB]
 
