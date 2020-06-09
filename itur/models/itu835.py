@@ -9,7 +9,8 @@ from itur.utils import prepare_input_array, prepare_output_array,\
 from astropy import units as u
 
 
-class __ITU835():
+class __ITU835__():
+
     """ Class to model the ITU-R P.835 recommendation.
 
     The procedures to compute the reference standard atmosphere parameters
@@ -157,7 +158,7 @@ class _ITU835_6():
     #  Low latitude standard atmosphere functions  (Section ITU-R P.835-5-2)  #
     @staticmethod
     def low_latitude_temperature(h):
-        """Section 2 of Recommendation ITU-R P.835        """
+        """Section 2 of Recommendation ITU-R P.835"""
         return np.where(np.logical_and((0 <= h), (h < 17)),
                         300.4222 - 6.3533 * h + 0.005886 * h**2,
                np.where(np.logical_and((17 <= h), (h < 47)),
@@ -168,7 +169,7 @@ class _ITU835_6():
                np.where(np.logical_and((80 <= h), (h <= 100)), 184, 184)))))
 
     def low_latitude_pressure(self, h):
-        """Section 2 of Recommendation ITU-R P.835        """
+        """Section 2 of Recommendation ITU-R P.835"""
 
         P10 = self.standard_pressure(10)
         P72 = self.standard_pressure(72)
@@ -181,7 +182,7 @@ class _ITU835_6():
 
     @staticmethod
     def low_latitude_water_vapour(h):
-        """Section 3.1 of Recommendation ITU-R P.835        """
+        """Section 3.1 of Recommendation ITU-R P.835"""
         return np.where(np.logical_and((0 <= h), (h <= 15)), 19.6542 *
                         np.exp(- 0.2313 * h - 0.1122 * h**2 + 0.01351 * h**3 -
                                0.0005923 * h**4), 0)
@@ -190,7 +191,7 @@ class _ITU835_6():
     # ##
     @staticmethod
     def mid_latitude_temperature_summer(h):
-        """Section 4.1 of Recommendation ITU-R P.835        """
+        """Section 4.1 of Recommendation ITU-R P.835"""
         return np.where(np.logical_and((0 <= h), (h < 10)),
                         286.8374 - 4.7805 * h - 0.1402 * h**2,
                np.where(np.logical_and((10 <= h), (h < 23)), 225,
@@ -203,7 +204,7 @@ class _ITU835_6():
                         171, np.nan))))))
 
     def mid_latitude_pressure_summer(self, h):
-        """Section 4.1 of Recommendation ITU-R P.835        """
+        """Section 4.1 of Recommendation ITU-R P.835"""
         P10 = self.standard_pressure(10)
         P72 = self.standard_pressure(72)
         return np.where(
@@ -218,14 +219,14 @@ class _ITU835_6():
 
     @staticmethod
     def mid_latitude_water_vapour_summer(h):
-        """Section 4.1 of Recommendation ITU-R P.835        """
+        """Section 4.1 of Recommendation ITU-R P.835"""
         return np.where(np.logical_and((0 <= h), (h <= 15)),
                         8.988 * np.exp(- 0.3614 * h - 0.005402 * h**2 -
                                        0.001955 * h**3), 0)
 
     @staticmethod
     def mid_latitude_temperature_winter(h):
-        """Section 4.2 of Recommendation ITU-R P.835        """
+        """Section 4.2 of Recommendation ITU-R P.835"""
         return np.where(np.logical_and((0 <= h), (h < 8.5)),
                         257.4345 + 2.3474 * h - 1.5479 * h ** 2 +
                         0.08473 * h ** 3,
@@ -237,7 +238,7 @@ class _ITU835_6():
                         260 - (h - 54) * 1.667, np.nan)))))
 
     def mid_latitude_pressure_winter(self, h):
-        """Section 4.2 of Recommendation ITU-R P.835        """
+        """Section 4.2 of Recommendation ITU-R P.835"""
         P10 = self.standard_pressure(10)
         P72 = self.standard_pressure(72)
         return np.where(np.logical_and((0 <= h), (h <= 10)),
@@ -249,7 +250,7 @@ class _ITU835_6():
 
     @staticmethod
     def mid_latitude_water_vapour_winter(h):
-        """Section 4.2 of Recommendation ITU-R P.835        """
+        """Section 4.2 of Recommendation ITU-R P.835"""
         return np.where(np.logical_and((0 <= h), (h <= 10)),
                         1.2319 * np.exp(0.07481 * h - 0.0981 * h**2 +
                                         0.00281 * h**3), 0)
@@ -257,7 +258,7 @@ class _ITU835_6():
     #  Mid latitude standard atmosphere functions  (Section ITU-R P.835-5-2)  #
     @staticmethod
     def high_latitude_temperature_summer(h):
-        """Section 3.1 of Recommendation ITU-R P.835        """
+        """Section 3.1 of Recommendation ITU-R P.835"""
         return np.where(np.logical_and((0 <= h), (h < 13)),
                         294.9838 - 5.2159 * h - 9.07109 * h ** 2,
                np.where(np.logical_and((13 <= h), (h < 17)), 215,
@@ -270,7 +271,7 @@ class _ITU835_6():
                         175, np.nan))))))
 
     def high_latitude_pressure_summer(self, h):
-        """Section 3.1 of Recommendation ITU-R P.835        """
+        """Section 3.1 of Recommendation ITU-R P.835"""
         P10 = self.standard_pressure(10)
         P72 = self.standard_pressure(72)
         return np.where(np.logical_and((0 <= h), (h <= 10)),
@@ -282,14 +283,14 @@ class _ITU835_6():
 
     @staticmethod
     def high_latitude_water_vapour_summer(h):
-        """Section 3.1 of Recommendation ITU-R P.835        """
+        """Section 3.1 of Recommendation ITU-R P.835"""
         return np.where(np.logical_and((0 <= h), (h <= 15)),
                         14.3542 * np.exp(- 0.4174 * h - 0.02290 * h**2 +
                                          0.001007 * h**3), 0)
 
     @staticmethod
     def high_latitude_temperature_winter(h):
-        """Section 3.2 of Recommendation ITU-R P.835        """
+        """Section 3.2 of Recommendation ITU-R P.835"""
         return np.where(np.logical_and((0 <= h), (h < 10)),
                         272.7241 - 3.6217 * h - 0.1759 * h**2,
                np.where(np.logical_and((10 <= h), (h < 33)), 218,
@@ -302,7 +303,7 @@ class _ITU835_6():
                         210, np.nan))))))
 
     def high_latitude_pressure_winter(self, h):
-        """Section 3.2 of Recommendation ITU-R P.835        """
+        """Section 3.2 of Recommendation ITU-R P.835"""
         P10 = self.standard_pressure(10)
         P72 = self.standard_pressure(72)
         return np.where(np.logical_and((0 <= h), (h <= 10)),
@@ -314,13 +315,13 @@ class _ITU835_6():
 
     @staticmethod
     def high_latitude_water_vapour_winter(h):
-        """Section 3.2 of Recommendation ITU-R P.835        """
+        """Section 3.2 of Recommendation ITU-R P.835"""
         return np.where(np.logical_and(0 <= h, h <= 10),
                         3.4742 * np.exp(- 0.2697 * h - 0.03604 * h**2 +
                                         0.0004489 * h**3), 0)
 
     def temperature(self, lat, h, season='summer'):
-        """ Section 2 of Recommendation ITU-R P.835        """
+        """ Section 2 of Recommendation ITU-R P.835"""
         if season == 'summer':
             return np.where(
                 np.abs(lat) < 22, self.low_latitude_temperature(h),
@@ -335,7 +336,7 @@ class _ITU835_6():
                     self.high_latitude_temperature_winter(h)))
 
     def pressure(self, lat, h, season='summer'):
-        """ Section 2 of Recommendation ITU-R P.835        """
+        """ Section 2 of Recommendation ITU-R P.835"""
         if season == 'summer':
             return np.where(
                 np.abs(lat) < 22, self.low_latitude_pressure(h),
@@ -350,7 +351,7 @@ class _ITU835_6():
                     self.high_latitude_pressure_winter(h)))
 
     def water_vapour_density(self, lat, h, season='summer'):
-        """ Section 2 of Recommendation ITU-R P.835        """
+        """ Section 2 of Recommendation ITU-R P.835"""
         if season == 'summer':
             return np.where(
                 np.abs(lat) < 22, self.low_latitude_water_vapour(h),
@@ -431,7 +432,7 @@ class _ITU835_5():
     #  Low latitude standard atmosphere functions  (Section ITU-R P.835-5-2)  #
     @staticmethod
     def low_latitude_temperature(h):
-        """Section 2 of Recommendation ITU-R P.835        """
+        """Section 2 of Recommendation ITU-R P.835"""
         return np.where(np.logical_and((0 <= h), (h < 17)),
                         300.4222 - 6.3533 * h + 0.005886 * h**2,
                np.where(np.logical_and((17 <= h), (h < 47)),
@@ -442,7 +443,7 @@ class _ITU835_5():
                np.where(np.logical_and((80 <= h), (h <= 100)), 184, np.nan)))))
 
     def low_latitude_pressure(self, h):
-        """Section 2 of Recommendation ITU-R P.835        """
+        """Section 2 of Recommendation ITU-R P.835"""
         P10 = self.standard_pressure([10])[0]
         P72 = self.standard_pressure([72])[0]
         return np.where(np.logical_and((0 <= h), (h <= 10)),
@@ -454,7 +455,7 @@ class _ITU835_5():
 
     @staticmethod
     def low_latitude_water_vapour(h):
-        """Section 3.1 of Recommendation ITU-R P.835        """
+        """Section 3.1 of Recommendation ITU-R P.835"""
         return np.where(np.logical_and((0 <= h), (h <= 15)), 19.6542 *
                         np.exp(- 0.2313 * h - 0.1122 * h**2 + 0.01351 * h**3 -
                                0.0005923 * h**4), 0)
@@ -462,7 +463,7 @@ class _ITU835_5():
     # High latitude standard atmosphere functions  (Section ITU-R P.835-5-2)  #
     @staticmethod
     def mid_latitude_temperature_summer(h):
-        """Section 4.1 of Recommendation ITU-R P.835        """
+        """Section 4.1 of Recommendation ITU-R P.835"""
         return np.where(np.logical_and((0 <= h), (h < 10)),
                         286.8374 - 4.7805 * h - 0.1402 * h**2,
                np.where(np.logical_and((10 <= h), (h < 23)), 225,
@@ -475,7 +476,7 @@ class _ITU835_5():
                         171, np.nan))))))
 
     def mid_latitude_pressure_summer(self, h):
-        """Section 4.1 of Recommendation ITU-R P.835        """
+        """Section 4.1 of Recommendation ITU-R P.835"""
         P10 = self.standard_pressure([10])[0]
         P72 = self.standard_pressure([72])[0]
         return np.where(
@@ -490,14 +491,14 @@ class _ITU835_5():
 
     @staticmethod
     def mid_latitude_water_vapour_summer(h):
-        """Section 4.1 of Recommendation ITU-R P.835        """
+        """Section 4.1 of Recommendation ITU-R P.835"""
         return np.where(np.logical_and((0 <= h), (h <= 15)),
                         8.988 * np.exp(- 0.3614 * h - 0.005402 * h**2 -
                                        0.001955 * h**3), 0)
 
     @staticmethod
     def mid_latitude_temperature_winter(h):
-        """Section 4.2 of Recommendation ITU-R P.835        """
+        """Section 4.2 of Recommendation ITU-R P.835"""
         return np.where(np.logical_and((0 <= h), (h < 8.5)),
                         257.4345 + 2.3474 * h - 1.5479 * h ** 2 +
                         0.08473 * h ** 3,
@@ -509,7 +510,7 @@ class _ITU835_5():
                         260 - (h - 54) * 1.667, np.nan)))))
 
     def mid_latitude_pressure_winter(self, h):
-        """Section 4.2 of Recommendation ITU-R P.835        """
+        """Section 4.2 of Recommendation ITU-R P.835"""
         P10 = self.standard_pressure([10])[0]
         P72 = self.standard_pressure([72])[0]
         return np.where(np.logical_and((0 <= h), (h <= 10)),
@@ -521,7 +522,7 @@ class _ITU835_5():
 
     @staticmethod
     def mid_latitude_water_vapour_winter(h):
-        """Section 4.2 of Recommendation ITU-R P.835        """
+        """Section 4.2 of Recommendation ITU-R P.835"""
         return np.where(np.logical_and((0 <= h), (h <= 10)),
                         1.2319 * np.exp(0.07481 * h - 0.0981 * h**2 +
                                         0.00281 * h**3), 0)
@@ -529,7 +530,7 @@ class _ITU835_5():
     #  Mid latitude standard atmosphere functions  (Section ITU-R P.835-5-2)  #
     @staticmethod
     def high_latitude_temperature_summer(h):
-        """Section 3.1 of Recommendation ITU-R P.835        """
+        """Section 3.1 of Recommendation ITU-R P.835"""
         return np.where(np.logical_and((0 <= h), (h < 13)),
                         294.9838 - 5.2159 * h - 9.07109 * h ** 2,
                np.where(np.logical_and((13 <= h), (h < 17)), 215,
@@ -542,7 +543,7 @@ class _ITU835_5():
                         175, np.nan))))))
 
     def high_latitude_pressure_summer(self, h):
-        """Section 3.1 of Recommendation ITU-R P.835        """
+        """Section 3.1 of Recommendation ITU-R P.835"""
         P10 = self.standard_pressure([10])[0]
         P72 = self.standard_pressure([72])[0]
         return np.where(np.logical_and((0 <= h), (h <= 10)),
@@ -553,14 +554,14 @@ class _ITU835_5():
                         P72 * np.exp(-0.165 * (h - 72)), np.nan)))
 
     def high_latitude_water_vapour_summer(self, h):
-        """Section 3.1 of Recommendation ITU-R P.835        """
+        """Section 3.1 of Recommendation ITU-R P.835"""
         return np.where(np.logical_and((0 <= h), (h <= 15)),
                         14.3542 * np.exp(- 0.4174 * h - 0.02290 * h**2 +
                                          0.001007 * h**3), 0)
 
     @staticmethod
     def high_latitude_temperature_winter(h):
-        """Section 3.2 of Recommendation ITU-R P.835        """
+        """Section 3.2 of Recommendation ITU-R P.835"""
         return np.where(np.logical_and((0 <= h), (h < 10)),
                         272.7241 - 3.6217 * h - 0.1759 * h**2,
                np.where(np.logical_and((10 <= h), (h < 33)), 218,
@@ -573,7 +574,7 @@ class _ITU835_5():
                         210, np.nan))))))
 
     def high_latitude_pressure_winter(self, h):
-        """Section 3.2 of Recommendation ITU-R P.835        """
+        """Section 3.2 of Recommendation ITU-R P.835"""
         P10 = self.standard_pressure([10])[0]
         P72 = self.standard_pressure([72])[0]
         return np.where(np.logical_and((0 <= h), (h <= 10)),
@@ -585,13 +586,13 @@ class _ITU835_5():
 
     @staticmethod
     def high_latitude_water_vapour_winter(h):
-        """Section 3.2 of Recommendation ITU-R P.835        """
+        """Section 3.2 of Recommendation ITU-R P.835"""
         return np.where(np.logical_and(0 <= h, h <= 10),
                         3.4742 * np.exp(- 0.2697 * h - 0.03604 * h**2 +
                                         0.0004489 * h**3), 0)
 
     def temperature(self, lat, h, season='summer'):
-        """ Section 2 of Recommendation ITU-R P.835        """
+        """ Section 2 of Recommendation ITU-R P.835"""
         if season == 'summer':
             return np.where(
                 np.abs(lat) < 22, self.low_latitude_temperature(h),
@@ -606,7 +607,7 @@ class _ITU835_5():
                     self.high_latitude_temperature_winter(h)))
 
     def pressure(self, lat, h, season='summer'):
-        """ Section 2 of Recommendation ITU-R P.835        """
+        """ Section 2 of Recommendation ITU-R P.835"""
         if season == 'summer':
             return np.where(
                 np.abs(lat) < 22, self.low_latitude_pressure(h),
@@ -621,7 +622,7 @@ class _ITU835_5():
                     self.high_latitude_pressure_winter(h)))
 
     def water_vapour_density(self, lat, h, season='summer'):
-        """ Section 2 of Recommendation ITU-R P.835        """
+        """ Section 2 of Recommendation ITU-R P.835"""
         if season == 'summer':
             return np.where(
                 np.abs(lat) < 22, self.low_latitude_water_vapour(h),
@@ -636,15 +637,12 @@ class _ITU835_5():
                     self.high_latitude_water_vapour_winter(h)))
 
 
-__model = __ITU835()
+__model = __ITU835__()
 
 
 def change_version(new_version):
     """
-    Change the version of the ITU-R P.835 recommendation currently being used.
-
-
-    This function changes the model used for the ITU-R P.835 recommendation
+    Change the version of the ITU-R P.835 recommendation currently being used.    This function changes the model used for the ITU-R P.835 recommendation
     to a different version.
 
 
@@ -661,12 +659,11 @@ def change_version(new_version):
            * P.835-6 (02/12) (Current version)
     """
     global __model
-    __model = __ITU835(new_version)
+    __model = __ITU835__(new_version)
 
 
 def get_version():
     """The version of the current model for the ITU-R P.835 recommendation.
-
 
     Obtain the version of the ITU-R P.835 recommendation currently being used.
 
@@ -722,7 +719,6 @@ def pressure(lat, h, season='summer'):
     Method to determine the pressure as a function of altitude and latitude,
     for calculating gaseous attenuation along an Earth-space path.
     This method is recommended when more reliable local data are not available.
-
 
     Parameters
     ----------

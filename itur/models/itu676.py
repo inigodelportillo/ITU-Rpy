@@ -3,19 +3,20 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import numpy as np
-import warnings
 import os
+import warnings
+
+import numpy as np
 from astropy import units as u
 
 from itur import utils
 from itur.models.itu453 import radio_refractive_index
-from itur.models.itu835 import standard_pressure, standard_temperature, \
-    standard_water_vapour_density
+from itur.models.itu835 import (standard_pressure, standard_temperature,
+                                standard_water_vapour_density)
 from itur.models.itu836 import total_water_vapour_content
 from itur.models.itu1511 import topographic_altitude
-from itur.utils import prepare_quantity, prepare_output_array,\
-    prepare_input_array, load_data, dataset_dir, memory
+from itur.utils import (prepare_quantity, prepare_output_array,
+                        prepare_input_array, load_data, dataset_dir, memory)
 
 
 def __gamma0_exact__676_9_11__(self, f, p, rho, T):
@@ -29,9 +30,9 @@ def __gamma0_exact__676_9_11__(self, f, p, rho, T):
 
     D_f_ox = self.a3 * 1e-4 * (p * (theta ** (0.8 - self.a4)) +
                                1.1 * e * theta)
-                               
+
     D_f_ox = np.sqrt(D_f_ox**2 + 2.25e-6)
-    
+
     delta_ox = (self.a5 + self.a6 * theta) * 1e-4 * (p + e) * theta**0.8
 
     F_i_ox = f / f_ox * ((D_f_ox - delta_ox * (f_ox - f)) /

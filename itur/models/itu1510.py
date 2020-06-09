@@ -3,18 +3,19 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import numpy as np
 import os
+import numpy as np
 from astropy import units as u
 
 from itur import utils
-from itur.models.itu1144 import bilinear_2D_interpolator, \
-    bicubic_2D_interpolator
-from itur.utils import load_data, dataset_dir, prepare_input_array,\
-    prepare_output_array, memory
+from itur.models.itu1144 import (bilinear_2D_interpolator,
+                                 bicubic_2D_interpolator)
+from itur.utils import (load_data, dataset_dir, prepare_input_array,
+                        prepare_output_array, memory)
 
 
-class __ITU1510():
+class __ITU1510__():
+
     """Annual mean surface temperature
 
     Available versions include:
@@ -25,9 +26,9 @@ class __ITU1510():
 
     def __init__(self, version=1):
         if version == 1:
-            self.instance = _ITU1510_1()
+            self.instance = _ITU1510_1_()
         elif version == 0:
-            self.instance = _ITU1510_0()
+            self.instance = _ITU1510_0_()
         else:
             raise ValueError('Version ' + str(version) + ' is not implemented'
                              ' for the ITU-R P.1510 model.')
@@ -37,8 +38,12 @@ class __ITU1510():
         return self.instance.__version__
 
     def surface_mean_temperature(self, lat, lon):
-        # Abstract method to compute the surface mean temperature
-        return self.instance.surface_mean_temperature(lat, lon)
+        """
+        Method to compute the annual mean surface temperature (K).
+
+        The temperature is computed at 2 m above the surface of the Earth.
+        """
+        return self.instance.temperature(lat, lon)
 
     def surface_month_mean_temperature(self, lat, lon, m):
         # Abstract method to compute the monthly surface mean temperature
@@ -47,7 +52,7 @@ class __ITU1510():
         return np.array(fcn(lat, lon, m).tolist())
 
 
-class _ITU1510_1():
+class _ITU1510_1_():
 
     def __init__(self):
         self.__version__ = 1
@@ -98,7 +103,7 @@ class _ITU1510_1():
         return self.month_temperature(lat, lon, m)
 
 
-class _ITU1510_0():
+class _ITU1510_0_():
 
     def __init__(self):
         self.__version__ = 0
@@ -120,20 +125,13 @@ class _ITU1510_0():
         return self._temperature(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
-    def surface_mean_temperature(self, lat, lon):
-        """
-        Method to compute the annual mean surface temperature (K) at 2 m
-        above the surface of the Earth
-        """
-        return self.temperature(lat, lon)
-
     def surface_month_mean_temperature(self, lat, lon, m):
         raise NotImplementedError('The monthly mean temperature is not'
                                   'implemented in recomendation ITU-R P.1510'
                                   '-{0}'.format(self.__version__))
 
 
-__model = __ITU1510()
+__model = __ITU1510__()
 
 
 def change_version(new_version):
@@ -149,7 +147,7 @@ def change_version(new_version):
         *version 0: P.1510-0 (02/01) (Current version)
     """
     global __model
-    __model = __ITU1510(new_version)
+    __model = __ITU1510__(new_version)
     utils.memory.clear()
 
 

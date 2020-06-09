@@ -13,7 +13,8 @@ from itur.utils import load_data, dataset_dir, prepare_input_array,\
     prepare_output_array, memory
 
 
-class __ITU839():
+class __ITU839__():
+
     """Rain height model for prediction methods.
 
     Not available versions:
@@ -29,11 +30,11 @@ class __ITU839():
 
     def __init__(self, version=4):
         if version == 4:
-            self.instance = _ITU839_4()
+            self.instance = _ITU839_4_()
         elif version == 3:
-            self.instance = _ITU839_3()
+            self.instance = _ITU839_3_()
         elif version == 2:
-            self.instance = _ITU839_2()
+            self.instance = _ITU839_2_()
 #        elif version == 1:
 #            self.instance = _ITU839_1()
 #        elif version == 0:
@@ -58,7 +59,7 @@ class __ITU839():
         return self.instance.isoterm_0(lat, lon)
 
 
-class _ITU839_4():
+class _ITU839_4_():
 
     def __init__(self):
         self.__version__ = 4
@@ -82,8 +83,7 @@ class _ITU839_4():
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def rain_height(self, lat_d, lon_d):
-        """
-        The rain height is computed as
+        """The rain height is computed as
 
         ..math:
             h_r = h_0 + 0.36 (km)
@@ -123,7 +123,7 @@ class _ITU839_3():
         return self.isoterm_0(lat_d, lon_d) + 0.36
 
 
-class _ITU839_2():
+class _ITU839_2_():
 
     def __init__(self):
         self.__version__ = 2
@@ -131,7 +131,8 @@ class _ITU839_2():
         self.month = 10
         self.link = 'https://www.itu.int/rec/R-REC-P.839-2-199910-S/en'
 
-    def isoterm_0(self, lat_d, lon_d):
+    @staticmethod
+    def isoterm_0(lat_d, lon_d):
         """
         The 0C mean isotherm height can be approximated as
 
@@ -166,7 +167,7 @@ class _ITU839_2():
                         3.2 - 0.075 * (lat_d - 35), h0)
 
 
-__model = __ITU839()
+__model = __ITU839__()
 
 
 def change_version(new_version):
@@ -186,7 +187,7 @@ def change_version(new_version):
         * version 4: P.839-4 (09/2013) (Current version)
     """
     global __model
-    __model = __ITU839(new_version)
+    __model = __ITU839__(new_version)
     utils.memory.clear()
 
 
