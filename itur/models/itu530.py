@@ -405,48 +405,48 @@ class _ITU530_16():
     #                               Section 2.2                               #
     ###########################################################################
     @staticmethod
-    def fresnel_ellipse_radius(self, *args, **kwargs):
+    def fresnel_ellipse_radius(*args, **kwargs):
         return _ITU530_17_.fresnel_ellipse_radius(*args, **kwargs)
 
     @staticmethod
-    def diffraction_loss(self, *args, **kwargs):
+    def diffraction_loss(*args, **kwargs):
         return _ITU530_17_.diffraction_loss(*args, **kwargs)
 
     ###########################################################################
     #                               Section 2.3                               #
     ###########################################################################
     @staticmethod
-    def multipath_loss_for_A(self, *args, **kwargs):
+    def multipath_loss_for_A(*args, **kwargs):
         return _ITU530_17_.multipath_loss_for_A(*args, **kwargs)
 
     @staticmethod
-    def multipath_loss(self, *args, **kwargs):
+    def multipath_loss(*args, **kwargs):
         return _ITU530_17_.multipath_loss(*args, **kwargs)
 
     ###########################################################################
     #                               Section 2.4                               #
     ###########################################################################
     @staticmethod
-    def rain_attenuation(self, *args, **kwargs):
+    def rain_attenuation(*args, **kwargs):
         return _ITU530_17_.rain_attenuation(*args, **kwargs)
 
     @staticmethod
-    def inverse_rain_attenuation(self, *args, **kwargs):
+    def inverse_rain_attenuation(*args, **kwargs):
         return _ITU530_17_.inverse_rain_attenuation(*args, **kwargs)
 
     @staticmethod
-    def rain_event_count(self, *args, **kwargs):
+    def rain_event_count(*args, **kwargs):
         return _ITU530_17_.rain_event_count(*args, **kwargs)
 
     ###########################################################################
     #                                Section 4                                #
     ###########################################################################
     @staticmethod
-    def XPD_outage_clear_air(self, *args, **kwargs):
+    def XPD_outage_clear_air(*args, **kwargs):
         return _ITU530_17_.XPD_outage_clear_air(*args, **kwargs)
 
     @staticmethod
-    def XPD_outage_precipitation(self, *args, **kwargs):
+    def XPD_outage_precipitation(*args, **kwargs):
         return _ITU530_17_.XPD_outage_precipitation(*args, **kwargs)
 
 
@@ -482,7 +482,6 @@ def get_version():
     -------
     version: int
        The version of the ITU-R P.530 recommendation being used.
-
     """
     global __model
     return __model.__version__

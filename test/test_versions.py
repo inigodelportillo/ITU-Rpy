@@ -87,7 +87,8 @@ class TestFunctionsRecommendation453(test.TestCase):
     def setUp(self):
         self.versions = [12, 13]
 
-    def test_all_functions_453(self):
+    @staticmethod
+    def test_all_functions_453():
 
         T = 15 * itur.u.deg_C
         e = (T.value * 7.5 / 216.7) * u.hPa
@@ -171,7 +172,8 @@ class TestFunctionsRecommendation618(test.TestCase):
     def setUp(self):
         self.versions = [12, 13]
 
-    def test_all_functions_618(self):
+    @staticmethod
+    def test_all_functions_618():
 
         f = 29 * itur.u.GHz
         el = 31
@@ -269,7 +271,8 @@ class TestFunctionsRecommendation676(test.TestCase):
     def setUp(self):
         self.versions = [9, 10, 11]
 
-    def test_all_functions_676(self):
+    @staticmethod
+    def test_all_functions_676():
 
         r = 5 * itur.u.km
         f = 29 * itur.u.GHz
@@ -348,7 +351,8 @@ class TestFunctionsRecommendation835(test.TestCase):
     def setUp(self):
         self.versions = [5, 6]
 
-    def test_all_functions_835(self):
+    @staticmethod
+    def test_all_functions_835():
 
         T_0 = 15 * itur.u.deg_C
         h_0 = 2 * itur.u.km
@@ -394,7 +398,8 @@ class TestFunctionsRecommendation836(test.TestCase):
     def setUp(self):
         self.versions = [4, 5, 6]
 
-    def test_all_functions_836(self):
+    @staticmethod
+    def test_all_functions_836():
 
         lat = 51
         lon = -63
@@ -438,7 +443,8 @@ class TestFunctionsRecommendation837(test.TestCase):
     def setUp(self):
         self.versions = [6, 7]
 
-    def test_all_functions_837(self):
+    @staticmethod
+    def test_all_functions_837():
         lat = 51
         lon = -63
         p = 0.51
@@ -463,7 +469,8 @@ class TestFunctionsRecommendation838(test.TestCase):
     def setUp(self):
         self.versions = [0, 1, 2, 3]
 
-    def test_all_functions_838(self):
+    @staticmethod
+    def test_all_functions_838():
 
         f = 29 * itur.u.GHz
         el = 32
@@ -495,7 +502,8 @@ class TestFunctionsRecommendation839(test.TestCase):
     def setUp(self):
         self.versions = [2, 3, 4]
 
-    def test_all_functions_839(self):
+    @staticmethod
+    def test_all_functions_839():
         lat = 51
         lon = -63
 
@@ -518,7 +526,8 @@ class TestFunctionsRecommendation840(test.TestCase):
     def setUp(self):
         self.versions = [4, 5, 6, 7]
 
-    def test_all_functions_840(self):
+    @staticmethod
+    def test_all_functions_840():
 
         T = 15 * itur.u.deg_C
         f = 29 * itur.u.GHz
@@ -562,7 +571,8 @@ class TestFunctionsRecommendation1510(test.TestCase):
     def setUp(self):
         self.versions = [0, 1]
 
-    def test_all_functions_1510(self):
+    @staticmethod
+    def test_all_functions_1510():
         lat = 51
         lon = -63
 
@@ -589,7 +599,8 @@ class TestFunctionsRecommendation1511(test.TestCase):
     def setUp(self):
         self.versions = [0, 1]
 
-    def test_all_functions_1511(self):
+    @staticmethod
+    def test_all_functions_1511():
         lat = 51
         lon = -63
 
@@ -605,7 +616,8 @@ class TestFunctionsRecommendation1511(test.TestCase):
             self.assertEqual(models.itu1511.get_version(), version)
 
 if __name__ == '__main__':
-    pass
+
+    # Create the test suite and run all the tests
     suite = suite()
     print('Test versioning of the code')
     print('------------------------')
