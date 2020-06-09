@@ -27,7 +27,8 @@ __wgs84_geod__ = Geod(ellps='WGS84')
 
 
 def load_data(path, is_text=False, **kwargs):
-    """ Loads data files from /itur/data/
+    """
+    Loads data files from /itur/data/
 
     Loads data from a comma-separated file. The contents of the file can be
     numeric or text-based.
@@ -54,7 +55,8 @@ def load_data(path, is_text=False, **kwargs):
 
 
 def prepare_input_array(input_array):
-    """ Formats an array to be a 2-D numpy-array.
+    """
+    Formats an array to be a 2-D numpy-array.
 
     If the contents of input_array are 0-D or 1D, it converts is to an
     array with at least two dimensions.
@@ -66,7 +68,8 @@ def prepare_input_array(input_array):
 
 
 def prepare_output_array(output_array, type_input=None):
-    """ Formats the output to have the same shape and type as the input.
+    """
+    Formats the output to have the same shape and type as the input.
 
     This function is a generic wrapper to format the output of a function
     to have the same type as the input. ITU-Rpy makes extensive use of numpy
@@ -117,7 +120,8 @@ def prepare_output_array(output_array, type_input=None):
 
 
 def prepare_quantity(value, units=None, name_val=None):
-    """ Convert the input to the required units
+    """
+    Convert the input to the required units
 
     The function verifies that the input has the right units and converts
     it to the desired units. For example, if a value is introduced in km
@@ -225,7 +229,8 @@ def compute_distance_earth_to_earth_wgs84(lat_p, lon_p, lat_grid, lon_grid):
 
 def compute_distance_earth_to_earth_haversine(lat_p, lon_p,
                                               lat_grid, lon_grid):
-    """Computes the distance between points using the Haversine formula
+    """
+    Computes the distance between points using the Haversine formula
 
     Compute the distance between a point (P) in (lat_s, lon_s) and a matrix of
     latitude and longitudes (lat_grid, lon_grid) using the Haversine formula
@@ -273,7 +278,8 @@ def compute_distance_earth_to_earth_haversine(lat_p, lon_p,
 
 def regular_lat_lon_grid(resolution_lat=1, resolution_lon=1, lon_start_0=False,
                          lat_min=-90, lat_max=90, lon_min=-180, lon_max=180):
-    """ Builds regular latitude and longitude matrices.
+    """
+    Builds regular latitude and longitude matrices.
 
 
     Builds a latitude and longitude coordinate matrix with resolution
@@ -309,7 +315,8 @@ def regular_lat_lon_grid(resolution_lat=1, resolution_lon=1, lon_start_0=False,
 
 
 def elevation_angle(h, lat_s, lon_s, lat_grid, lon_grid):
-    """ Computes the elevation angle between a satellite and a point.
+    """
+    Computes the elevation angle between a satellite and a point.
 
     Compute the elevation angle between a satellite located in an orbit
     at height h and located above coordinates (lat_s, lon_s) and a matrix of
