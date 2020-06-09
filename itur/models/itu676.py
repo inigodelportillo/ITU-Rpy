@@ -854,29 +854,37 @@ class _ITU676_9():
 
     # Recommendation ITU-P R.676-9 has most of the methods similar to those
     # in Recommendation ITU-P R.676-10.
-    def gammaw_approx(self, *args, **kwargs):
+    @staticmethod
+    def gammaw_approx(*args, **kwargs):
         return _ITU676_10.gammaw_approx(*args, **kwargs)
 
-    def gamma0_approx(self, *args, **kwargs):
+    @staticmethod
+    def gamma0_approx(*args, **kwargs):
         return _ITU676_10.gamma0_approx(*args, **kwargs)
 
-    def gaseous_attenuation_inclined_path(self, *args, **kwargs):
+    @staticmethod
+    def gaseous_attenuation_inclined_path(*args, **kwargs):
         return _ITU676_10.gaseous_attenuation_inclined_path(*args, **kwargs)
 
-    def zenit_water_vapour_attenuation(self, *args, **kwargs):
+    @staticmethod
+    def zenit_water_vapour_attenuation(*args, **kwargs):
         return _ITU676_10.zenit_water_vapour_attenuation(*args, **kwargs)
 
-    def gaseous_attenuation_approximation(self, *args, **kwargs):
+    @staticmethod
+    def gaseous_attenuation_approximation(*args, **kwargs):
         return _ITU676_10.gaseous_attenuation_approximation(*args, **kwargs)
 
-    def slant_inclined_path_equivalent_height(self, *args, **kwargs):
+    @staticmethod
+    def slant_inclined_path_equivalent_height(*args, **kwargs):
         return _ITU676_10.slant_inclined_path_equivalent_height(*args,
                                                                 **kwargs)
 
-    def gaseous_attenuation_terrestrial_path(self, *args, **kwargs):
+    @staticmethod
+    def gaseous_attenuation_terrestrial_path(*args, **kwargs):
         return _ITU676_10.gaseous_attenuation_terrestrial_path(*args, **kwargs)
 
-    def gaseous_attenuation_slant_path(self, *args, **kwargs):
+    @staticmethod
+    def gaseous_attenuation_slant_path(*args, **kwargs):
         return _ITU676_10.gaseous_attenuation_slant_path(*args, **kwargs)
 
     def gamma0_exact(self, f, p, rho, T):

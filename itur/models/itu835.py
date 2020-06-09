@@ -553,7 +553,8 @@ class _ITU835_5():
                np.where(np.logical_and((72 < h), (h <= 100)),
                         P72 * np.exp(-0.165 * (h - 72)), np.nan)))
 
-    def high_latitude_water_vapour_summer(self, h):
+    @staticmethod
+    def high_latitude_water_vapour_summer(h):
         """Section 3.1 of Recommendation ITU-R P.835"""
         return np.where(np.logical_and((0 <= h), (h <= 15)),
                         14.3542 * np.exp(- 0.4174 * h - 0.02290 * h**2 +
@@ -642,9 +643,10 @@ __model = __ITU835__()
 
 def change_version(new_version):
     """
-    Change the version of the ITU-R P.835 recommendation currently being used.    This function changes the model used for the ITU-R P.835 recommendation
-    to a different version.
+    Change the version of the ITU-R P.835 recommendation currently being used.
 
+    This function changes the model used for the ITU-R P.835 recommendation
+    to a different version.
 
     Parameters
     ----------

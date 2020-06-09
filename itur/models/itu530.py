@@ -20,7 +20,7 @@ from itur.utils import (prepare_input_array, prepare_quantity, load_data,
 
 class __ITU530__():
 
-    """ Private class to model the ITU-R P.530 recommendations
+    """Private class to model the ITU-R P.530 recommendations
 
     Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems
@@ -267,8 +267,9 @@ class _ITU530_17_():
         Ap = A001 * C1 * p ** (- (C2 + C3 * np.log10(p)))       # Eq. 34 [dB]
         return Ap
 
+    @staticmehotd
     def inverse_rain_attenuation(
-            self, lat, lon, d, f, el, Ap, tau=45, R001=None):
+            lat, lon, d, f, el, Ap, tau=45, R001=None):
         """
         Estimate the percentage of time a given attenuation is exceeded due to
         rain events.
@@ -322,7 +323,8 @@ class _ITU530_17_():
         """
         # Compute the the percentage of time that the rain attenuation A(dB)
         # exceeded in the average year.
-        p_A = self.inverse_rain_attenuation(lat, lon, d, f, el, A)
+        p_A = self.inverse_rain_attenuation(lat, lon, d, f, el, Ap=A,
+                                            tau=tau, R001=R001)
 
         # The number of fade events exceeding attenuation A for 10 s or longer
         N10s = 1 + 1313 * p_A**0.945                               # Eq. 78 [-]
@@ -577,7 +579,8 @@ def diffraction_loss(d1, d2, h, f):
 
 
 def multipath_loss_for_A(lat, lon, h_e, h_r, d, f, A):
-    """ Estimate the single-frequency (or narrow-band) fading distribution
+    """
+    Estimate the single-frequency (or narrow-band) fading distribution
 
     Method for predicting the single-frequency (or narrow-band) fading
     distribution at large fade depths in the average worst month in any part
@@ -641,7 +644,8 @@ def multipath_loss_for_A(lat, lon, h_e, h_r, d, f, A):
 
 
 def multipath_loss(lat, lon, h_e, h_r, d, f, A):
-    """ Estimate the percentage of time that any fade depth is exceeded.
+    """
+    Estimate the percentage of time that any fade depth is exceeded.
 
     Method for predicting the percentage of time that any fade depth is
     exceeded. This method combines the deep fading distribution given in the
@@ -703,7 +707,8 @@ def multipath_loss(lat, lon, h_e, h_r, d, f, A):
 
 
 def rain_attenuation(lat, lon, d, f, el, p, tau=45, R001=None):
-    """ Estimate long-term statistics of rain attenuation.
+    """
+    Estimate long-term statistics of rain attenuation.
 
     Attenuation can also
     occur as a result of absorption and scattering by such hydro-meteors as

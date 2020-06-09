@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-ITU-RPy is a python implementation of the ITU-P R Recommendations to compute
-atmospheric attenuation for Earth-to-space and horizontal paths, for
-frequencies in the Ghz range.
+ITU-RPy is a python implementation of the ITU-P R Recommendations.
+
+ITU-Rpy can be used to compute atmospheric attenuation for Earth-to-space
+and horizontal paths, for frequencies in the Ghz range.
 
 The propagation loss on an Earth-space path and a horizontal-path, relative to
 the free-space loss, is the sum of different contributions, namely:

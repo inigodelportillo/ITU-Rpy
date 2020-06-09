@@ -136,7 +136,8 @@ class _ITU840_7():
         return self._Pclw(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
-    def specific_attenuation_coefficients(self, f, T):
+    @staticmethod
+    def specific_attenuation_coefficients(f, T):
         """
         """
         if np.any(f > 1000):

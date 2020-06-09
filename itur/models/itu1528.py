@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
-import numpy as np
-import matplotlib.pyplot as plt
-from satcomm_utils import RE, LLA_to_ECEF
-from scipy.special import jv
-
-
 """
 Method to compute the antenna gain in angles different from the boresight.
+
+
 The method is based on the 2nd one found in Recommendation ITU-R S.1528-0.
 
 References
@@ -15,6 +11,11 @@ References
 antennas operating in the fixed-satellite service below 30 GHz:
 https://www.itu.int/rec/R-REC-S.1528/en
 """
+
+import numpy as np
+import matplotlib.pyplot as plt
+from satcomm_utils import RE, LLA_to_ECEF
+from scipy.special import jv
 
 
 def convert_nparray(arr):
