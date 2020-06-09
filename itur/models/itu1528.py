@@ -185,7 +185,8 @@ def calculate_gain_1528(lat_boresight, lon_boresight, lat_sat, lon_sat, lat, lon
     else:
         psi = convert_nparray(psi)
 
-    assert all(0 <= angle <= 90 for angle in psi)
+    if not all(0 <= angle <= 90 for angle in psi):
+        raise RuntimeError('Value of psi is not within bounds 0 - 90 degrees')
 
     if psi_b is None:
         psi_b = np.sqrt(1200)/(D/l)
