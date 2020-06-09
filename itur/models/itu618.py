@@ -107,8 +107,8 @@ class _ITU618():
 #        elif version == 1:
 #            self.instance = _ITU618_1()
         else:
-            raise ValueError('Version {0} is not implemented' +
-                             ' for the ITU-R P.618 model.'.format(version))
+            raise ValueError(('Version {0} is not implemented'
+                              ' for the ITU-R P.618 model.').format(version))
 
     @property
     def __version__(self):
@@ -646,17 +646,17 @@ def rain_attenuation(lat, lon, f, el, hs=None, p=0.01, R001=None,
         estimate is obtained from the maps of topographic altitude
         given in Recommendation ITU-R P.1511.
     p : number, optional
-        Percetage of the time the rain attenuation value is exceeded.
+        Percentage of the time the rain attenuation value is exceeded.
     R001: number, optional
         Point rainfall rate for the location for 0.01% of an average year
         (mm/h).
         If not provided, an estimate is obtained from Recommendation
         Recommendation ITU-R P.837. Some useful values:
-            * 0.25 mm/h : Drizle
+            * 0.25 mm/h : Drizzle
             *  2.5 mm/h : Light rain
             * 12.5 mm/h : Medium rain
             * 25.0 mm/h : Heavy rain
-            * 50.0 mm/h : Dwonpour
+            * 50.0 mm/h : Downpour
             * 100  mm/h : Tropical
             * 150  mm/h : Monsoon
     tau : number, optional
@@ -862,7 +862,7 @@ def scintillation_attenuation(lat, lon, f, el, p, D, eta=0.5, T=None,
     el : sequence, or number
         Elevation angle (degrees)
     p : number
-        Percetage of the time the scintillation attenuation value is exceeded.
+        Percentage of the time the scintillation attenuation value is exceeded.
     D: number
         Physical diameter of the earth-station antenna (m)
     eta: number, optional
@@ -933,7 +933,7 @@ def scintillation_attenuation_sigma(lat, lon, f, el, p, D, eta=0.5, T=None,
     el : sequence, or number
         Elevation angle (degrees)
     p : number
-        Percetage of the time the scintillation attenuation value is exceeded.
+        Percentage of the time the scintillation attenuation value is exceeded.
     D: number
         Physical diameter of the earth-station antenna (m)
     eta: number, optional
@@ -1004,7 +1004,7 @@ def rain_cross_polarization_discrimination(Ap, f, el, p, tau=45):
     el : number, sequence, or numpy.ndarray
         Elevation angle (degrees)
     p : number
-        Percetage of the time the XPD is exceeded.
+        Percentage of the time the XPD is exceeded.
     tau : number, optional
         Polarization tilt angle relative to the horizontal (degrees)
         (tau = 45 deg for circular polarization). Default value is 45
