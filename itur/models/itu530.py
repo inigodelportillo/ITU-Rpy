@@ -267,7 +267,7 @@ class _ITU530_17_():
         Ap = A001 * C1 * p ** (- (C2 + C3 * np.log10(p)))       # Eq. 34 [dB]
         return Ap
 
-    @staticmehotd
+    @staticmethod
     def inverse_rain_attenuation(
             lat, lon, d, f, el, Ap, tau=45, R001=None):
         """
