@@ -19,6 +19,7 @@ from itur.utils import (prepare_input_array, prepare_quantity, load_data,
 
 
 class __ITU530__():
+
     """ Private class to model the ITU-R P.530 recommendations
 
     Propagation data and prediction methods required for the design of
@@ -102,7 +103,8 @@ class _ITU530_17_():
 
     @classmethod
     def s_a(self, lat, lon):
-        """ Standard deviation of terrain heights
+        """
+        Standard deviation of terrain heights
 
         Computes the Standard deviation of terrain heights (m) within a
         110 km × 110 km area with a 30 s resolution (e.g. the Globe “gtopo30”
@@ -126,7 +128,8 @@ class _ITU530_17_():
     ###########################################################################
     @classmethod
     def fresnel_ellipse_radius(self, d1, d2, f):
-        """ Computes the Fresnel ellipse radius at a given frequency
+        """
+        Computes the Fresnel ellipse radius at a given frequency
 
         Implementation of 'fresnel_ellipse_radius' method for recommendation
         ITU-P R.530-16. See documentation for function
@@ -136,7 +139,8 @@ class _ITU530_17_():
 
     @classmethod
     def diffraction_loss(self, d1, d2, h, f):
-        """ Computes the diffraction losses at a given frequency
+        """
+        Computes the diffraction losses at a given frequency
 
         Implementation of 'diffraction_loss' method for recommendation
         ITU-P R.530-16. See documentation for function
@@ -151,8 +155,9 @@ class _ITU530_17_():
     ###########################################################################
     @classmethod
     def multipath_loss_for_A(self, lat, lon, h_e, h_r, d, f, A):
-        """ Computes the percentage of time that a fade depth A is exceeded
-            due to multi-path losses
+        """
+        Computes the percentage of time that a fade depth A is exceeded
+        due to multi-path losses
 
         Implementation of 'multipath_loss_for_A' method for recommendation
         ITU-P R.530-16. See documentation for function
@@ -182,8 +187,9 @@ class _ITU530_17_():
 
     @classmethod
     def multipath_loss(self, lat, lon, h_e, h_r, d, f, A):
-        """ Estimate the number of fade events exceeding attenuation 'A'
-            for 10 seconds or longer.
+        """
+        Estimate the number of fade events exceeding attenuation 'A'
+        for 10 seconds or longer.
 
 
         Implementation of 'multipath_loss' method for recommendation
@@ -222,7 +228,8 @@ class _ITU530_17_():
     ###########################################################################
     @classmethod
     def rain_attenuation(self, lat, lon, d, f, el, p, tau=45, R001=None):
-        """ Estimate long-term statistics of rain attenuation.
+        """
+        Estimate long-term statistics of rain attenuation.
 
         Implementation of 'rain_attenuation' method for recommendation
         ITU-P R.530-16. See documentation for function
