@@ -3,18 +3,19 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import numpy as np
 import os
+import numpy as np
+
 from astropy import units as u
 from scipy.optimize import bisect
 
 from itur.models.itu453 import DN65
 from itur.models.itu837 import rainfall_rate
 from itur.models.itu1144 import bilinear_2D_interpolator
-from itur.models.itu838 import rain_specific_attenuation,\
-    rain_specific_attenuation_coefficients
-from itur.utils import prepare_input_array, prepare_quantity, load_data,\
-    dataset_dir, prepare_output_array
+from itur.models.itu838 import (rain_specific_attenuation,
+                                rain_specific_attenuation_coefficients)
+from itur.utils import (prepare_input_array, prepare_quantity, load_data,
+                        dataset_dir, prepare_output_array)
 
 
 class __ITU530__():
