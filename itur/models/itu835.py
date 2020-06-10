@@ -170,7 +170,6 @@ class _ITU835_6():
 
     def low_latitude_pressure(self, h):
         """Section 2 of Recommendation ITU-R P.835"""
-
         P10 = self.standard_pressure(10)
         P72 = self.standard_pressure(72)
         return np.where(np.logical_and((0 <= h), (h <= 10)),
