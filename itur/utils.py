@@ -88,8 +88,7 @@ def load_data(path, is_text=False, **kwargs):
         raise RuntimeError('The path provided is not a file - {0}'
                            .format(path))
 
-
-    filename, file_extension = os.path.splitext(path)
+    _, file_extension = os.path.splitext(path)
 
     if file_extension == '.npz':
         data = np.load(path)['arr_0']

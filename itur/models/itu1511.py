@@ -4,13 +4,12 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-import os
 from astropy import units as u
 
 from itur import utils
 from itur.models.itu1144 import bicubic_2D_interpolator
-from itur.utils import (load_data, dataset_dir, prepare_input_array,
-                        prepare_output_array, memory, load_data_interpolator)
+from itur.utils import (prepare_input_array, prepare_output_array,
+                        memory, load_data_interpolator)
 
 
 class __ITU1511():

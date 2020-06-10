@@ -8,7 +8,7 @@ import numpy as np
 from astropy import units as u
 
 from itur.models.itu1144 import bilinear_2D_interpolator
-from itur.utils import (prepare_input_array, prepare_output_array,
+from itur.utils import (dataset_dir, prepare_input_array, prepare_output_array,
                         prepare_quantity, memory, load_data_interpolator)
 
 

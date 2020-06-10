@@ -3,16 +3,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import os
 import numpy as np
 from astropy import units as u
 
 from itur import utils
 from itur.models.itu1144 import (bilinear_2D_interpolator,
                                  bicubic_2D_interpolator)
-from itur.utils import (load_data, dataset_dir, prepare_input_array,
-                        prepare_output_array, memory,
-                        load_data_interpolator)
+from itur.utils import (prepare_input_array, prepare_output_array,
+                        memory, load_data_interpolator)
 
 
 class __ITU1510__():
@@ -114,7 +112,7 @@ class _ITU1510_0_():
         if not self._temperature:
             self._temperature = load_data_interpolator(
                 '1510/v1_Lat.npz', '1510/v1_Lon.npz',
-                '1510/v0_Temp.npz', bilinear_2D_interpolator)
+                '1510/v0_Temp.npz', bicubic_2D_interpolator)
 
         return self._temperature(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
