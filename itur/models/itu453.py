@@ -96,7 +96,7 @@ class _ITU453_13_():
         if not self._DN65:
             ps = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80,
                   90, 95, 98, 99, 99.5, 99.8, 99.9]
-            d_dir = os.path.join(dataset_dir, '453/v12_DN65m_%02dd%02d_v1.npz')
+            d_dir = os.path.join(dataset_dir, '453/v12_dn65m_%02dd%02d_v1.npz')
             lats = load_data(os.path.join(dataset_dir, '453/v12_lat0d75.npz'))
             lons = load_data(os.path.join(dataset_dir, '453/v12_lon0d75.npz'))
             for p_loads in ps:
@@ -113,7 +113,7 @@ class _ITU453_13_():
         if not self._DN1:
             ps = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80,
                   90, 95, 98, 99, 99.5, 99.8, 99.9]
-            d_dir = os.path.join(dataset_dir, '453/v12_DN_%02dd%02d_v1.npz')
+            d_dir = os.path.join(dataset_dir, '453/v12_dn_%02dd%02d_v1.npz')
             lats = load_data(os.path.join(dataset_dir, '453/v12_lat0d75.npz'))
             lons = load_data(os.path.join(dataset_dir, '453/v12_lon0d75.npz'))
             for p_loads in ps:
@@ -130,9 +130,9 @@ class _ITU453_13_():
         if not self._N_wet:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30, 50, 60, 70, 80,
                   90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '453/v13_NWET_Annual_%s.npz')
-            lats = load_data(os.path.join(dataset_dir, '453/v13_LAT_N.npz'))
-            lons = load_data(os.path.join(dataset_dir, '453/v13_LON_N.npz'))
+            d_dir = os.path.join(dataset_dir, '453/v13_nwet_annual_%s.npz')
+            lats = load_data(os.path.join(dataset_dir, '453/v13_lat_n.npz'))
+            lons = load_data(os.path.join(dataset_dir, '453/v13_lon_n.npz'))
             for p_loads in ps:
                 vals = load_data(d_dir % (str(p_loads).replace('.', '')))
                 self._N_wet[float(p_loads)] = bilinear_2D_interpolator(
@@ -259,7 +259,7 @@ class _ITU453_12_():
         if not self._DN65:
             ps = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80,
                   90, 95, 98, 99, 99.5, 99.8, 99.9]
-            d_dir = os.path.join(dataset_dir, '453/v12_DN65m_%02dd%02d_v1.npz')
+            d_dir = os.path.join(dataset_dir, '453/v12_dn65m_%02dd%02d_v1.npz')
             lats = load_data(os.path.join(dataset_dir, '453/v12_lat0d75.npz'))
             lons = load_data(os.path.join(dataset_dir, '453/v12_lon0d75.npz'))
             for p_loads in ps:
@@ -276,7 +276,7 @@ class _ITU453_12_():
         if not self._DN1:
             ps = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80,
                   90, 95, 98, 99, 99.5, 99.8, 99.9]
-            d_dir = os.path.join(dataset_dir, '453/v12_DN_%02dd%02d_v1.npz')
+            d_dir = os.path.join(dataset_dir, '453/v12_dn_%02dd%02d_v1.npz')
             lats = load_data(os.path.join(dataset_dir, '453/v12_lat0d75.npz'))
             lons = load_data(os.path.join(dataset_dir, '453/v12_lon0d75.npz'))
             for p_loads in ps:
@@ -291,9 +291,9 @@ class _ITU453_12_():
 
     def N_wet(self, lat, lon):
         if not self._N_wet:
-            vals = load_data(os.path.join(dataset_dir, '453/v12_ESANWET.npz'))
-            lats = load_data(os.path.join(dataset_dir, '453/v12_ESALAT.npz'))
-            lons = load_data(os.path.join(dataset_dir, '453/v12_ESALON.npz'))
+            vals = load_data(os.path.join(dataset_dir, '453/v12_esanwet.npz'))
+            lats = load_data(os.path.join(dataset_dir, '453/v12_esalat.npz'))
+            lons = load_data(os.path.join(dataset_dir, '453/v12_esalon.npz'))
             self._N_wet = bilinear_2D_interpolator(lats, lons, vals)
 
         return self._N_wet(
