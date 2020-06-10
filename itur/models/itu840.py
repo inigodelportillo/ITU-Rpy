@@ -109,7 +109,7 @@ class _ITU840_7():
         if not self._M:
             self._M = load_data_interpolator(
                 '840/v7_lat.npz', '840/v7_lon.npz',
-                '840/v7_M.npz', bilinear_2D_interpolator, flip_ud=False)
+                '840/v7_m.npz', bilinear_2D_interpolator, flip_ud=False)
 
         return self._M(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
@@ -127,7 +127,7 @@ class _ITU840_7():
         if not self._Pclw:
             self._Pclw = load_data_interpolator(
                 '840/v6_lat.npz', '840/v6_lon.npz',
-                '840/v6_Pclw.npz', bilinear_2D_interpolator, flip_ud=False)
+                '840/v6_pclw.npz', bilinear_2D_interpolator, flip_ud=False)
 
         return self._Pclw(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
