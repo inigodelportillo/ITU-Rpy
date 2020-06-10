@@ -91,7 +91,7 @@ class _ITU839_4_():
         return self.isoterm_0(lat_d, lon_d) + 0.36
 
 
-class _ITU839_3():
+class _ITU839_3_():
 
     def __init__(self):
         self.__version__ = 3
