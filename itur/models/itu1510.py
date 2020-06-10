@@ -111,7 +111,7 @@ class _ITU1510_0_():
     def temperature(self, lat, lon):
         if not self._temperature:
             self._temperature = load_data_interpolator(
-                '1510/v1_lat.npz', '1510/v1_lon.npz',
+                '1510/v0_lat.npz', '1510/v0_lon.npz',
                 '1510/v0_temp.npz', bicubic_2D_interpolator)
 
         return self._temperature(
