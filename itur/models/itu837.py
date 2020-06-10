@@ -87,11 +87,11 @@ class _ITU837_7():
 
     def Mt(self, lat, lon, m):
         if not self._Mt:
-            lats = load_data(os.path.join(dataset_dir, '837/v7_LAT_MT.txt'))
-            lons = load_data(os.path.join(dataset_dir, '837/v7_LON_MT.txt'))
+            lats = load_data(os.path.join(dataset_dir, '837/v7_LAT_MT.npz'))
+            lons = load_data(os.path.join(dataset_dir, '837/v7_LON_MT.npz'))
             for _m in self.months:
                 vals = load_data(os.path.join(dataset_dir,
-                                              '837/v7_MT_Month{0:02d}.txt')
+                                              '837/v7_MT_Month{0:02d}.npz')
                                  .format(_m))
                 self._Mt[_m] = bilinear_2D_interpolator(np.flipud(lats), lons,
                                                         np.flipud(vals))
@@ -105,9 +105,9 @@ class _ITU837_7():
 
     def R001(self, lat, lon):
         if not self._R001:
-            lats = load_data(os.path.join(dataset_dir, '837/v7_LAT_R001.txt'))
-            lons = load_data(os.path.join(dataset_dir, '837/v7_LON_R001.txt'))
-            vals = load_data(os.path.join(dataset_dir, '837/v7_R001.txt'))
+            lats = load_data(os.path.join(dataset_dir, '837/v7_LAT_R001.npz'))
+            lons = load_data(os.path.join(dataset_dir, '837/v7_LON_R001.npz'))
+            vals = load_data(os.path.join(dataset_dir, '837/v7_R001.npz'))
             self._R001 = bilinear_2D_interpolator(np.flipud(lats), lons,
                                                   np.flipud(vals))
 
@@ -219,11 +219,11 @@ class _ITU837_6():
     def Pr6(self, lat, lon):
         if not self._Pr6:
             vals = load_data(os.path.join(dataset_dir,
-                                          '837/ESARAIN_PR6_v5.txt'))
+                                          '837/ESARAIN_PR6_v5.npz'))
             lats = load_data(os.path.join(dataset_dir,
-                                          '837/ESARAIN_LAT_v5.txt'))
+                                          '837/ESARAIN_LAT_v5.npz'))
             lons = load_data(os.path.join(dataset_dir,
-                                          '837/ESARAIN_LON_v5.txt'))
+                                          '837/ESARAIN_LON_v5.npz'))
             self._Pr6 = bilinear_2D_interpolator(lats, lons, vals)
 
         return self._Pr6(
@@ -232,11 +232,11 @@ class _ITU837_6():
     def Mt(self, lat, lon):
         if not self._Mt:
             vals = load_data(os.path.join(dataset_dir,
-                                          '837/ESARAIN_MT_v5.txt'))
+                                          '837/ESARAIN_MT_v5.npz'))
             lats = load_data(os.path.join(dataset_dir,
-                                          '837/ESARAIN_LAT_v5.txt'))
+                                          '837/ESARAIN_LAT_v5.npz'))
             lons = load_data(os.path.join(dataset_dir,
-                                          '837/ESARAIN_LON_v5.txt'))
+                                          '837/ESARAIN_LON_v5.npz'))
             self._Mt = bilinear_2D_interpolator(lats, lons, vals)
 
         return self._Mt(
@@ -245,11 +245,11 @@ class _ITU837_6():
     def Beta(self, lat, lon):
         if not self._Beta:
             vals = load_data(os.path.join(dataset_dir,
-                                          '837/ESARAIN_BETA_v5.txt'))
+                                          '837/ESARAIN_BETA_v5.npz'))
             lats = load_data(os.path.join(dataset_dir,
-                                          '837/ESARAIN_LAT_v5.txt'))
+                                          '837/ESARAIN_LAT_v5.npz'))
             lons = load_data(os.path.join(dataset_dir,
-                                          '837/ESARAIN_LON_v5.txt'))
+                                          '837/ESARAIN_LON_v5.npz'))
             self._Beta = bilinear_2D_interpolator(lats, lons, vals)
 
         return self._Beta(

@@ -3,14 +3,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import numpy as np
 import os
+import numpy as np
 from astropy import units as u
 
 from itur import utils
 from itur.models.itu1144 import bilinear_2D_interpolator
-from itur.utils import load_data, dataset_dir, prepare_input_array,\
-    prepare_output_array, memory
+from itur.utils import (load_data, dataset_dir, prepare_input_array,
+    prepare_output_array, memory, load_data_interpolator)
 
 
 class __ITU839__():
@@ -72,12 +72,9 @@ class _ITU839_4_():
 
     def isoterm_0(self, lat, lon):
         if not self._zero_isoterm_data:
-            vals = load_data(os.path.join(dataset_dir,
-                                          '839/v4_ESA0HEIGHT.txt'))
-            lats = load_data(os.path.join(dataset_dir, '839/v4_ESALAT.txt'))
-            lons = load_data(os.path.join(dataset_dir, '839/v4_ESALON.txt'))
-            self._zero_isoterm_data = bilinear_2D_interpolator(
-                lats, lons, vals)
+            self._zero_isoterm_data = load_data_interpolator(
+                '839/v4_ESALAT.npz', '839/v4_ESALON.npz',
+                '839/v4_ESA0HEIGHT.npz', bilinear_2D_interpolator)
 
         return self._zero_isoterm_data(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
@@ -103,12 +100,9 @@ class _ITU839_3_():
 
     def isoterm_0(self, lat, lon):
         if not self._zero_isoterm_data:
-            vals = load_data(os.path.join(dataset_dir,
-                                          '839/v3_ESA0HEIGHT.txt'))
-            lats = load_data(os.path.join(dataset_dir, '839/v3_ESALAT.txt'))
-            lons = load_data(os.path.join(dataset_dir, '839/v3_ESALON.txt'))
-            self._zero_isoterm_data = bilinear_2D_interpolator(
-                lats, lons, vals)
+            self._zero_isoterm_data =  load_data_interpolator(
+                '839/v3_ESALAT.npz', '839/v3_ESALON.npz',
+                '839/v3_ESA0HEIGHT.npz', bilinear_2D_interpolator)
 
         return self._zero_isoterm_data(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)

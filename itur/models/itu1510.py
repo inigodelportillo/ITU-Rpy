@@ -11,7 +11,8 @@ from itur import utils
 from itur.models.itu1144 import (bilinear_2D_interpolator,
                                  bicubic_2D_interpolator)
 from itur.utils import (load_data, dataset_dir, prepare_input_array,
-                        prepare_output_array, memory)
+                        prepare_output_array, memory,
+                        load_data_interpolator)
 
 
 class __ITU1510__():
@@ -67,11 +68,9 @@ class _ITU1510_1_():
 
     def temperature(self, lat, lon):
         if not self._temperature:
-            vals = load_data(os.path.join(dataset_dir, '1510/v1_T_Annual.txt'))
-            lats = load_data(os.path.join(dataset_dir, '1510/v1_Lat.txt'))
-            lons = load_data(os.path.join(dataset_dir, '1510/v1_Lon.txt'))
-            self._temperature = bilinear_2D_interpolator(
-                    np.flipud(lats), lons, np.flipud(vals))
+            self._temperature = load_data_interpolator(
+                '1510/v1_Lat.npz', '1510/v1_Lon.npz',
+                '1510/v1_T_Annual.npz', bilinear_2D_interpolator)
 
         lon[lon > 180] = lon[lon > 180] - 360
         return self._temperature(
@@ -79,14 +78,11 @@ class _ITU1510_1_():
 
     def month_temperature(self, lat, lon, m):
         if not self._month_temperature:
-            lats = load_data(os.path.join(dataset_dir, '1510/v1_Lat.txt'))
-            lons = load_data(os.path.join(dataset_dir, '1510/v1_Lon.txt'))
             for _m in self.__months:
-                vals = load_data(os.path.join(dataset_dir,
-                                              '1510/v1_T_Month{0:02d}.txt')
-                                 .format(_m))
-                self._month_temperature[_m] = bilinear_2D_interpolator(
-                            np.flipud(lats), lons, np.flipud(vals))
+                self._month_temperature[_m] = load_data_interpolator(
+                    '1510/v1_Lat.npz', '1510/v1_Lon.npz',
+                    '1510/v1_T_Month{0:02d}.npz'.format(_m),
+                    bilinear_2D_interpolator)
 
         lon[lon > 180] = lon[lon > 180] - 360
         return self._month_temperature[m](
@@ -116,11 +112,9 @@ class _ITU1510_0_():
 
     def temperature(self, lat, lon):
         if not self._temperature:
-            vals = load_data(os.path.join(dataset_dir, '1510/v0_Temp.txt'))
-            lats = load_data(os.path.join(dataset_dir, '1510/v0_Lat.txt'))
-            lons = load_data(os.path.join(dataset_dir, '1510/v0_Lon.txt'))
-            self._temperature = bicubic_2D_interpolator(np.flipud(lats), lons,
-                                                        np.flipud(vals))
+            self._temperature = load_data_interpolator(
+                '1510/v1_Lat.npz', '1510/v1_Lon.npz',
+                '1510/v0_Temp.npz', bilinear_2D_interpolator)
 
         return self._temperature(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)

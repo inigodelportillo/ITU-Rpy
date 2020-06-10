@@ -15,7 +15,8 @@ from itur.models.itu1144 import bilinear_2D_interpolator
 from itur.models.itu838 import (rain_specific_attenuation,
                                 rain_specific_attenuation_coefficients)
 from itur.utils import (prepare_input_array, prepare_quantity, load_data,
-                        dataset_dir, prepare_output_array)
+                        dataset_dir, prepare_output_array,
+                        load_data_interpolator)
 
 
 class __ITU530__():
@@ -115,10 +116,9 @@ class _ITU530_17_():
         using bi-linear interpolation.
         """
         if not self._s_a:
-            vals = load_data(os.path.join(dataset_dir, '530/v16_gtopo_30.txt'))
-            lats = load_data(os.path.join(dataset_dir, '530/v16_lat.txt'))
-            lons = load_data(os.path.join(dataset_dir, '530/v16_lon.txt'))
-            self._Pr6 = bilinear_2D_interpolator(lats, lons, vals)
+            self._Pr6 = self._altitude = load_data_interpolator(
+                '530/v16_lat.npz', '530/v16_lon.npz',
+                '530/v16_gtopo_30.npz', bilinear_2D_interpolator)
 
         return self._Pr6(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)

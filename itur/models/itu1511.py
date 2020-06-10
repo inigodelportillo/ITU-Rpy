@@ -9,8 +9,8 @@ from astropy import units as u
 
 from itur import utils
 from itur.models.itu1144 import bicubic_2D_interpolator
-from itur.utils import load_data, dataset_dir, prepare_input_array,\
-    prepare_output_array, memory
+from itur.utils import (load_data, dataset_dir, prepare_input_array,
+                        prepare_output_array, memory, load_data_interpolator)
 
 
 class __ITU1511():
@@ -65,14 +65,10 @@ class _ITU1511_1():
         self._altitude = {}
 
     def altitude(self, lat, lon):
-
         if not self._altitude:
-            vals = load_data(os.path.join(dataset_dir,
-                                          '1511/v1_TOPO_0DOT5.txt'))
-            lats = load_data(os.path.join(dataset_dir, '1511/v1_Lat.txt'))
-            lons = load_data(os.path.join(dataset_dir, '1511/v1_Lon.txt'))
-            self._altitude = bicubic_2D_interpolator(np.flipud(lats), lons,
-                                                     np.flipud(vals))
+            self._altitude = load_data_interpolator(
+                '1511/v1_Lat.npz', '1511/v1_Lon.npz',
+                '1511/v1_TOPO_0DOT5.npz', bicubic_2D_interpolator)
 
         return self._altitude(
                 np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
@@ -105,12 +101,9 @@ class _ITU1511_0():
 
     def altitude(self, lat, lon):
         if not self._altitude:
-            vals = load_data(os.path.join(dataset_dir,
-                                          '1511/v1_TOPO_0DOT5.txt'))
-            lats = load_data(os.path.join(dataset_dir, '1511/v1_Lat.txt'))
-            lons = load_data(os.path.join(dataset_dir, '1511/v1_Lon.txt'))
-            self._altitude = bicubic_2D_interpolator(np.flipud(lats), lons,
-                                                     np.flipud(vals))
+            self._altitude = load_data_interpolator(
+                '1511/v1_Lat.npz', '1511/v1_Lon.npz',
+                '1511/v1_TOPO_0DOT5.npz', bicubic_2D_interpolator)
 
         return self._altitude(
                 np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)

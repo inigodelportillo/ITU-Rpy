@@ -26,6 +26,33 @@ __NUMERIC_TYPES__ = [numbers.Number, int, float, complex,
 __wgs84_geod__ = Geod(ellps='WGS84')
 
 
+def load_data_interpolator(path_lat, path_lon, path_data, interp_fcn):
+    """
+    Loads a lat-lon tabulated dataset and build an interpolator
+
+    Parameters
+    ----------
+    path_lat : string
+        Path for the file containing the latitude values
+    path_lon : string
+        Path for the file containing the longitude values
+    path_data : string
+        Path for the file containing the data values
+    interp_fcn : string
+        The interpolation function to be used
+
+    Returns
+    -------
+    interp: interp_fcn
+        An interpolator that given a latitude-longitude pair, returns the
+        data value
+    """
+    vals = load_data(os.path.join(dataset_dir, path_data))
+    lats = load_data(os.path.join(dataset_dir, path_lat))
+    lons = load_data(os.path.join(dataset_dir, path_lon))
+    return interp_fcn(np.flipud(lats), lons, np.flipud(vals))
+
+
 def load_data(path, is_text=False, **kwargs):
     """
     Loads data files from /itur/data/
@@ -47,10 +74,23 @@ def load_data(path, is_text=False, **kwargs):
         Numpy-array with the data. Numerical data is returned as a float
     """
     # TODO: Change method to allow for h5df data too
-    if is_text:
-        data = np.loadtxt(path, dtype=np.string_, delimiter=',', **kwargs)
-    else:
-        data = np.genfromtxt(path, dtype=float, delimiter=',', **kwargs)
+    if not os.path.isfile(path):
+        raise RuntimeError('The path provided is not a file - {0}'
+                           .format(path))
+
+
+    filename, file_extension = os.path.splitext(path)
+
+    if file_extension == '.npz':
+        data = np.load(path)['arr_0']
+    elif file_extension == '.npy':
+        data = np.load(path)
+    elif file_extension == '.txt':
+        if is_text:
+            data = np.loadtxt(path, dtype=np.string_, delimiter=',', **kwargs)
+        else:
+            data = np.genfromtxt(path, dtype=float, delimiter=',', **kwargs)
+
     return data
 
 

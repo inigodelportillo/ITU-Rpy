@@ -157,9 +157,9 @@ class _ITU836_6():
         if not self._V:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '836/v6_V_%s.txt')
-            lats = load_data(os.path.join(dataset_dir, '836/v6_Lat.txt'))
-            lons = load_data(os.path.join(dataset_dir, '836/v6_Lon.txt'))
+            d_dir = os.path.join(dataset_dir, '836/v6_V_%s.npz')
+            lats = load_data(os.path.join(dataset_dir, '836/v6_Lat.npz'))
+            lons = load_data(os.path.join(dataset_dir, '836/v6_Lon.npz'))
             for p_loads in ps:
                 vals = load_data(d_dir % (str(p_loads).replace('.', '')))
                 self._V[float(p_loads)] = bilinear_2D_interpolator(
@@ -172,9 +172,9 @@ class _ITU836_6():
         if not self._VSCH:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '836/v6_VSCH_%s.txt')
-            lats = load_data(os.path.join(dataset_dir, '836/v6_Lat.txt'))
-            lons = load_data(os.path.join(dataset_dir, '836/v6_Lon.txt'))
+            d_dir = os.path.join(dataset_dir, '836/v6_VSCH_%s.npz')
+            lats = load_data(os.path.join(dataset_dir, '836/v6_Lat.npz'))
+            lons = load_data(os.path.join(dataset_dir, '836/v6_Lon.npz'))
             for p_loads in ps:
                 vals = load_data(d_dir % (str(p_loads).replace('.', '')))
                 self._VSCH[float(p_loads)] = bilinear_2D_interpolator(
@@ -187,9 +187,9 @@ class _ITU836_6():
         if not self._rho:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '836/v6_RHO_%s.txt')
-            lats = load_data(os.path.join(dataset_dir, '836/v6_Lat.txt'))
-            lons = load_data(os.path.join(dataset_dir, '836/v6_Lon.txt'))
+            d_dir = os.path.join(dataset_dir, '836/v6_RHO_%s.npz')
+            lats = load_data(os.path.join(dataset_dir, '836/v6_Lat.npz'))
+            lons = load_data(os.path.join(dataset_dir, '836/v6_Lon.npz'))
             for p_loads in ps:
                 vals = load_data(d_dir % (str(p_loads).replace('.', '')))
                 self._rho[float(p_loads)] = bilinear_2D_interpolator(
@@ -200,9 +200,9 @@ class _ITU836_6():
 
     def topo_alt(self, lat, lon):
         if self._topo_alt is None:
-            d_dir = os.path.join(dataset_dir, '836/v6_TOPO_0DOT5.txt')
-            lats = load_data(os.path.join(dataset_dir, '836/v6_TOPOLAT.txt'))
-            lons = load_data(os.path.join(dataset_dir, '836/v6_TOPOLON.txt'))
+            d_dir = os.path.join(dataset_dir, '836/v6_TOPO_0DOT5.npz')
+            lats = load_data(os.path.join(dataset_dir, '836/v6_TOPOLAT.npz'))
+            lons = load_data(os.path.join(dataset_dir, '836/v6_TOPOLON.npz'))
             vals = load_data(d_dir)
             self._topo_alt = bicubic_2D_interpolator(np.flipud(lats), lons,
                                                      np.flipud(vals))
@@ -241,9 +241,9 @@ class _ITU836_5():
         if not self._V:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '836/v5_V_%s.txt')
-            lats = load_data(os.path.join(dataset_dir, '836/v5_Lat.txt'))
-            lons = load_data(os.path.join(dataset_dir, '836/v5_Lon.txt'))
+            d_dir = os.path.join(dataset_dir, '836/v5_V_%s.npz')
+            lats = load_data(os.path.join(dataset_dir, '836/v5_Lat.npz'))
+            lons = load_data(os.path.join(dataset_dir, '836/v5_Lon.npz'))
             for p_loads in ps:
                 vals = load_data(d_dir % (str(p_loads).replace('.', '')))
                 self._V[float(p_loads)] = bilinear_2D_interpolator(
@@ -256,9 +256,9 @@ class _ITU836_5():
         if not self._VSCH:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '836/v5_VSCH_%s.txt')
-            lats = load_data(os.path.join(dataset_dir, '836/v5_Lat.txt'))
-            lons = load_data(os.path.join(dataset_dir, '836/v5_Lon.txt'))
+            d_dir = os.path.join(dataset_dir, '836/v5_VSCH_%s.npz')
+            lats = load_data(os.path.join(dataset_dir, '836/v5_Lat.npz'))
+            lons = load_data(os.path.join(dataset_dir, '836/v5_Lon.npz'))
             for p_loads in ps:
                 vals = load_data(d_dir % (str(p_loads).replace('.', '')))
                 self._VSCH[float(p_loads)] = bilinear_2D_interpolator(
@@ -271,9 +271,9 @@ class _ITU836_5():
         if not self._rho:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '836/v5_RHO_%s.txt')
-            lats = load_data(os.path.join(dataset_dir, '836/v5_Lat.txt'))
-            lons = load_data(os.path.join(dataset_dir, '836/v5_Lon.txt'))
+            d_dir = os.path.join(dataset_dir, '836/v5_RHO_%s.npz')
+            lats = load_data(os.path.join(dataset_dir, '836/v5_Lat.npz'))
+            lons = load_data(os.path.join(dataset_dir, '836/v5_Lon.npz'))
             for p_loads in ps:
                 vals = load_data(d_dir % (str(p_loads).replace('.', '')))
                 self._rho[float(p_loads)] = bilinear_2D_interpolator(
@@ -313,9 +313,9 @@ class _ITU836_4():
         if not self._V:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '836/v4_V_%s.txt')
-            lats = load_data(os.path.join(dataset_dir, '836/v4_Lat.txt'))
-            lons = load_data(os.path.join(dataset_dir, '836/v4_Lon.txt'))
+            d_dir = os.path.join(dataset_dir, '836/v4_V_%s.npz')
+            lats = load_data(os.path.join(dataset_dir, '836/v4_Lat.npz'))
+            lons = load_data(os.path.join(dataset_dir, '836/v4_Lon.npz'))
             for p_loads in ps:
                 vals = load_data(d_dir % (str(p_loads).replace('.', '')))
                 self._V[float(p_loads)] =\
@@ -328,9 +328,9 @@ class _ITU836_4():
         if not self._VSCH:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '836/v4_VSCH_%s.txt')
-            lats = load_data(os.path.join(dataset_dir, '836/v4_Lat.txt'))
-            lons = load_data(os.path.join(dataset_dir, '836/v4_Lon.txt'))
+            d_dir = os.path.join(dataset_dir, '836/v4_VSCH_%s.npz')
+            lats = load_data(os.path.join(dataset_dir, '836/v4_Lat.npz'))
+            lons = load_data(os.path.join(dataset_dir, '836/v4_Lon.npz'))
             for p_loads in ps:
                 vals = load_data(d_dir % (str(p_loads).replace('.', '')))
                 self._VSCH[float(p_loads)] =\
@@ -343,9 +343,9 @@ class _ITU836_4():
         if not self._rho:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '836/v4_RHO_%s.txt')
-            lats = load_data(os.path.join(dataset_dir, '836/v4_Lat.txt'))
-            lons = load_data(os.path.join(dataset_dir, '836/v4_Lon.txt'))
+            d_dir = os.path.join(dataset_dir, '836/v4_RHO_%s.npz')
+            lats = load_data(os.path.join(dataset_dir, '836/v4_Lat.npz'))
+            lons = load_data(os.path.join(dataset_dir, '836/v4_Lon.npz'))
             for p_loads in ps:
                 vals = load_data(d_dir % (str(p_loads).replace('.', '')))
                 self._rho[float(p_loads)] =\
