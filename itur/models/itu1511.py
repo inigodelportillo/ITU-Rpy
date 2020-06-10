@@ -66,8 +66,8 @@ class _ITU1511_1():
     def altitude(self, lat, lon):
         if not self._altitude:
             self._altitude = load_data_interpolator(
-                '1511/v1_Lat.npz', '1511/v1_Lon.npz',
-                '1511/v1_TOPO_0DOT5.npz', bicubic_2D_interpolator)
+                '1511/v1_lat.npz', '1511/v1_lon.npz',
+                '1511/v1_topo_0dot5.npz', bicubic_2D_interpolator)
 
         return self._altitude(
                 np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
@@ -101,8 +101,8 @@ class _ITU1511_0():
     def altitude(self, lat, lon):
         if not self._altitude:
             self._altitude = load_data_interpolator(
-                '1511/v1_Lat.npz', '1511/v1_Lon.npz',
-                '1511/v1_TOPO_0DOT5.npz', bicubic_2D_interpolator)
+                '1511/v1_lat.npz', '1511/v1_lon.npz',
+                '1511/v1_topo_0dot5.npz', bicubic_2D_interpolator)
 
         return self._altitude(
                 np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)

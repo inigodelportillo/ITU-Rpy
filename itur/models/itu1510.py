@@ -67,8 +67,8 @@ class _ITU1510_1_():
     def temperature(self, lat, lon):
         if not self._temperature:
             self._temperature = load_data_interpolator(
-                '1510/v1_Lat.npz', '1510/v1_Lon.npz',
-                '1510/v1_T_Annual.npz', bilinear_2D_interpolator)
+                '1510/v1_lat.npz', '1510/v1_lon.npz',
+                '1510/v1_t_annual.npz', bilinear_2D_interpolator)
 
         lon[lon > 180] = lon[lon > 180] - 360
         return self._temperature(
@@ -78,8 +78,8 @@ class _ITU1510_1_():
         if not self._month_temperature:
             for _m in self.__months:
                 self._month_temperature[_m] = load_data_interpolator(
-                    '1510/v1_Lat.npz', '1510/v1_Lon.npz',
-                    '1510/v1_T_Month{0:02d}.npz'.format(_m),
+                    '1510/v1_lat.npz', '1510/v1_lon.npz',
+                    '1510/v1_t_month{0:02d}.npz'.format(_m),
                     bilinear_2D_interpolator)
 
         lon[lon > 180] = lon[lon > 180] - 360
@@ -111,8 +111,8 @@ class _ITU1510_0_():
     def temperature(self, lat, lon):
         if not self._temperature:
             self._temperature = load_data_interpolator(
-                '1510/v1_Lat.npz', '1510/v1_Lon.npz',
-                '1510/v0_Temp.npz', bicubic_2D_interpolator)
+                '1510/v1_lat.npz', '1510/v1_lon.npz',
+                '1510/v0_temp.npz', bicubic_2D_interpolator)
 
         return self._temperature(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)

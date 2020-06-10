@@ -88,8 +88,8 @@ class _ITU837_7():
         if not self._Mt:
             for _m in self.months:
                 self._Mt[_m] = load_data_interpolator(
-                       '837/v7_LAT_MT.npz', '837/v7_LON_MT.npz',
-                       '837/v7_MT_Month{0:02d}.npz'.format(_m),
+                       '837/v7_lat_MT.npz', '837/v7_lon_mt.npz',
+                       '837/v7_mt_Month{0:02d}.npz'.format(_m),
                        bilinear_2D_interpolator)
 
         # In this recommendation the longitude is encoded with format -180 to
@@ -102,8 +102,8 @@ class _ITU837_7():
     def R001(self, lat, lon):
         if not self._R001:
             self._R001 = load_data_interpolator(
-                       '837/v7_LAT_R001.npz', '837/v7_LON_R001.npz',
-                       '837/v7_R001.npz', bilinear_2D_interpolator)
+                       '837/v7_lat_r001.npz', '837/v7_lon_r001.npz',
+                       '837/v7_r001.npz', bilinear_2D_interpolator)
 
         # In this recommendation the longitude is encoded with format -180 to
         # 180 whereas we always use 0 - 360 encoding
@@ -213,8 +213,8 @@ class _ITU837_6():
     def Pr6(self, lat, lon):
         if not self._Pr6:
             self._Pr6 = load_data_interpolator(
-                       '837/ESARAIN_LAT_v5.npz', '837/ESARAIN_LON_v5.npz',
-                       '837/ESARAIN_PR6_v5.npz', bilinear_2D_interpolator,
+                       '837/esarain_lat_v5.npz', '837/esarain_lon_v5.npz',
+                       '837/esarain_pr6_v5.npz', bilinear_2D_interpolator,
                        flip_ud=False)
 
 
@@ -224,8 +224,8 @@ class _ITU837_6():
     def Mt(self, lat, lon):
         if not self._Mt:
             self._Mt = load_data_interpolator(
-                       '837/ESARAIN_LAT_v5.npz', '837/ESARAIN_LON_v5.npz',
-                       '837/ESARAIN_MT_v5.npz', bilinear_2D_interpolator,
+                       '837/esarain_lat_v5.npz', '837/esarain_lon_v5.npz',
+                       '837/esarain_mt_v5.npz', bilinear_2D_interpolator,
                        flip_ud=False)
 
         return self._Mt(
@@ -234,8 +234,8 @@ class _ITU837_6():
     def Beta(self, lat, lon):
         if not self._Beta:
             self._Beta = load_data_interpolator(
-                       '837/ESARAIN_LAT_v5.npz', '837/ESARAIN_LON_v5.npz',
-                       '837/ESARAIN_BETA_v5.npz', bilinear_2D_interpolator,
+                       '837/esarain_lat_v5.npz', '837/esarain_lon_v5.npz',
+                       '837/esarain_beta_v5.npz', bilinear_2D_interpolator,
                        flip_ud=False)
 
         return self._Beta(

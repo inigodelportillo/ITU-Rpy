@@ -95,10 +95,10 @@ class _ITU840_7():
         if not self._Lred:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95]
-            d_dir = os.path.join(dataset_dir, '840/v7_Lred_%s.npz')
+            d_dir = os.path.join(dataset_dir, '840/v7_lred_%s.npz')
             for p_load in ps:
                 self._Lred[float(p_load)] = load_data_interpolator(
-                       '840/v7_Lat.npz', '840/v7_Lon.npz',
+                       '840/v7_lat.npz', '840/v7_lon.npz',
                        d_dir % (str(p_load).replace('.', '')),
                        bilinear_2D_interpolator, flip_ud=False)
 
@@ -108,7 +108,7 @@ class _ITU840_7():
     def M(self, lat, lon):
         if not self._M:
             self._M = load_data_interpolator(
-                '840/v7_Lat.npz', '840/v7_Lon.npz',
+                '840/v7_lat.npz', '840/v7_lon.npz',
                 '840/v7_M.txt', bilinear_2D_interpolator, flip_ud=False)
 
         return self._M(
@@ -117,7 +117,7 @@ class _ITU840_7():
     def sigma(self, lat, lon):
         if not self._sigma:
             self._sigma = load_data_interpolator(
-                '840/v7_Lat.npz', '840/v7_Lon.npz',
+                '840/v7_lat.npz', '840/v7_lon.npz',
                 '840/v7_sigma.txt', bilinear_2D_interpolator, flip_ud=False)
 
         return self._sigma(
@@ -126,7 +126,7 @@ class _ITU840_7():
     def Pclw(self, lat, lon):
         if not self._Pclw:
             self._Pclw = load_data_interpolator(
-                '840/v6_Lat.npz', '840/v6_Lon.npz',
+                '840/v6_lat.npz', '840/v6_lon.npz',
                 '840/v6_Pclw.txt', bilinear_2D_interpolator, flip_ud=False)
 
         return self._Pclw(
@@ -217,10 +217,10 @@ class _ITU840_6():
         if not self._Lred:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95]
-            d_dir = os.path.join(dataset_dir, '840/v6_Lred_%s.txt')
+            d_dir = os.path.join(dataset_dir, '840/v6_lred_%s.txt')
             for p_load in ps:
                 self._Lred[float(p_load)] = load_data_interpolator(
-                       '840/v6_Lat.npz', '840/v6_Lon.npz',
+                       '840/v6_lat.npz', '840/v6_lon.npz',
                        d_dir % (str(p_load).replace('.', '')),
                        bilinear_2D_interpolator, flip_ud=False)
 
@@ -230,7 +230,7 @@ class _ITU840_6():
     def M(self, lat, lon):
         if not self._M:
             self._M = load_data_interpolator(
-                '840/v6_Lat.npz', '840/v6_Lon.npz',
+                '840/v6_lat.npz', '840/v6_lon.npz',
                 '840/v6_M.txt', bilinear_2D_interpolator, flip_ud=False)
 
         return self._M(
@@ -239,7 +239,7 @@ class _ITU840_6():
     def sigma(self, lat, lon):
         if not self._sigma:
             self._sigma = load_data_interpolator(
-                '840/v6_Lat.npz', '840/v6_Lon.npz',
+                '840/v6_lat.npz', '840/v6_lon.npz',
                 '840/v6_sigma.txt', bilinear_2D_interpolator, flip_ud=False)
 
         return self._sigma(
@@ -248,7 +248,7 @@ class _ITU840_6():
     def Pclw(self, lat, lon):
         if not self._Pclw:
             self._Pclw = load_data_interpolator(
-                '840/v6_Lat.npz', '840/v6_Lon.npz',
+                '840/v6_lat.npz', '840/v6_lon.npz',
                 '840/v6_Pclw.txt', bilinear_2D_interpolator, flip_ud=False)
 
         return self._Pclw(
@@ -341,7 +341,7 @@ class _ITU840_5():
             d_dir = os.path.join(dataset_dir, '840/v4_ESAWRED_%s.txt')
             for p_load in ps:
                 self._Lred[float(p_load)] = load_data_interpolator(
-                       '840/v4_Lat.npz', '840/v4_Lon.npz',
+                       '840/v4_lat.npz', '840/v4_lon.npz',
                        d_dir % (str(p_load).replace('.', '')),
                        bilinear_2D_interpolator, flip_ud=False)
 
@@ -351,8 +351,8 @@ class _ITU840_5():
     def M(self, lat, lon):
         if not self._M:
             self._M = load_data_interpolator(
-                '840/v6_Lat.npz', '840/v6_Lon.npz',
-                '840/v4_WRED_LOGNORMAL_MEAN.txt', bilinear_2D_interpolator,
+                '840/v6_lat.npz', '840/v6_lon.npz',
+                '840/v4_wred_lognormal_mean.txt', bilinear_2D_interpolator,
                 flip_ud=False)
 
         return self._M(
@@ -361,8 +361,8 @@ class _ITU840_5():
     def sigma(self, lat, lon):
         if not self._sigma:
             self._sigma = load_data_interpolator(
-                '840/v6_Lat.npz', '840/v6_Lon.npz',
-                '840/v4_WRED_LOGNORMAL_STDEV.txt', bilinear_2D_interpolator,
+                '840/v6_lat.npz', '840/v6_lon.npz',
+                '840/v4_wred_lognormal_stdev.txt', bilinear_2D_interpolator,
                 flip_ud=False)
 
         return self._sigma(
@@ -371,8 +371,8 @@ class _ITU840_5():
     def Pclw(self, lat, lon):
         if not self._Pclw:
             self._Pclw = load_data_interpolator(
-                '840/v6_Lat.npz', '840/v6_Lon.npz',
-                '840/v4_WRED_LOGNORMAL_PCLW.txt', bilinear_2D_interpolator,
+                '840/v6_lat.npz', '840/v6_lon.npz',
+                '840/v4_wred_lognormal_pclw.txt', bilinear_2D_interpolator,
                 flip_ud=False)
 
         return self._Pclw(
@@ -465,7 +465,7 @@ class _ITU840_4():
             d_dir = os.path.join(dataset_dir, '840/v4_ESAWRED_%s.txt')
             for p_load in ps:
                 self._Lred[float(p_load)] = load_data_interpolator(
-                       '840/v4_Lat.npz', '840/v4_Lon.npz',
+                       '840/v4_lat.npz', '840/v4_lon.npz',
                        d_dir % (str(p_load).replace('.', '')),
                        bilinear_2D_interpolator, flip_ud=False)
 
@@ -475,8 +475,8 @@ class _ITU840_4():
     def M(self, lat, lon):
         if not self._M:
             self._M = load_data_interpolator(
-                '840/v6_Lat.npz', '840/v6_Lon.npz',
-                '840/v4_WRED_LOGNORMAL_MEAN.txt', bilinear_2D_interpolator,
+                '840/v6_lat.npz', '840/v6_lon.npz',
+                '840/v4_wred_lognormal_mean.txt', bilinear_2D_interpolator,
                 flip_ud=False)
 
         return self._M(
@@ -485,8 +485,8 @@ class _ITU840_4():
     def sigma(self, lat, lon):
         if not self._sigma:
             self._sigma = load_data_interpolator(
-                '840/v6_Lat.npz', '840/v6_Lon.npz',
-                '840/v4_WRED_LOGNORMAL_STDEV.txt', bilinear_2D_interpolator,
+                '840/v6_lat.npz', '840/v6_lon.npz',
+                '840/v4_wred_lognormal_stdev.txt', bilinear_2D_interpolator,
                 flip_ud=False)
 
         return self._sigma(
@@ -495,8 +495,8 @@ class _ITU840_4():
     def Pclw(self, lat, lon):
         if not self._Pclw:
             self._Pclw = load_data_interpolator(
-                '840/v6_Lat.npz', '840/v6_Lon.npz',
-                '840/v4_WRED_LOGNORMAL_PCLW.txt', bilinear_2D_interpolator,
+                '840/v6_lat.npz', '840/v6_lon.npz',
+                '840/v4_wred_lognormal_pclw.txt', bilinear_2D_interpolator,
                 flip_ud=False)
 
         return self._Pclw(

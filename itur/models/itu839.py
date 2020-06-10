@@ -72,8 +72,8 @@ class _ITU839_4_():
     def isoterm_0(self, lat, lon):
         if not self._zero_isoterm_data:
             self._zero_isoterm_data = load_data_interpolator(
-                '839/v4_ESALAT.npz', '839/v4_ESALON.npz',
-                '839/v4_ESA0HEIGHT.npz', bilinear_2D_interpolator,
+                '839/v4_esalat.npz', '839/v4_esalon.npz',
+                '839/v4_esa0height.npz', bilinear_2D_interpolator,
                 flip_ud=False)
 
         return self._zero_isoterm_data(
@@ -101,8 +101,8 @@ class _ITU839_3_():
     def isoterm_0(self, lat, lon):
         if not self._zero_isoterm_data:
             self._zero_isoterm_data =  load_data_interpolator(
-                '839/v3_ESALAT.npz', '839/v3_ESALON.npz',
-                '839/v3_ESA0HEIGHT.npz', bilinear_2D_interpolator,
+                '839/v3_esalat.npz', '839/v3_esalon.npz',
+                '839/v3_esa0height.npz', bilinear_2D_interpolator,
                 flip_ud=False)
 
         return self._zero_isoterm_data(
