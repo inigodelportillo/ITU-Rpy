@@ -127,7 +127,9 @@ setup(
     # If using Python 2.6 or earlier, then these have to be included in
     # MANIFEST.in as well.
     package_data={  # Optional
-        'itur': ['data/453/*.npz',
+        'itur': ['LICENSE.txt',
+                 'README.md',
+                 'data/453/*.npz',
                  'data/530/*.npz',
                  'data/676/*.txt',
                  'data/836/*.npz',
