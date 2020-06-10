@@ -12,7 +12,8 @@ from itur.models.itu1511 import topographic_altitude
 from itur.models.itu1144 import (bilinear_2D_interpolator,
                                  bicubic_2D_interpolator)
 from itur.utils import (prepare_input_array, prepare_output_array,
-                        dataset_dir, load_data, prepare_quantity, memory)
+                        dataset_dir, prepare_quantity, memory,
+                        load_data_interpolator)
 
 
 def __interpolator_836__(self, data, lat, lon, p, alt=None,
@@ -158,12 +159,11 @@ class _ITU836_6():
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
             d_dir = os.path.join(dataset_dir, '836/v6_V_%s.npz')
-            lats = load_data(os.path.join(dataset_dir, '836/v6_Lat.npz'))
-            lons = load_data(os.path.join(dataset_dir, '836/v6_Lon.npz'))
             for p_loads in ps:
-                vals = load_data(d_dir % (str(p_loads).replace('.', '')))
-                self._V[float(p_loads)] = bilinear_2D_interpolator(
-                    lats, lons, vals)
+                self._V[float(p_loads)] = load_data_interpolator(
+                       '836/v6_Lat.npz', '836/v6_Lon.npz',
+                       d_dir % (str(p_loads).replace('.', '')),
+                       bilinear_2D_interpolator, flip_ud=False)
 
         return self._V[float(p)](
                 np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
@@ -173,12 +173,11 @@ class _ITU836_6():
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
             d_dir = os.path.join(dataset_dir, '836/v6_VSCH_%s.npz')
-            lats = load_data(os.path.join(dataset_dir, '836/v6_Lat.npz'))
-            lons = load_data(os.path.join(dataset_dir, '836/v6_Lon.npz'))
             for p_loads in ps:
-                vals = load_data(d_dir % (str(p_loads).replace('.', '')))
-                self._VSCH[float(p_loads)] = bilinear_2D_interpolator(
-                    lats, lons, vals)
+                self._VSCH[float(p_loads)] = load_data_interpolator(
+                       '836/v6_Lat.npz', '836/v6_Lon.npz',
+                       d_dir % (str(p_loads).replace('.', '')),
+                       bilinear_2D_interpolator, flip_ud=False)
 
         return self._VSCH[float(p)](
                 np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
@@ -188,24 +187,20 @@ class _ITU836_6():
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
             d_dir = os.path.join(dataset_dir, '836/v6_RHO_%s.npz')
-            lats = load_data(os.path.join(dataset_dir, '836/v6_Lat.npz'))
-            lons = load_data(os.path.join(dataset_dir, '836/v6_Lon.npz'))
             for p_loads in ps:
-                vals = load_data(d_dir % (str(p_loads).replace('.', '')))
-                self._rho[float(p_loads)] = bilinear_2D_interpolator(
-                    lats, lons, vals)
+                self._rho[float(p_loads)] = load_data_interpolator(
+                       '836/v6_Lat.npz', '836/v6_Lon.npz',
+                       d_dir % (str(p_loads).replace('.', '')),
+                       bilinear_2D_interpolator, flip_ud=False)
 
         return self._rho[float(p)](
                 np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def topo_alt(self, lat, lon):
         if self._topo_alt is None:
-            d_dir = os.path.join(dataset_dir, '836/v6_TOPO_0DOT5.npz')
-            lats = load_data(os.path.join(dataset_dir, '836/v6_TOPOLAT.npz'))
-            lons = load_data(os.path.join(dataset_dir, '836/v6_TOPOLON.npz'))
-            vals = load_data(d_dir)
-            self._topo_alt = bicubic_2D_interpolator(np.flipud(lats), lons,
-                                                     np.flipud(vals))
+            self._topo_alt = load_data_interpolator(
+                       '836/v6_TOPOLAT.npz', '836/v6_TOPOLON.npz',
+                       '836/v6_TOPO_0DOT5.npz', bicubic_2D_interpolator)
 
         return self._topo_alt(
                 np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
@@ -242,12 +237,11 @@ class _ITU836_5():
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
             d_dir = os.path.join(dataset_dir, '836/v5_V_%s.npz')
-            lats = load_data(os.path.join(dataset_dir, '836/v5_Lat.npz'))
-            lons = load_data(os.path.join(dataset_dir, '836/v5_Lon.npz'))
             for p_loads in ps:
-                vals = load_data(d_dir % (str(p_loads).replace('.', '')))
-                self._V[float(p_loads)] = bilinear_2D_interpolator(
-                    lats, lons, vals)
+                self._V[float(p_loads)] = load_data_interpolator(
+                       '836/v5_Lat.npz', '836/v5_Lon.npz',
+                       d_dir % (str(p_loads).replace('.', '')),
+                       bilinear_2D_interpolator, flip_ud=False)
 
         return self._V[float(p)](
                 np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
@@ -257,12 +251,11 @@ class _ITU836_5():
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
             d_dir = os.path.join(dataset_dir, '836/v5_VSCH_%s.npz')
-            lats = load_data(os.path.join(dataset_dir, '836/v5_Lat.npz'))
-            lons = load_data(os.path.join(dataset_dir, '836/v5_Lon.npz'))
             for p_loads in ps:
-                vals = load_data(d_dir % (str(p_loads).replace('.', '')))
-                self._VSCH[float(p_loads)] = bilinear_2D_interpolator(
-                    lats, lons, vals)
+                self._VSCH[float(p_loads)] = load_data_interpolator(
+                       '836/v5_Lat.npz', '836/v5_Lon.npz',
+                       d_dir % (str(p_loads).replace('.', '')),
+                       bilinear_2D_interpolator, flip_ud=False)
 
         return self._VSCH[float(p)](
                 np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
@@ -272,12 +265,11 @@ class _ITU836_5():
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
             d_dir = os.path.join(dataset_dir, '836/v5_RHO_%s.npz')
-            lats = load_data(os.path.join(dataset_dir, '836/v5_Lat.npz'))
-            lons = load_data(os.path.join(dataset_dir, '836/v5_Lon.npz'))
             for p_loads in ps:
-                vals = load_data(d_dir % (str(p_loads).replace('.', '')))
-                self._rho[float(p_loads)] = bilinear_2D_interpolator(
-                    lats, lons, vals)
+                self._rho[float(p_loads)] = load_data_interpolator(
+                       '836/v5_Lat.npz', '836/v5_Lon.npz',
+                       d_dir % (str(p_loads).replace('.', '')),
+                       bilinear_2D_interpolator, flip_ud=False)
 
         return self._rho[float(p)](
                 np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
@@ -292,7 +284,7 @@ class _ITU836_5():
     def total_water_vapour_content(self, lat, lon, p, alt=None):
         """
         """
-        return  __interpolator_836__(
+        return __interpolator_836__(
             self, data=self.V, lat=lat, lon=lon, p=p, alt=alt,
             alt_res_fcn=topographic_altitude)
 
@@ -314,12 +306,11 @@ class _ITU836_4():
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
             d_dir = os.path.join(dataset_dir, '836/v4_V_%s.npz')
-            lats = load_data(os.path.join(dataset_dir, '836/v4_Lat.npz'))
-            lons = load_data(os.path.join(dataset_dir, '836/v4_Lon.npz'))
             for p_loads in ps:
-                vals = load_data(d_dir % (str(p_loads).replace('.', '')))
-                self._V[float(p_loads)] =\
-                    bilinear_2D_interpolator(lats, lons, vals)
+                self._V[float(p_loads)] = load_data_interpolator(
+                       '836/v4_Lat.npz', '836/v4_Lon.npz',
+                       d_dir % (str(p_loads).replace('.', '')),
+                       bilinear_2D_interpolator, flip_ud=False)
 
         return self._V[float(p)](
                 np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
@@ -329,12 +320,11 @@ class _ITU836_4():
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
             d_dir = os.path.join(dataset_dir, '836/v4_VSCH_%s.npz')
-            lats = load_data(os.path.join(dataset_dir, '836/v4_Lat.npz'))
-            lons = load_data(os.path.join(dataset_dir, '836/v4_Lon.npz'))
             for p_loads in ps:
-                vals = load_data(d_dir % (str(p_loads).replace('.', '')))
-                self._VSCH[float(p_loads)] =\
-                    bilinear_2D_interpolator(lats, lons, vals)
+                self._VSCH[float(p_loads)] = load_data_interpolator(
+                       '836/v4_Lat.npz', '836/v4_Lon.npz',
+                       d_dir % (str(p_loads).replace('.', '')),
+                       bilinear_2D_interpolator, flip_ud=False)
 
         return self._VSCH[float(p)](
                 np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
@@ -344,12 +334,11 @@ class _ITU836_4():
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95, 99]
             d_dir = os.path.join(dataset_dir, '836/v4_RHO_%s.npz')
-            lats = load_data(os.path.join(dataset_dir, '836/v4_Lat.npz'))
-            lons = load_data(os.path.join(dataset_dir, '836/v4_Lon.npz'))
             for p_loads in ps:
-                vals = load_data(d_dir % (str(p_loads).replace('.', '')))
-                self._rho[float(p_loads)] =\
-                    bilinear_2D_interpolator(lats, lons, vals)
+                self._rho[float(p_loads)] = load_data_interpolator(
+                       '836/v4_Lat.npz', '836/v4_Lon.npz',
+                       d_dir % (str(p_loads).replace('.', '')),
+                       bilinear_2D_interpolator, flip_ud=False)
 
         return self._rho[float(p)](
                 np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)

@@ -74,7 +74,8 @@ class _ITU839_4_():
         if not self._zero_isoterm_data:
             self._zero_isoterm_data = load_data_interpolator(
                 '839/v4_ESALAT.npz', '839/v4_ESALON.npz',
-                '839/v4_ESA0HEIGHT.npz', bilinear_2D_interpolator)
+                '839/v4_ESA0HEIGHT.npz', bilinear_2D_interpolator,
+                flip_ud=False)
 
         return self._zero_isoterm_data(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
@@ -102,7 +103,8 @@ class _ITU839_3_():
         if not self._zero_isoterm_data:
             self._zero_isoterm_data =  load_data_interpolator(
                 '839/v3_ESALAT.npz', '839/v3_ESALON.npz',
-                '839/v3_ESA0HEIGHT.npz', bilinear_2D_interpolator)
+                '839/v3_ESA0HEIGHT.npz', bilinear_2D_interpolator,
+                flip_ud=False)
 
         return self._zero_isoterm_data(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)

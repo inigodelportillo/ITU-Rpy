@@ -26,7 +26,8 @@ __NUMERIC_TYPES__ = [numbers.Number, int, float, complex,
 __wgs84_geod__ = Geod(ellps='WGS84')
 
 
-def load_data_interpolator(path_lat, path_lon, path_data, interp_fcn):
+def load_data_interpolator(path_lat, path_lon, path_data, interp_fcn,
+                           flip_ud=True):
     """
     Loads a lat-lon tabulated dataset and build an interpolator
 
@@ -40,6 +41,12 @@ def load_data_interpolator(path_lat, path_lon, path_data, interp_fcn):
         Path for the file containing the data values
     interp_fcn : string
         The interpolation function to be used
+    flip_ud : boolean
+        Wether to flip the latitude and data arrays along the first axis. This
+        is an artifact of the format that the ITU uses to encode its data,
+        which is inconsistent across recommendations (in some latitude are
+        sorted in ascending order, in others they are sorted in
+        descending order).
 
     Returns
     -------
@@ -50,7 +57,10 @@ def load_data_interpolator(path_lat, path_lon, path_data, interp_fcn):
     vals = load_data(os.path.join(dataset_dir, path_data))
     lats = load_data(os.path.join(dataset_dir, path_lat))
     lons = load_data(os.path.join(dataset_dir, path_lon))
-    return interp_fcn(np.flipud(lats), lons, np.flipud(vals))
+    if flip_ud:
+        return interp_fcn(np.flipud(lats), lons, np.flipud(vals))
+    else:
+        return interp_fcn(lats, lons, vals)
 
 
 def load_data(path, is_text=False, **kwargs):
