@@ -16,7 +16,7 @@ before_script: # configure a headless display to test plot generation
   - "export DISPLAY=:99.0"
   - sleep 3 # give xvfb some time to start
 script:
-  - find . -name '*.npz'
+  - find .. -name "*.npz" -exec readlink -f {} \;
   - python setup.py nosetests --processes=1 --process-timeout=400 --verbosity 2 --with-coverage --cover-package itur  
 after_success:
   coveralls
