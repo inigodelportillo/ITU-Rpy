@@ -89,7 +89,7 @@ def prepare_output_array(output_array, type_input=None):
         unit = None
 
     # Squeeze output array to remove singleton dimensions
-    if isinstance(value, int) or isinstance(value, list):
+    if isinstance(value, np.ndarray) or isinstance(value, list):
         value = np.array(value).squeeze()
 
     # First, cast the output_array to the same type of the input
