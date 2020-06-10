@@ -338,7 +338,7 @@ class _ITU840_5():
         if not self._Lred:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95]
-            d_dir = os.path.join(dataset_dir, '840/v4_esawred_%s.txt')
+            d_dir = os.path.join(dataset_dir, '840/v4_esawred_%s.npz')
             for p_load in ps:
                 self._Lred[float(p_load)] = load_data_interpolator(
                        '840/v4_lat.npz', '840/v4_lon.npz',
@@ -462,7 +462,7 @@ class _ITU840_4():
         if not self._Lred:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
                   50, 60, 70, 80, 90, 95]
-            d_dir = os.path.join(dataset_dir, '840/v4_esawred_%s.txt')
+            d_dir = os.path.join(dataset_dir, '840/v4_esawred_%s.npz')
             for p_load in ps:
                 self._Lred[float(p_load)] = load_data_interpolator(
                        '840/v4_lat.npz', '840/v4_lon.npz',
