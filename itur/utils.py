@@ -125,7 +125,6 @@ def prepare_output_array(output_array, type_input=None):
     arrays, but uses this fucntion to return outputs having the same type
     that was provided in the input of the function.
     """
-    global output_quantity
 
     # First, differentiate between the units and the value of the output_array
     # since the rest of the funcion is mainly focused on casting the value
@@ -141,12 +140,13 @@ def prepare_output_array(output_array, type_input=None):
     if isinstance(value, np.ndarray) or isinstance(value, list):
         value = np.array(value).squeeze()
 
+    type_output = type(output_array)
     # First, cast the output_array to the same type of the input
     # Check if the output array is a 0-D number and cast it to a float
     if (type_input in __NUMERIC_TYPES__ and
-        (type(output_array) in __NUMERIC_TYPES__) or
+        (type_output in __NUMERIC_TYPES__) or
         ((isinstance(output_array, np.ndarray) and output_array.size == 1) or
-         (not type(output_array) not in __NUMERIC_TYPES__ and
+         (not type_output not in __NUMERIC_TYPES__ and
           len(output_array) == 1))):
         value = float(value)
 
