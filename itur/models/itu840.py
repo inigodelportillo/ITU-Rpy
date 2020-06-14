@@ -12,7 +12,7 @@ from itur.utils import (dataset_dir, prepare_input_array, prepare_output_array,
                         prepare_quantity, memory, load_data_interpolator)
 
 
-class __ITU840():
+class __ITU840__():
     """Attenuation due to clouds and fog: This Recommendation provides methods
     to predict the attenuation due to clouds and fog on Earth-space paths.
 
@@ -33,22 +33,17 @@ class __ITU840():
 
     def __init__(self, version=7):
         if version == 7:
-            self.instance = _ITU840_7()
+            self.instance = _ITU840_7_()
         elif version == 6:
-            self.instance = _ITU840_6()
+            self.instance = _ITU840_6_()
         elif version == 5:
-            self.instance = _ITU840_5()
+            self.instance = _ITU840_5_()
         elif version == 4:
-            self.instance = _ITU840_4()
+            self.instance = _ITU840_4_()
         else:
             raise ValueError(
                 'Version {0}  is not implemented for the ITU-R P.840 model.'
                 .format(version))
-
-        self._Lred = {}
-        self._M = {}
-        self._sigma = {}
-        self._Pclw = {}
 
     @property
     def __version__(self):
@@ -61,7 +56,7 @@ class __ITU840():
 
     def columnar_content_reduced_liquid(self, lat, lon, p):
         # Abstract method to compute the columnar content of reduced liquid
-        fcn = np.vectorize(self.instance.columnar_content_reduced_liquid,
+        fcn = np.vectorize(self.__fcn_columnar_content_reduced_liquid__,
                            excluded=[0, 1], otypes=[np.ndarray])
         return np.array(fcn(lat, lon, p).tolist())
 
@@ -77,8 +72,34 @@ class __ITU840():
         # Abstract method to compute the lognormal approximation coefficients
         return self.instance.lognormal_approximation_coefficient(lat, lon)
 
+    def __fcn_columnar_content_reduced_liquid__(self, lat, lon, p):
+        available_p = np.array(
+            [0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0, 30.0, 50.0,
+             60.0, 70.0, 80.0, 90.0, 95.0])
 
-class _ITU840_7():
+        if p in available_p:
+            p_below = p_above = p
+            pExact = True
+        else:
+            pExact = False
+            idx = available_p.searchsorted(p, side='right') - 1
+            idx = np.clip(idx, 0, len(available_p))
+
+            p_below = available_p[idx]
+            p_above = available_p[idx + 1]
+
+        # Compute the values of Lred_a
+        Lred_a = self.instance.Lred(lat, lon, p_above)
+        if not pExact:
+            Lred_b = self.instance.Lred(lat, lon, p_below)
+            Lred = Lred_b + (Lred_a - Lred_b) * (np.log(p) - np.log(p_below)) \
+                / (np.log(p_above) - np.log(p_below))
+            return Lred
+        else:
+            return Lred_a
+
+
+class _ITU840_7_():
 
     def __init__(self):
         self.__version__ = 7
@@ -136,61 +157,7 @@ class _ITU840_7():
     def specific_attenuation_coefficients(f, T):
         """
         """
-        if np.any(f > 1000):
-            raise ValueError('Frequency must be introduced in GHz and the '
-                             'maximum range is 1000 GHz')
-
-        T_kelvin = T + 273.15
-        theta = 300.0 / T_kelvin                # Eq. 9
-
-        # Compute the values of the epsilons
-        epsilon0 = 77.66 + 103.3 * (theta - 1)  # Eq. 6
-        epsilon1 = 0.0671 * epsilon0            # Eq. 7
-        epsilon2 = 3.52                         # Eq. 8
-
-        # Compute the principal and secondary relacation frequencies
-        fp = 20.20 - 146 * (theta - 1) + 316.0 * (theta - 1)**2     # Eq. 10
-        fs = 39.8 * fp                                              # Eq. 11
-
-        # Compute the dielectric permitivity of water
-        epsilonp = (epsilon0 - epsilon1) / (1 + (f / fp) ** 2) + \
-            (epsilon1 - epsilon2) / (1 + (f / fs) ** 2) + epsilon2  # Eq. 5
-
-        epsilonpp = f * (epsilon0 - epsilon1) / (fp * (1 + (f / fp)**2)) + \
-            f * (epsilon1 - epsilon2) / (fs * (1 + (f / fs)**2))       # Eq. 4
-
-        eta = (2 + epsilonp) / epsilonpp                    # Eq. 3
-        Kl = (0.819 * f) / (epsilonpp * (1 + eta**2))       # Eq. 2
-
-        return Kl       # Specific attenuation coefficient  (dB/km)/(g/m3)
-
-    def columnar_content_reduced_liquid(self, lat, lon, p):
-        """
-        """
-        available_p = np.array(
-            [0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0, 30.0, 50.0,
-             60.0, 70.0, 80.0, 90.0, 95.0])
-
-        if p in available_p:
-            p_below = p_above = p
-            pExact = True
-        else:
-            pExact = False
-            idx = available_p.searchsorted(p, side='right') - 1
-            idx = np.clip(idx, 0, len(available_p))
-
-            p_below = available_p[idx]
-            p_above = available_p[idx + 1]
-
-        # Compute the values of Lred_a
-        Lred_a = self.Lred(lat, lon, p_above)
-        if not pExact:
-            Lred_b = self.Lred(lat, lon, p_below)
-            Lred = Lred_b + (Lred_a - Lred_b) * (np.log(p) - np.log(p_below)) \
-                / (np.log(p_above) - np.log(p_below))
-            return Lred
-        else:
-            return Lred_a
+        return _ITU840_6_.specific_attenuation_coefficients(f, T)
 
     def lognormal_approximation_coefficient(self, lat, lon):
         m = self.M(lat, lon)
@@ -200,7 +167,7 @@ class _ITU840_7():
         return m, sigma, Pclw
 
 
-class _ITU840_6():
+class _ITU840_6_():
 
     def __init__(self):
         self.__version__ = 6
@@ -254,7 +221,8 @@ class _ITU840_6():
         return self._Pclw(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
-    def specific_attenuation_coefficients(self, f, T):
+    @staticmethod
+    def specific_attenuation_coefficients(f, T):
         """
         """
         if np.any(f > 1000):
@@ -285,34 +253,6 @@ class _ITU840_6():
 
         return Kl       # Specific attenuation coefficient  (dB/km)/(g/m3)
 
-    def columnar_content_reduced_liquid(self, lat, lon, p):
-        """
-        """
-        available_p = np.array(
-            [0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0, 30.0, 50.0,
-             60.0, 70.0, 80.0, 90.0, 95.0])
-
-        if p in available_p:
-            p_below = p_above = p
-            pExact = True
-        else:
-            pExact = False
-            idx = available_p.searchsorted(p, side='right') - 1
-            idx = np.clip(idx, 0, len(available_p))
-
-            p_below = available_p[idx]
-            p_above = available_p[idx + 1]
-
-        # Compute the values of Lred_a
-        Lred_a = self.Lred(lat, lon, p_above)
-        if not pExact:
-            Lred_b = self.Lred(lat, lon, p_below)
-            Lred = Lred_b + (Lred_a - Lred_b) * (np.log(p) - np.log(p_below)) \
-                / (np.log(p_above) - np.log(p_below))
-            return Lred
-        else:
-            return Lred_a
-
     def lognormal_approximation_coefficient(self, lat, lon):
         m = self.M(lat, lon)
         sigma = self.sigma(lat, lon)
@@ -321,7 +261,7 @@ class _ITU840_6():
         return m, sigma, Pclw
 
 
-class _ITU840_5():
+class _ITU840_5_():
 
     def __init__(self):
         self.__version__ = 5
@@ -378,64 +318,11 @@ class _ITU840_5():
         return self._Pclw(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
-    def specific_attenuation_coefficients(self, f, T):
+    @staticmethod
+    def specific_attenuation_coefficients(f, T):
         """
         """
-        if np.any(f > 1000):
-            raise ValueError(
-                'Frequency must be introduced in GHz and the maximum range '
-                'is 1000 GHz')
-
-        T_kelvin = T + 273.15
-        theta = 300.0 / T_kelvin                # Eq. 9
-
-        # Compute the values of the epsilons
-        epsilon0 = 77.66 + 103.3 * (theta - 1)  # Eq. 6
-        epsilon1 = 5.48                         # Eq. 7
-        epsilon2 = 3.51                         # Eq. 8
-
-        # Compute the principal and secondary relacation frequencies
-        fp = 20.09 - 142 * (theta - 1) + 294.0 * (theta - 1)**2     # Eq. 10
-        fs = 590 - 1500 * (theta - 1)                               # Eq. 11
-
-        # Compute the dielectric permitivity of water
-        epsilonp = (epsilon0 - epsilon1) / (1 + (f / fp) ** 2) + \
-            (epsilon1 - epsilon2) / (1 + (f / fs) ** 2) + epsilon2  # Eq. 5
-
-        epsilonpp = f * (epsilon0 - epsilon1) / (fp * (1 + (f / fp)**2)) + \
-            f * (epsilon1 - epsilon2) / (fs * (1 + (f / fs)**2))       # Eq. 4
-
-        eta = (2 + epsilonp) / epsilonpp                    # Eq. 3
-        Kl = (0.819 * f) / (epsilonpp * (1 + eta**2))       # Eq. 2
-
-        return Kl       # Specific attenuation coefficient  (dB/km)/(g/m3)
-
-    def columnar_content_reduced_liquid(self, lat, lon, p):
-        """
-        """
-        available_p = np.array(
-            [0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0, 30.0, 50.0,
-             60.0, 70.0, 80.0, 90.0, 95.0])
-
-        if p in available_p:
-            p_below = p_above = p
-            pExact = True
-        else:
-            pExact = False
-            idx = available_p.searchsorted(p, side='right') - 1
-            idx = np.clip(idx, 0, len(available_p))
-
-            p_below = available_p[idx]
-            p_above = available_p[idx + 1]
-
-        Lred_a = self.Lred(lat, lon, p_above)
-        if not pExact:
-            Lred_b = self.Lred(lat, lon, p_below)
-            Lred = Lred_b + (Lred_a - Lred_b) * (np.log(p) - np.log(p_below)) \
-                / (np.log(p_above) - np.log(p_below))
-            return Lred
-        else:
-            return Lred_a
+        return _ITU840_4_.specific_attenuation_coefficients(f, T)
 
     def lognormal_approximation_coefficient(self, lat, lon):
         m = self.M(lat, lon)
@@ -445,7 +332,7 @@ class _ITU840_5():
         return m, sigma, Pclw
 
 
-class _ITU840_4():
+class _ITU840_4_():
 
     def __init__(self):
         self.__version__ = 4
@@ -502,7 +389,8 @@ class _ITU840_4():
         return self._Pclw(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
-    def specific_attenuation_coefficients(self, f, T):
+    @staticmethod
+    def specific_attenuation_coefficients(f, T):
         """
         """
         if np.any(f > 1000):
@@ -534,33 +422,6 @@ class _ITU840_4():
 
         return Kl       # Specific attenuation coefficient  (dB/km)/(g/m3)
 
-    def columnar_content_reduced_liquid(self, lat, lon, p):
-        """
-        """
-        available_p = np.array(
-            [0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0, 30.0, 50.0,
-             60.0, 70.0, 80.0, 90.0, 95.0])
-
-        if p in available_p:
-            p_below = p_above = p
-            pExact = True
-        else:
-            pExact = False
-            idx = available_p.searchsorted(p, side='right') - 1
-            idx = np.clip(idx, 0, len(available_p))
-
-            p_below = available_p[idx]
-            p_above = available_p[idx + 1]
-
-        Lred_a = self.Lred(lat, lon, p_above)
-        if not pExact:
-            Lred_b = Lred_a = self.Lred(lat, lon, p_below)
-            Lred = Lred_b + (Lred_a - Lred_b) * (np.log(p) - np.log(p_below)) \
-                / (np.log(p_above) - np.log(p_below))
-            return Lred
-        else:
-            return Lred_a
-
     def lognormal_approximation_coefficient(self, lat, lon):
         m = self.M(lat, lon)
         sigma = self.sigma(lat, lon)
@@ -569,7 +430,7 @@ class _ITU840_4():
         return m, sigma, Pclw
 
 
-__model = __ITU840()
+__model = __ITU840__()
 
 
 def change_version(new_version):
@@ -587,7 +448,7 @@ def change_version(new_version):
         * 6: P.840-6 (09/13) (Current version)
     """
     global __model
-    __model = __ITU840(new_version)
+    __model = __ITU840__(new_version)
 
 
 def get_version():
