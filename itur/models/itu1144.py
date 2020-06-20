@@ -19,8 +19,8 @@ from scipy.interpolate import griddata, RegularGridInterpolator
 
 def is_regular_grid(lats_o, lons_o):
     """
-    Determinere whether the grids in lats_o and lons_o are both regular grids or
-    not.
+    Determinere whether the grids in lats_o and lons_o are both regular grids
+    or not.
 
     A grid is regular if the difference (column-wise or row-wise)
     between consecutive values is constant across the grid.
@@ -41,8 +41,9 @@ def is_regular_grid(lats_o, lons_o):
     Delta_lons = np.unique(np.diff(lons_o, axis=1))
     Delta_lats = np.unique(np.diff(lats_o, axis=0))
 
-    return (Delta_lons.size == 1 and (Delta_lons != 0).all() and
-            Delta_lats.size == 1 and (Delta_lats != 0).all())
+    return (np.allclose(Delta_lons, Delta_lons[0], rtol=1e-5) and
+            np.allclose(Delta_lats, Delta_lats[0], rtol=1e-5) and
+            (Delta_lons != 0).all() and (Delta_lats != 0).all())
 
 ###############################################################################
 #                       Nearest Neighbour Interpolation                       #
