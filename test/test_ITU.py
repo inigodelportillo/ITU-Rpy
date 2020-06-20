@@ -88,6 +88,7 @@ def suite():
 
     # ITU-R P.1511 tests (Topographic altitude)
     suite.addTest(ITUR1511_1TestCase('test_topographic_altitude'))
+    suite.addTest(ITUR1511_2TestCase('test_topographic_altitude'))
 
     return suite
 
@@ -7849,6 +7850,38 @@ class ITUR1511_1TestCase(test.TestCase):
         self.assertAlmostEqual(
             models.itu1511.topographic_altitude(51.5, -0.14).value,
             0.06916422, places=5)
+
+
+class ITUR1511_2TestCase(test.TestCase):
+
+    def setUp(self):
+        models.itu1511.change_version(2)
+
+    def test_topographic_altitude(self):
+        self.assertAlmostEqual(
+            models.itu1511.topographic_altitude(51.5, -0.14).value,
+            0.031382983999999, places=4)
+        self.assertAlmostEqual(
+            models.itu1511.topographic_altitude(41.9, 12.49).value,
+            0.0461229880100015, places=4)
+        self.assertAlmostEqual(
+            models.itu1511.topographic_altitude(33.94, 18.43).value,
+            0, places=5)
+        self.assertAlmostEqual(
+            models.itu1511.topographic_altitude(22.9, -43.23).value,
+            0, places=5)
+        self.assertAlmostEqual(
+            models.itu1511.topographic_altitude(25.78, -80.22).value,
+            0.00861727999508758, places=4)
+        self.assertAlmostEqual(
+            models.itu1511.topographic_altitude(28.717, 77.3).value,
+            0.209383698952704, places=4)
+        self.assertAlmostEqual(
+            models.itu1511.topographic_altitude(3.133, 101.7).value,
+            0.0512514559528945, places=4)
+        self.assertAlmostEqual(
+            models.itu1511.topographic_altitude(9.05, 38.7).value,
+            2.5398618775, places=4)
 
 
 if __name__ == '__main__':
