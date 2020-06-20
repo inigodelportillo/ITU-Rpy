@@ -25,6 +25,16 @@ def suite():
     """
     suite = test.TestSuite()
 
+    # Ensure models are in the right version
+    models.itu676.change_version(11)
+    models.itu618.change_version(13)
+    models.itu453.change_version(12)
+    models.itu837.change_version(7)
+    models.itu838.change_version(3)
+    models.itu839.change_version(4)
+    models.itu840.change_version(7)
+    models.itu1511.change_version(1)
+
     # ITU-R P.676 tests (Gaseous attenuation)
     suite.addTest(ITUR676_9TestCase('test_gammaw'))
     suite.addTest(ITUR676_9TestCase('test_gamma0'))
