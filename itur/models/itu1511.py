@@ -91,7 +91,9 @@ class _ITU1511_2_():
         sea level of the surface of the Earth.
         """
 
-        # The new recommendation provides the output in meters
+        # The new recommendation provides the output in meters and uses
+        # a -180 to 180 longitude refernce
+        lon_d = np.where(lon_d > 180, lon_d - 360, lon_d)
         return self.altitude(lat_d, lon_d) / 1000
 
 
@@ -127,8 +129,7 @@ class _ITU1511_1_():
         Method to compute the values of topographical height (km) above mean
         sea level of the surface of the Earth.
         """
-        # The dataset in this recommendation is in a 0-360 lon reference
-        return self.altitude(lat_d, np.mod(lon_d, 360))
+        return self.altitude(lat_d, lon_d)
 
 
 class _ITU1511_0_():
@@ -163,8 +164,7 @@ class _ITU1511_0_():
         Method to compute the values of topographical height (km) above mean
         sea level of the surface of the Earth.
         """
-        # The dataset in this recommendation is in a 0-360 lon reference
-        return self.altitude(lat_d, np.mod(lon_d, 360))
+        return self.altitude(lat_d, lon_d)
 
 
 __model = __ITU1511()
@@ -228,6 +228,7 @@ def topographic_altitude(lat, lon):
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
+    lon = np.mod(lon, 360)
     val = __model.topographic_altitude(lat, lon)
     val = np.maximum(val, 1e-7)
     return prepare_output_array(val, type_output) * u.km
