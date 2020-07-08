@@ -14,12 +14,13 @@ from itur.models.itu453 import radio_refractive_index
 from itur.models.itu835 import (standard_pressure, standard_temperature,
                                 standard_water_vapour_density)
 from itur.models.itu836 import total_water_vapour_content
+from itur.models.itu1510 import surface_mean_temperature
 from itur.models.itu1511 import topographic_altitude
 from itur.utils import (prepare_quantity, prepare_output_array,
                         prepare_input_array, load_data, dataset_dir, memory)
 
 
-def __gamma0_exact__676_9_11__(self, f, p, rho, T):
+def __gamma0_exact__(self, f, p, rho, T):
     # T in Kelvin
     # e : water vapour partial pressure in hPa (total barometric pressure
     # ptot = p + e)
@@ -56,7 +57,7 @@ def __gamma0_exact__676_9_11__(self, f, p, rho, T):
     return gamma
 
 
-def __gammaw_exact__676_9_11__(self, f, p, rho, T):
+def __gammaw_exact__(self, f, p, rho, T):
     # T in Kelvin
     # e : water vapour partial pressure in hPa (total barometric pressure
     # ptot = p + e)
@@ -84,13 +85,14 @@ def __gammaw_exact__676_9_11__(self, f, p, rho, T):
     return gamma
 
 
-class __ITU676():
+class __ITU676__():
     """Attenuation by atmospheric gases.
 
     Available versions include:
        * P.676-9 (02/12) (Superseded)
        * P.676-10 (09/13) (Superseded)
-       * P.676-11 (09/16) (Current version)
+       * P.676-11 (09/16) (Superseded)
+       * P.676-11 (08/19) (Current version)
     Not available versions:
        * P.676-1 (03/92) (Superseded)
        * P.676-2 (10/95) (Superseded)
@@ -104,13 +106,15 @@ class __ITU676():
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.676 recommendation.
 
-    def __init__(self, version=11):
-        if version == 11:
-            self.instance = _ITU676_11()
+    def __init__(self, version=12):
+        if version == 12:
+            self.instance = _ITU676_12_()
+        elif version == 11:
+            self.instance = _ITU676_11_()
         elif version == 10:
-            self.instance = _ITU676_10()
+            self.instance = _ITU676_10_()
         elif version == 9:
-            self.instance = _ITU676_9()
+            self.instance = _ITU676_9_()
 #        elif version == 8:
 #            self.instance = _ITU676_8()
 #        elif version == 7:
@@ -190,7 +194,298 @@ class __ITU676():
         return fcn(f, p, rho, t)
 
 
-class _ITU676_11():
+class _ITU676_12_():
+
+    tmp = load_data(os.path.join(dataset_dir, '676/v12_lines_oxygen.txt'),
+                    skip_header=1)
+    f_ox = tmp[:, 0]
+    a1 = tmp[:, 1]
+    a2 = tmp[:, 2]
+    a3 = tmp[:, 3]
+    a4 = tmp[:, 4]
+    a5 = tmp[:, 5]
+    a6 = tmp[:, 6]
+
+    tmp = load_data(os.path.join(dataset_dir,
+                                 '676//v12_lines_water_vapour.txt'),
+                    skip_header=1)
+    f_wv = tmp[:, 0]
+    b1 = tmp[:, 1]
+    b2 = tmp[:, 2]
+    b3 = tmp[:, 3]
+    b4 = tmp[:, 4]
+    b5 = tmp[:, 5]
+    b6 = tmp[:, 6]
+
+    # Coefficients in table 3
+    t2_coeffs = [(0.1597, 118.750334),
+                 (0.1066, 368.498246),
+                 (0.1325, 424.763020),
+                 (0.1242, 487.249273),
+                 (0.0938, 715.392902),
+                 (0.1448, 773.839490),
+                 (0.1374, 834.145546)]
+
+    # Coefficients in table 4
+    hw_coeffs = [(22.23508, 1.52, 2.56),
+                 (183.310087, 7.62, 10.2),
+                 (325.152888, 1.56, 2.7),
+                 (380.197353, 4.15, 5.7),
+                 (439.150807, 0.2, 0.91),
+                 (448.001085, 1.63, 2.46),
+                 (474.689092, 0.76, 2.22),
+                 (488.490108, 0.26, 2.49),
+                 (556.935985, 7.81, 10),
+                 (620.70087, 1.25, 2.35),
+                 (752.033113, 16.2, 20),
+                 (916.171582, 1.47, 2.58),
+                 (970.315022, 1.36, 2.44),
+                 (987.926764, 1.6, 1.86)]
+
+    def __init__(self):
+        self.__version__ = 12
+        self.year = 2019
+        self.month = 8
+        self.link = 'https://www.itu.int/rec/R-REC-P.676-11-201712-S/en'
+
+    def gammaw_approx(self, f, p, rho, T):
+        warnings.warn(
+                RuntimeWarning(
+                    'Recommendation ITU-R P.676-12 does not have an explicit '
+                    'method to approximate gamma_w. The exact method shall be '
+                    'used instead.'))
+        return self.gamma_exact(f, p, rho, T)
+
+    def gamma0_approx(self, f, p, rho, T):
+        warnings.warn(
+                RuntimeWarning(
+                    'Recommendation ITU-R P.676-12 does not have an explicit '
+                    'method to approximate gamma_w. The exact method shall be '
+                    'used instead.'))
+        return self.gamma_exact(f, p, rho, T)
+
+    @classmethod
+    def gamma0_exact(self, f, p, rho, T):
+        return __gamma0_exact__(self, f, p, rho, T)
+
+    @classmethod
+    def gammaw_exact(self, f, p, rho, T):
+        return __gammaw_exact__(self, f, p, rho, T)
+
+    @classmethod
+    def gamma_exact(self, f, p, rho, T):
+        return (self.gamma0_exact(f, p, rho, T) +
+                self.gammaw_exact(f, p, rho, T))
+
+    @classmethod
+    def gaseous_attenuation_approximation(self, f, el, rho, P, T):
+        """
+        T goes in Kelvin
+        """
+        if np.any(f > 350):
+            warnings.warn(
+                RuntimeWarning(
+                    'The approximated method to computes '
+                    'the gaseous attenuation in recommendation ITU-P 676-11 '
+                    'is only recommended for frequencies below 350GHz'))
+
+        if np.any(5 > el) or np.any(np.mod(el, 90) < 5):
+            warnings.warn(
+                RuntimeWarning(
+                    'The approximated method to compute '
+                    'the gaseous attenuation in recommendation ITU-P 676-11 '
+                    'is only recommended for elevation angles between'
+                    '5 and 90 degrees'))
+
+        # Water vapour attenuation (gammaw) computation as in Section 1 of
+        # Annex 2 of [1]
+        gamma0 = self.gamma0_exact(f, P, rho, T)
+        gammaw = self.gammaw_exact(f, P, rho, T)
+
+        return gamma0, gammaw
+
+    @classmethod
+    def slant_inclined_path_equivalent_height(self, f, P, rho, T):
+        """
+        """
+        e = rho * T / 216.7
+        rp = (P + e) / 1013.25
+
+        # Eq. 31 - 34
+        t1 = 5.1040 / (1 + 0.066 * rp**-2.3) * \
+            np.exp(-((f - 59.7) / (2.87 + 12.4 * np.exp(-7.9 * rp)))**2)
+
+        t2 = sum([(ci * np.exp(2.12 * rp)) /
+                  ((f - fi)**2 + 0.025 * np.exp(2.2 * rp))
+                  for ci, fi in self.t2_coeffs])
+
+        t3 = 0.0114 * f / (1 + 0.14 * rp**-2.6) * \
+            (15.02 * f**2 - 1353 * f + 5.333e4) / \
+            (f**3 - 151.3 * f**2 + 9629 * f - 6803)
+
+        A = 0.7832 + 0.00709 * (T - 273.15)
+
+        # Eq. 30
+        h0 = 6.1 * A / (1 + 0.17 * rp**-1.1) * (1 + t1 + t2 + t3)
+
+        h0 = np.where(f < 70,
+                      np.minimum(h0, 10.7 * rp**0.3),
+                      h0)
+
+        # Eq. 36 - 38
+        A = 1.9298 - 0.04166 * (T - 273.15) + 0.0517 * rho
+        B = 1.1674 - 0.00622 * (T - 273.15) + 0.0063 * rho
+        sigmaw = 1.013 / (1 + np.exp(-8.6 * (rp - 0.57)))
+
+        # Eq. 35 b
+        hw = A + B * sum([(ai * sigmaw) / ((f - fi)**2 + bi * sigmaw)
+                          for fi, ai, bi in self.hw_coeffs])
+        return h0, hw
+
+    @classmethod
+    def gaseous_attenuation_terrestrial_path(
+            self, r, f, el, rho, P, T, mode='approx'):
+        """
+        """
+        if mode == 'approx':
+            gamma0, gammaw = self.gaseous_attenuation_approximation(
+                f, el, rho, P, T)
+            return (gamma0 + gammaw) * r
+        else:
+            gamma = self.gamma_exact(f, P, rho, T)
+            return gamma * r
+
+    @classmethod
+    def gaseous_attenuation_slant_path(self, f, el, rho, P, T, V_t=None,
+                                       h=None, mode='approx'):
+        """
+        """
+        if mode == 'approx':
+            gamma0, gammaw = self.gaseous_attenuation_approximation(
+                f, el, rho, P, T)
+
+            h0, hw = self.slant_inclined_path_equivalent_height(f, P, rho, T)
+
+            # Use the zenit water-vapour method if the values of V_t
+            # and h are provided
+            if V_t is not None and h is not None:
+                Aw = self.zenit_water_vapour_attenuation(None, None, None,
+                                                         f, V_t, h)
+            else:
+                Aw = gammaw * hw
+
+            A0 = gamma0 * h0
+            return (A0 + Aw) / np.sin(np.deg2rad(el))
+
+        else:
+            delta_h = 0.0001 * np.exp((np.arange(0, 923)) / 100)
+            h_n = np.cumsum(delta_h)
+            T_n = standard_temperature(h_n).to(u.K).value
+            press_n = standard_pressure(h_n).value
+            rho_n = standard_water_vapour_density(h_n, rho_0=rho).value
+
+            e = rho * T / 216.7
+            n_n = radio_refractive_index(press_n, e, T).value
+            n_ratio = np.pad(n_n[1:], (0, 1), mode='edge') / n_n
+            r_n = 6371 + h_n
+
+            b = np.pi / 2 - np.deg2rad(el)
+            Agas = 0
+            for t, press, rho, r, delta, n_r in zip(
+                    T_n, press_n, rho_n, r_n, delta_h, n_ratio):
+                a = - r * np.cos(b) + 0.5 * np.sqrt(
+                    4 * r**2 * np.cos(b)**2 + 8 * r * delta + 4 * delta**2)
+                a_cos_arg = np.clip((-a**2 - 2 * r * delta - delta**2) /
+                                    (2 * a * r + 2 * a * delta), -1, 1)
+                alpha = np.pi - np.arccos(a_cos_arg)
+                gamma = self.gamma_exact(f, press, rho, t)
+                Agas += a * gamma
+                b = np.arcsin(n_r * np.sin(alpha))
+
+            return Agas
+
+    @classmethod
+    def gaseous_attenuation_inclined_path(
+            self, f, el, rho, P, T, h1, h2, mode='approx'):
+        """
+        """
+        if h1 > 10 or h2 > 10:
+            raise ValueError(
+                'Both the transmitter and the receiver must be at'
+                'altitude of less than 10 km above the sea level.'
+                'Current altitude Tx: %.2f km, Rx: %.2f km' % (h1, h2))
+
+        if mode == 'approx':
+            rho = rho * np.exp(h1 / 2)
+            gamma0, gammaw = self.gaseous_attenuation_approximation(
+                f, el, rho, P, T)
+        else:
+            gamma0 = self.gamma0_exact(f, P, rho, T)
+            gammaw = 0
+
+        e = rho * T / 216.7
+        h0, hw = self.slant_inclined_path_equivalent_height(f, P + e)
+
+        if 5 < el and el < 90:
+            h0_p = h0 * (np.exp(-h1 / h0) - np.exp(-h2 / h0))
+            hw_p = hw * (np.exp(-h1 / hw) - np.exp(-h2 / hw))
+            return (gamma0 * h0_p + gammaw * hw_p) / np.sin(np.deg2rad(el))
+        else:
+            def F(x):
+                return 1 / (0.661 * x + 0.339 * np.sqrt(x**2 + 5.51))
+
+            el1 = el
+            el2 = -el
+            Re = 8500  # TODO: change to ITU-R P 834
+
+            def xi(eli, hi):
+                return np.tan(np.deg2rad(eli) * np.sqrt((Re + hi) / h0))
+
+            def xi_p(eli, hi):
+                return np.tan(np.deg2rad(eli) * np.sqrt((Re + hi) / hw))
+
+            def eq_33(h_num, h_den, el, x):
+                return np.sqrt(Re + h_num) * F(x) * \
+                    np.exp(-h_num / h_den) / np.cos(np.deg2rad(el))
+
+            A = gamma0 * np.sqrt(h0) * (eq_33(h1, h0, el1, xi(el1, h1)) -
+                                        eq_33(h2, h0, el2, xi(el2, h2))) +\
+                gammaw * np.sqrt(hw) * (eq_33(h1, hw, el1, xi_p(el1, h1)) -
+                                        eq_33(h2, hw, el2, xi_p(el2, h2)))
+            return A
+
+    @classmethod
+    def zenit_water_vapour_attenuation(
+            self, lat, lon, p, f, V_t=None, h=None):
+        f_ref = 20.6        # [GHz]
+        p_ref = 845         # [hPa]
+
+        if h is None:
+            h = topographic_altitude(lat, lon).value
+
+        if V_t is None:
+            V_t = total_water_vapour_content(lat, lon, p, h).value
+
+        rho_ref = V_t / 2.38
+        t_ref = 14 * np.log(0.22 * V_t / 2.38) + 3    # [Celsius]
+
+        a = (0.2048 * np.exp(- ((f - 22.43)/3.097)**2) +
+             0.2326 * np.exp(- ((f - 183.5)/4.096)**2) +
+             0.2073 * np.exp(- ((f - 325)/3.651)**2) - 0.1113)
+
+        b = 8.741e4 * np.exp(-0.587 * f) + 312.2 * f**(-2.38) + 0.723
+        h = np.clip(h, 0, 4)
+
+        gammaw_approx_vect = np.vectorize(self.gammaw_exact)
+
+        Aw_term1 = (0.0176 * V_t *
+                    gammaw_approx_vect(f, p_ref, rho_ref, t_ref + 273.15) /
+                    gammaw_approx_vect(f_ref, p_ref, rho_ref, t_ref + 273.15))
+
+        return np.where(f < 20, Aw_term1, Aw_term1 * (a * h ** b + 1))
+
+
+class _ITU676_11_():
 
     tmp = load_data(os.path.join(dataset_dir, '676/v11_lines_oxygen.txt'),
                     skip_header=1)
@@ -291,11 +586,11 @@ class _ITU676_11():
 
     @classmethod
     def gamma0_exact(self, f, p, rho, T):
-        return __gamma0_exact__676_9_11__(self, f, p, rho, T)
+        return __gamma0_exact__(self, f, p, rho, T)
 
     @classmethod
     def gammaw_exact(self, f, p, rho, T):
-        return __gammaw_exact__676_9_11__(self, f, p, rho, T)
+        return __gammaw_exact__(self, f, p, rho, T)
 
     @classmethod
     def gamma_exact(self, f, p, rho, T):
@@ -484,7 +779,7 @@ class _ITU676_11():
         t_ref = 14 * np.log(0.22 * V_t / 3.67) + 3    # [Celsius]
 
         a = (0.2048 * np.exp(- ((f - 22.43)/3.097)**2) +
-             0.2236 * np.exp(- ((f-183.5)/4.096)**2) +
+             0.2326 * np.exp(- ((f-183.5)/4.096)**2) +
              0.2073 * np.exp(- ((f-325)/3.651)**2) - 0.113)
 
         b = 8.741e4 * np.exp(-0.587 * f) + 312.2 * f**(-2.38) + 0.723
@@ -499,7 +794,7 @@ class _ITU676_11():
         return np.where(f < 20, Aw_term1, Aw_term1 * (a * h ** b + 1))
 
 
-class _ITU676_10():
+class _ITU676_10_():
 
     tmp = load_data(os.path.join(dataset_dir, '676/v10_lines_oxygen.txt'),
                     skip_header=1)
@@ -631,11 +926,11 @@ class _ITU676_10():
 
     @classmethod
     def gamma0_exact(self, f, p, rho, T):
-        return __gamma0_exact__676_9_11__(self, f, p, rho, T)
+        return __gamma0_exact__(self, f, p, rho, T)
 
     @classmethod
     def gammaw_exact(self, f, p, rho, T):
-        return __gammaw_exact__676_9_11__(self, f, p, rho, T)
+        return __gammaw_exact__(self, f, p, rho, T)
 
     @classmethod
     def gamma_exact(self, f, p, rho, T):
@@ -823,7 +1118,7 @@ class _ITU676_10():
                 gammaw_approx_vect(f_ref, p_ref, rho_ref, t_ref + 273))
 
 
-class _ITU676_9():
+class _ITU676_9_():
 
     tmp = load_data(os.path.join(dataset_dir, '676//v9_lines_oxygen.txt'),
                     skip_header=1)
@@ -856,48 +1151,49 @@ class _ITU676_9():
     # in Recommendation ITU-P R.676-10.
     @staticmethod
     def gammaw_approx(*args, **kwargs):
-        return _ITU676_10.gammaw_approx(*args, **kwargs)
+        return _ITU676_10_.gammaw_approx(*args, **kwargs)
 
     @staticmethod
     def gamma0_approx(*args, **kwargs):
-        return _ITU676_10.gamma0_approx(*args, **kwargs)
+        return _ITU676_10_.gamma0_approx(*args, **kwargs)
 
     @staticmethod
     def gaseous_attenuation_inclined_path(*args, **kwargs):
-        return _ITU676_10.gaseous_attenuation_inclined_path(*args, **kwargs)
+        return _ITU676_10_.gaseous_attenuation_inclined_path(*args, **kwargs)
 
     @staticmethod
     def zenit_water_vapour_attenuation(*args, **kwargs):
-        return _ITU676_10.zenit_water_vapour_attenuation(*args, **kwargs)
+        return _ITU676_10_.zenit_water_vapour_attenuation(*args, **kwargs)
 
     @staticmethod
     def gaseous_attenuation_approximation(*args, **kwargs):
-        return _ITU676_10.gaseous_attenuation_approximation(*args, **kwargs)
+        return _ITU676_10_.gaseous_attenuation_approximation(*args, **kwargs)
 
     @staticmethod
     def slant_inclined_path_equivalent_height(*args, **kwargs):
-        return _ITU676_10.slant_inclined_path_equivalent_height(*args,
-                                                                **kwargs)
+        return _ITU676_10_.slant_inclined_path_equivalent_height(*args,
+                                                                 **kwargs)
 
     @staticmethod
     def gaseous_attenuation_terrestrial_path(*args, **kwargs):
-        return _ITU676_10.gaseous_attenuation_terrestrial_path(*args, **kwargs)
+        return _ITU676_10_.gaseous_attenuation_terrestrial_path(*args,
+                                                                **kwargs)
 
     @staticmethod
     def gaseous_attenuation_slant_path(*args, **kwargs):
-        return _ITU676_10.gaseous_attenuation_slant_path(*args, **kwargs)
+        return _ITU676_10_.gaseous_attenuation_slant_path(*args, **kwargs)
 
     def gamma0_exact(self, f, p, rho, T):
-        return __gamma0_exact__676_9_11__(self, f, p, rho, T)
+        return __gamma0_exact__(self, f, p, rho, T)
 
     def gammaw_exact(self, f, p, rho, T):
-        return __gammaw_exact__676_9_11__(self, f, p, rho, T)
+        return __gammaw_exact__(self, f, p, rho, T)
 
     def gamma_exact(self, f, p, rho, T):
         return (self.gamma0_exact(f, p, rho, T) +
                 self.gammaw_exact(f, p, rho, T))
 
-__model = __ITU676()
+__model = __ITU676__()
 
 
 def change_version(new_version):
@@ -918,7 +1214,7 @@ def change_version(new_version):
            * P.676-6 (02/12) (Current version)
     """
     global __model
-    __model = __ITU676(new_version)
+    __model = __ITU676__(new_version)
     utils.memory.clear()
 
 
