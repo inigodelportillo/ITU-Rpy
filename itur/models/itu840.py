@@ -12,6 +12,33 @@ from itur.utils import (dataset_dir, prepare_input_array, prepare_output_array,
                         prepare_quantity, memory, load_data_interpolator)
 
 
+def __fcn_columnar_content_reduced_liquid__(Lred, lat, lon, p):
+        available_p = np.array(
+            [0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0, 30.0, 50.0,
+             60.0, 70.0, 80.0, 90.0, 95.0])
+
+        if p in available_p:
+            p_below = p_above = p
+            pExact = True
+        else:
+            pExact = False
+            idx = available_p.searchsorted(p, side='right') - 1
+            idx = np.clip(idx, 0, len(available_p))
+
+            p_below = available_p[idx]
+            p_above = available_p[idx + 1]
+
+        # Compute the values of Lred_a
+        Lred_a = Lred(lat, lon, p_above)
+        if not pExact:
+            Lred_b = Lred(lat, lon, p_below)
+            Lred = Lred_b + (Lred_a - Lred_b) * (np.log(p) - np.log(p_below)) \
+                / (np.log(p_above) - np.log(p_below))
+            return Lred
+        else:
+            return Lred_a
+
+
 class __ITU840__():
     """Attenuation due to clouds and fog: This Recommendation provides methods
     to predict the attenuation due to clouds and fog on Earth-space paths.
@@ -20,7 +47,8 @@ class __ITU840__():
     * P.840-4 (10/09) (Superseded)
     * P.840-5 (02/12) (Superseded)
     * P.840-6 (09/13) (Superseded)
-    * P.840-7 (12/17) (Current version)
+    * P.840-7 (12/17) (Superseded)
+    * P.840-8 (08/19) (Current version)
 
     Non-available versions include:
     * P.840-1 (08/94) (Superseded) - Tentative similar to P.840-4
@@ -32,7 +60,9 @@ class __ITU840__():
     # ITU-R P.840 recommendation.
 
     def __init__(self, version=7):
-        if version == 7:
+        if version == 8:
+            self.instance = _ITU840_8_()
+        elif version == 7:
             self.instance = _ITU840_7_()
         elif version == 6:
             self.instance = _ITU840_6_()
@@ -56,9 +86,9 @@ class __ITU840__():
 
     def columnar_content_reduced_liquid(self, lat, lon, p):
         # Abstract method to compute the columnar content of reduced liquid
-        fcn = np.vectorize(self.__fcn_columnar_content_reduced_liquid__,
-                           excluded=[0, 1], otypes=[np.ndarray])
-        return np.array(fcn(lat, lon, p).tolist())
+        fcn = np.vectorize(__fcn_columnar_content_reduced_liquid__,
+                           excluded=[0, 1, 2], otypes=[np.ndarray])
+        return np.array(fcn(self.instance.Lred, lat, lon, p).tolist())
 
     def cloud_attenuation(self, lat, lon, el, f, p):
         # Abstract method to compute the cloud attenuation
@@ -72,31 +102,77 @@ class __ITU840__():
         # Abstract method to compute the lognormal approximation coefficients
         return self.instance.lognormal_approximation_coefficient(lat, lon)
 
-    def __fcn_columnar_content_reduced_liquid__(self, lat, lon, p):
-        available_p = np.array(
-            [0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0, 30.0, 50.0,
-             60.0, 70.0, 80.0, 90.0, 95.0])
 
-        if p in available_p:
-            p_below = p_above = p
-            pExact = True
-        else:
-            pExact = False
-            idx = available_p.searchsorted(p, side='right') - 1
-            idx = np.clip(idx, 0, len(available_p))
+class _ITU840_8_():
 
-            p_below = available_p[idx]
-            p_above = available_p[idx + 1]
+    def __init__(self):
+        self.__version__ = 8
+        self.year = 2019
+        self.month = 8
+        self.link = 'https://www.itu.int/rec/R-REC-P.840-8-201908-I/en'
 
-        # Compute the values of Lred_a
-        Lred_a = self.instance.Lred(lat, lon, p_above)
-        if not pExact:
-            Lred_b = self.instance.Lred(lat, lon, p_below)
-            Lred = Lred_b + (Lred_a - Lred_b) * (np.log(p) - np.log(p_below)) \
-                / (np.log(p_above) - np.log(p_below))
-            return Lred
-        else:
-            return Lred_a
+        self._Lred = {}
+        self._M = None
+        self._sigma = None
+        self._Pclw = None
+
+    # Note: The dataset used in recommendation 840-8 is the same as the
+    # dataset use in recommendation 840-7. (The zip files included in
+    # both recommendations are identical)
+
+    def Lred(self, lat, lon, p):
+        if not self._Lred:
+            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
+                  50, 60, 70, 80, 90, 95]
+            d_dir = os.path.join(dataset_dir, '840/v7_lred_%s.npz')
+            for p_load in ps:
+                self._Lred[float(p_load)] = load_data_interpolator(
+                       '840/v7_lat.npz', '840/v7_lon.npz',
+                       d_dir % (str(p_load).replace('.', '')),
+                       bilinear_2D_interpolator, flip_ud=False)
+
+        return self._Lred[float(p)](
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+
+    def M(self, lat, lon):
+        if not self._M:
+            self._M = load_data_interpolator(
+                '840/v7_lat.npz', '840/v7_lon.npz',
+                '840/v7_m.npz', bilinear_2D_interpolator, flip_ud=False)
+
+        return self._M(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+
+    def sigma(self, lat, lon):
+        if not self._sigma:
+            self._sigma = load_data_interpolator(
+                '840/v7_lat.npz', '840/v7_lon.npz',
+                '840/v7_sigma.npz', bilinear_2D_interpolator, flip_ud=False)
+
+        return self._sigma(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+
+    def Pclw(self, lat, lon):
+        if not self._Pclw:
+            self._Pclw = load_data_interpolator(
+                '840/v6_lat.npz', '840/v6_lon.npz',
+                '840/v6_pclw.npz', bilinear_2D_interpolator, flip_ud=False)
+
+        return self._Pclw(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+
+    @staticmethod
+    def specific_attenuation_coefficients(f, T):
+        """
+        """
+        return _ITU840_6_.specific_attenuation_coefficients(f, T)
+
+    def lognormal_approximation_coefficient(self, lat, lon):
+        m = self.M(lat, lon)
+        sigma = self.sigma(lat, lon)
+        Pclw = self.Pclw(lat, lon)
+
+        return m, sigma, Pclw
 
 
 class _ITU840_7_():
@@ -160,6 +236,7 @@ class _ITU840_7_():
         return _ITU840_6_.specific_attenuation_coefficients(f, T)
 
     def lognormal_approximation_coefficient(self, lat, lon):
+        #TODO: This is the wrong method, Need to update
         m = self.M(lat, lon)
         sigma = self.sigma(lat, lon)
         Pclw = self.Pclw(lat, lon)
