@@ -120,10 +120,10 @@ class _ITU618():
                            excluded=[0, 1, 3, 4, 6], otypes=[np.ndarray])
         return np.array(fcn(lat, lon, f, el, hs, p, R001, tau, Ls).tolist())
 
-    def rain_attenuation_probability(self, lat, lon, el, Ls, P0=None):
+    def rain_attenuation_probability(self, lat, lon, el, hs, Ls, P0=None):
         fcn = np.vectorize(self.instance.rain_attenuation_probability,
                            excluded=[0, 1, 2], otypes=[np.ndarray])
-        return np.array(fcn(lat, lon, el, Ls, P0).tolist())
+        return np.array(fcn(lat, lon, el, hs, Ls, P0).tolist())
 
     def rain_cross_polarization_discrimination(self, Ap, f, el, p, tau):
         fcn = np.vectorize(
@@ -137,7 +137,7 @@ class _ITU618():
         return np.array(fcn(lat, lon, f, el, p, D, eta, T, H, P, hL).tolist())
 
     def scintillation_attenuation_sigma(self, lat, lon, f, el, p, D, eta,
-                                  T, H, P, hL):
+                                        T, H, P, hL):
         fcn = np.vectorize(self.instance.scintillation_attenuation_sigma,
                            excluded=[0, 1, 3, 7, 8, 9], otypes=[np.ndarray])
         return np.array(fcn(lat, lon, f, el, p, D, eta, T, H, P, hL).tolist())
@@ -247,6 +247,7 @@ class _ITU618_13():
     @classmethod
     def rain_attenuation_probability(self, lat, lon, el, hs=None,
                                      Ls=None, P0=None):
+
         Re = 8500
         if hs is None:
             hs = topographic_altitude(lat, lon).to(u.km).value
@@ -747,11 +748,13 @@ def rain_attenuation_probability(lat, lon, el, hs=None, Ls=None, P0=None):
 
     lon = np.mod(lon, 360)
     el = prepare_quantity(prepare_input_array(el), u.deg, 'Elevation angle')
+    hs = prepare_quantity(
+        hs, u.km, 'Heigh above mean sea level of the earth station')
     Ls = prepare_quantity(
         Ls, u.km, 'Heigh above mean sea level of the earth station')
     P0 = prepare_quantity(P0, u.pct, 'Point rainfall rate')
 
-    val = __model.rain_attenuation_probability(lat, lon, el, Ls, P0)
+    val = __model.rain_attenuation_probability(lat, lon, el, hs, Ls, P0)
 
     return prepare_output_array(val, type_output) * 100 * u.pct
 
