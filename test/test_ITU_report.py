@@ -33,45 +33,48 @@ def create_ITU_suite():
     suite = ITU_Suite()
 
     # ITU-R P.676 tests (Gaseous attenuation)
-#    suite.addTest(ITUR453_14TestCase('test_wet_term_radio_refractivity'))
-
+    suite.addTest(ITUR453_14TestCase('test_wet_term_radio_refractivity'))
+#
     # ITU-R P.618
-#    suite.add_test(ITUR618_13TestCase('test_rain_attenuation'))
-#    suite.add_test(ITUR618_13TestCase('test_rain_probability'))
-#    suite.add_test(ITUR618_13TestCase('test_scintillation_attenuation'))
-#    suite.add_test(ITUR618_13TestCase('test_total_attenuation'))
+    suite.add_test(ITUR618_13TestCase('test_rain_attenuation'))
+    suite.add_test(ITUR618_13TestCase('test_rain_probability'))
+    suite.add_test(ITUR618_13TestCase('test_scintillation_attenuation'))
+    suite.add_test(ITUR618_13TestCase('test_total_attenuation'))
     suite.add_test(ITUR618_13TestCase('test_cross_polarization_discrimination'))
 
-#    # ITU-R P.676
-#    suite.add_test(ITUR676_12TestCase('test_gamma0'))
-#    suite.add_test(ITUR676_12TestCase('test_gammaw'))
-#    suite.add_test(ITUR676_12TestCase('test_gamma'))
-#    suite.add_test(ITUR676_12TestCase('test_zenith_attenuation'))
-#    suite.add_test(ITUR676_12TestCase('test_attenuation_gas'))
-#
-#    # ITU-R P.836
-#    suite.add_test(ITUR836_6TestCase('test_surface_water_vapour_density_annual'))
-#    suite.add_test(ITUR836_6TestCase('test_total_water_vapour_content_annual'))
-#
-#    # ITU-R P.837
-#    suite.add_test(ITUR837_7TestCase('test_rainfall_rate'))
-#    suite.add_test(ITUR837_7TestCase('test_rainfall_rate_probability'))
-#    suite.add_test(ITUR837_7TestCase('test_rainfall_rate_R001'))
-#
-#    # ITU-R P.838
-#    suite.add_test(ITUR838_3TestCase('test_rain_specific_attenuation'))
-#
-#    # ITU-R P.839
-#    suite.add_test(ITUR839_4TestCase('test_isoterm_0_deg'))
-#    suite.add_test(ITUR839_4TestCase('test_rain_height'))
-#
-#    # ITU-R P.840
-#    suite.add_test(ITUR840_8TestCase('test_columnar_content_reduced_liquid'))
-#    suite.add_test(ITUR840_8TestCase('test_cloud_attenuation'))
-#
-#    # ITU-R P.1511
-#    suite.add_test(ITUR1511_1TestCase('test_topographic_altitude'))
-#    suite.add_test(ITUR1511_2TestCase('test_topographic_altitude'))
+    # ITU-R P.676
+    suite.add_test(ITUR676_12TestCase('test_gamma0'))
+    suite.add_test(ITUR676_12TestCase('test_gammaw'))
+    suite.add_test(ITUR676_12TestCase('test_gamma'))
+    suite.add_test(ITUR676_12TestCase('test_zenith_attenuation'))
+    suite.add_test(ITUR676_12TestCase('test_attenuation_gas'))
+
+    # ITU-R P.836
+    suite.add_test(ITUR836_6TestCase('test_surface_water_vapour_density_annual'))
+    suite.add_test(ITUR836_6TestCase('test_total_water_vapour_content_annual'))
+
+    # ITU-R P.837
+    suite.add_test(ITUR837_7TestCase('test_rainfall_rate'))
+    suite.add_test(ITUR837_7TestCase('test_rainfall_rate_probability'))
+    suite.add_test(ITUR837_7TestCase('test_rainfall_rate_R001'))
+
+    # ITU-R P.838
+    suite.add_test(ITUR838_3TestCase('test_rain_specific_attenuation'))
+
+    # ITU-R P.839
+    suite.add_test(ITUR839_4TestCase('test_isoterm_0_deg'))
+    suite.add_test(ITUR839_4TestCase('test_rain_height'))
+
+    # ITU-R P.840
+    suite.add_test(ITUR840_8TestCase('test_columnar_content_reduced_liquid'))
+    suite.add_test(ITUR840_8TestCase('test_cloud_attenuation'))
+
+    # ITU-R P.1510
+    suite.add_test(ITUR1510_1TestCase('test_surface_mean_temperature'))
+
+    # ITU-R P.1511
+    suite.add_test(ITUR1511_1TestCase('test_topographic_altitude'))
+    suite.add_test(ITUR1511_2TestCase('test_topographic_altitude'))
 
     return suite
 
@@ -191,20 +194,19 @@ class ITU_TestCase(test.TestCase):
     def read_csv(path_name, columns):
         df = pd.read_csv(path_name, sep=',', skiprows=range(1, 2))
 #        units = pd.read_csv(path_name, sep=',', nrows=2)
-        return df[columns]#, units[columns].iloc(0)
+        return df[columns]  # , units[columns].iloc(0)
 
     def setUp(self):
         self.tests = []
 
-    def run_test(self, test_name, test_fcn, df, attributes, result_value,
-                 n_places=5):
+    def __run__(self, test_name, test_fcn, df, attributes, result_value,
+                n_places=5):
 
-        #
         test_fcn_name = test_fcn
         test_fcn = eval(test_fcn)
 
         # Evaluate all the functions
-        res  = []
+        res = []
         for i, row in df.iterrows():
             args = {a: row[a] for a in attributes}
             # Evaluate function
@@ -307,17 +309,18 @@ class ITUR453_14TestCase(ITU_TestCase):
                            columns=['lat', 'lon', 'p', 'Nwet'])
 
         # Run test and generate the report
-        self.run_test('test_wet_term_radio_refractivity',
-                      test_fcn='models.itu453.map_wet_term_radio_refractivity',
-                      df=df, attributes=['lat', 'lon', 'p'],
-                      result_value='Nwet',
-                      n_places=5)
+        self.__run__('test_wet_term_radio_refractivity',
+                     test_fcn='models.itu453.map_wet_term_radio_refractivity',
+                     df=df, attributes=['lat', 'lon', 'p'],
+                     result_value='Nwet',
+                     n_places=5)
 
 
 class ITUR618_13TestCase(ITU_TestCase):
 
     itu_name = 'ITU-R P.618-13'
-    itu_description = 'TBD'
+    itu_description = 'Propagation data and prediction methods required for' +\
+                      ' the design of Earth-space telecommunication systems'
 
     def test_rain_attenuation(self):
         # Set the version to the
@@ -329,12 +332,12 @@ class ITUR618_13TestCase(ITU_TestCase):
                                     'R001', 'A_rain'])
 
         # Run test and generate the report
-        self.run_test('test_rain_attenuation',
-                      test_fcn='models.itu618.rain_attenuation',
-                      df=df, attributes=['lat', 'lon', 'hs', 'el', 'f',
-                                         'tau', 'p', 'R001'],
-                      result_value='A_rain',
-                      n_places=5)
+        self.__run__('test_rain_attenuation',
+                     test_fcn='models.itu618.rain_attenuation',
+                     df=df, attributes=['lat', 'lon', 'hs', 'el', 'f',
+                                        'tau', 'p', 'R001'],
+                     result_value='A_rain',
+                     n_places=5)
 
     def test_rain_probability(self):
         # Set the version to the
@@ -346,11 +349,11 @@ class ITUR618_13TestCase(ITU_TestCase):
                                     'P_rain'])
 
         # Run test and generate the report
-        self.run_test('test_rain_probability',
-                      test_fcn='models.itu618.rain_attenuation_probability',
-                      df=df, attributes=['lat', 'lon', 'hs', 'el', 'Ls', 'P0'],
-                      result_value='P_rain',
-                      n_places=5)
+        self.__run__('test_rain_probability',
+                     test_fcn='models.itu618.rain_attenuation_probability',
+                     df=df, attributes=['lat', 'lon', 'hs', 'el', 'Ls', 'P0'],
+                     result_value='P_rain',
+                     n_places=5)
 
     def test_scintillation_attenuation(self):
         # Set the version to the
@@ -362,12 +365,12 @@ class ITUR618_13TestCase(ITU_TestCase):
                                     'A_scin'])
 
         # Run test and generate the report
-        self.run_test('test_scintillation_attenuation',
-                      test_fcn='models.itu618.scintillation_attenuation',
-                      df=df, attributes=['lat', 'lon', 'f', 'el', 'p', 'D',
-                                         'eta'],
-                      result_value='A_scin',
-                      n_places=5)
+        self.__run__('test_scintillation_attenuation',
+                     test_fcn='models.itu618.scintillation_attenuation',
+                     df=df, attributes=['lat', 'lon', 'f', 'el', 'p', 'D',
+                                        'eta'],
+                     result_value='A_scin',
+                     n_places=5)
 
     def test_cross_polarization_discrimination(self):
         # Set the version to the
@@ -378,11 +381,11 @@ class ITUR618_13TestCase(ITU_TestCase):
                            columns=['f', 'el', 'p', 'tau', 'Ap', 'XPD'])
 
         # Run test and generate the report
-        self.run_test('test_cross_polarization_discrimination',
-                      test_fcn='models.itu618.rain_cross_polarization_discrimination',
-                      df=df, attributes=['f', 'el', 'p', 'tau', 'Ap'],
-                      result_value='XPD',
-                      n_places=5)
+        self.__run__('test_cross_polarization_discrimination',
+                     test_fcn='models.itu618.rain_cross_polarization_discrimination',
+                     df=df, attributes=['f', 'el', 'p', 'tau', 'Ap'],
+                     result_value='XPD',
+                     n_places=5)
 
     def test_total_attenuation(self):
         # Set the version to the
@@ -394,12 +397,12 @@ class ITUR618_13TestCase(ITU_TestCase):
                                     'tau', 'hs', 'A_total'])
 
         # Run test and generate the report
-        self.run_test('test_total_attenuation',
-                      test_fcn='atmospheric_attenuation_slant_path',
-                      df=df, attributes=['lat', 'lon', 'f', 'el', 'p', 'D',
-                                         'eta', 'tau', 'hs'],
-                      result_value='A_total',
-                      n_places=4)
+        self.__run__('test_total_attenuation',
+                     test_fcn='atmospheric_attenuation_slant_path',
+                     df=df, attributes=['lat', 'lon', 'f', 'el', 'p', 'D',
+                                        'eta', 'tau', 'hs'],
+                     result_value='A_total',
+                     n_places=4)
 
 
 class ITUR676_12TestCase(ITU_TestCase):
@@ -417,11 +420,11 @@ class ITUR676_12TestCase(ITU_TestCase):
                            columns=['f', 'P', 'rho', 'T', 'gamma0'])
 
         # Run test and generate the report
-        self.run_test('test_gamma0',
-                      test_fcn='models.itu676.gamma0_exact',
-                      df=df, attributes=['f', 'P', 'rho', 'T'],
-                      result_value='gamma0',
-                      n_places=5)
+        self.__run__('test_gamma0',
+                     test_fcn='models.itu676.gamma0_exact',
+                     df=df, attributes=['f', 'P', 'rho', 'T'],
+                     result_value='gamma0',
+                     n_places=5)
 
     def test_gammaw(self):
         # Set the version to the
@@ -433,11 +436,11 @@ class ITUR676_12TestCase(ITU_TestCase):
                            columns=['f', 'P', 'rho', 'T', 'gammaw'])
 
         # Run test and generate the report
-        self.run_test('test_gammaw',
-                      test_fcn='models.itu676.gammaw_exact',
-                      df=df, attributes=['f', 'P', 'rho', 'T'],
-                      result_value='gammaw',
-                      n_places=5)
+        self.__run__('test_gammaw',
+                     test_fcn='models.itu676.gammaw_exact',
+                     df=df, attributes=['f', 'P', 'rho', 'T'],
+                     result_value='gammaw',
+                     n_places=5)
 
     def test_gamma(self):
         # Set the version to the
@@ -449,11 +452,11 @@ class ITUR676_12TestCase(ITU_TestCase):
                            columns=['f', 'P', 'rho', 'T', 'gamma'])
 
         # Run test and generate the report
-        self.run_test('test_gamma',
-                      test_fcn='models.itu676.gamma_exact',
-                      df=df, attributes=['f', 'P', 'rho', 'T'],
-                      result_value='gamma',
-                      n_places=5)
+        self.__run__('test_gamma',
+                     test_fcn='models.itu676.gamma_exact',
+                     df=df, attributes=['f', 'P', 'rho', 'T'],
+                     result_value='gamma',
+                     n_places=5)
 
     def test_attenuation_gas(self):
         # Set the version to the
@@ -466,12 +469,12 @@ class ITUR676_12TestCase(ITU_TestCase):
                                     'A_gas'])
 
         # Run test and generate the report
-        self.run_test('test_attenuation_gas',
-                      test_fcn='models.itu676.gaseous_attenuation_slant_path',
-                      df=df, attributes=['f', 'el', 'rho', 'P', 'T', 'h',
-                                         'V_t'],
-                      result_value='A_gas',
-                      n_places=5)
+        self.__run__('test_attenuation_gas',
+                     test_fcn='models.itu676.gaseous_attenuation_slant_path',
+                     df=df, attributes=['f', 'el', 'rho', 'P', 'T', 'h',
+                                        'V_t'],
+                     result_value='A_gas',
+                     n_places=5)
 
     def test_zenith_attenuation(self):
         # Set the version to the
@@ -483,11 +486,11 @@ class ITUR676_12TestCase(ITU_TestCase):
                            columns=['lat', 'lon', 'p', 'f', 'h', 'V_t', 'Aw'])
 
         # Run test and generate the report
-        self.run_test('test_zenith_attenuation',
-                      test_fcn='models.itu676.zenit_water_vapour_attenuation',
-                      df=df, attributes=['lat', 'lon', 'p', 'f', 'h', 'V_t'],
-                      result_value='Aw',
-                      n_places=5)
+        self.__run__('test_zenith_attenuation',
+                     test_fcn='models.itu676.zenit_water_vapour_attenuation',
+                     df=df, attributes=['lat', 'lon', 'p', 'f', 'h', 'V_t'],
+                     result_value='Aw',
+                     n_places=5)
 
 
 class ITUR836_6TestCase(ITU_TestCase):
@@ -505,11 +508,11 @@ class ITUR836_6TestCase(ITU_TestCase):
                            columns=['lat', 'lon', 'alt', 'p', 'rho'])
 
         # Run test and generate the report
-        self.run_test('test_surface_water_vapour_density_annual',
-                      test_fcn='models.itu836.surface_water_vapour_density',
-                      df=df, attributes=['lat', 'lon', 'alt', 'p'],
-                      result_value='rho',
-                      n_places=5)
+        self.__run__('test_surface_water_vapour_density_annual',
+                     test_fcn='models.itu836.surface_water_vapour_density',
+                     df=df, attributes=['lat', 'lon', 'alt', 'p'],
+                     result_value='rho',
+                     n_places=5)
 
     def test_total_water_vapour_content_annual(self):
         # Set the version to the
@@ -521,11 +524,11 @@ class ITUR836_6TestCase(ITU_TestCase):
                            columns=['lat', 'lon', 'alt', 'p', 'V'])
 
         # Run test and generate the report
-        self.run_test('test_total_water_vapour_content_annual',
-                      test_fcn='models.itu836.total_water_vapour_content',
-                      df=df, attributes=['lat', 'lon', 'alt', 'p'],
-                      result_value='V',
-                      n_places=5)
+        self.__run__('test_total_water_vapour_content_annual',
+                     test_fcn='models.itu836.total_water_vapour_content',
+                     df=df, attributes=['lat', 'lon', 'alt', 'p'],
+                     result_value='V',
+                     n_places=5)
 
 
 class ITUR837_7TestCase(ITU_TestCase):
@@ -543,11 +546,11 @@ class ITUR837_7TestCase(ITU_TestCase):
                            columns=['lat', 'lon', 'p', 'Rp'])
 
         # Run test and generate the report
-        self.run_test('test_rainfall_rate',
-                      test_fcn='models.itu837.rainfall_rate',
-                      df=df, attributes=['lat', 'lon', 'p'],
-                      result_value='Rp',
-                      n_places=3)
+        self.__run__('test_rainfall_rate',
+                     test_fcn='models.itu837.rainfall_rate',
+                     df=df, attributes=['lat', 'lon', 'p'],
+                     result_value='Rp',
+                     n_places=3)
 
     def test_rainfall_rate_R001(self):
         # Set the version to the
@@ -559,11 +562,11 @@ class ITUR837_7TestCase(ITU_TestCase):
                            columns=['lat', 'lon', 'p', 'Rp'])
 
         # Run test and generate the report
-        self.run_test('test_rainfall_rate_R001',
-                      test_fcn='models.itu837.rainfall_rate',
-                      df=df, attributes=['lat', 'lon', 'p'],
-                      result_value='Rp',
-                      n_places=5)
+        self.__run__('test_rainfall_rate_R001',
+                     test_fcn='models.itu837.rainfall_rate',
+                     df=df, attributes=['lat', 'lon', 'p'],
+                     result_value='Rp',
+                     n_places=5)
 
     def test_rainfall_rate_probability(self):
         # Set the version to the
@@ -575,11 +578,11 @@ class ITUR837_7TestCase(ITU_TestCase):
                            columns=['lat', 'lon', 'p'])
 
         # Run test and generate the report
-        self.run_test('test_rainfall_rate_probability',
-                      test_fcn='models.itu837.rainfall_probability',
-                      df=df, attributes=['lat', 'lon'],
-                      result_value='p',
-                      n_places=5)
+        self.__run__('test_rainfall_rate_probability',
+                     test_fcn='models.itu837.rainfall_probability',
+                     df=df, attributes=['lat', 'lon'],
+                     result_value='p',
+                     n_places=5)
 
 
 class ITUR838_3TestCase(ITU_TestCase):
@@ -597,11 +600,11 @@ class ITUR838_3TestCase(ITU_TestCase):
                            columns=['el', 'f', 'R', 'tau', 'gamma_r'])
 
         # Run test and generate the report
-        self.run_test('test_rain_specific_attenuation',
-                      test_fcn='models.itu838.rain_specific_attenuation',
-                      df=df, attributes=['el', 'f', 'R', 'tau'],
-                      result_value='gamma_r',
-                      n_places=5)
+        self.__run__('test_rain_specific_attenuation',
+                     test_fcn='models.itu838.rain_specific_attenuation',
+                     df=df, attributes=['el', 'f', 'R', 'tau'],
+                     result_value='gamma_r',
+                     n_places=5)
 
 
 class ITUR839_4TestCase(ITU_TestCase):
@@ -619,11 +622,11 @@ class ITUR839_4TestCase(ITU_TestCase):
                            columns=['lat', 'lon', 'h0'])
 
         # Run test and generate the report
-        self.run_test('test_isoterm_0_deg',
-                      test_fcn='models.itu839.isoterm_0',
-                      df=df, attributes=['lat', 'lon'],
-                      result_value='h0',
-                      n_places=5)
+        self.__run__('test_isoterm_0_deg',
+                     test_fcn='models.itu839.isoterm_0',
+                     df=df, attributes=['lat', 'lon'],
+                     result_value='h0',
+                     n_places=5)
 
     def test_rain_height(self):
         # Set the version to the
@@ -635,11 +638,11 @@ class ITUR839_4TestCase(ITU_TestCase):
                            columns=['lat', 'lon', 'hr'])
 
         # Run test and generate the report
-        self.run_test('test_rain_height',
-                      test_fcn='models.itu839.rain_height',
-                      df=df, attributes=['lat', 'lon'],
-                      result_value='hr',
-                      n_places=5)
+        self.__run__('test_rain_height',
+                     test_fcn='models.itu839.rain_height',
+                     df=df, attributes=['lat', 'lon'],
+                     result_value='hr',
+                     n_places=5)
 
 
 class ITUR840_8TestCase(ITU_TestCase):
@@ -657,11 +660,11 @@ class ITUR840_8TestCase(ITU_TestCase):
                            columns=['lat', 'lon', 'p', 'Lred'])
 
         # Run test and generate the report
-        self.run_test('test_columnar_content_reduced_liquid',
-                      test_fcn='models.itu840.columnar_content_reduced_liquid',
-                      df=df, attributes=['lat', 'lon', 'p'],
-                      result_value='Lred',
-                      n_places=5)
+        self.__run__('test_columnar_content_reduced_liquid',
+                     test_fcn='models.itu840.columnar_content_reduced_liquid',
+                     df=df, attributes=['lat', 'lon', 'p'],
+                     result_value='Lred',
+                     n_places=5)
 
     def test_cloud_attenuation(self):
         # Set the version to the
@@ -673,11 +676,33 @@ class ITUR840_8TestCase(ITU_TestCase):
                            columns=['lat', 'lon', 'f', 'el', 'p', 'Ac'])
 
         # Run test and generate the report
-        self.run_test('test_cloud_attenuation',
-                      test_fcn='models.itu840.cloud_attenuation',
-                      df=df, attributes=['lat', 'lon', 'f', 'el', 'p'],
-                      result_value='Ac',
-                      n_places=5)
+        self.__run__('test_cloud_attenuation',
+                     test_fcn='models.itu840.cloud_attenuation',
+                     df=df, attributes=['lat', 'lon', 'f', 'el', 'p'],
+                     result_value='Ac',
+                     n_places=5)
+
+
+class ITUR1510_1TestCase(ITU_TestCase):
+
+    itu_name = 'ITU-R P.1510-1'
+    itu_description = 'Mean surface temperature'
+
+    def test_surface_mean_temperature(self):
+        # Set the version to the
+        models.itu1510.change_version(1)
+
+        path_file = '1510/ITURP1510-1_temperature.csv'
+        # Read the test data
+        df = self.read_csv(path.join(test_data, path_file),
+                           columns=['lat', 'lon', 'T'])
+
+        # Run test and generate the report
+        self.__run__('test_surface_mean_temperature',
+                     test_fcn='models.itu1510.surface_mean_temperature',
+                     df=df, attributes=['lat', 'lon'],
+                     result_value='T',
+                     n_places=5)
 
 
 class ITUR1511_1TestCase(ITU_TestCase):
@@ -695,11 +720,11 @@ class ITUR1511_1TestCase(ITU_TestCase):
                            columns=['lat', 'lon', 'hs'])
 
         # Run test and generate the report
-        self.run_test('test_topographic_altitude',
-                      test_fcn='models.itu1511.topographic_altitude',
-                      df=df, attributes=['lat', 'lon'],
-                      result_value='hs',
-                      n_places=5)
+        self.__run__('test_topographic_altitude',
+                     test_fcn='models.itu1511.topographic_altitude',
+                     df=df, attributes=['lat', 'lon'],
+                     result_value='hs',
+                     n_places=5)
 
 
 class ITUR1511_2TestCase(ITU_TestCase):
@@ -717,21 +742,19 @@ class ITUR1511_2TestCase(ITU_TestCase):
                            columns=['lat', 'lon', 'hs'])
 
         # Run test and generate the report
-        self.run_test('test_topographic_altitude',
-                      test_fcn='models.itu1511.topographic_altitude',
-                      df=df, attributes=['lat', 'lon'],
-                      result_value='hs',
-                      n_places=5)
+        self.__run__('test_topographic_altitude',
+                     test_fcn='models.itu1511.topographic_altitude',
+                     df=df, attributes=['lat', 'lon'],
+                     result_value='hs',
+                     n_places=5)
 
 
 if __name__ == '__main__':
-    pass
     suite = create_ITU_suite()
     print('Validation tests for the ITU-R models')
     print('------------------------')
-    print(
-        'A total of %d test-cases are going to be tested' %
-        suite.countTestCases())
+    print('A total of %d test-cases are going to be tested' %
+          suite.countTestCases())
     sys.stdout.flush()
     test.TextTestRunner(verbosity=2).run(suite)
     suite.html_reports(html_path)
