@@ -26,13 +26,15 @@ def suite():
     suite = test.TestSuite()
 
     # Ensure models are in the right version
-    models.itu676.change_version(11)
+    models.itu453.change_version(13)
     models.itu618.change_version(13)
-    models.itu453.change_version(12)
+    models.itu676.change_version(11)
+    models.itu836.change_version(6)
     models.itu837.change_version(7)
     models.itu838.change_version(3)
     models.itu839.change_version(4)
     models.itu840.change_version(7)
+    models.itu1510.change_version(1)
     models.itu1511.change_version(1)
 
     # ITU-R P.676 tests (Gaseous attenuation)
@@ -5756,12 +5758,16 @@ class ITUR618_12TestCase(test.TestCase):
 class ITUR618_13TestCase(test.TestCase):
 
     def setUp(self):
-        models.itu618.change_version(13)
         models.itu453.change_version(13)
-        models.itu838.change_version(3)
+        models.itu618.change_version(13)
+        models.itu676.change_version(11)
         models.itu836.change_version(6)
         models.itu837.change_version(7)
+        models.itu838.change_version(3)
+        models.itu839.change_version(4)
         models.itu840.change_version(7)
+        models.itu1510.change_version(1)
+        models.itu1511.change_version(1)
 
     def test_rain_attenuation(self):
         self.assertAlmostEqual(
