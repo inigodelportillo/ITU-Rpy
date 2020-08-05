@@ -1,417 +1,498 @@
 # -*- coding: utf-8 -*-
-import matplotlib
-matplotlib.use('agg')
-import matplotlib.pyplot as plt
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 
-import unittest as test
 import numpy as np
-import sys
+import os
+import numbers
+import warnings
+
+from tempfile import mkdtemp
+from joblib import Memory
 from astropy import units as u
 
-import itur
-import itur.models as models
-import itur.models.itu676 as itu676
-import itur.models.itu835 as itu835
+from pyproj import Geod
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+dataset_dir = os.path.join(dir_path, 'data/')
+
+# Create a memory cache to memoize results of some functions
+cachedir = mkdtemp()
+memory = Memory(cachedir=cachedir, verbose=0)
+
+__NUMERIC_TYPES__ = [numbers.Number, int, float, complex,
+                     np.float, np.float16, np.float32, np.float64,
+                     np.int, np.int8, np.int16, np.int32, np.int64]
+__wgs84_geod__ = Geod(ellps='WGS84')
 
 
-def suite():
-    """ A test suite for the ITU-P Recommendations. Recommendations tested:
+def load_data(path, is_text=False, **kwargs):
+    """ Loads data files from /itur/data/
+
+
+    Parameters
+    ----------
+    path : string
+        Path of the data to load
+    is_text : bool
+        Indicates whether the data is numerical or text
+
+
+    Returns
+    -------
+    data: numpy.ndarray
+        Numpy-array with the data. Numerical data is returned as a float
     """
-    suite = test.TestSuite()
-
-    # Test valid versions
-    suite.addTest(TestMapAfrica('test_map_africa'))
-    suite.addTest(TestGaseousAttenuation('test_gaseous_attenuation'))
-    suite.addTest(TestMultipleLocations('test_multiple_locations'))
-    suite.addTest(TestSingleLocation('test_single_location'))
-    suite.addTest(TestSingleLocationVsFrequency('test_single_location_vs_f'))
-    suite.addTest(TestSingleLocationVsUnavailability(
-            'test_single_location_vs_p'))
-
-    return suite
-
-
-class TestMapAfrica(test.TestCase):
-
-    def test_map_africa(self):
-        # Generate a regular grid of latitude and longitudes with 0.1
-        # degree resolution for the region of interest.
-        lat, lon = itur.utils.regular_lat_lon_grid(lat_max=60,
-                                                   lat_min=-60,
-                                                   lon_max=65,
-                                                   lon_min=-35,
-                                                   resolution_lon=1,
-                                                   resolution_lat=1)
-
-        # Satellite coordinates (GEO, 4 E)
-        lat_sat = 0
-        lon_sat = 4
-        h_sat = 35786 * itur.u.km
-
-        # Compute the elevation angle between satellite and ground stations
-        el = itur.utils.elevation_angle(h_sat, lat_sat, lon_sat, lat, lon)
-
-        # Set the link parameters
-        f = 22.5 * itur.u.GHz    # Link frequency
-        D = 1.2 * itur.u.m       # Antenna diameters
-        p = 0.1                  # Unavailability (Vals exceeded 0.1% of time)
-
-        # Compute the atmospheric attenuation
-        Att = itur.atmospheric_attenuation_slant_path(lat, lon, f, el, p, D)
-
-        # Now we show the surface mean temperature distribution
-        T = itur.surface_mean_temperature(lat, lon)\
-            .to(itur.u.Celsius, equivalencies=itur.u.temperature())
-
-        # Plot the results
-        try:
-            m = itur.utils.plot_in_map(Att, lat, lon,
-                                       cbar_text='Atmospheric attenuation [dB]',
-                                       cmap='magma')
-
-            # Plot the satellite location
-            m.scatter(lon_sat, lat_sat, c='white', s=20)
-
-            m = itur.utils.plot_in_map(
-                T, lat, lon, cbar_text='Surface mean temperature [C]',
-                cmap='RdBu_r')
-        except RuntimeError as e:
-            print(e)
-
-
-class TestMultipleLocations(test.TestCase):
-
-    def test_multiple_locations(self):
-        # Obtain the coordinates of the different cities
-        cities = {'Boston': (42.36, -71.06),
-                  'New York': (40.71, -74.01),
-                  'Los Angeles': (34.05, -118.24),
-                  'Denver': (39.74, -104.99),
-                  'Las Vegas': (36.20, -115.14),
-                  'Seattle': (47.61, -122.33),
-                  'Washington DC': (38.91, -77.04)}
-
-        lat = [coords[0] for coords in cities.values()]
-        lon = [coords[1] for coords in cities.values()]
-
-        # Satellite coordinates (GEO, 4 E)
-        lat_sat = 0
-        lon_sat = -77
-        h_sat = 35786 * itur.u.km
-
-        # Compute the elevation angle between satellite and ground stations
-        el = itur.utils.elevation_angle(h_sat, lat_sat, lon_sat, lat, lon)
-
-        # Set the link parameters
-        f = 22.5 * itur.u.GHz    # Link frequency
-        D = 1.2 * itur.u.m       # Antenna diameters
-        p = 0.1                  # Unavailability (Vals exceeded 0.1% of time)
-
-        # Compute the atmospheric attenuation
-        Ag, Ac, Ar, As, Att = itur.atmospheric_attenuation_slant_path(
-            lat, lon, f, el, p, D, return_contributions=True)
-
-        # Plot the results
-        city_idx = np.arange(len(cities))
-        width = 0.15
-
-        fig, ax = plt.subplots(1, 1)
-        ax.bar(city_idx, Att.value, 0.6, label='Total atmospheric Attenuation')
-        ax.bar(city_idx - 1.5 * width, Ar.value, width,
-               label='Rain attenuation')
-        ax.bar(city_idx - 0.5 * width, Ag.value, width,
-               label='Gaseous attenuation')
-        ax.bar(city_idx + 0.5 * width, Ac.value, width,
-               label='Clouds attenuation')
-        ax.bar(city_idx + 1.5 * width, As.value, width,
-               label='Scintillation attenuation')
-
-        # Set the labels
-        ticks = ax.set_xticklabels([''] + list(cities.keys()))
-        for t in ticks:
-            t.set_rotation(45)
-        ax.set_ylabel('Atmospheric attenuation exceeded for 0.1% [dB]')
-
-        # Format image
-        ax.yaxis.grid(which='both', linestyle=':')
-        ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.3), ncol=2)
-        plt.tight_layout(rect=(0, 0, 1, 0.85))
-
-
-class TestSingleLocation(test.TestCase):
-
-    def test_single_location(self):
-
-        # Location of the receiver ground stations
-        lat = 41.39
-        lon = -71.05
-
-        # Link parameters
-        el = 60                # Elevation angle equal to 60 degrees
-        f = 22.5 * itur.u.GHz  # Frequency equal to 22.5 GHz
-        D = 1 * itur.u.m       # Receiver antenna diameter of 1 m
-        p = 0.1                # We compute values exceeded during 0.1 % of
-                               # the average year
-
-        # Compute atmospheric parameters
-        hs = itur.topographic_altitude(lat, lon)
-        T = itur.surface_mean_temperature(lat, lon)
-        P = itur.models.itu835.pressure(lat, hs)
-        rho_p = itur.surface_water_vapour_density(lat, lon, p, hs)
-        rho_sa = itur.models.itu835.water_vapour_density(lat, hs)
-        T_sa = itur.models.itu835.temperature(lat, hs)
-        V = itur.models.itu836.total_water_vapour_content(lat, lon, p, hs)
-
-        # Compute rain and cloud-related parameters
-        R_prob = itur.models.itu618.rain_attenuation_probability(
-                lat, lon, el, hs)
-        R_pct_prob = itur.models.itu837.rainfall_probability(lat, lon)
-        R001 = itur.models.itu837.rainfall_rate(lat, lon, p)
-        h_0 = itur.models.itu839.isoterm_0(lat, lon)
-        h_rain = itur.models.itu839.rain_height(lat, lon)
-        L_red = itur.models.itu840.columnar_content_reduced_liquid(
-                lat, lon, p)
-        A_w = itur.models.itu676.zenit_water_vapour_attenuation(
-                lat, lon, p, f, h=hs)
-
-        # Compute attenuation values
-        A_g = itur.gaseous_attenuation_slant_path(f, el, rho_p, P, T)
-        A_r = itur.rain_attenuation(lat, lon, f, el, hs=hs, p=p)
-        A_c = itur.cloud_attenuation(lat, lon, el, f, p)
-        A_s = itur.scintillation_attenuation(lat, lon, f, el, p, D)
-        A_t = itur.atmospheric_attenuation_slant_path(lat, lon, f, el, p, D)
-
-
-class TestSingleLocationVsFrequency(test.TestCase):
-
-    def test_single_location_vs_f(self):
-        # Ground station coordinates (Boston)
-        lat_GS = 42.3601
-        lon_GS = -71.0942
-
-        ################################################
-        # First case: Attenuation vs. frequency        #
-        ################################################
-
-        # Satellite coordinates (GEO, 77 W)
-        lat_sat = 0
-        lon_sat = -77
-        h_sat = 35786 * itur.u.km
-
-        # Compute the elevation angle between satellite and ground station
-        el = itur.utils.elevation_angle(h_sat, lat_sat, lon_sat,
-                                        lat_GS, lon_GS)
-
-        f = 22.5 * itur.u.GHz    # Link frequency
-        D = 1.2 * itur.u.m       # Antenna diameters
-        p = 1
-
-        f = np.logspace(-0.2, 2, 100) * itur.u.GHz
-
-        Ag, Ac, Ar, As, A =\
-            itur.atmospheric_attenuation_slant_path(lat_GS, lon_GS, f,
-                                                    el, p, D,
-                                                    return_contributions=True)
-
-        # Plot the results
-        fig, ax = plt.subplots(1, 1)
-        ax.loglog(f, Ag, label='Gaseous attenuation')
-        ax.loglog(f, Ac, label='Cloud attenuation')
-        ax.loglog(f, Ar, label='Rain attenuation')
-        ax.loglog(f, As, label='Scintillation attenuation')
-        ax.loglog(f, A, label='Total atmospheric attenuation')
-
-        ax.set_xlabel('Frequency [GHz]')
-        ax.set_ylabel('Atmospheric attenuation [dB]')
-        ax.grid(which='both', linestyle=':')
-        plt.legend()
-
-        ################################################
-        # Second case: Attenuation vs. elevation angle #
-        ################################################
-
-        f = 22.5 * itur.u.GHz
-        el = np.linspace(5, 90, 100)
-
-        Ag, Ac, Ar, As, A =\
-            itur.atmospheric_attenuation_slant_path(lat_GS, lon_GS,
-                                                    f, el, p, D,
-                                                    return_contributions=True)
-
-        # Plot the results
-        fig, ax = plt.subplots(1, 1)
-        ax.plot(el, Ag, label='Gaseous attenuation')
-        ax.plot(el, Ac, label='Cloud attenuation')
-        ax.plot(el, Ar, label='Rain attenuation')
-        ax.plot(el, As, label='Scintillation attenuation')
-        ax.plot(el, A, label='Total atmospheric attenuation')
-
-        ax.set_xlabel('Elevation angle [deg]')
-        ax.set_ylabel('Atmospheric attenuation [dB]')
-        ax.grid(which='both', linestyle=':')
-        plt.legend()
-
-
-class TestSingleLocationVsUnavailability(test.TestCase):
-
-    def test_single_location_vs_p(self):
-        # Ground station coordinates (Boston)
-        lat_GS = 42.3601
-        lon_GS = -71.0942
-
-        # Satellite coordinates (GEO, 77 W)
-        lat_sat = 0
-        lon_sat = -77
-        h_sat = 35786 * itur.u.km
-
-        # Compute the elevation angle between satellite and ground station
-        el = itur.utils.elevation_angle(h_sat, lat_sat, lon_sat,
-                                        lat_GS, lon_GS)
-
-        f = 22.5 * itur.u.GHz    # Link frequency
-        D = 1.2 * itur.u.m       # Antenna diameters
-
-        # Define unavailabilities vector in logarithmic scale
-        p = np.logspace(-1.5, 1.5, 100)
-
-        A_g, A_c, A_r, A_s, A_t = \
-            itur.atmospheric_attenuation_slant_path(
-                    lat_GS, lon_GS, f, el, p, D, return_contributions=True)
-
-        # Plot the results using matplotlib
-        f, ax = plt.subplots(1, 1)
-        ax.semilogx(p, A_g.value, label='Gaseous attenuation')
-        ax.semilogx(p, A_c.value, label='Cloud attenuation')
-        ax.semilogx(p, A_r.value, label='Rain attenuation')
-        ax.semilogx(p, A_s.value, label='Scintillation attenuation')
-        ax.semilogx(p, A_t.value, label='Total atmospheric attenuation')
-
-        ax.set_xlabel('Percentage of time attenuation value is exceeded [%]')
-        ax.set_ylabel('Attenuation [dB]')
-        ax.grid(which='both', linestyle=':')
-        plt.legend()
-
-
-class TestGaseousAttenuation(test.TestCase):
-
-    def test_gaseous_attenuation(self):
-        # Define atmospheric parameters
-        rho_wet = 7.5 * itur.u.g / itur.u.m**3
-        rho_dry = 0 * itur.u.g / itur.u.m**3
-        P = 1013.25 * itur.u.hPa
-        T = 15 * itur.u.deg_C
-
-        # Define frequency logspace parameters
-        N_freq = 1000
-        fs = np.linspace(0, 1000, N_freq)
-
-        # Compute the attenuation values
-        att_wet = itu676.gamma_exact(fs, P, rho_wet, T)
-        att_dry = itu676.gamma_exact(fs, P, rho_dry, T)
-
-        # Plot the results
-        plt.figure()
-        plt.plot(fs, att_wet.value, 'b--', label='Wet atmosphere')
-        plt.plot(fs, att_dry.value, 'r', label='Dry atmosphere')
-        plt.xlabel('Frequency [GHz]')
-        plt.ylabel('Specific attenuation [dB/km]')
-        plt.yscale('log')
-        plt.xscale('linear')
-        plt.xlim(0, 1000)
-        plt.ylim(1e-3, 1e5)
-        plt.legend()
-        plt.grid(which='both', linestyle=':', color='gray',
-                 linewidth=0.3, alpha=0.5)
-        plt.grid(which='major', linestyle=':', color='black')
-        plt.title('FIGURE 1. - Specific attenuation due to atmospheric gases,'
-                  '\ncalculated at 1 GHz intervals, including line centres')
-        plt.tight_layout()
-
-        #######################################################################
-        #               Specific attenuation at different altitudes           #
-        #######################################################################
-
-        # Define atmospheric parameters
-        hs = np.array([0, 5, 10, 15, 20]) * itur.u.km
-
-        # Define frequency logspace parameters
-        N_freq = 2001
-        fs = np.linspace(50, 70, N_freq)
-
-        # Plot the results
-        plt.figure()
-
-        # Loop over heights and compute values
-        for h in hs:
-            rho = itu835.standard_water_vapour_density(h)
-            P = itu835.standard_pressure(h)
-            T = itu835.standard_temperature(h)
-            atts = itu676.gamma_exact(fs * itur.u.GHz, P, rho, T)
-            plt.plot(fs, atts.value, label='Altitude {0} km'.format(h.value))
-
-        plt.xlabel('Frequency [GHz]')
-        plt.ylabel('Specific attenuation [dB/km]')
-        plt.yscale('log')
-        plt.xscale('linear')
-        plt.xlim(50, 70)
-        plt.ylim(1e-3, 1e2)
-        plt.legend()
-        plt.grid(which='both', linestyle=':', color='gray',
-                 linewidth=0.3, alpha=0.5)
-        plt.grid(which='major', linestyle=':', color='black')
-        plt.title('FIGURE 2. - Specific attenuation in the range 50-70 GHz'
-                  ' at the\n altitudes indicated, calculated at intervals of'
-                  ' 10 MHz\nincluding line centers (0, 5, 10 15, 20) km')
-        plt.tight_layout()
-
-        #######################################################################
-        #           Comparison of line-by-line and approximate method         #
-        #######################################################################
-        # Define atmospheric parameters
-        el = 90
-        rho = 7.5 * itur.u.g / itur.u.m**3
-        P = 1013.25 * itur.u.hPa
-        T = 15 * itur.u.deg_C
-
-        # Define frequency logspace parameters
-        N_freq = 350
-        fs = np.linspace(0, 350, N_freq)
-
-        # Initialize result vectors
-        atts_approx = []
-        atts_exact = []
-
-        # Loop over frequencies and compute values
-        atts_approx = itu676.gaseous_attenuation_slant_path(
-            fs, el, rho, P, T, mode='approx')
-
-        atts_exact = itu676.gaseous_attenuation_slant_path(
-            fs, el, rho, P, T, mode='exact')
-
-        # Plot the results
-        plt.figure()
-        plt.plot(fs, atts_approx.value, 'b--',
-                 label='Approximate method Annex 2')
-        plt.plot(fs, atts_exact.value, 'r', label='Exact line-by-line method')
-        plt.xlabel('Frequency [GHz]')
-        plt.ylabel('Attenuation [dB]')
-        plt.yscale('log')
-        plt.xscale('log')
-        plt.legend()
-        plt.grid(which='both', linestyle=':', color='gray',
-                 linewidth=0.3, alpha=0.5)
-        plt.grid(which='major', linestyle=':', color='black')
-        plt.title('Comparison of line-by-line method to approximate method')
-        plt.tight_layout()
-
-
-if __name__ == '__main__':
-    pass
-    suite = suite()
-    print('Test examples of the code')
-    print('------------------------')
-    print(
-        'A total of %d test-cases are going to be tested' %
-        suite.countTestCases())
-    sys.stdout.flush()
-    test.TextTestRunner(verbosity=2).run(suite)
+    if is_text:
+        data = np.loadtxt(path, dtype=np.string_, delimiter=',', **kwargs)
+    else:
+        data = np.genfromtxt(path, dtype=float, delimiter=',', **kwargs)
+    return data
+
+
+def prepare_input_array(array):
+    """ Formats an array to be a 2-D numpy-array
+    """
+    if array is None:
+        return None
+
+    return np.atleast_2d(array)
+
+
+def prepare_output_array(array, type_input=None):
+    """ Formats the output to have the same shape and type as the input
+    """
+    global output_quantity
+
+    if isinstance(array, u.Quantity):
+        value = array.value
+        unit = array.unit
+    else:
+        value = array
+        unit = None
+
+    # Squeeze output array to remove singleton dimensions
+    if type(value) in [np.ndarray, list]:
+        value = np.array(value).squeeze()
+
+    if (type_input in __NUMERIC_TYPES__ and
+        (type(array) in __NUMERIC_TYPES__) or
+        ((isinstance(array, np.ndarray) and array.size == 1) or
+         (not type(array) not in __NUMERIC_TYPES__ and len(array) == 1))):
+        value = float(value)
+    elif type_input is list:
+        if isinstance(value, np.ndarray):
+            value = value.tolist()
+        else:
+            value = list(value)
+    else:
+        value = value
+
+    if unit is not None:
+        return value * unit
+    else:
+        return value
+
+
+def prepare_quantity(value, units=None, name_val=None):
+    """ The function verifys that a
+    """
+    if value is None:
+        return None
+
+    if isinstance(value, u.Quantity):
+        if units in [u.K, u.deg_C, u.Kelvin, u.Celsius, u.imperial.deg_F]:
+            return value.to(units, equivalencies=u.temperature()).value
+        else:
+            return value.to(units).value
+
+    elif isinstance(value, numbers.Number) and units is not None:
+        return value
+    elif isinstance(value, np.ndarray) and units is not None:
+        return value
+    elif isinstance(value, list) and units is not None:
+        return np.array([prepare_quantity(v, units, name_val) for v in value])
+    elif isinstance(value, tuple) and units is not None:
+        return np.array([prepare_quantity(v, units, name_val) for v in value])
+    else:
+        raise ValueError('%s has not the correct format. It must be a value,'
+                         'sequence, array, or a Quantity with %s units' %
+                         (name_val, str(units)))
+
+
+def compute_distance_earth_to_earth(lat_p, lon_p, lat_grid, lon_grid,
+                                    method=None):
+    '''
+    Compute the distance between a point (P) in (lat_s, lon_s) and a matrix of
+    latitude and longitudes (lat_grid, lon_grid).
+
+    If the number of elements in lat_grid is smaller than 100,000, uses the
+    WGS84 method, otherwise, uses the harvesine formula.
+
+
+    Parameters
+    ----------
+    lat_p : number
+        latitude projection of the point P (degrees)
+    lon_p : number
+        longitude projection of the point P (degrees)
+    lat_grid : number, sequence of np.ndarray
+        Grid of latitude points to which compute the distance (degrees)
+    lon_grid : number, sequence of np.ndarray
+        Grid of longitude points to which compute the distance (degrees)
+
+
+    Returns
+    -------
+    d : numpy.ndarray
+        Distance between the point P and each point in (lat_grid, lon_grid)
+        (km)
+
+    '''
+    if ((method == 'WGS84' and not(method is not None)) or
+        (type(lat_p) in __NUMERIC_TYPES__) or
+        (type(lat_grid) in __NUMERIC_TYPES__) or
+        (len(lat_grid) < 10000) or
+        (isinstance(lat_grid, np.ndarray) and lat_grid.size < 1e5)):
+            return compute_distance_earth_to_earth_wgs84(
+                    lat_p, lon_p, lat_grid, lon_grid)
+    else:
+            return compute_distance_earth_to_earth_haversine(
+                    lat_p, lon_p, lat_grid, lon_grid)
+
+
+def compute_distance_earth_to_earth_wgs84(lat_p, lon_p, lat_grid, lon_grid):
+    '''
+    Compute the distance between a point (P) in (lat_s, lon_s) and a matrix of
+    latitude and longitudes (lat_grid, lon_grid) using the WGS84 inverse method
+
+
+    Parameters
+    ----------
+    lat_p : number
+        latitude projection of the point P (degrees)
+    lon_p : number
+        longitude projection of the point P (degrees)
+    lat_grid : number, sequence of np.ndarray
+        Grid of latitude points to which compute the distance (degrees)
+    lon_grid : number, sequence of np.ndarray
+        Grid of longitude points to which compute the distance (degrees)
+
+
+    Returns
+    -------
+    d : numpy.ndarray
+        Distance between the point P and each point in (lat_grid, lon_grid)
+        (km)
+
+    '''
+    lat_p = lat_p * np.ones_like(lat_grid)
+    lon_p = lon_p * np.ones_like(lon_grid)
+    _a, _b, d = __wgs84_geod__.inv(lon_p, lat_p, lon_grid, lat_grid)
+    return d/1e3
+
+
+def compute_distance_earth_to_earth_haversine(lat_p, lon_p,
+                                              lat_grid, lon_grid):
+    '''
+    Compute the distance between a point (P) in (lat_s, lon_s) and a matrix of
+    latitude and longitudes (lat_grid, lon_grid) using the Haversine formula
+
+
+    Parameters
+    ----------
+    lat_p : number
+        latitude projection of the point P (degrees)
+    lon_p : number
+        longitude projection of the point P (degrees)
+    lat_grid : number, sequence of np.ndarray
+        Grid of latitude points to which compute the distance (degrees)
+    lon_grid : number, sequence of np.ndarray
+        Grid of longitude points to which compute the distance (degrees)
+
+
+    Returns
+    -------
+    d : numpy.ndarray
+        Distance between the point P and each point in (lat_grid, lon_grid)
+        (km)
+
+
+    References
+    This is based on the Haversine formula
+    '''
+    RE = 6371.0  # Radius of the Earth, km
+
+    lat1 = np.deg2rad(lat_grid)
+    lat2 = np.deg2rad(lat_p)
+    lon1 = np.deg2rad(lon_grid)
+    lon2 = np.deg2rad(lon_p)
+
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+
+    # Compute the distance
+    a = np.clip((np.sin(dlat / 2.0))**2 + np.cos(lat1) * np.cos(lat2) *
+                (np.sin(dlon / 2))**2, -1, 1)
+    c = 2 * np.arcsin(np.sqrt(a))
+    d = RE * c
+    return d
+
+
+def regular_lat_lon_grid(resolution_lat=1, resolution_lon=1, lon_start_0=False,
+                         lat_min=-90, lat_max=90, lon_min=-180, lon_max=180):
+    '''
+    Build latitude and longitude coordinate matrix with resolution
+    resolution_lat, resolution_lon
+
+
+    Parameters
+    ----------
+    resolution_lat: number
+        Resolution for the latitude axis (deg)
+    resolution_lon: number
+        Resolution for the longitude axis (deg)
+    lon_start_0: boolean
+        Indicates whether the longitude is indexed using a 0 - 360 scale (True)
+        or using -180 - 180 scale (False). Default value is False
+
+
+    Returns
+    -------
+    lat: numpy.ndarray
+        Grid of coordinates of the latitude point
+    lon: numpy.ndarray
+        Grid of coordinates of the latitude point
+    '''
+    if lon_start_0:
+        lon, lat = np.meshgrid(np.arange(lon_min + 180.0, lon_max + 180.0,
+                                         resolution_lon),
+                               np.arange(lat_max, lat_min, - resolution_lat))
+    else:
+        lon, lat = np.meshgrid(np.arange(lon_min, lon_max, resolution_lon),
+                               np.arange(lat_max, lat_min, - resolution_lat))
+
+    return lat, lon
+
+
+def elevation_angle(h, lat_s, lon_s, lat_grid, lon_grid):
+    '''
+    Compute the elevation angle between a satellite located in an orbit
+    at height h and located above coordinates (lat_s, lon_s) and a matrix of
+    latitude and longitudes (lat_grid, lon_grid)
+
+
+    Parameters
+    ----------
+    h : float
+        Orbital altitude of the satellite (km)
+    lat_s : float
+        latitude of the projection of the satellite (degrees)
+    lon_s : float
+        longitude of the projection of the satellite (degrees)
+    lat_grid :  number, sequence of np.ndarray
+        Grid of latitude points to which compute the elevation angle (degrees)
+    lon_grid :  number, sequence of np.ndarray
+        Grid of longitude points to which compute the elevation angle (degrees)
+
+
+    Returns
+    -------
+    elevation : numpy.ndarray
+        Elevation angle between the satellite and each point in
+        (lat_grid, lon_grid) (degrees)
+
+
+    References
+    [1] http://www.propagation.gatech.edu/ECE6390/notes/ASD5.pdf - Slides 3, 4
+    '''
+    h = prepare_quantity(h, u.km, name_val='Orbital altitude of the satellite')
+
+    RE = 6371.0     # Radius of the Earth (km)
+    rs = RE + h
+
+    # Transform latitude_longitude values to radians
+    lat1 = np.deg2rad(lat_grid)
+    lat2 = np.deg2rad(lat_s)
+    lon1 = np.deg2rad(lon_grid)
+    lon2 = np.deg2rad(lon_s)
+
+    # Compute the elevation angle as described in
+    gamma = np.arccos(
+        np.clip(np.sin(lat2) * np.sin(lat1) +
+                np.cos(lat1) * np.cos(lat2) * np.cos(lon2 - lon1), -1, 1))
+    elevation = np.arccos(np.sin(gamma) /
+                          np.sqrt(1 + (RE / rs)**2 -
+                                  2 * (RE / rs) * np.cos(gamma)))  # In radians
+
+    return np.rad2deg(elevation)
+
+
+def plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
+                lon_min=None, lon_max=None, cbar_text='', ax=None,
+                figsize=(6,4),
+                **kwargs):
+    '''
+    Displays the value sin data in a map.
+
+    Either {lat, lon} or {lat_min, lat_max, lon_min, lon_max} need to be
+    provided as inputs.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        Data values to be plotted.
+    lat : np.ndarray
+        Matrix with the latitudes for each point in data (deg N)
+    lon : np.ndarray
+        Matrix with the longitudes for each point in data (deg E)
+    lat_min :  float
+        Minimum latitude of the data (deg N)
+    lat_max :  float
+        Maximum latitude of the data (deg N)
+    lon_min :  float
+        Minimum longitude of the data (deg E)
+    lat_max :  float
+        Maximum longitude of the data (deg E)
+    cbar_text : string
+        Colorbar text caption.
+    ax : Axes
+        matplotlib axes where the data will be plotted.
+    **kwargs: dict
+        Key-value arguments that will be passed to the imshow function.
+
+
+    Returns
+    -------
+    m : Basemap
+        The map object generated by Basemap
+    '''
+    import matplotlib.pyplot as plt
+
+    try:
+        from mpl_toolkits.basemap import Basemap
+    except BaseException:
+        raise RuntimeError('Basemap is not installed and therefore plot_in_map'
+                           ' cannot be used')
+
+    if all([el is None for el in [lat, lon, lat_min, lon_min,
+                                  lat_max, lon_max]]):
+        raise ValueError('Either \{lat, lon\} or \{lat_min, lon_min, lat_max,'
+                         'lon_max\} need to be provided')
+
+    elif lat is not None and lon is not None:
+        assert(np.shape(lat) == np.shape(lon) and
+               np.shape(lat) == np.shape(data))
+        lat_max = np.max(lat)
+        lat_min = np.min(lat)
+        lon_max = np.max(lon)
+        lon_min = np.min(lon)
+
+    if ax is None:
+        fig = plt.figure(figsize=figsize)
+        ax = plt.subplot(111)
+
+    m = Basemap(ax=ax, projection='cyl', llcrnrlat=lat_min,
+                urcrnrlat=lat_max, llcrnrlon=lon_min, urcrnrlon=lon_max,
+                resolution='l')
+
+    m.drawcoastlines(color='grey', linewidth=0.8)
+    m.drawcountries(color='grey', linewidth=0.8)
+    parallels = np.arange(-80, 81, 20)
+    m.drawparallels(parallels, labels=[1, 0, 0, 1], dashes=[2, 1],
+                    linewidth=0.2, color='white')
+    meridians = np.arange(0., 360., 30.)
+    m.drawmeridians(meridians, labels=[1, 0, 0, 1], dashes=[2, 1],
+                    linewidth=0.2, color='white')
+
+    im = m.imshow(np.flipud(data), **kwargs)
+    cbar = m.colorbar(im, location='bottom', pad="8%")
+    cbar.set_label(cbar_text)
+
+    return m
+
+def carto_plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
+                lon_min=None, lon_max=None, cbar_text='', ax=None,figsize=(6,4),
+                filename=None, **kwargs):
+    '''
+    Displays the value sin data in a map.
+
+    Either {lat, lon} or {lat_min, lat_max, lon_min, lon_max} need to be
+    provided as inputs.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        Data values to be plotted.
+    lat : np.ndarray
+        Matrix with the latitudes for each point in data (deg N)
+    lon : np.ndarray
+        Matrix with the longitudes for each point in data (deg E)
+    lat_min :  float
+        Minimum latitude of the data (deg N)
+    lat_max :  float
+        Maximum latitude of the data (deg N)
+    lon_min :  float
+        Minimum longitude of the data (deg E)
+    lat_max :  float
+        Maximum longitude of the data (deg E)
+    cbar_text : string : optional
+        Colorbar text caption.
+    ax : Axes : optional
+        matplotlib axes where the data will be plotted.
+    filename : string : optional
+        Filename of saved figure
+    **kwargs: dict
+        Key-value arguments that will be passed to the imshow function.
+
+    Returns
+    -------
+    ax : AxesSubplot
+        Object which can be manipulated using the matplotlib class 'AxesSubplot'
+    '''
+
+
+    import matplotlib.pyplot as plt
+
+    try:
+        import cartopy.crs as ccrs
+    except:
+        raise RuntimeError('Cartopy is not installed and therefore carto_plot_in_map'
+                           ' cannot be used')
+
+    if all([el is None for el in [lat, lon, lat_min, lon_min,
+                                  lat_max, lon_max]]):
+        raise ValueError('Either \{lat, lon\} or \{lat_min, lon_min, lat_max,'
+                         'lon_max\} need to be provided')
+
+    elif lat is not None and lon is not None:
+        assert(np.shape(lat) == np.shape(lon) and
+               np.shape(lat) == np.shape(data))
+        lat_max = np.max(lat)
+        lat_min = np.min(lat)
+        lon_max = np.max(lon)
+        lon_min = np.min(lon)
+
+    if ax is None:
+        fig = plt.figure(figsize=figsize)
+        ax = fig.add_subplot(1,1,1,projection=ccrs.PlateCarree())
+
+
+    ax.set_global()
+    ax.coastlines()
+    ax.contourf(lon,lat,data,100,transform=ccrs.PlateCarree())
+    ax.gridlines(xlocs=np.arange(-180.,180.,30.),ylocs=np.arange(-80.,81.,20.),draw_labels=True)
+
+    cbar = fig.colorbar(ax.contourf(lon,lat,data,100,transform=ccrs.PlateCarree()),orientation="horizontal")
+    cbar.set_label(cbar_text)
+
+    if type(filename) == str:
+        plt.savefig(filename)
+    elif filename is not None:
+        warnings.warn(
+            RuntimeWarning(
+                'filename given was not string so figure will not be saved'
+            ))
+        
+    return ax
