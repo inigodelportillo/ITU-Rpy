@@ -6,6 +6,7 @@ from __future__ import print_function
 import numpy as np
 import os
 import numbers
+import warnings
 
 from tempfile import mkdtemp
 from joblib import Memory
@@ -330,7 +331,8 @@ def elevation_angle(h, lat_s, lon_s, lat_grid, lon_grid):
 
 def plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
                 lon_min=None, lon_max=None, cbar_text='', ax=None,
-                figsize=(6, 4), **kwargs):
+                figsize=(6,4),
+                **kwargs):
     '''
     Displays the value sin data in a map.
 
@@ -389,7 +391,7 @@ def plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
 
     if ax is None:
         fig = plt.figure(figsize=figsize)
-        ax = fig.add_subplot(111)
+        ax = plt.subplot(111)
 
     m = Basemap(ax=ax, projection='cyl', llcrnrlat=lat_min,
                 urcrnrlat=lat_max, llcrnrlon=lon_min, urcrnrlon=lon_max,
@@ -407,4 +409,91 @@ def plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
     im = m.imshow(np.flipud(data), **kwargs)
     cbar = m.colorbar(im, location='bottom', pad="8%")
     cbar.set_label(cbar_text)
+
     return m
+
+def carto_plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
+                lon_min=None, lon_max=None, cbar_text='', ax=None,figsize=(6,4),
+                filename=None, **kwargs):
+    '''
+    Displays the value sin data in a map.
+
+    Either {lat, lon} or {lat_min, lat_max, lon_min, lon_max} need to be
+    provided as inputs.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        Data values to be plotted.
+    lat : np.ndarray
+        Matrix with the latitudes for each point in data (deg N)
+    lon : np.ndarray
+        Matrix with the longitudes for each point in data (deg E)
+    lat_min :  float
+        Minimum latitude of the data (deg N)
+    lat_max :  float
+        Maximum latitude of the data (deg N)
+    lon_min :  float
+        Minimum longitude of the data (deg E)
+    lat_max :  float
+        Maximum longitude of the data (deg E)
+    cbar_text : string : optional
+        Colorbar text caption.
+    ax : Axes : optional
+        matplotlib axes where the data will be plotted.
+    filename : string : optional
+        Filename of saved figure
+    **kwargs: dict
+        Key-value arguments that will be passed to the imshow function.
+
+    Returns
+    -------
+    ax : AxesSubplot
+        Object which can be manipulated using the matplotlib class 'AxesSubplot'
+    '''
+
+
+    import matplotlib.pyplot as plt
+
+    try:
+        import cartopy.crs as ccrs
+    except:
+        raise RuntimeError('Cartopy is not installed and therefore carto_plot_in_map'
+                           ' cannot be used')
+
+    if all([el is None for el in [lat, lon, lat_min, lon_min,
+                                  lat_max, lon_max]]):
+        raise ValueError('Either \{lat, lon\} or \{lat_min, lon_min, lat_max,'
+                         'lon_max\} need to be provided')
+
+    elif lat is not None and lon is not None:
+        assert(np.shape(lat) == np.shape(lon) and
+               np.shape(lat) == np.shape(data))
+        lat_max = np.max(lat)
+        lat_min = np.min(lat)
+        lon_max = np.max(lon)
+        lon_min = np.min(lon)
+
+    if ax is None:
+        fig = plt.figure(figsize=figsize)
+        ax = fig.add_subplot(1,1,1,projection=ccrs.PlateCarree())
+
+
+    ax.set_global()
+    ax.coastlines()
+    ax.contourf(lon,lat,data,100,transform=ccrs.PlateCarree())
+    ax.gridlines(xlocs=np.arange(-180.,180.,30.),ylocs=np.arange(-80.,81.,20.),draw_labels=True)
+
+    cbar = fig.colorbar(ax.contourf(lon,lat,data,100,transform=ccrs.PlateCarree()),orientation="horizontal")
+    cbar.set_label(cbar_text)
+
+    if type(filename) == str:
+        plt.savefig(filename)
+    elif filename is not None:
+        warnings.warn(
+            RuntimeWarning(
+                'filename given was not string so figure will not be saved'
+            ))
+    return ax
+
+    
