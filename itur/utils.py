@@ -391,7 +391,7 @@ def plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
 
     if ax is None:
         fig = plt.figure(figsize=figsize)
-        ax = plt.subplot(111)
+        ax = plt.fig_subplot(111)
 
     m = Basemap(ax=ax, projection='cyl', llcrnrlat=lat_min,
                 urcrnrlat=lat_max, llcrnrlon=lon_min, urcrnrlon=lon_max,
