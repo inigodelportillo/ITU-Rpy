@@ -1,4 +1,22 @@
 # -*- coding: utf-8 -*-
+"""
+ITU-RPy is a python implementation of the ITU-P R Recommendations.
+
+ITU-Rpy can be used to compute atmospheric attenuation for Earth-to-space
+and horizontal paths, for frequencies in the Ghz range.
+
+The propagation loss on an Earth-space path and a horizontal-path, relative to
+the free-space loss, is the sum of different contributions, namely:
+ *   attenuation by atmospheric gases;
+ *   attenuation by rain, other precipitation and clouds;
+ *   scintillation and multipath effects;
+ *   attenuation by sand and dust storms.
+
+Each of these contributions has its own characteristics as a function of
+frequency, geographic location and elevation angle. ITU-Rpy allows for fast,
+vectorial computation of the different contributions to the atmospheric
+attenuation.
+"""
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -28,7 +46,9 @@ def atmospheric_attenuation_slant_path(
         H=None, P=None, hL=1e3, Ls=None, tau=45, V_t=None, mode='approx',
         return_contributions=False, include_rain=True, include_gas=True,
         include_scintillation=True, include_clouds=True):
-    """ Calculation of long-term atmospheric attenuation statistics.
+    """
+    Calculation of long-term atmospheric attenuation statistics.
+
     The following procedure provides estimates of the long-term statistics of
     the slant-path atmospheric attenuation at a given location for
     frequencies up to 55 GHz and percentages of time 0.001 % < p < 50 %.
@@ -64,7 +84,7 @@ def atmospheric_attenuation_slant_path(
             *  2.5 mm/h : Light rain
             * 12.5 mm/h : Medium rain
             * 25.0 mm/h : Heavy rain
-            * 50.0 mm/h : Dwonpour
+            * 50.0 mm/h : Downpour
             * 100  mm/h : Tropical
             * 150  mm/h : Monsoon
     eta: number, optional

@@ -24,6 +24,7 @@ from astropy import units as u
 
 
 class __ITU1853():
+
     """Tropospheric attenuation time series synthesis
 
     Available versions include:
@@ -43,7 +44,8 @@ class __ITU1853():
                 'Version {0} is not implemented for the ITU-R P.1853 model.'
                 .format(version))
 
-    def set_seed(self, seed):
+    @staticmethod
+    def set_seed(seed):
         np.random.seed(seed)
 
     @property
@@ -84,9 +86,9 @@ class _ITU1853_1():
         self.month = 2
         self.link = 'https://www.itu.int/rec/R-REC-P.1853-1-201202-I/en'
 
-    @classmethod
-    def rain_attenuation_synthesis(self, lat, lon, f, el, hs, Ns, tau=45,
-                                   Ts=1, n=None):
+    @staticmethod
+    def rain_attenuation_synthesis(
+            lat, lon, f, el, hs, Ns, tau=45, Ts=1, n=None):
         """
         For Earth-space paths, the time series synthesis method is valid for
         frequencies between 4 GHz and 55 GHz and elevation angles between
@@ -145,8 +147,8 @@ class _ITU1853_1():
 
         return A_rain.flatten()
 
-    @classmethod
-    def fftnoise(self, f):
+    @staticmethod
+    def fftnoise(f):
         f = np.array(f, dtype='complex')
         Np = (len(f) - 1) // 2
         phases = np.random.rand(Np) * 2 * np.pi
@@ -155,7 +157,6 @@ class _ITU1853_1():
         f[-1:-1 - Np:-1] = np.conj(f[1:Np + 1])
         return np.fft.ifft(f).real
 
-    @classmethod
     def scintillation_attenuation_synthesis(self, Ns, f_c=0.1, Ts=1):
         """
         For Earth-space paths, the time series synthesis method is valid for
@@ -169,7 +170,8 @@ class _ITU1853_1():
         sci = self.fftnoise(np.fft.fftshift(H_f))
         return sci[200000:].flatten()
 
-    def cloud_liquid_water_synthesis(self, lat, lon, Ns, Ts=1, n=None):
+    @staticmethod
+    def cloud_liquid_water_synthesis(lat, lon, Ns, Ts=1, n=None):
         """
         """
 
@@ -214,7 +216,8 @@ class _ITU1853_1():
 
         return L.flatten()
 
-    def integrated_water_vapour_coefficients(self, lat, lon):
+    @staticmethod
+    def integrated_water_vapour_coefficients(lat, lon):
         # A Estimation of κ and λ
         ps = np.array([0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30, 50])
         Vi = np.array([total_water_vapour_content(lat, lon, p_i).value
@@ -331,7 +334,7 @@ class _ITU1853_1():
 
         e = Tm * rho / 216.7
         go = gamma0_exact(f, P, rho, Tm).value
-        ho, hw = slant_inclined_path_equivalent_height(f, P + e).value
+        ho, _ = slant_inclined_path_equivalent_height(f, P + e).value
         Ao = ho * go * np.ones_like(Ar)
 
         # Step C15: Synthesize unit variance scintillation time series
@@ -374,22 +377,27 @@ class _ITU1853_0():
         self.month = 10
         self.link = 'https://www.itu.int/rec/R-REC-P.1853-0-200910-I/en'
 
+    @staticmethod
     def rain_attenuation_synthesis(*args, **kwargs):
         return _ITU1853_1.rain_attenuation_synthesis(*args, **kwargs)
 
-    def scintillation_attenuation_synthesis(self, *args, **kwargs):
+    @staticmethod
+    def scintillation_attenuation_synthesis(*args, **kwargs):
         return _ITU1853_1.scintillation_attenuation_synthesis(*args, **kwargs)
 
+    @staticmethod
     def cloud_liquid_water_synthesis(*args, **kwargs):
         raise NotImplementedError(
             "Recommendation ITU-R P.1853 does not specify a method to compute "
             "time series for the cloud liquid water content.")
 
+    @staticmethod
     def integrated_water_vapour_synthesis(*args, **kwargs):
         raise NotImplementedError(
             "Recommendation ITU-R P.1853 does not specify a method to compute "
             "time series for the water vapour content.")
 
+    @staticmethod
     def total_attenuation_synthesis(*args, **kwargs):
         raise NotImplementedError(
             "Recommendation ITU-R P.1853 does not specify a method to compute "
@@ -604,7 +612,7 @@ def total_attenuation_synthesis(lat, lon, f, el, p, D, Ns, Ts=1, hs=None,
     el : number
         Elevation angle (degrees)
     p : number
-        Percetage of the time the rain attenuation value is exceeded.
+        Percentage of the time the rain attenuation value is exceeded.
     D: number or Quantity
         Physical diameter of the earth-station antenna (m)
     Ns : int

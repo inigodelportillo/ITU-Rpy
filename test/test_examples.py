@@ -3,20 +3,17 @@ import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
-import unittest as test
-import numpy as np
 import sys
-from astropy import units as u
+import numpy as np
+import unittest as test
 
 import itur
-import itur.models as models
 import itur.models.itu676 as itu676
 import itur.models.itu835 as itu835
 
 
 def suite():
-    """ A test suite for the ITU-P Recommendations. Recommendations tested:
-    """
+    """A test suite for the examples includes in itur. """
     suite = test.TestSuite()
 
     # Test valid versions
@@ -33,7 +30,8 @@ def suite():
 
 class TestMapAfrica(test.TestCase):
 
-    def test_map_africa(self):
+    @staticmethod
+    def test_map_africa():
         # Generate a regular grid of latitude and longitudes with 0.1
         # degree resolution for the region of interest.
         lat, lon = itur.utils.regular_lat_lon_grid(lat_max=60,
@@ -81,7 +79,8 @@ class TestMapAfrica(test.TestCase):
 
 class TestMultipleLocations(test.TestCase):
 
-    def test_multiple_locations(self):
+    @staticmethod
+    def test_multiple_locations():
         # Obtain the coordinates of the different cities
         cities = {'Boston': (42.36, -71.06),
                   'New York': (40.71, -74.01),
@@ -140,7 +139,8 @@ class TestMultipleLocations(test.TestCase):
 
 class TestSingleLocation(test.TestCase):
 
-    def test_single_location(self):
+    @staticmethod
+    def test_single_location():
 
         # Location of the receiver ground stations
         lat = 41.39
@@ -158,33 +158,34 @@ class TestSingleLocation(test.TestCase):
         T = itur.surface_mean_temperature(lat, lon)
         P = itur.models.itu835.pressure(lat, hs)
         rho_p = itur.surface_water_vapour_density(lat, lon, p, hs)
-        rho_sa = itur.models.itu835.water_vapour_density(lat, hs)
-        T_sa = itur.models.itu835.temperature(lat, hs)
-        V = itur.models.itu836.total_water_vapour_content(lat, lon, p, hs)
+        itur.models.itu835.water_vapour_density(lat, hs)
+        itur.models.itu835.temperature(lat, hs)
+        itur.models.itu836.total_water_vapour_content(lat, lon, p, hs)
 
         # Compute rain and cloud-related parameters
-        R_prob = itur.models.itu618.rain_attenuation_probability(
+        itur.models.itu618.rain_attenuation_probability(
                 lat, lon, el, hs)
-        R_pct_prob = itur.models.itu837.rainfall_probability(lat, lon)
-        R001 = itur.models.itu837.rainfall_rate(lat, lon, p)
-        h_0 = itur.models.itu839.isoterm_0(lat, lon)
-        h_rain = itur.models.itu839.rain_height(lat, lon)
-        L_red = itur.models.itu840.columnar_content_reduced_liquid(
+        itur.models.itu837.rainfall_probability(lat, lon)
+        itur.models.itu837.rainfall_rate(lat, lon, p)
+        itur.models.itu839.isoterm_0(lat, lon)
+        itur.models.itu839.rain_height(lat, lon)
+        itur.models.itu840.columnar_content_reduced_liquid(
                 lat, lon, p)
-        A_w = itur.models.itu676.zenit_water_vapour_attenuation(
+        itur.models.itu676.zenit_water_vapour_attenuation(
                 lat, lon, p, f, h=hs)
 
         # Compute attenuation values
-        A_g = itur.gaseous_attenuation_slant_path(f, el, rho_p, P, T)
-        A_r = itur.rain_attenuation(lat, lon, f, el, hs=hs, p=p)
-        A_c = itur.cloud_attenuation(lat, lon, el, f, p)
-        A_s = itur.scintillation_attenuation(lat, lon, f, el, p, D)
-        A_t = itur.atmospheric_attenuation_slant_path(lat, lon, f, el, p, D)
+        itur.gaseous_attenuation_slant_path(f, el, rho_p, P, T)
+        itur.rain_attenuation(lat, lon, f, el, hs=hs, p=p)
+        itur.cloud_attenuation(lat, lon, el, f, p)
+        itur.scintillation_attenuation(lat, lon, f, el, p, D)
+        itur.atmospheric_attenuation_slant_path(lat, lon, f, el, p, D)
 
 
 class TestSingleLocationVsFrequency(test.TestCase):
 
-    def test_single_location_vs_f(self):
+    @staticmethod
+    def test_single_location_vs_f():
         # Ground station coordinates (Boston)
         lat_GS = 42.3601
         lon_GS = -71.0942
@@ -254,7 +255,8 @@ class TestSingleLocationVsFrequency(test.TestCase):
 
 class TestSingleLocationVsUnavailability(test.TestCase):
 
-    def test_single_location_vs_p(self):
+    @staticmethod
+    def test_single_location_vs_p():
         # Ground station coordinates (Boston)
         lat_GS = 42.3601
         lon_GS = -71.0942
@@ -294,7 +296,8 @@ class TestSingleLocationVsUnavailability(test.TestCase):
 
 class TestGaseousAttenuation(test.TestCase):
 
-    def test_gaseous_attenuation(self):
+    @staticmethod
+    def test_gaseous_attenuation():
         # Define atmospheric parameters
         rho_wet = 7.5 * itur.u.g / itur.u.m**3
         rho_dry = 0 * itur.u.g / itur.u.m**3
@@ -406,7 +409,6 @@ class TestGaseousAttenuation(test.TestCase):
 
 
 if __name__ == '__main__':
-    pass
     suite = suite()
     print('Test examples of the code')
     print('------------------------')

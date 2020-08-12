@@ -4,7 +4,6 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-import os
 from astropy import units as u
 from scipy.optimize import bisect
 import scipy.stats as stats
@@ -12,8 +11,8 @@ import scipy.stats as stats
 from itur import utils
 from itur.models.itu1510 import surface_month_mean_temperature
 from itur.models.itu1144 import bilinear_2D_interpolator
-from itur.utils import load_data, dataset_dir, prepare_input_array,\
-    prepare_output_array, memory
+from itur.utils import (prepare_input_array, prepare_output_array,
+                        memory, load_data_interpolator)
 
 
 class __ITU837():
@@ -87,14 +86,11 @@ class _ITU837_7():
 
     def Mt(self, lat, lon, m):
         if not self._Mt:
-            lats = load_data(os.path.join(dataset_dir, '837/v7_LAT_MT.txt'))
-            lons = load_data(os.path.join(dataset_dir, '837/v7_LON_MT.txt'))
             for _m in self.months:
-                vals = load_data(os.path.join(dataset_dir,
-                                              '837/v7_MT_Month{0:02d}.txt')
-                                 .format(_m))
-                self._Mt[_m] = bilinear_2D_interpolator(np.flipud(lats), lons,
-                                                        np.flipud(vals))
+                self._Mt[_m] = load_data_interpolator(
+                       '837/v7_lat_mt.npz', '837/v7_lon_mt.npz',
+                       '837/v7_mt_month{0:02d}.npz'.format(_m),
+                       bilinear_2D_interpolator)
 
         # In this recommendation the longitude is encoded with format -180 to
         # 180 whereas we always use 0 - 360 encoding
@@ -105,11 +101,9 @@ class _ITU837_7():
 
     def R001(self, lat, lon):
         if not self._R001:
-            lats = load_data(os.path.join(dataset_dir, '837/v7_LAT_R001.txt'))
-            lons = load_data(os.path.join(dataset_dir, '837/v7_LON_R001.txt'))
-            vals = load_data(os.path.join(dataset_dir, '837/v7_R001.txt'))
-            self._R001 = bilinear_2D_interpolator(np.flipud(lats), lons,
-                                                  np.flipud(vals))
+            self._R001 = load_data_interpolator(
+                       '837/v7_lat_r001.npz', '837/v7_lon_r001.npz',
+                       '837/v7_r001.npz', bilinear_2D_interpolator)
 
         # In this recommendation the longitude is encoded with format -180 to
         # 180 whereas we always use 0 - 360 encoding
@@ -218,39 +212,31 @@ class _ITU837_6():
 
     def Pr6(self, lat, lon):
         if not self._Pr6:
-            vals = load_data(os.path.join(dataset_dir,
-                                          '837/ESARAIN_PR6_v5.txt'))
-            lats = load_data(os.path.join(dataset_dir,
-                                          '837/ESARAIN_LAT_v5.txt'))
-            lons = load_data(os.path.join(dataset_dir,
-                                          '837/ESARAIN_LON_v5.txt'))
-            self._Pr6 = bilinear_2D_interpolator(lats, lons, vals)
+            self._Pr6 = load_data_interpolator(
+                       '837/esarain_lat_v5.npz', '837/esarain_lon_v5.npz',
+                       '837/esarain_pr6_v5.npz', bilinear_2D_interpolator,
+                       flip_ud=False)
+
 
         return self._Pr6(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def Mt(self, lat, lon):
         if not self._Mt:
-            vals = load_data(os.path.join(dataset_dir,
-                                          '837/ESARAIN_MT_v5.txt'))
-            lats = load_data(os.path.join(dataset_dir,
-                                          '837/ESARAIN_LAT_v5.txt'))
-            lons = load_data(os.path.join(dataset_dir,
-                                          '837/ESARAIN_LON_v5.txt'))
-            self._Mt = bilinear_2D_interpolator(lats, lons, vals)
+            self._Mt = load_data_interpolator(
+                       '837/esarain_lat_v5.npz', '837/esarain_lon_v5.npz',
+                       '837/esarain_mt_v5.npz', bilinear_2D_interpolator,
+                       flip_ud=False)
 
         return self._Mt(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def Beta(self, lat, lon):
         if not self._Beta:
-            vals = load_data(os.path.join(dataset_dir,
-                                          '837/ESARAIN_BETA_v5.txt'))
-            lats = load_data(os.path.join(dataset_dir,
-                                          '837/ESARAIN_LAT_v5.txt'))
-            lons = load_data(os.path.join(dataset_dir,
-                                          '837/ESARAIN_LON_v5.txt'))
-            self._Beta = bilinear_2D_interpolator(lats, lons, vals)
+            self._Beta = load_data_interpolator(
+                       '837/esarain_lat_v5.npz', '837/esarain_lon_v5.npz',
+                       '837/esarain_beta_v5.npz', bilinear_2D_interpolator,
+                       flip_ud=False)
 
         return self._Beta(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)

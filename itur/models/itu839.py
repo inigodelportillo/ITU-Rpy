@@ -4,16 +4,16 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-import os
 from astropy import units as u
 
 from itur import utils
 from itur.models.itu1144 import bilinear_2D_interpolator
-from itur.utils import load_data, dataset_dir, prepare_input_array,\
-    prepare_output_array, memory
+from itur.utils import (prepare_input_array, prepare_output_array,
+                        memory, load_data_interpolator)
 
 
-class __ITU839():
+class __ITU839__():
+
     """Rain height model for prediction methods.
 
     Not available versions:
@@ -29,11 +29,11 @@ class __ITU839():
 
     def __init__(self, version=4):
         if version == 4:
-            self.instance = _ITU839_4()
+            self.instance = _ITU839_4_()
         elif version == 3:
-            self.instance = _ITU839_3()
+            self.instance = _ITU839_3_()
         elif version == 2:
-            self.instance = _ITU839_2()
+            self.instance = _ITU839_2_()
 #        elif version == 1:
 #            self.instance = _ITU839_1()
 #        elif version == 0:
@@ -58,7 +58,7 @@ class __ITU839():
         return self.instance.isoterm_0(lat, lon)
 
 
-class _ITU839_4():
+class _ITU839_4_():
 
     def __init__(self):
         self.__version__ = 4
@@ -71,19 +71,16 @@ class _ITU839_4():
 
     def isoterm_0(self, lat, lon):
         if not self._zero_isoterm_data:
-            vals = load_data(os.path.join(dataset_dir,
-                                          '839/v4_ESA0HEIGHT.txt'))
-            lats = load_data(os.path.join(dataset_dir, '839/v4_ESALAT.txt'))
-            lons = load_data(os.path.join(dataset_dir, '839/v4_ESALON.txt'))
-            self._zero_isoterm_data = bilinear_2D_interpolator(
-                lats, lons, vals)
+            self._zero_isoterm_data = load_data_interpolator(
+                '839/v4_esalat.npz', '839/v4_esalon.npz',
+                '839/v4_esa0height.npz', bilinear_2D_interpolator,
+                flip_ud=False)
 
         return self._zero_isoterm_data(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def rain_height(self, lat_d, lon_d):
-        """
-        The rain height is computed as
+        """The rain height is computed as
 
         ..math:
             h_r = h_0 + 0.36 (km)
@@ -91,7 +88,7 @@ class _ITU839_4():
         return self.isoterm_0(lat_d, lon_d) + 0.36
 
 
-class _ITU839_3():
+class _ITU839_3_():
 
     def __init__(self):
         self.__version__ = 3
@@ -103,12 +100,10 @@ class _ITU839_3():
 
     def isoterm_0(self, lat, lon):
         if not self._zero_isoterm_data:
-            vals = load_data(os.path.join(dataset_dir,
-                                          '839/v3_ESA0HEIGHT.txt'))
-            lats = load_data(os.path.join(dataset_dir, '839/v3_ESALAT.txt'))
-            lons = load_data(os.path.join(dataset_dir, '839/v3_ESALON.txt'))
-            self._zero_isoterm_data = bilinear_2D_interpolator(
-                lats, lons, vals)
+            self._zero_isoterm_data =  load_data_interpolator(
+                '839/v3_esalat.npz', '839/v3_esalon.npz',
+                '839/v3_esa0height.npz', bilinear_2D_interpolator,
+                flip_ud=False)
 
         return self._zero_isoterm_data(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
@@ -123,7 +118,7 @@ class _ITU839_3():
         return self.isoterm_0(lat_d, lon_d) + 0.36
 
 
-class _ITU839_2():
+class _ITU839_2_():
 
     def __init__(self):
         self.__version__ = 2
@@ -131,7 +126,8 @@ class _ITU839_2():
         self.month = 10
         self.link = 'https://www.itu.int/rec/R-REC-P.839-2-199910-S/en'
 
-    def isoterm_0(self, lat_d, lon_d):
+    @staticmethod
+    def isoterm_0(lat_d, lon_d):
         """
         The 0C mean isotherm height can be approximated as
 
@@ -166,7 +162,7 @@ class _ITU839_2():
                         3.2 - 0.075 * (lat_d - 35), h0)
 
 
-__model = __ITU839()
+__model = __ITU839__()
 
 
 def change_version(new_version):
@@ -186,7 +182,7 @@ def change_version(new_version):
         * version 4: P.839-4 (09/2013) (Current version)
     """
     global __model
-    __model = __ITU839(new_version)
+    __model = __ITU839__(new_version)
     utils.memory.clear()
 
 

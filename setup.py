@@ -1,20 +1,15 @@
-"""A setuptools based setup module.
-
-See:
-https://packaging.python.org/en/latest/distributing.html
-https://github.com/pypa/sampleproject
-"""
+"""A setuptools based setup module for ITUR-py."""
 
 # Always prefer setuptools over distutils
 from setuptools import setup, find_packages
 # To use a consistent encoding
-from codecs import open
+from codecs import open as open_codecs
 from os import path
 
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the README file
-with open(path.join(here, 'README.rst')) as f:
+with open_codecs(path.join(here, 'README.rst')) as f:
     long_description = f.read()
 
 # Arguments marked as "Required" below must be included for upload to PyPI.
@@ -47,8 +42,7 @@ setup(
     # https://packaging.python.org/specifications/core-metadata/#summary
     description='A python implementation of the ITU-R P. Recommendations',
 
-	
-	# This is an optional longer description of your project that represents
+    # This is an optional longer description of your project that represents
     # the body of text which users will see when they visit PyPI.
     #
     # Often, this is the same as your README, so you can just read it in from
@@ -58,7 +52,6 @@ setup(
     # https://packaging.python.org/specifications/core-metadata/#description-optional
     long_description=long_description,  # Optional
 
-	
     # This should be a valid link to your project's main homepage.
     #
     # This field corresponds to the "Home-Page" metadata field:
@@ -74,7 +67,7 @@ setup(
     author_email='portillo@mit.edu',
 
     license='MIT',
-	
+
     # Classifiers help users find your project by categorizing it.
     #
     # For a list of valid classifiers, see
@@ -134,17 +127,19 @@ setup(
     # If using Python 2.6 or earlier, then these have to be included in
     # MANIFEST.in as well.
     package_data={  # Optional
-        'itur': ['data/453/*.*',
-                 'data/530/*.*',
-                 'data/676/*.*',
-                 'data/836/*.*',
-                 'data/837/*.*',
-                 'data/839/*.*',
-                 'data/840/*.*',
-                 'data/1510/*.*',
-                 'data/1511/*.*']
+        'itur': ['LICENSE.txt',
+                 'README.md',
+                 'data/453/*.npz',
+                 'data/530/*.npz',
+                 'data/676/*.txt',
+                 'data/836/*.npz',
+                 'data/837/*.npz',
+                 'data/839/*.npz',
+                 'data/840/*.npz',
+                 'data/1510/*.npz',
+                 'data/1511/*.npz']
     },
-	
+
 	project_urls={  # Optional
         'Bug Reports': 'https://github.com/iportillo/ITU-Rpy/issues',
         'Source': 'https://github.com/iportillo/ITU-Rpy/',

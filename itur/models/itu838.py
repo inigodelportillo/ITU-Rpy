@@ -8,7 +8,7 @@ from astropy import units as u
 from itur.utils import prepare_quantity
 
 
-class __ITU838():
+class __ITU838__():
     """Specific attenuation model for rain for use in prediction methods
 
     Available versions include:
@@ -22,13 +22,13 @@ class __ITU838():
 
     def __init__(self, version=3):
         if version == 3:
-            self.instance = _ITU838_3()
+            self.instance = _ITU838_3_()
         elif version == 2:
-            self.instance = _ITU838_2()
+            self.instance = _ITU838_2_()
         elif version == 1:
-            self.instance = _ITU838_1()
+            self.instance = _ITU838_1_()
         elif version == 0:
-            self.instance = _ITU838_0()
+            self.instance = _ITU838_0_()
         else:
             raise ValueError(
                 'Version ' +
@@ -52,7 +52,7 @@ class __ITU838():
         return k * R**alpha
 
 
-class _ITU838_3():
+class _ITU838_3_():
 
     def __init__(self):
         self.__version__ = 3
@@ -60,7 +60,8 @@ class _ITU838_3():
         self.month = 3
         self.link = 'https://www.itu.int/rec/R-REC-P.838-3-200503-I/en'
 
-    def rain_specific_attenuation_coefficients(self, f, el, tau):
+    @staticmethod
+    def rain_specific_attenuation_coefficients(f, el, tau):
         """
 
         """
@@ -110,7 +111,7 @@ class _ITU838_3():
         return k, alpha
 
 
-class _ITU838_2():
+class _ITU838_2_():
 
     def __init__(self):
         self.__version__ = 2
@@ -118,8 +119,8 @@ class _ITU838_2():
         self.month = 4
         self.link = 'https://www.itu.int/rec/R-REC-P.838-2-200304-S/en'
 
-    @classmethod
-    def rain_specific_attenuation_coefficients(self, f, el, tau):
+    @staticmethod
+    def rain_specific_attenuation_coefficients(f, el, tau):
         """
 
         """
@@ -170,7 +171,7 @@ class _ITU838_2():
         return k, alpha
 
 
-class _ITU838_1():
+class _ITU838_1_():
 
     def __init__(self):
         self.__version__ = 1
@@ -178,8 +179,8 @@ class _ITU838_1():
         self.month = 10
         self.link = 'https://www.itu.int/rec/R-REC-P.838-1-199910-S/en'
 
-    @classmethod
-    def rain_specific_attenuation_coefficients(self, f, el, tau):
+    @staticmethod
+    def rain_specific_attenuation_coefficients(f, el, tau):
         """
         The frequency-dependent coefficients k and α are given in Table 1 for
         linear polarizations (horizontal: H, vertical: V) and horizontal paths.
@@ -226,7 +227,7 @@ class _ITU838_1():
         return k, alpha
 
 
-class _ITU838_0():
+class _ITU838_0_():
 
     def __init__(self):
         self.__version__ = 0
@@ -234,12 +235,13 @@ class _ITU838_0():
         self.month = 8
         self.link = 'https://www.itu.int/rec/R-REC-P.838-0-199203-S/en'
 
-    def rain_specific_attenuation_coefficients(self, *args, **kwargs):
-        return _ITU838_1.rain_specific_attenuation_coefficients(*args,
+    @staticmethod
+    def rain_specific_attenuation_coefficients(*args, **kwargs):
+        return _ITU838_1_.rain_specific_attenuation_coefficients(*args,
                                                                 **kwargs)
 
 
-__model = __ITU838()
+__model = __ITU838__()
 
 
 def change_version(new_version):
@@ -258,7 +260,7 @@ def change_version(new_version):
         * P.838-3 (03/05) (Current version)
     """
     global __model
-    __model = __ITU838(new_version)
+    __model = __ITU838__(new_version)
 
 
 def get_version():

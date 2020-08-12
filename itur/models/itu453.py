@@ -3,17 +3,19 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import numpy as np
 import os
+import numpy as np
 from astropy import units as u
 
 from itur.models.itu1144 import bilinear_2D_interpolator
-from itur.utils import prepare_input_array, prepare_quantity, load_data,\
-    prepare_output_array, dataset_dir
+from itur.utils import (prepare_input_array, prepare_quantity, load_data,
+                        prepare_output_array, dataset_dir)
 
 
-class __ITU453():
-    """ Implementation of the methods in Recommendation ITU-R P.453
+class __ITU453__():
+    """ Private class to model the ITU-R P.453 recommendations
+
+    Implementation of the methods in Recommendation ITU-R P.453
     "The radio refractive index: its formula and refractivity data"
 
     Available versions:
@@ -33,9 +35,9 @@ class __ITU453():
 
     def __init__(self, version=13):
         if version == 13:
-            self.instance = _ITU453_13()
+            self.instance = _ITU453_13_()
         elif version == 12:
-            self.instance = _ITU453_12()
+            self.instance = _ITU453_12_()
         else:
             raise ValueError(
                 'Version {0} is not implemented for the ITU-R P.453 model.'
@@ -78,7 +80,7 @@ class __ITU453():
         return np.array(fcn(lat, lon, p).tolist())
 
 
-class _ITU453_13():
+class _ITU453_13_():
 
     def __init__(self):
         self.__version__ = 13
@@ -94,9 +96,9 @@ class _ITU453_13():
         if not self._DN65:
             ps = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80,
                   90, 95, 98, 99, 99.5, 99.8, 99.9]
-            d_dir = os.path.join(dataset_dir, '453/v12_DN65m_%02dd%02d_v1.txt')
-            lats = load_data(os.path.join(dataset_dir, '453/v12_lat0d75.txt'))
-            lons = load_data(os.path.join(dataset_dir, '453/v12_lon0d75.txt'))
+            d_dir = os.path.join(dataset_dir, '453/v12_dn65m_%02dd%02d_v1.npz')
+            lats = load_data(os.path.join(dataset_dir, '453/v12_lat0d75.npz'))
+            lons = load_data(os.path.join(dataset_dir, '453/v12_lon0d75.npz'))
             for p_loads in ps:
                 int_p = p_loads // 1
                 frac_p = round((p_loads % 1.0) * 100)
@@ -111,9 +113,9 @@ class _ITU453_13():
         if not self._DN1:
             ps = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80,
                   90, 95, 98, 99, 99.5, 99.8, 99.9]
-            d_dir = os.path.join(dataset_dir, '453/v12_DN_%02dd%02d_v1.txt')
-            lats = load_data(os.path.join(dataset_dir, '453/v12_lat0d75.txt'))
-            lons = load_data(os.path.join(dataset_dir, '453/v12_lon0d75.txt'))
+            d_dir = os.path.join(dataset_dir, '453/v12_dn_%02dd%02d_v1.npz')
+            lats = load_data(os.path.join(dataset_dir, '453/v12_lat0d75.npz'))
+            lons = load_data(os.path.join(dataset_dir, '453/v12_lon0d75.npz'))
             for p_loads in ps:
                 int_p = p_loads // 1
                 frac_p = round((p_loads % 1.0) * 100)
@@ -128,9 +130,9 @@ class _ITU453_13():
         if not self._N_wet:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30, 50, 60, 70, 80,
                   90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '453/v13_NWET_Annual_%s.txt')
-            lats = load_data(os.path.join(dataset_dir, '453/v13_LAT_N.txt'))
-            lons = load_data(os.path.join(dataset_dir, '453/v13_LON_N.txt'))
+            d_dir = os.path.join(dataset_dir, '453/v13_nwet_annual_%s.npz')
+            lats = load_data(os.path.join(dataset_dir, '453/v13_lat_n.npz'))
+            lons = load_data(os.path.join(dataset_dir, '453/v13_lon_n.npz'))
             for p_loads in ps:
                 vals = load_data(d_dir % (str(p_loads).replace('.', '')))
                 self._N_wet[float(p_loads)] = bilinear_2D_interpolator(
@@ -241,7 +243,7 @@ class _ITU453_13():
             return N_wet_a.reshape(lat.shape)
 
 
-class _ITU453_12():
+class _ITU453_12_():
 
     def __init__(self):
         self.__version__ = 12
@@ -257,9 +259,9 @@ class _ITU453_12():
         if not self._DN65:
             ps = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80,
                   90, 95, 98, 99, 99.5, 99.8, 99.9]
-            d_dir = os.path.join(dataset_dir, '453/v12_DN65m_%02dd%02d_v1.txt')
-            lats = load_data(os.path.join(dataset_dir, '453/v12_lat0d75.txt'))
-            lons = load_data(os.path.join(dataset_dir, '453/v12_lon0d75.txt'))
+            d_dir = os.path.join(dataset_dir, '453/v12_dn65m_%02dd%02d_v1.npz')
+            lats = load_data(os.path.join(dataset_dir, '453/v12_lat0d75.npz'))
+            lons = load_data(os.path.join(dataset_dir, '453/v12_lon0d75.npz'))
             for p_loads in ps:
                 int_p = p_loads // 1
                 frac_p = round((p_loads % 1.0) * 100)
@@ -274,9 +276,9 @@ class _ITU453_12():
         if not self._DN1:
             ps = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80,
                   90, 95, 98, 99, 99.5, 99.8, 99.9]
-            d_dir = os.path.join(dataset_dir, '453/v12_DN_%02dd%02d_v1.txt')
-            lats = load_data(os.path.join(dataset_dir, '453/v12_lat0d75.txt'))
-            lons = load_data(os.path.join(dataset_dir, '453/v12_lon0d75.txt'))
+            d_dir = os.path.join(dataset_dir, '453/v12_dn_%02dd%02d_v1.npz')
+            lats = load_data(os.path.join(dataset_dir, '453/v12_lat0d75.npz'))
+            lons = load_data(os.path.join(dataset_dir, '453/v12_lon0d75.npz'))
             for p_loads in ps:
                 int_p = p_loads // 1
                 frac_p = round((p_loads % 1.0) * 100)
@@ -289,34 +291,39 @@ class _ITU453_12():
 
     def N_wet(self, lat, lon):
         if not self._N_wet:
-            vals = load_data(os.path.join(dataset_dir, '453/v12_ESANWET.txt'))
-            lats = load_data(os.path.join(dataset_dir, '453/v12_ESALAT.txt'))
-            lons = load_data(os.path.join(dataset_dir, '453/v12_ESALON.txt'))
+            vals = load_data(os.path.join(dataset_dir, '453/v12_esanwet.npz'))
+            lats = load_data(os.path.join(dataset_dir, '453/v12_esalat.npz'))
+            lons = load_data(os.path.join(dataset_dir, '453/v12_esalon.npz'))
             self._N_wet = bilinear_2D_interpolator(lats, lons, vals)
 
         return self._N_wet(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
-    def wet_term_radio_refractivity(self, e, T):
-        return _ITU453_13.wet_term_radio_refractivity(e, T)
+    @staticmethod
+    def wet_term_radio_refractivity(e, T):
+        return _ITU453_13_.wet_term_radio_refractivity(e, T)
 
-    def dry_term_radio_refractivity(self, Pd, T):
-        return _ITU453_13.dry_term_radio_refractivity(Pd, T)
+    @staticmethod
+    def dry_term_radio_refractivity(Pd, T):
+        return _ITU453_13_.dry_term_radio_refractivity(Pd, T)
 
-    def radio_refractive_index(self, P, e, T):
-        return _ITU453_13.radio_refractive_index(P, e, T)
+    @staticmethod
+    def radio_refractive_index(P, e, T):
+        return _ITU453_13_.radio_refractive_index(P, e, T)
 
-    def water_vapour_pressure(self, T, P, H, type_hydrometeor='water'):
-        return _ITU453_13.water_vapour_pressure(T, P, H, type_hydrometeor)
+    @staticmethod
+    def water_vapour_pressure(T, P, H, type_hydrometeor='water'):
+        return _ITU453_13_.water_vapour_pressure(T, P, H, type_hydrometeor)
 
-    def saturation_vapour_pressure(self, T, P, type_hydrometeor='water'):
-        return _ITU453_13.saturation_vapour_pressure(T, P, type_hydrometeor)
+    @staticmethod
+    def saturation_vapour_pressure(T, P, type_hydrometeor='water'):
+        return _ITU453_13_.saturation_vapour_pressure(T, P, type_hydrometeor)
 
     def map_wet_term_radio_refractivity(self, lat, lon, p):
         return self.N_wet(lat, lon)
 
 
-__model = __ITU453()
+__model = __ITU453__()
 
 
 def change_version(new_version):
@@ -324,20 +331,32 @@ def change_version(new_version):
     Change the version of the ITU-R P.453 recommendation currently being used.
 
 
+    This function changes the model used for the ITU-R P.453 recommendation
+    to a different version.
+
     Parameters
     ----------
     new_version : int
         Number of the version to use.
         Valid values are:
-           * P.453-12 (02/12) (Current version)
+            * P.453-13 (12/17)
+            * P.453-12 (07/15)
+
     """
     global __model
-    __model = __ITU453(new_version)
+    __model = __ITU453__(new_version)
 
 
 def get_version():
-    """
+    """ The version of the current model for the ITU-R P.453 recommendation.
+
+
     Obtain the version of the ITU-R P.453 recommendation currently being used.
+
+    Returns
+    -------
+    version: int
+       The version of the ITU-R P.453 recommendation being used.
     """
     global __model
     return __model.__version__
