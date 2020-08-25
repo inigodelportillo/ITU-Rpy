@@ -18,7 +18,7 @@ dataset_dir = os.path.join(dir_path, 'data/')
 
 # Create a memory cache to memoize results of some functions
 cachedir = mkdtemp()
-memory = Memory(cachedir=cachedir, verbose=0)
+memory = Memory(location=cachedir, verbose=0)
 
 __NUMERIC_TYPES__ = [numbers.Number, int, float, complex,
                      np.float, np.float16, np.float32, np.float64,
