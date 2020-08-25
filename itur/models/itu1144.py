@@ -1,11 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-import numpy as np
-from scipy.interpolate import griddata, RegularGridInterpolator
-
 """
 Interpolation methods for the geophysical properties used to compute
 propagation effects. These methods are based on those in Recommendation
@@ -16,13 +9,20 @@ References
 [1] Guide to the application of the propagation methods of Radiocommunication
 Study Group 3: https://www.itu.int/rec/R-REC-P.1144/en
 """
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+import numpy as np
+from scipy.interpolate import griddata, RegularGridInterpolator
 
 
 def is_regular_grid(lats_o, lons_o):
-    '''
+    """
+    Determinere whether the grids in lats_o and lons_o are both regular grids
+    or not.
 
-    Returns whether the grids in lats_o and lons_o are both regular grids or
-    not. A grid is regular if the difference (column-wise or row-wise)
+    A grid is regular if the difference (column-wise or row-wise)
     between consecutive values is constant across the grid.
 
 
@@ -37,12 +37,13 @@ def is_regular_grid(lats_o, lons_o):
     Returns
     --------
         is_regular: boolean
-    '''
+    """
     Delta_lons = np.unique(np.diff(lons_o, axis=1))
     Delta_lats = np.unique(np.diff(lats_o, axis=0))
 
-    return (Delta_lons.size == 1 and (Delta_lons != 0).all() and
-            Delta_lats.size == 1 and (Delta_lats != 0).all())
+    return (np.allclose(Delta_lons, Delta_lons[0], rtol=1e-5) and
+            np.allclose(Delta_lats, Delta_lats[0], rtol=1e-5) and
+            (Delta_lons != 0).all() and (Delta_lats != 0).all())
 
 ###############################################################################
 #                       Nearest Neighbour Interpolation                       #
@@ -50,7 +51,7 @@ def is_regular_grid(lats_o, lons_o):
 
 
 def nearest_2D_interpolator(lats_o, lons_o, values):
-    '''
+    """
     Produces a 2D interpolator function using the nearest value interpolation
     method. If the grids are regular grids, uses the
     scipy.interpolate.RegularGridInterpolator,
@@ -75,7 +76,7 @@ def nearest_2D_interpolator(lats_o, lons_o, values):
     --------
     interpolator: function
         Nearest neighbour interpolator function
-    '''
+    """
     # Determine if we are dealing with a regular grid
     if is_regular_grid(lats_o[2:-2, 2:-2], lons_o[2:-2, 2:-2]):
         return _nearest_2D_interpolator_reg(lats_o, lons_o, values)
@@ -83,7 +84,7 @@ def nearest_2D_interpolator(lats_o, lons_o, values):
         return _nearest_2D_interpolator_arb(lats_o, lons_o, values)
 
 
-def _nearest_2D_interpolator_reg(lats_o, lons_o, values, lats_d, lons_d):
+def _nearest_2D_interpolator_reg(lats_o, lons_o, values):
     f = RegularGridInterpolator((np.flipud(lats_o[:, 0]), lons_o[0, :]),
                                 np.flipud(values), method='nearest',
                                 bounds_error=False)
@@ -100,7 +101,7 @@ def _nearest_2D_interpolator_arb(lats_o, lons_o, values):
 ###############################################################################
 
 def bilinear_2D_interpolator(lats_o, lons_o, values):
-    '''
+    """
     Produces a 2D interpolator function using the bilinear interpolation
     method. If the grids are regular grids, uses the
     scipy.interpolate.RegularGridInterpolator,
@@ -125,7 +126,7 @@ def bilinear_2D_interpolator(lats_o, lons_o, values):
     --------
     interpolator: function
         Bilinear interpolator function
-    '''
+    """
     if is_regular_grid(lats_o[2:-2, 2:-2], lons_o[2:-2, 2:-2]):
         return _bilinear_2D_interpolator_reg(lats_o, lons_o, values)
     else:
@@ -149,7 +150,7 @@ def _bilinear_2D_interpolator_arb(lats_o, lons_o, values):
 ###############################################################################
 
 def bicubic_2D_interpolator(lats_o, lons_o, values):
-    '''
+    """
     Produces a 2D interpolator function using the bicubic interpolation
     method. Uses the scipy.intepolate.griddata method.
 
@@ -172,7 +173,7 @@ def bicubic_2D_interpolator(lats_o, lons_o, values):
     --------
     interpolator: function
         Bicubic interpolator function
-    '''
+    """
     if is_regular_grid(lats_o[2:-2, 2:-2], lons_o[2:-2, 2:-2]):
         return _bicubic_2D_interpolator_reg(lats_o, lons_o, values)
     else:

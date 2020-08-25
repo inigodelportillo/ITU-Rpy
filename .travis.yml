@@ -1,18 +1,19 @@
 language: python
 virtualenv:
   system_site_packages: true
+services:
+  - xvfb
 python:
   - "2.7"
-  - "3.4"
+  - "3.5"
 install:
   - pip install -r requirements.txt
   - pip install .
   - pip install matplotlib
-  - pip install nose coverage
+  - pip install nose coverage==4.5.2
   - pip install coveralls
 before_script: # configure a headless display to test plot generation
   - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
   - sleep 3 # give xvfb some time to start
 script:
   - python setup.py nosetests --processes=1 --process-timeout=400 --verbosity 2 --with-coverage --cover-package itur  

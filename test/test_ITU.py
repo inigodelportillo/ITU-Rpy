@@ -25,6 +25,18 @@ def suite():
     """
     suite = test.TestSuite()
 
+    # Ensure models are in the right version
+    models.itu453.change_version(13)
+    models.itu618.change_version(13)
+    models.itu676.change_version(11)
+    models.itu836.change_version(6)
+    models.itu837.change_version(7)
+    models.itu838.change_version(3)
+    models.itu839.change_version(4)
+    models.itu840.change_version(7)
+    models.itu1510.change_version(1)
+    models.itu1511.change_version(1)
+
     # ITU-R P.676 tests (Gaseous attenuation)
     suite.addTest(ITUR676_9TestCase('test_gammaw'))
     suite.addTest(ITUR676_9TestCase('test_gamma0'))
@@ -78,6 +90,7 @@ def suite():
 
     # ITU-R P.1511 tests (Topographic altitude)
     suite.addTest(ITUR1511_1TestCase('test_topographic_altitude'))
+    suite.addTest(ITUR1511_2TestCase('test_topographic_altitude'))
 
     return suite
 
@@ -5745,12 +5758,16 @@ class ITUR618_12TestCase(test.TestCase):
 class ITUR618_13TestCase(test.TestCase):
 
     def setUp(self):
-        models.itu618.change_version(13)
         models.itu453.change_version(13)
-        models.itu838.change_version(3)
+        models.itu618.change_version(13)
+        models.itu676.change_version(11)
         models.itu836.change_version(6)
         models.itu837.change_version(7)
+        models.itu838.change_version(3)
+        models.itu839.change_version(4)
         models.itu840.change_version(7)
+        models.itu1510.change_version(1)
+        models.itu1511.change_version(1)
 
     def test_rain_attenuation(self):
         self.assertAlmostEqual(
@@ -7839,6 +7856,38 @@ class ITUR1511_1TestCase(test.TestCase):
         self.assertAlmostEqual(
             models.itu1511.topographic_altitude(51.5, -0.14).value,
             0.06916422, places=5)
+
+
+class ITUR1511_2TestCase(test.TestCase):
+
+    def setUp(self):
+        models.itu1511.change_version(2)
+
+    def test_topographic_altitude(self):
+        self.assertAlmostEqual(
+            models.itu1511.topographic_altitude(51.5, -0.14).value,
+            0.031382983999999, places=4)
+        self.assertAlmostEqual(
+            models.itu1511.topographic_altitude(41.9, 12.49).value,
+            0.0461229880100015, places=4)
+        self.assertAlmostEqual(
+            models.itu1511.topographic_altitude(33.94, 18.43).value,
+            0, places=5)
+        self.assertAlmostEqual(
+            models.itu1511.topographic_altitude(22.9, -43.23).value,
+            0, places=5)
+        self.assertAlmostEqual(
+            models.itu1511.topographic_altitude(25.78, -80.22).value,
+            0.00861727999508758, places=4)
+        self.assertAlmostEqual(
+            models.itu1511.topographic_altitude(28.717, 77.3).value,
+            0.209383698952704, places=4)
+        self.assertAlmostEqual(
+            models.itu1511.topographic_altitude(3.133, 101.7).value,
+            0.0512514559528945, places=4)
+        self.assertAlmostEqual(
+            models.itu1511.topographic_altitude(9.05, 38.7).value,
+            2.5398618775, places=4)
 
 
 if __name__ == '__main__':

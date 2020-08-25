@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
-import numpy as np
-import matplotlib.pyplot as plt
-from satcomm_utils import RE, LLA_to_ECEF
-from scipy.special import jv
-
-
 """
-Method to compute the antenna gain in angles different from the boresight. 
-The method is based on the 2nd one found in Recommendation ITU-R S.1528-0. 
+Method to compute the antenna gain in angles different from the boresight.
+
+
+The method is based on the 2nd one found in Recommendation ITU-R S.1528-0.
 
 References
 --------
 [1] Satellite antenna radiation patterns for non-geostationary orbit satellite
-antennas operating in the fixed-satellite service below 30 GHz: 
+antennas operating in the fixed-satellite service below 30 GHz:
 https://www.itu.int/rec/R-REC-S.1528/en
 """
+
+import numpy as np
+import matplotlib.pyplot as plt
+from satcomm_utils import RE, LLA_to_ECEF
+from scipy.special import jv
 
 
 def convert_nparray(arr):
@@ -118,7 +119,8 @@ def calculate_gain(lat_boresight, lon_boresight, lat_sat, lon_sat, lat, lon, a,
     else:
         psi = convert_nparray(psi)
 
-    assert all(0 <= angle <= 90 for angle in psi)
+    if not all(0 <= angle <= 90 for angle in psi):
+        raise RuntimeError('Value of psi is not within bounds 0 - 90 degrees')
 
     if psi_b is None:
         psi_b = np.sqrt(1200)/(D/l)
@@ -184,7 +186,8 @@ def calculate_gain_1528(lat_boresight, lon_boresight, lat_sat, lon_sat, lat, lon
     else:
         psi = convert_nparray(psi)
 
-    assert all(0 <= angle <= 90 for angle in psi)
+    if not all(0 <= angle <= 90 for angle in psi):
+        raise RuntimeError('Value of psi is not within bounds 0 - 90 degrees')
 
     if psi_b is None:
         psi_b = np.sqrt(1200)/(D/l)
