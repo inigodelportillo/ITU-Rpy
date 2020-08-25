@@ -750,6 +750,7 @@ class ITUR676_11TestCase(test.TestCase):
     def setUp(self):
         models.itu676.change_version(11)
         models.itu836.change_version(6)
+        models.itu1511.change_version(1)
 
     def test_gammaw_exact(self):
         # The ITU models are non-sense and believe that the conversion between
