@@ -87,7 +87,6 @@ def __gammaw_exact__(self, f, p, rho, T):
 
 class __ITU676__():
     """Attenuation by atmospheric gases.
-
     Available versions include:
        * P.676-9 (02/12) (Superseded)
        * P.676-10 (09/13) (Superseded)
@@ -369,7 +368,7 @@ class _ITU676_12_():
             # Use the zenit water-vapour method if the values of V_t
             # and h are provided
             if V_t is not None and h is not None:
-                Aw = self.zenit_water_vapour_attenuation(None, None, None,
+               rho_ref, t_ref, a, b, ab, Aw = self.zenit_water_vapour_attenuation(None, None, None,
                                                          f, V_t, h)
             else:
                 Aw = gammaw * hw
@@ -482,7 +481,7 @@ class _ITU676_12_():
                     gammaw_approx_vect(f, p_ref, rho_ref, t_ref + 273.15) /
                     gammaw_approx_vect(f_ref, p_ref, rho_ref, t_ref + 273.15))
 
-        return np.where(f < 20, Aw_term1, Aw_term1 * (a * h ** b + 1))
+        return rho_ref, t_ref, a, b, (a*(h**b) + 1), np.where(f < 20, Aw_term1, Aw_term1 * (a * h ** b + 1))
 
 
 class _ITU676_11_():
@@ -1199,8 +1198,6 @@ __model = __ITU676__()
 def change_version(new_version):
     """
     Change the version of the ITU-R P.676 recommendation currently being used.
-
-
     Parameters
     ----------
     new_version : int
@@ -1230,14 +1227,11 @@ def gaseous_attenuation_terrestrial_path(r, f, el, rho, P, T, mode):
     """
     Estimate the attenuation of atmospheric gases on terrestrial paths.
     This function operates in two modes, 'approx', and 'exact':
-
     * 'approx': a simplified approximate method to estimate gaseous attenuation
     that is applicable in the frequency range 1-350 GHz.
     * 'exact': an estimate of gaseous attenuation computed by summation of
     individual absorption lines that is valid for the frequency
     range 1-1,000 GHz
-
-
     Parameters
     ----------
     r : number or Quantity
@@ -1256,13 +1250,10 @@ def gaseous_attenuation_terrestrial_path(r, f, el, rho, P, T, mode):
         Mode for the calculation. Valid values are 'approx', 'exact'. If
         'approx' Uses the method in Annex 2 of the recommendation (if any),
         else uses the method described in Section 1. Default, 'approx'
-
-
     Returns
     -------
     attenuation: Quantity
         Terrestrial path attenuation (dB)
-
     References
     --------
     [1] Attenuation by atmospheric gases:
@@ -1285,14 +1276,11 @@ def gaseous_attenuation_slant_path(f, el, rho, P, T, V_t=None, h=None,
     """
     Estimate the attenuation of atmospheric gases on slant paths. This function
     operates in two modes, 'approx', and 'exact':
-
     * 'approx': a simplified approximate method to estimate gaseous attenuation
     that is applicable in the frequency range 1-350 GHz.
     * 'exact': an estimate of gaseous attenuation computed by summation of
     individual absorption lines that is valid for the frequency
     range 1-1,000 GHz
-
-
     Parameters
     ----------
     f : number or Quantity
@@ -1320,13 +1308,10 @@ def gaseous_attenuation_slant_path(f, el, rho, P, T, V_t=None, h=None,
         Mode for the calculation. Valid values are 'approx', 'exact'. If
         'approx' Uses the method in Annex 2 of the recommendation (if any),
         else uses the method described in Section 1. Default, 'approx'
-
-
     Returns
     -------
     attenuation: Quantity
         Slant path attenuation (dB)
-
     References
     --------
     [1] Attenuation by atmospheric gases:
@@ -1351,14 +1336,11 @@ def gaseous_attenuation_inclined_path(f, el, rho, P, T, h1, h2, mode='approx'):
     Estimate the attenuation of atmospheric gases on inclined paths between two
     ground stations at heights h1 and h2. This function operates in two modes,
     'approx', and 'exact':
-
     * 'approx': a simplified approximate method to estimate gaseous attenuation
     that is applicable in the frequency range 1-350 GHz.
     * 'exact': an estimate of gaseous attenuation computed by summation of
     individual absorption lines that is valid for the frequency
     range 1-1,000 GHz
-
-
     Parameters
     ----------
     f : number or Quantity
@@ -1379,13 +1361,10 @@ def gaseous_attenuation_inclined_path(f, el, rho, P, T, h1, h2, mode='approx'):
         Mode for the calculation. Valid values are 'approx', 'exact'. If
         'approx' Uses the method in Annex 2 of the recommendation (if any),
         else uses the method described in Section 1. Default, 'approx'
-
-
     Returns
     -------
     attenuation: Quantity
         Inclined path attenuation (dB)
-
     References
     --------
     [1] Attenuation by atmospheric gases:
@@ -1407,24 +1386,20 @@ def gaseous_attenuation_inclined_path(f, el, rho, P, T, h1, h2, mode='approx'):
 def slant_inclined_path_equivalent_height(f, p):
     """ Computes the equivalent height to be used for oxygen and water vapour
     gaseous attenuation computations.
-
     Parameters
     ----------
     f : number or Quantity
         Frequency (GHz)
     p : number
         Percentage of the time the gaseous attenuation value is exceeded.
-
     Returns
     -------
     ho, hw : Quantity
         Equivalent height for oxygen and water vapour (m)
-
     References
     --------
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
-
     """
     type_output = type(f)
     f = prepare_quantity(f, u.GHz, 'Frequency')
@@ -1439,8 +1414,6 @@ def zenit_water_vapour_attenuation(lat, lon, p, f, V_t=None, h=None):
     An alternative method may be used to compute the slant path attenuation by
     water vapour, in cases where the integrated water vapour content along the
     path, ``V_t``, is known.
-
-
     Parameters
     ----------
     lat : number, sequence, or numpy.ndarray
@@ -1459,13 +1432,10 @@ def zenit_water_vapour_attenuation(lat, lon, p, f, V_t=None, h=None):
     h : number, sequence, or numpy.ndarray
         Altitude of the receivers. If None, use the topographical altitude as
         described in recommendation ITU-R P.1511
-
-
     Returns
     -------
     A_w : Quantity
         Water vapour attenuation along the slant path (dB)
-
     References
     --------
     [1] Attenuation by atmospheric gases:
@@ -1490,8 +1460,6 @@ def gammaw_approx(f, P, rho, T):
     """
     Method to estimate the specific attenuation due to water vapour using the
     approximate method descibed in Annex 2.
-
-
     Parameters
     ----------
     f : number or Quantity
@@ -1502,13 +1470,10 @@ def gammaw_approx(f, P, rho, T):
         Water vapor density (g/m3)
     T : number or Quantity
         Absolute temperature (K)
-
-
     Returns
     -------
     gamma_w : Quantity
         Water vapour specific attenuation (dB/km)
-
     References
     --------
     [1] Attenuation by atmospheric gases:
@@ -1528,7 +1493,6 @@ def gamma0_approx(f, P, rho, T):
     """
     Method to estimate the specific attenuation due to dry atmosphere using the
     approximate method descibed in Annex 2.
-
     Parameters
     ----------
     f : number or Quantity
@@ -1539,13 +1503,10 @@ def gamma0_approx(f, P, rho, T):
         Water vapor density (g/m3)
     T : number or Quantity
         Absolute temperature (K)
-
-
     Returns
     -------
     gamma_w : Quantity
         Dry atmosphere specific attenuation (dB/km)
-
     References
     --------
     [1] Attenuation by atmospheric gases:
@@ -1565,8 +1526,6 @@ def gammaw_exact(f, P, rho, T):
     """
     Method to estimate the specific attenuation due to water vapour using
     the line-by-line method described in Annex 1 of the recommendation.
-
-
     Parameters
     ----------
     f : number or Quantity
@@ -1577,13 +1536,10 @@ def gammaw_exact(f, P, rho, T):
         Water vapor density (g/m3)
     T : number or Quantity
         Absolute temperature (K)
-
-
     Returns
     -------
     gamma_w : Quantity
         Water vapour specific attenuation (dB/km)
-
     References
     --------
     [1] Attenuation by atmospheric gases:
@@ -1603,7 +1559,6 @@ def gamma0_exact(f, P, rho, T):
     """
     Method to estimate the specific attenuation due to dry atmosphere using
     the line-by-line method described in Annex 1 of the recommendation.
-
     Parameters
     ----------
     f : number or Quantity
@@ -1614,13 +1569,10 @@ def gamma0_exact(f, P, rho, T):
         Water vapor density (g/m3)
     T : number or Quantity
         Absolute temperature (K)
-
-
     Returns
     -------
     gamma_w : Quantity
         Dry atmosphere specific attenuation (dB/km)
-
     References
     --------
     [1] Attenuation by atmospheric gases:
@@ -1640,8 +1592,6 @@ def gamma_exact(f, P, rho, T):
     """
     Method to estimate the specific attenuation using the line-by-line method
     described in Annex 1 of the recommendation.
-
-
     Parameters
     ----------
     f : number or Quantity
@@ -1652,12 +1602,10 @@ def gamma_exact(f, P, rho, T):
         Water vapor density (g/m3)
     T : number or Quantity
         Absolute temperature (K)
-
     Returns
     -------
     gamma : Quantity
         Specific attenuation (dB/km)
-
     References
     --------
     [1] Attenuation by atmospheric gases:
