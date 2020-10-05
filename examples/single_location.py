@@ -58,7 +58,7 @@ R001 = itur.models.itu837.rainfall_rate(lat, lon, p)
 h_0 = itur.models.itu839.isoterm_0(lat, lon)
 h_rain = itur.models.itu839.rain_height(lat, lon)
 L_red = itur.models.itu840.columnar_content_reduced_liquid(lat, lon, p)
-A_w = itur.models.itu676.zenit_water_vapour_attenuation(lat, lon, p, f, h=hs)
+rho_ref, t_ref, a, b, ab, A_w = itur.models.itu676.zenit_water_vapour_attenuation(lat, lon, p, f, h=hs)
 
 print('  - Rain attenuation probability                [ITU-R P.618]   {0:.1f}'
       .format(R_prob))
