@@ -169,7 +169,7 @@ class _ITU618_13():
                 RuntimeWarning('The method to compute the rain attenuation in '
                                'recommendation ITU-P 618-12 is only valid for '
                                'unavailability values between 0.001 and 5'))
-
+        
         Re = 8500   # Efective radius of the Earth (8500 km)
 
         if hs is None:

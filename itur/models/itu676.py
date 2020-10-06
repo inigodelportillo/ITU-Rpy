@@ -146,8 +146,40 @@ class __ITU676__():
 
     def gaseous_attenuation_slant_path(self, f, el, rho, P, T, V_t, h, mode):
         # Abstract method to compute the gaseous attenuation over a slant path
-        fcn = np.vectorize(self.instance.gaseous_attenuation_slant_path)
-        return fcn(f, el, rho, P, T, V_t, h, mode)
+        # print("f is:")
+        # print(f)
+        # print("el is:")
+        # print(el)
+        # print(np.shape(el))
+        # print("rho is: ")
+        # rho = np.linspace(1,10, 10)
+        # print(rho)
+        # print(np.shape(rho))
+        # print("P is:")
+        # print(P)
+        # print("T is: ")
+        # print(T)
+        # print("V_t is:")
+        # V_t = np.linspace(20, 40, 10)
+        # print(V_t)
+        # print("h is:")
+        # print(h)
+        # print("mode is: ")
+        # print(mode)
+        
+        output = []
+        for i in range(len(V_t)):
+            inner = []
+            for j in range(len(el)):
+                toAdd = self.instance.gaseous_attenuation_slant_path(f, el[j], rho[i], P, T, V_t[i],
+                                       h=None, mode='approx')
+                inner.append(toAdd)
+            output.append(inner)
+                
+        
+        #fcn = np.vectorize(self.instance.gaseous_attenuation_slant_path)
+        #return fcn(f, el, rho, P, T, V_t, h, mode)
+        return output
 
     def slant_inclined_path_equivalent_height(self, f, p):
         fcn = np.vectorize(self.instance.slant_inclined_path_equivalent_height,
@@ -1319,13 +1351,16 @@ def gaseous_attenuation_slant_path(f, el, rho, P, T, V_t=None, h=None,
     """
     type_output = type(el)
     f = prepare_quantity(f, u.GHz, 'Frequency')
-    el = prepare_quantity(prepare_input_array(el), u.deg, 'Elevation angle')
+    #print(el)
+    #el = prepare_quantity(prepare_input_array(el), u.deg, 'Elevation angle')
+    #print(el)
     rho = prepare_quantity(rho, u.g / u.m**3, 'Water vapor density')
     P = prepare_quantity(P, u.hPa, 'Atospheric pressure')
     T = prepare_quantity(T, u.K, 'Temperature')
     V_t = prepare_quantity(V_t, u.kg / u.m**2,
                            'Integrated water vapour content')
     h = prepare_quantity(h, u.km, 'Altitude')
+    
     val = __model.gaseous_attenuation_slant_path(
             f, el, rho, P, T, V_t, h, mode)
     return prepare_output_array(val, type_output) * u.dB
