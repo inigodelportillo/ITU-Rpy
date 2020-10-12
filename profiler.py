@@ -31,10 +31,6 @@ pListL = np.append(pListL, 0.01)
 pListL = np.append(pListL, 0.001)
 pListL = np.append(pListL, .0005)
 
-#p values for small 2D data table 
-pS = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
-pListS = np.array(pS)
-
 #elevation angle values for full large 2D table
 #create a numpy list of the correct elevation angle inputs
 eleListL =  np.arange(start = 0.5, stop = 90.5, step = 0.5) 
@@ -42,30 +38,19 @@ eleListL = np.flip(eleListL)
 eleListL = np.append(eleListL, 0.1)
 eleListL = np.flip(eleListL)
 
-#elevation angle values for an extra large 2D table
-eleListXl = np.arange(start = 0.5, stop = 90.25, step = 0.25)
-
-#Elevation angle  values for creating a very large 2D Table
-bigList = np.arange(start = 0.1, stop = 90.05, step = 0.05)
-
-#Elevation angle values for creating a 2D data table with 1M entries
-vBigList = np.arange(start = 0.1, stop = 90.0005, step = 0.005)
-
-#elevation angle values for small 2D data table
-eleS = [1, 2, 3, 4, 5, 6, 7, 8]
-eleListS = np.array(eleS)
-
-#probability lists
+#Extra probability lists
 pList8 = np.linspace(1, 5, 8)
 pList62 = np.linspace(1, 5, 62)
 pList100 = np.linspace(1, 5, 100)
+pList1000 =np.linspace(1, 5, 1000)
 pList10000 = np.linspace(1, 5, 10000)
 
-#elevation angle lists
+#Extra elevation angle lists
 eleList8 = np.linspace(30, 60, 8)
-eleList100 =np.linspace(30, 60, 100)
+eleList100 = np.linspace(30, 60, 100)
 eleList181 = np.linspace(30, 60, 181)
 eleList359 = np.linspace(30, 60, 359)
+eleList1000 = np.linspace(30, 60, 1000)
 eleList1779 = np.linspace(30, 60, 1779)
 eleList10000 = np.linspace(30, 60, 10000)
 eleList17981 = np.linspace(30, 60, 17981)

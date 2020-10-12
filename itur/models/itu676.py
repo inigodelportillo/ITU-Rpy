@@ -145,40 +145,51 @@ class __ITU676__():
         return fcn(r, f, el, rho, P, T, mode)
 
     def gaseous_attenuation_slant_path(self, f, el, rho, P, T, V_t, h, mode):
+        print("-------------------------------")
+        print("Gas Stuff")
+        print()
         # Abstract method to compute the gaseous attenuation over a slant path
         # print("f is:")
         # print(f)
-        # print("el is:")
-        # print(el)
-        # print(np.shape(el))
-        # print("rho is: ")
+        print("el is:")
+        #print(el)
+        print(np.shape(el))
+        print()
+        
+        print("rho is: ")
         # rho = np.linspace(1,10, 10)
-        # print(rho)
-        # print(np.shape(rho))
+        #print(rho)
+        print(np.shape(rho))
+        print()
+        
         # print("P is:")
         # print(P)
         # print("T is: ")
         # print(T)
-        # print("V_t is:")
+        print("V_t is:")
         # V_t = np.linspace(20, 40, 10)
-        # print(V_t)
+        #print(V_t)
+        print(np.shape(V_t))
+        print()
         # print("h is:")
         # print(h)
         # print("mode is: ")
         # print(mode)
         
+        
+        
         output = []
-        for i in range(len(V_t)):
+        for i, j in zip(rho, V_t):
             inner = []
-            for j in range(len(el)):
-                toAdd = self.instance.gaseous_attenuation_slant_path(f, el[j], rho[i], P, T, V_t[i],
-                                       h=None, mode='approx')
+            for k in el:
+                toAdd = self.instance.gaseous_attenuation_slant_path(f, k, i, P, T, j,
+                                        h=None, mode='approx')
                 inner.append(toAdd)
             output.append(inner)
                 
         
-        #fcn = np.vectorize(self.instance.gaseous_attenuation_slant_path)
-        #return fcn(f, el, rho, P, T, V_t, h, mode)
+        # fcn = np.vectorize(self.instance.gaseous_attenuation_slant_path)
+        # return np.array(fcn(f, el, rho, P, T, V_t, h, mode).toList())
         return output
 
     def slant_inclined_path_equivalent_height(self, f, p):
