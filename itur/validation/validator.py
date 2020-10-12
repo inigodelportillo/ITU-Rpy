@@ -33,7 +33,7 @@ The validation scripts that are currently supported are as follows:
             Error statistics for gaseous attenuation, cloud attenuation, rain
             attenuation, scintillation attenuation, and total attenuation
 -------------------------------------------------------------------------------
-    gasoues_attenuation_validation()
+    gaseous_attenuation_validation()
     
         This function determines the error for the gaseous attenuation as well 
         as the error for intermediate values that are used to determine the
