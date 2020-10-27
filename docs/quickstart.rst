@@ -317,7 +317,7 @@ We conclude the quickstart with a summary of other functions included in *ITU-Rp
 	# Compute atmospheric parameters
 	hs = itur.topographic_altitude(lat, lon)
 	T = itur.surface_mean_temperature(lat, lon)
-	P = itur.pressure(lat, hs)
+	P = itur.standard_pressure(lat, hs)
 	rho_p = itur.surface_water_vapour_density(lat, lon, p, hs)
 	rho_sa = itur.models.itu835.water_vapour_density(lat, hs)
 	T_sa = itur.models.itu835.temperature(lat, hs)
