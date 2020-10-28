@@ -7,46 +7,41 @@ Created on Thu Oct 15 17:24:31 2020
 @author: MAW32652
 """
 
-def minSq(m, n, r, sqList = []):
+def tiler(m, n, dimList = []):
+    """
+    Tiler outputs the size of the tiles (squares), that are required to fill 
+    a rectangle of arbitrary dimension. 
     
-    # print("this is m:")
-    # print(m)
-    # print()
+    Note: It does not find the minimum number of squares, but finds a number of squares. 
     
-    # print("this is n:")
-    # print(n)
-    # print()
-    
-    # print("this is r:")
-    # print(r)
-    # print()
+    m = len of horz dimension
+    n = len of vert dimension
+    """
     
     #if the input lists are of the same length
     if len(m) == len(n):
-        #append the add the results to the list of results.
-        sqList.append(r)
-        print("Done!")
-        print("Your List of square's is: " + str(sqList))
+        #add the length of either dimension to the list. 
+        dimList.append(len(m))
         #return the lsit of results. 
-        return sqList
+        return dimList
     
     #case where the m dimension is larger than the n dimension
     elif len(m) > len(n):
-        #append the results for m - n and all of n
-        sqList.append(r[:len(n), :len(n)])
+        #append the length of the smaller dimension, n.
+        dimList.append(len(n))
         
-        #do minSq on the rest of the rectangle
+        #do tiler on the rest of the rectangle
         #start at len(n) to the end and all of n. 
-        return minSq(m[len(n):], n, r[:, len(n):], sqList)
+        return tiler(m[len(n):], n, dimList)
     
     #case where the n dimension is larger than the m dimension.
     elif len(n) > len(m):
-        #append the results for all of m and n - m.
-        sqList.append(r[:len(m), :len(m)])
+        #append the length of the smaller dimension, m.
+        dimList.append(len(m))
         
-        #do minSq on the rest of the rectangle
+        #do tiler on the rest of the rectangle
         #start at all of m and at len(m)
-        return minSq(m, n[len(m):], r[len(m):, :], sqList)
+        return tiler(m, n[len(m):], dimList)
     
 
     
