@@ -11,6 +11,8 @@ import datetime
 import cProfile
 import itur
 import numpy as np
+from tableCreator_v3 import tableCreator
+
 
 ###input variables lists
 lat = 39 #latitude
@@ -89,6 +91,11 @@ def runtime(pList, eleList, mode):
                                                   return_contributions =False, include_gas = True)
         count +=1
     
+    elif mode == "tiled":
+        result = tableCreator(pList, eleList)
+        count += 1
+        return result
+    
     elif mode == "nested":
         #Using nested for loops used to fill in the 2D Data table       
         for i in pList:
@@ -105,7 +112,3 @@ def runtime(pList, eleList, mode):
         #print("Number of Rows: " + str(len(outputs[0])))        
         print("Number of Rows: " + str(count))
     
-    
-
-
-
