@@ -11,7 +11,7 @@ import datetime
 import cProfile
 import itur
 import numpy as np
-from tableCreator_v3 import tableCreator
+from tiledTable import tiledTable
 
 
 ###input variables lists
@@ -60,7 +60,7 @@ eleList17981 = np.linspace(30, 60, 17981)
 
 
 
-def runtime(pList, eleList, mode):
+def runtime(pList, eleList, mode, lat = lat, lon = lon, hs = hs, f = f, d = d, tau = tau):
     #compute the outputs
     begin_time = datetime.datetime.now()
     outputs = [] 
@@ -92,8 +92,14 @@ def runtime(pList, eleList, mode):
         count +=1
     
     elif mode == "tiled":
-        result = tableCreator(pList, eleList)
+        result = tiledTable(pList, eleList, lat = lat, lon = lon, hs = hs, f = f, d = d, tau = tau)
         count += 1
+        print("Total runtime: "  + str(datetime.datetime.now() - begin_time))
+
+        print("Number of Columns: " + str(len(result)))
+       
+        print("Number of Rows: " + str(len(result[0])))        
+            
         return result
     
     elif mode == "nested":

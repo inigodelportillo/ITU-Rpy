@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-creates a rectangular data table from 
-arrays of probability and elevation angle as inputs.
+Function that creates an 2D data table with probability and elevation angle as the
+varrying inputs using the square tiled rectangle approach. 
 
 Created on Wed Oct 28 13:05:02 2020
+
+Copywrite The Aerospace Corporation 2020
 
 @author: MAW32652
 """
 
 import itur
 import numpy as np
-from min_squares import tiler
+from tiler import tiler
 
-###input variables 
+###Default input variables 
 lat = 39 #latitude
 lon = 283 #longitude
 hs = 1 #altitude [km]
@@ -20,7 +22,7 @@ f = 20 #frequency [GHz]
 d = 3 #antenna diameter [m] 
 tau = 45 #polarization tilt angle [degrees]
 
-def tableCreator(pList, eleList):
+def tiledTable(pList, eleList, lat = lat, lon = lon, hs = hs, f = f, d = d, tau = tau):
     #check to see if this is the first iteration. 
     #if it is, create an array of correct dimmensions for output
     output = np.zeros((len(pList), len(eleList)))
@@ -70,8 +72,5 @@ def tableCreator(pList, eleList):
         
             #update the offset variables
             eleCount += dim
-            eleList = eleList[dim:]
-            
+            eleList = eleList[dim:]      
     return output
-
-testOut = tableCreator(np.linspace(1, 5, 62), np.linspace(30, 60, 181))

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Turns a rectangle into a minimum number of squares. 
+Turns a rectangle into a number of square tiles. 
 
 Created on Thu Oct 15 17:24:31 2020
 
@@ -16,6 +16,9 @@ def tiler(m, n, dimList = []):
     
     m = len of horz dimension
     n = len of vert dimension
+    
+    output = dimList, a list of the dimensions of the squares that are required to
+    fill the rectangle. 
     """
     
     #if the input lists are of the same length
