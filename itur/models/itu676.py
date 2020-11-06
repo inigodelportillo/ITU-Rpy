@@ -440,8 +440,9 @@ class _ITU676_12_():
                 return 1 / (0.661 * x + 0.339 * np.sqrt(x**2 + 5.51))
 
             el1 = el
-            el2 = -el
             Re = 8500  # TODO: change to ITU-R P 834
+            el2 = np.rad2deg(
+                np.arccos(((Re + h1)/(Re + h2))*np.cos(np.deg2rad(el1))))
 
             def xi(eli, hi):
                 return np.tan(np.deg2rad(eli)) * np.sqrt((Re + hi) / h0)
@@ -749,8 +750,9 @@ class _ITU676_11_():
                 return 1 / (0.661 * x + 0.339 * np.sqrt(x**2 + 5.51))
 
             el1 = el
-            el2 = -el
             Re = 8500  # TODO: change to ITU-R P 834
+            el2 = np.rad2deg(
+                np.arccos(((Re + h1)/(Re + h2))*np.cos(np.deg2rad(el1))))
 
             def xi(eli, hi):
                 return np.tan(np.deg2rad(eli)) * np.sqrt((Re + hi) / h0)
@@ -1088,8 +1090,9 @@ class _ITU676_10_():
                 return 1 / (0.661 * x + 0.339 * np.sqrt(x**2 + 5.51))
 
             el1 = el
-            el2 = -el
             Re = 8500  # TODO: change to ITU-R P 834
+            el2 = np.rad2deg(
+                np.arccos(((Re + h1)/(Re + h2))*np.cos(np.deg2rad(el1))))
 
             def xi(eli, hi):
                 return np.tan(np.deg2rad(eli)) * np.sqrt((Re + hi) / h0)
