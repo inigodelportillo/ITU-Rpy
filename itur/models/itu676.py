@@ -444,10 +444,10 @@ class _ITU676_12_():
             Re = 8500  # TODO: change to ITU-R P 834
 
             def xi(eli, hi):
-                return np.tan(np.deg2rad(eli) * np.sqrt((Re + hi) / h0))
+                return np.tan(np.deg2rad(eli)) * np.sqrt((Re + hi) / h0)
 
             def xi_p(eli, hi):
-                return np.tan(np.deg2rad(eli) * np.sqrt((Re + hi) / hw))
+                return np.tan(np.deg2rad(eli)) * np.sqrt((Re + hi) / hw)
 
             def eq_33(h_num, h_den, el, x):
                 return np.sqrt(Re + h_num) * F(x) * \
@@ -753,10 +753,10 @@ class _ITU676_11_():
             Re = 8500  # TODO: change to ITU-R P 834
 
             def xi(eli, hi):
-                return np.tan(np.deg2rad(eli) * np.sqrt((Re + hi) / h0))
+                return np.tan(np.deg2rad(eli)) * np.sqrt((Re + hi) / h0)
 
             def xi_p(eli, hi):
-                return np.tan(np.deg2rad(eli) * np.sqrt((Re + hi) / hw))
+                return np.tan(np.deg2rad(eli)) * np.sqrt((Re + hi) / hw)
 
             def eq_33(h_num, h_den, el, x):
                 return np.sqrt(Re + h_num) * F(x) * \
@@ -1092,10 +1092,10 @@ class _ITU676_10_():
             Re = 8500  # TODO: change to ITU-R P 834
 
             def xi(eli, hi):
-                return np.tan(np.deg2rad(eli) * np.sqrt((Re + hi) / h0))
+                return np.tan(np.deg2rad(eli)) * np.sqrt((Re + hi) / h0)
 
             def xi_p(eli, hi):
-                return np.tan(np.deg2rad(eli) * np.sqrt((Re + hi) / hw))
+                return np.tan(np.deg2rad(eli)) * np.sqrt((Re + hi) / hw)
 
             def eq_33(h_num, h_den, el, x):
                 return np.sqrt(Re + h_num) * F(x) * \
