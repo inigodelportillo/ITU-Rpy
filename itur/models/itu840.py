@@ -70,28 +70,6 @@ class __ITU840():
         ep, epp, eta, Kl = self.specific_attenuation_coefficients(f, T=0)
         Lred = self.columnar_content_reduced_liquid(lat, lon, p)
         
-        # print("----------------------------------------")
-        # print("Cloud Stuff")
-        # print()
-        
-        # print("Lred")
-        # print(np.shape(Lred))
-        # print()
-        
-        # print("ele")
-        # print(np.shape(el))
-        # print()
-        
-        # klNew = Kl / np.sin(np.deg2rad(el))
-        # print("klNew")
-        # print(np.shape(klNew))
-        # print()
-        
-        # A = Lred * klNew
-        
-        # print("A")
-        # print(np.shape(A))
-        # print()
 
         A = Lred * Kl / np.sin(np.deg2rad(el))
 
