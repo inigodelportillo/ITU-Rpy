@@ -209,7 +209,6 @@ def total_attenuation_validation():
     print("Total runtime: "  + str(datetime.datetime.now() - begin_time))
     
 
-
     
     
     

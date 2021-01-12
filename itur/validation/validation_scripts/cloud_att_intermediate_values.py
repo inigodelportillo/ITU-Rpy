@@ -146,8 +146,6 @@ def cloud_attenuation_validation():
     klAvgPE = sum(klPEList)/len(klPEList)
     LredAvgPE = sum(LredPEList)/len(LredPEList)
     
-    print("Error Analysis: Expected value - Calculated value")
-    
     print()  
     print("Epsilon prime: ")
     print("Average: " + str(epAvg))
