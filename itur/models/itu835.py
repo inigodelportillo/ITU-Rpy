@@ -491,8 +491,8 @@ class _ITU835_5():
 
     def mid_latitude_pressure_summer(self, h):
         """Section 3.1 of Recommendation ITU-R P.835-5."""
-        P10 = self.standard_pressure(10)
-        P72 = self.standard_pressure(72)
+        P10 = self.standard_pressure([10])[0]
+        P72 = self.standard_pressure([72])[0]
         return np.where(
             np.logical_and((0 <= h), (h <= 10)),
             1012.8186 - 111.5569 * h + 3.8646 * h**2, np.where(
@@ -526,8 +526,8 @@ class _ITU835_5():
 
     def mid_latitude_pressure_winter(self, h):
         """Section 3.2 of Recommendation ITU-R P.835-5."""
-        P10 = self.standard_pressure(10)
-        P72 = self.standard_pressure(72)
+        P10 = self.standard_pressure([10])[0]
+        P72 = self.standard_pressure([72])[0]
         return np.where(np.logical_and((0 <= h), (h <= 10)),
                     1018.8627 - 124.2954 * h + 4.8307 * h**2,
                np.where(np.logical_and((10 < h), (h <= 72)),
@@ -559,8 +559,8 @@ class _ITU835_5():
 
     def high_latitude_pressure_summer(self, h):
         """Section 4.1 of Recommendation ITU-R P.835-5."""
-        P10 = self.standard_pressure(10)
-        P72 = self.standard_pressure(72)
+        P10 = self.standard_pressure([10])[0]
+        P72 = self.standard_pressure([72])[0]
         return np.where(np.logical_and((0 <= h), (h <= 10)),
                         1008.0278 - 113.2494 * h + 3.9408 * h**2,
                np.where(np.logical_and((10 < h), (h <= 72)),
@@ -590,8 +590,8 @@ class _ITU835_5():
 
     def high_latitude_pressure_winter(self, h):
         """Section 4.2 of Recommendation ITU-R P.835-5."""
-        P10 = self.standard_pressure(10)
-        P72 = self.standard_pressure(72)
+        P10 = self.standard_pressure([10])[0]
+        P72 = self.standard_pressure([72])[0]
         return np.where(np.logical_and((0 <= h), (h <= 10)),
                         1010.8828 - 122.2411 * h + 4.554 * h**2,
                np.where(np.logical_and((10 < h), (h <= 72)),
