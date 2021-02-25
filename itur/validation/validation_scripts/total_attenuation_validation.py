@@ -176,40 +176,38 @@ def total_attenuation_validation():
     #displays the average error and the max arror for each attenuation component
     print()
     print ("Gaseous Attenuation:")
-    print("Average: " + str(agAvg) + " dB")
-    print("Max: " + str(agMax) + " dB")
-    print("Average Percent Error: " + str(agAvgPE))    
+    print("Average Error: " + '{:0.2e}'.format(agAvg) + " dB")
+    print("Max Error: " + '{:0.2e}'.format(agMax) + " dB")
+    print("Average Percent Error: " + '{:0.2e}'.format(agAvgPE))    
     
     print()
     print ("Cloud Attenuation:")
-    print("Average: " + str(acAvg) + " dB")
-    print("Max: " + str(acMax) + " dB")
-    print("Average Percent Error: " + str(acAvgPE))
+    print("Average Error: " + '{:0.2e}'.format(acAvg) + " dB")
+    print("Max Error: " + '{:0.2e}'.format(acMax) + " dB")
+    print("Average Percent Error: " + '{:0.2e}'.format(acAvgPE))
     
     print()
     print ("Rain Attenuation:")
-    print("Average: " + str(arAvg) + " dB")
-    print("Max: " + str(arMax) + " dB")
-    print("Average Percent Error: " + str(arAvgPE))
+    print("Average Error: " + '{:0.2e}'.format(arAvg) + " dB")
+    print("Max Error: " + '{:0.2e}'.format(arMax) + " dB")
+    print("Average Percent Error: " + '{:0.2e}'.format(arAvgPE))
     
     print()
     print ("Scictillation Attenuation:")
-    print("Average: " + str(asAvg) + " dB")
-    print("Max: " + str(asMax) + " dB")    
-    print("Average Percent Error: " + str(asAvgPE))
+    print("Average Error: " + '{:0.2e}'.format(asAvg) + " dB")
+    print("Max Error: " + '{:0.2e}'.format(asMax) + " dB")    
+    print("Average Percent Error: " + '{:0.2e}'.format(asAvgPE))
     
     print()
     print ("Total Attenuation:")
-    print("Average: " + str(atAvg) + " dB")
-    print("Max: " + str(atMax) + " dB")   
-    print("Average Percent Error: " + str(atAvgPE))
+    print("Average Error: " + '{:0.2e}'.format(atAvg) + " dB")
+    print("Max Error: " + '{:0.2e}'.format(atMax) + " dB")   
+    print("Average Percent Error: " + '{:0.2e}'.format(atAvgPE))
 
     print()
     print()
     print("Total runtime: "  + str(datetime.datetime.now() - begin_time))
     
-
-
     
     
     

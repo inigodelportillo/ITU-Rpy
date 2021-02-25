@@ -144,8 +144,7 @@ class __ITU676__():
         fcn = np.vectorize(self.instance.gaseous_attenuation_terrestrial_path)
         return fcn(r, f, el, rho, P, T, mode)
 
-    def gaseous_attenuation_slant_path(self, f, el, rho, P, T, V_t, h, mode):
-        # Abstract method to compute the gaseous attenuation over a slant path
+    def gaseous_attenuation_slant_path(self, f, el, rho, P, T, V_t, h, mode):      
         fcn = np.vectorize(self.instance.gaseous_attenuation_slant_path)
         return fcn(f, el, rho, P, T, V_t, h, mode)
 
@@ -1319,13 +1318,16 @@ def gaseous_attenuation_slant_path(f, el, rho, P, T, V_t=None, h=None,
     """
     type_output = type(el)
     f = prepare_quantity(f, u.GHz, 'Frequency')
-    el = prepare_quantity(prepare_input_array(el), u.deg, 'Elevation angle')
+    #print(el)
+    #el = prepare_quantity(prepare_input_array(el), u.deg, 'Elevation angle')
+    #print(el)
     rho = prepare_quantity(rho, u.g / u.m**3, 'Water vapor density')
     P = prepare_quantity(P, u.hPa, 'Atospheric pressure')
     T = prepare_quantity(T, u.K, 'Temperature')
     V_t = prepare_quantity(V_t, u.kg / u.m**2,
                            'Integrated water vapour content')
     h = prepare_quantity(h, u.km, 'Altitude')
+    
     val = __model.gaseous_attenuation_slant_path(
             f, el, rho, P, T, V_t, h, mode)
     return prepare_output_array(val, type_output) * u.dB

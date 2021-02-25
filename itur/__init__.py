@@ -36,7 +36,7 @@ import numpy as np
 import warnings
 import astropy.units as u
 
-from .__version__ import __version__
+#from .__version__ import __version__face
 
 AUTHORS = "Inigo del Portillo"
 
@@ -154,19 +154,31 @@ def atmospheric_attenuation_slant_path(
 
 
     """
-    if np.logical_or(p < 0.001, p > 50).any():
-        warnings.warn(
-            RuntimeWarning(
-                'The method to compute the total '
-                'atmospheric attenuation in recommendation ITU-P 618-13 '
-                'is only recommended for unavailabilities (p) between '
-                '0.001 % and 50 %'))
+    if type(p) == list or str(type(p)) == "<class 'numpy.ndarray'>":
+        for i in range(len(p)):
+            if np.logical_or(p[i] < 0.001, p[i] > 50).any():
+                warnings.warn(
+                    RuntimeWarning(
+                        'The method to compute the total '
+                        'atmospheric attenuation in recommendation ITU-P 618-13 '
+                        'is only recommended for unavailabilities (p) between '
+                        '0.001 % and 50 %'))
+    else:
+         if np.logical_or(p < 0.001, p > 50).any():
+                warnings.warn(
+                    RuntimeWarning(
+                        'The method to compute the total '
+                        'atmospheric attenuation in recommendation ITU-P 618-13 '
+                        'is only recommended for unavailabilities (p) between '
+                        '0.001 % and 50 %'))
 
     # This takes account of the fact that a large part of the cloud attenuation
     # and gaseous attenuation is already included in the rain attenuation
     # prediction for time percentages below 1%. Eq. 64 and Eq. 65 in
     # Recommendation ITU 618-12
+    
     p_c_g = np.maximum(1, p)
+    
 
     # Estimate the ground station altitude
     if hs is None:
@@ -177,7 +189,7 @@ def atmospheric_attenuation_slant_path(
         T = surface_mean_temperature(lat, lon)
 
     # Estimate the surface Pressure
-    if P is None:
+    if P is None:       
         P = standard_pressure(hs)
 
     # Estimate the surface Pressure
@@ -194,7 +206,7 @@ def atmospheric_attenuation_slant_path(
     else:
         Ar = 0 * u.dB
 
-    if include_gas:
+    if include_gas:        
         Ag = gaseous_attenuation_slant_path(f, el, rho, P, T, V_t, hs, mode)
     else:
         Ag = 0 * u.dB
