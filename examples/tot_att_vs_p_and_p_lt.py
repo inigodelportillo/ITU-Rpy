@@ -13,31 +13,41 @@ from itur.models.itu678 import p_lt_from_risk
 import numpy as np
 import matplotlib.pyplot as plt
 
-#set up variables that will be used in calcs
-lat = 33.915335
-lon = -118.38257
-p_arr = np.linspace(50, 0.1, 100)
+fig, ax = plt.subplots()
 
-#calculate the attenuations at risk = 50% and plot the reuslts
-p_atts = itur.atmospheric_attenuation_slant_path(lat, lon, 20.0, 45.0,
-                                               p_arr, 3.0)
-plt.plot(p_arr, p_atts)
+#set up variables that will be used in calcs
+lat = -22.8778
+lon = -47.2121
+p_arr = np.linspace(10, 0.1, 100)
+av_arr = 100 - p_arr
+#av_arr = np.flip(av_arr)
+
 
 #calculate the attenuations at risk = 10% and plot the reuslts
 p_r10_arr = p_lt_from_risk(lat, lon, p_arr, 10, N = 10000)
 p_r10_atts = itur.atmospheric_attenuation_slant_path(lat, lon, 20.0, 45.0,
                                                p_r10_arr, 3.0)
-plt.plot(p_arr, p_r10_atts, color = 'red')
+ax.plot(av_arr, p_r10_atts, color = 'red')
+
+#calculate the attenuations at risk = 50% and plot the reuslts
+p_atts = itur.atmospheric_attenuation_slant_path(lat, lon, 20.0, 45.0,
+                                               p_arr, 3.0)
+ax.plot(av_arr, p_atts)
 
 #calculate the attenuations at risk = 90% and plot the reuslts
 p_r90_arr = p_lt_from_risk(lat, lon, p_arr, 90, N = 10000)
 p_r90_atts = itur.atmospheric_attenuation_slant_path(lat, lon, 20.0, 45.0,
                                                p_r90_arr, 3.0)
-plt.plot(p_arr, p_r90_atts, color = 'green')
+ax.plot(av_arr, p_r90_atts, color = 'green')
 
 
 #Add standard plot features
-plt.legend(labels = ['Risk = 50%', 'Risk = 10%', 'Risk = 90%'])
+textstr = "Location = O3b ground station in Hortolandia, Brazil\n\
+Frequency = 20 Ghz\nElevation Angle = 45 degrees\nAntenna Diameter = 3 m\n\
+Polarization Angle  = 45 Degrees"
+props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+ax.text(0.05, 0.95, textstr, transform = ax.transAxes, fontsize = 8, verticalalignment = 'top', bbox = props)
+ax.legend(['Risk = 10%', 'Risk = 50%', 'Risk = 90%'], loc = 'center left')
 plt.ylabel('Total Atmospheric Attenuation [dB]')
-plt.xlabel('Unavailablity over a period of time, p')
+plt.xlabel('Availability Over Any One Year, [0-100%]')
 plt.title('Risk Analysis: Atmospheric Loss at Different Risk Values')

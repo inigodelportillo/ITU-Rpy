@@ -36,7 +36,7 @@ import numpy as np
 import warnings
 import astropy.units as u
 
-from .__version__ import __version__
+#from .__version__ import __version__face
 
 AUTHORS = "Inigo del Portillo"
 
@@ -189,7 +189,7 @@ def atmospheric_attenuation_slant_path(
         T = surface_mean_temperature(lat, lon)
 
     # Estimate the surface Pressure
-    if P is None:
+    if P is None:       
         P = standard_pressure(hs)
 
     # Estimate the surface Pressure

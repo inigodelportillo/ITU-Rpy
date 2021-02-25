@@ -23,7 +23,7 @@ def cloud_attenuation_validation():
     
     ###excel variables
     
-    workbook = xlrd.open_workbook("CG-3M3J-13-ValEx-Rev5_0.xlsx")
+    workbook = xlrd.open_workbook("H:/ITU-Rpy/CG-3M3J-13-ValEx-Rev5_0.xlsx")
     sheet = workbook.sheet_by_name("P840-8 A_Clouds")
     
     ### ITU_rpy variables
@@ -148,37 +148,37 @@ def cloud_attenuation_validation():
     
     print()  
     print("Epsilon prime: ")
-    print("Average: " + str(epAvg))
-    print("Max: " + str(epMax))
-    print("Average Percent Error: " + str(epAvgPE))
+    print("Average Error: " + '{:0.2e}'.format(epAvg))
+    print("Max Error: " + '{:0.2e}'.format(epMax))
+    print("Average Percent Error: " + '{:0.2e}'.format(epAvgPE))
     
     print()  
     print("Epsilon prime prime: ")
-    print("Average: " + str(eppAvg))
-    print("Max: " + str(eppMax))
-    print("Average Percent Error: " + str(eppAvgPE))
+    print("Average Error: " + '{:0.2e}'.format(eppAvg))
+    print("Max Error: " + '{:0.2e}'.format(eppMax))
+    print("Average Percent Error: " + '{:0.2e}'.format(eppAvgPE))
     
     print()  
     print("Eta: ")
-    print("Average: " + str(etaAvg))
-    print("Max: " + str(etaMax))
-    print("Average Percent Error: " + str(etaAvgPE))
+    print("Average Error: " + '{:0.2e}'.format(etaAvg))
+    print("Max Error: " + '{:0.2e}'.format(etaMax))
+    print("Average Percent Error: " + '{:0.2e}'.format(etaAvgPE))
     
     print()
     print("Note: Kl is a function of epsilon prime, epsilon prime prime, and eta")
     print()  
     print("Kl: ")
-    print("Average: " + str(klAvg))
-    print("Max: " + str(klMax))
-    print("Average Percent Error: " + str(klAvgPE))
+    print("Average Error: " + '{:0.2e}'.format(klAvg))
+    print("Max Error: " + '{:0.2e}'.format(klMax))
+    print("Average Percent Error: " + '{:0.2e}'.format(klAvgPE))
     
     print ()
     print("Note: L_red is not related to Kl")
     print()  
     print("L_red: ")
-    print("Average: " + str(LredAvg))
-    print("Max: " + str(LredMax))
-    print("Average Percent Error: " + str(LredAvgPE))
+    print("Average Error: " + '{:0.2e}'.format(LredAvg))
+    print("Max Error: " + '{:0.2e}'.format(LredMax))
+    print("Average Percent Error: " + '{:0.2e}'.format(LredAvgPE))
     
     
     
