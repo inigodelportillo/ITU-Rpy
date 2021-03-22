@@ -1,6 +1,6 @@
 
 Recommendation ITU-R P.835
------------------------------------
+--------------------------
 
 Implementation of the methods in Recommendation ITU-R P.835 "Reference Standard Atmospheres".
 

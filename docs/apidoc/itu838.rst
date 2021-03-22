@@ -1,6 +1,6 @@
 
 Recommendation ITU-R P.838
------------------------------------
+--------------------------
 
 Implementation of the methods in Recommendation ITU-R P.838 "Specific attenuation model for rain for use in prediction methods"
 

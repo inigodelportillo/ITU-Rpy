@@ -7,12 +7,12 @@ I cannot install Basemap
 This happens most likely because you are using python  version > 3.X. You can try to install from conda-forge  ``conda install -c conda-forge basemap`` or, if you are using Windows, using the appropriate pre-compiled wheels file from `this webpage <https://www.lfd.uci.edu/~gohlke/pythonlibs/#basemap>`_. Once you download the .whl file you can install it using ``pip install name_of_whl_file.whl``.
 
 The first time I run *ITU-Rpy* is considerable slower
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 *ITU-Rpy* loads in memory several datasets upon first execution. This process might take up to 30 seconds. Once that datasets are loaded into memory *ITU-Rpy* uses cached versions to reduce execution time.
 
 I cannot operate with the values returned by *ITU-Rpy*
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 *ITU-Rpy* returns Quantity objects, which consist of a value and a unit. Only quantities with compatible dimensions can be added / subtracted.
 

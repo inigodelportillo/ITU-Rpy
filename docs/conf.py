@@ -116,7 +116,7 @@ pygments_style = 'sphinx'
 #modindex_common_prefix = []
 
 # If true, keep warnings as "system message" paragraphs in the built documents.
-#keep_warnings = False
+keep_warnings = False
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
@@ -196,7 +196,7 @@ html_sidebars = {'**': ['localtoc.html']}
 #html_show_sourcelink = True
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
-#html_show_sphinx = True
+html_show_sphinx = False
 
 # If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
 #html_show_copyright = True
@@ -294,7 +294,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'ITU-Rpy', u'ITU-Rpy Documentation',
-     author, 'ITU-Rpy', 'One line description of project.',
+     author, 'ITU-Rpy', 'A python implementation of ITU-R P. recommendations for atmospheric attenuation.',
      'Miscellaneous'),
 ]
 

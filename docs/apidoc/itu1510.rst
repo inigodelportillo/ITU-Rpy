@@ -1,6 +1,6 @@
 
 Recommendation ITU-R P.1510
--------------------------------------
+---------------------------
 
 Implementation of the methods in Recommendation ITU-R P.1510 "Annual mean surface temperature"
 

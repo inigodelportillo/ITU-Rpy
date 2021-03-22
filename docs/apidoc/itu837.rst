@@ -1,6 +1,6 @@
 
 Recommendation ITU-R P.837
------------------------------------
+--------------------------
 
 Implementation of the methods in Recommendation ITU-R P.837 "Characteristics of precipitation for propagation modeling"
 

@@ -1,0 +1,6 @@
+Validation results for ITU-R P.618-13
+=====================================
+
+.. raw:: html
+    :file: itur618_13_table.html
+        

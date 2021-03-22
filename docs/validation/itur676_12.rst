@@ -1,0 +1,6 @@
+Validation results for ITU-R P.676-12
+=====================================
+
+.. raw:: html
+    :file: itur676_12_table.html
+        

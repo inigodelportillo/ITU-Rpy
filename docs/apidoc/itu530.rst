@@ -1,6 +1,6 @@
 
 Recommendation ITU-R P.530
------------------------------------
+--------------------------
 
 Propagation data and prediction methods required for the design of
 terrestrial line-of-sight systems

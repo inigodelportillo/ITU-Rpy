@@ -1,6 +1,6 @@
 
 Recommendation ITU-R P.618
------------------------------------
+--------------------------
 
 Implementation of the methods in Recommendation ITU-R P.618 " Propagation data and prediction methods required for the design of Earth-space telecommunication systems."
 

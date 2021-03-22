@@ -7,7 +7,7 @@ Submodules
 Module contents
 ---------------
 
-.. automodule:: models
+.. automodule:: itur.models
     :members:
     :undoc-members:
     :show-inheritance:
@@ -20,10 +20,11 @@ Module contents
     itu618
     itu676
     itu835
-	itu836
+    itu836
     itu837
-	itu838
+    itu838
     itu839
+    itu840
     itu1144
     itu1510
     itu1511
