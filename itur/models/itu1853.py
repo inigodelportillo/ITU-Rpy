@@ -417,7 +417,7 @@ def change_version(new_version):
     new_version : int
         Number of the version to use.
         Valid values are:
-        * P.1853-1 (02/12) (Current version)
+        * 1:  Activates recommendation ITU-R P.1853-1 (02/12) (Current version)
     """
     global __model
     __model = __ITU1853(new_version)

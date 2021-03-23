@@ -131,12 +131,16 @@ def change_version(new_version):
     Change the version of the ITU-R P.1510 recommendation currently being used.
 
 
+    This function changes the model used for the ITU-R P.1510 recommendation
+    to a different version.
+
     Parameters
     ----------
     new_version : int
         Number of the version to use.
         Valid values are:
-        *version 0: P.1510-0 (02/01) (Current version)
+        * 1: Activates recommendation ITU-R P.1510-0 (02/01) (Current version)
+        * 0: Activates recommendation ITU-R P.1510-0 (02/01) (Current version)
     """
     global __model
     __model = __ITU1510__(new_version)

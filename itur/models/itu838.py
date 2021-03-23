@@ -249,15 +249,19 @@ def change_version(new_version):
     Change the version of the ITU-R P.838 recommendation currently being used.
 
 
+    This function changes the model used for the ITU-R P.838 recommendation
+    to a different version.
+
     Parameters
     ----------
     new_version : int
         Number of the version to use.
         Valid values are:
-        * P.838-0 (03/92) (Superseded)
-        * P.838-1 (10/99) (Superseded)
-        * P.838-2 (04/03) (Superseded)
-        * P.838-3 (03/05) (Current version)
+        *  3: Activates recommendation ITU-R P.838-3 (03/05) (Current version)
+        *  2: Activates recommendation ITU-R P.838-2 (04/03) (Superseded)
+        *  1: Activates recommendation ITU-R P.838-1 (10/99) (Superseded)
+        *  0: Activates recommendation ITU-R P.838-0 (03/92) (Superseded)
+
     """
     global __model
     __model = __ITU838__(new_version)

@@ -669,12 +669,9 @@ def change_version(new_version):
     new_version : int
         Number of the version to use.
         Valid values are:
-           * P.835-1 (08/94) (Superseded)
-           * P.835-2 (10/99) (Superseded)
-           * P.835-3 (02/01) (Superseded)
-           * P.835-4 (04/03) (Superseded)
-           * P.835-5 (08/07) (Superseded)
-           * P.835-6 (02/12) (Current version)
+        *  6: Activates recommendation ITU-R P.835-6 (12/17) (Current version)
+        *  5: Activates recommendation ITU-R P.835-5 (02/12) (Superseded)
+
     """
     global __model
     __model = __ITU835__(new_version)

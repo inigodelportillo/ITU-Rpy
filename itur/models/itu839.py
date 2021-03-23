@@ -169,17 +169,19 @@ def change_version(new_version):
     """
     Change the version of the ITU-R P.839 recommendation currently being used.
 
+    This function changes the model used for the ITU-R P.839 recommendation
+    to a different version.
 
     Parameters
     ----------
     new_version : int
         Number of the version to use.
         Valid values are:
-        * version 0: P.839-0 (03/92) (Superseded)
-        * version 1: P.839-1 (83/97) (Superseded)
-        * version 2: P.839-2 (10/99) (Superseded)
-        * version 3: P.839-3 (02/01) (Superseded)
-        * version 4: P.839-4 (09/2013) (Current version)
+        * 4: Activates recommendation ITU-R P.839-4 (09/2013) (Current version)
+        * 3: Activates recommendation ITU-R P.839-3 (02/01) (Superseded)
+        * 2: Activates recommendation ITU-R P.839-2 (10/99) (Superseded)
+
+
     """
     global __model
     __model = __ITU839__(new_version)

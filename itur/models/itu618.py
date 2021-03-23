@@ -611,12 +611,35 @@ __model = _ITU618()
 
 
 def change_version(new_version):
+    """
+    Change the version of the ITU-R P.618 recommendation currently being used.
+
+    This function changes the model used for the ITU-R P.618 recommendation
+    to a different version.
+
+    Parameters
+    ----------
+    new_version : int
+        Number of the version to use.
+        Valid values are:
+        *  13: Activates recommendation ITU-R P.618-13 (12/17) (Current version)
+        *  12: Activates recommendation ITU-R P.618-12 (07/15) (Superseded)
+    """
     global __model
     __model = _ITU618(new_version)
     utils.memory.clear()
 
 
 def get_version():
+    """ The version of the current model for the ITU-R P.618 recommendation.
+
+    Obtain the version of the ITU-R P.618 recommendation currently being used.
+
+    Returns
+    -------
+    version: int
+       The version of the ITU-R P.618 recommendation being used.
+    """
     global __model
     return __model.__version__
 

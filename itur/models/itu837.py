@@ -303,17 +303,17 @@ def change_version(new_version):
     Change the version of the ITU-R P.837 recommendation currently being used.
 
 
+    This function changes the model used for the ITU-R P.837 recommendation
+    to a different version.
+
     Parameters
     ----------
     new_version : int
         Number of the version to use.
         Valid values are:
-           * P.837-1 (08/94) (Superseded)
-           * P.837-2 (10/99) (Superseded)
-           * P.837-3 (02/01) (Superseded)
-           * P.837-4 (04/03) (Superseded)
-           * P.837-5 (08/07) (Superseded)
-           * P.837-6 (02/12) (Current version)
+        *  7: Activates recommendation ITU-R P.837-7 (12/17) (Current version)
+        *  6: Activates recommendation ITU-R P.837-6 (02/12) (Superseded)
+
     """
     global __model
     __model = __ITU837(new_version)

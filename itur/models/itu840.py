@@ -520,9 +520,9 @@ def change_version(new_version):
     new_version : int
         Number of the version to use.
         Valid values are:
-        * 4: P.840-4 (10/09) (Superseded)
-        * 5: P.840-5 (02/12) (Superseded)
-        * 6: P.840-6 (09/13) (Current version)
+        * Activates recommendation ITU-R 6: P.840-6 (09/13) (Current version)
+        * Activates recommendation ITU-R 5: P.840-5 (02/12) (Superseded)
+        * Activates recommendation ITU-R 4: P.840-4 (10/09) (Superseded)
     """
     global __model
     __model = __ITU840__(new_version)

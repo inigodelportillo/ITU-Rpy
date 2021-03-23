@@ -180,8 +180,9 @@ def change_version(new_version):
     new_version : int
         Number of the version to use.
         Valid values are:
-        *0: P.1511-0 (02/01) (Superseded)
-        *1: P.1511-1 (07/15) (Current version)
+        * 1:  Activates recommendation ITU-R P.1511-1 (07/15) (Current version)
+        * 0:  Activates recommendation ITU-R P.1511-0 (02/01) (Superseded)
+
     """
     global __model
     __model = __ITU1511(new_version)

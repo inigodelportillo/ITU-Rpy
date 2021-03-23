@@ -366,21 +366,18 @@ def change_version(new_version):
     """
     Change the version of the ITU-R P.836 recommendation currently being used.
 
+    This function changes the model used for the ITU-R P.836 recommendation
+    to a different version.
 
     Parameters
     ----------
     new_version : int
         Number of the version to use.
-        Available versions:
-           * P.836-6 (12/17) (Current version)
-           * P.836-5 (09/13) (Superseded)
-           * P.836-4 (10/09) (Superseded)
+        Valid values are:
+        *  6: Activates recommendation ITU-R P.836-6 (12/17) (Current version)
+        *  5: Activates recommendation ITU-R P.836-5 (09/13) (Superseded)
+        *  4: Activates recommendation ITU-R P.836-4 (10/09) (Superseded)
 
-        Not available versions:
-           * P.836-0 (03/92) (Superseded)
-           * P.836-1 (08/97) (Superseded)
-           * P.836-2 (02/01) (Superseded)
-           * P.836-3 (11/01) (Superseded)
     """
     global __model
     __model = __ITU836(new_version)

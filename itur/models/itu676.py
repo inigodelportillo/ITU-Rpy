@@ -1208,18 +1208,19 @@ def change_version(new_version):
     """
     Change the version of the ITU-R P.676 recommendation currently being used.
 
+    This function changes the model used for the ITU-R P.676 recommendation
+    to a different version.
+
 
     Parameters
     ----------
     new_version : int
         Number of the version to use.
         Valid values are:
-           * P.676-1 (08/94) (Superseded)
-           * P.676-2 (10/99) (Superseded)
-           * P.676-3 (02/01) (Superseded)
-           * P.676-4 (04/03) (Superseded)
-           * P.676-5 (08/07) (Superseded)
-           * P.676-6 (02/12) (Current version)
+        *  12: Activates recommendation ITU-R P.676-12 (08/19) (Current version)
+        *  11: Activates recommendation ITU-R P.676-11 (09/16) (Superseded)
+        *  10: Activates recommendation ITU-R P.676-10 (09/13) (Superseded)
+        *  9: Activates recommendation ITU-R P.676-9 (02/12) (Superseded)
     """
     global __model
     __model = __ITU676__(new_version)
