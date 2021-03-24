@@ -64,12 +64,13 @@ class _ITU618():
     Recommendation ITU-R P.618 provides methods to estimate the propagation
     loss on an Earth-space path, relative to the free-space loss. This value
     is the sum of different contributions as follows:
-    * attenuation by atmospheric gases;
-    * attenuation by rain, other precipitation and clouds;
-    * focusing and defocusing;
-    * decrease in antenna gain due to wave-front incoherence;
-    * scintillation and multipath effects;
-    * attenuation by sand and dust storms.
+      * attenuation by atmospheric gases;
+      * attenuation by rain, other precipitation and clouds;
+      * focusing and defocusing;
+      * decrease in antenna gain due to wave-front incoherence;
+      * scintillation and multipath effects;
+      * attenuation by sand and dust storms.
+
     Each of these contributions has its own characteristics as a function of
     frequency, geographic location and elevation angle. As a rule, at elevation
     angles above 10°, only gaseous attenuation, rain and cloud attenuation and
@@ -622,12 +623,11 @@ def change_version(new_version):
     new_version : int
         Number of the version to use.
         Valid values are:
-        *  13: Activates recommendation ITU-R P.618-13 (12/17) (Current version)
-        *  12: Activates recommendation ITU-R P.618-12 (07/15) (Superseded)
+          *  13: Activates recommendation ITU-R P.618-13 (12/17) (Current version)
+          *  12: Activates recommendation ITU-R P.618-12 (07/15) (Superseded)
     """
     global __model
     __model = _ITU618(new_version)
-    utils.memory.clear()
 
 
 def get_version():

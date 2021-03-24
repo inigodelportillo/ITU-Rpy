@@ -669,8 +669,8 @@ def change_version(new_version):
     new_version : int
         Number of the version to use.
         Valid values are:
-        *  6: Activates recommendation ITU-R P.835-6 (12/17) (Current version)
-        *  5: Activates recommendation ITU-R P.835-5 (02/12) (Superseded)
+          *  6: Activates recommendation ITU-R P.835-6 (12/17) (Current version)
+          *  5: Activates recommendation ITU-R P.835-5 (02/12) (Superseded)
 
     """
     global __model
@@ -682,7 +682,7 @@ def get_version():
 
     Obtain the version of the ITU-R P.835 recommendation currently being used.
 
-     Returns
+    Returns
     -------
     version: int
        The version of the ITU-R P.530 recommendation being used.

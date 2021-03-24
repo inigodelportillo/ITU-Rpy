@@ -339,8 +339,8 @@ def change_version(new_version):
     new_version : int
         Number of the version to use.
         Valid values are:
-        * 13: Activates recommendation ITU-R P.453-13 (12/17)
-        * 12: Activates recommendation ITU-R P.453-12 (07/15)
+          * 13: Activates recommendation ITU-R P.453-13 (12/17)
+          * 12: Activates recommendation ITU-R P.453-12 (07/15)
 
     """
     global __model
