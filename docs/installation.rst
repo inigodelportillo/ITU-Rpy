@@ -22,7 +22,7 @@ To install the development version of ITU-Rpy, please type the following command
 
     git clone https://github.com/iportillo/ITU-Rpy
     cd ITU-Rpy
-    cat requirements.txt | xargs -n 1 -L 1 pip install
+    pip install -U -r requirements.txt
     python setup.py install
 	
 	
