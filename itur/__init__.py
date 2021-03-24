@@ -3,14 +3,14 @@
 ITU-RPy is a python implementation of the ITU-P R Recommendations.
 
 ITU-Rpy can be used to compute atmospheric attenuation for Earth-to-space
-and horizontal paths, for frequencies in the Ghz range.
+and horizontal paths, for frequencies in the GHz range.
 
 The propagation loss on an Earth-space path and a horizontal-path, relative to
 the free-space loss, is the sum of different contributions, namely:
- *   attenuation by atmospheric gases;
- *   attenuation by rain, other precipitation and clouds;
- *   scintillation and multipath effects;
- *   attenuation by sand and dust storms.
+* attenuation by atmospheric gases;
+* attenuation by rain, other precipitation and clouds;
+* scintillation and multipath effects;
+* attenuation by sand and dust storms.
 
 Each of these contributions has its own characteristics as a function of
 frequency, geographic location and elevation angle. ITU-Rpy allows for fast,
@@ -22,8 +22,8 @@ from __future__ import division
 from __future__ import print_function
 
 from .models.itu618 import rain_attenuation, scintillation_attenuation
-from .models.itu676 import gaseous_attenuation_slant_path,\
-    gaseous_attenuation_inclined_path,\
+from .models.itu676 import gaseous_attenuation_slant_path, \
+    gaseous_attenuation_inclined_path, \
     gaseous_attenuation_terrestrial_path
 from .models.itu835 import standard_pressure
 from .models.itu836 import surface_water_vapour_density, \
@@ -47,15 +47,19 @@ def atmospheric_attenuation_slant_path(
         return_contributions=False, include_rain=True, include_gas=True,
         include_scintillation=True, include_clouds=True):
     """
-    Calculation of long-term atmospheric attenuation statistics.
+    Calculate long-term atmospheric attenuation statistics for slant paths.
 
-    The following procedure provides estimates of the long-term statistics of
-    the slant-path atmospheric attenuation at a given location for
-    frequencies up to 55 GHz and percentages of time 0.001 % < p < 50 %.
+    This function provides estimates of the long-term statistics of
+    the slant-path atmospheric attenuation at a given location, for
+    frequencies up to 55 GHz and percentages of time 0.001% < `p` < 50%.
 
+    The model used is based on the guidelines provided in Section 2 of
+    ITU-R P.618. If optional values are not provided they will be
+    automatically computed using the procedures described in other ITU-R P.
+    recommendations.
 
     Parameters
-    -------------
+    ----------
     lat : number, sequence, or numpy.ndarray
         Latitudes of the receiver points
     lon : number, sequence, or numpy.ndarray
@@ -65,11 +69,11 @@ def atmospheric_attenuation_slant_path(
     el : sequence, number or Quantity
         Elevation angle (degrees)
     p : number
-        Percetage of the time the rain attenuation value is exceeded.
+        Percentage of the time the rain attenuation value is exceeded.
     D: number or Quantity
         Physical diameter of the earth-station antenna (m)
     hs : number, sequence, or numpy.ndarray, optional
-        Heigh above mean sea level of the earth station (km). If local data for
+        Height above mean sea level of the earth station (km). If local data for
         the earth station height above mean sea level is not available, an
         estimate is obtained from the maps of topographic altitude
         given in Recommendation ITU-R P.1511.
@@ -80,7 +84,7 @@ def atmospheric_attenuation_slant_path(
         Point rainfall rate for the location for 0.01% of an average year \
         (mm/h). If not provided, an estimate is obtained from Recommendation
         ITU-R P.837. Some useful values:
-            * 0.25 mm/h : Drizle
+            * 0.25 mm/h : Drizzle
             *  2.5 mm/h : Light rain
             * 12.5 mm/h : Medium rain
             * 25.0 mm/h : Heavy rain
@@ -91,13 +95,13 @@ def atmospheric_attenuation_slant_path(
         Antenna efficiency. Default value 0.5 (conservative estimate)
     T: number, sequence, or numpy.ndarray, optional
         Average surface ambient temperature (°C) at the site. If None, uses the
-        ITU-R P.453 to estimate the wet term of the radio refractivity.
+        ITU-R P.1510 to estimate the surface ambient temperature.
     H: number, sequence, or numpy.ndarray, optional
         Average surface relative humidity (%) at the site. If None, uses the
-        ITU-R P.453 to estimate the wet term of the radio refractivity.
+        ITU-R P.836 to estimate the wet term of the surface relative humidity.
     P: number, sequence, or numpy.ndarray, optional
         Average surface pressure (hPa) at the site. If None, uses the
-        ITU-R P.453 to estimate the wet term of the radio refractivity.
+        ITU-R P.835 to estimate the average surface pressure.
     hL : number, optional
         Height of the turbulent layer (m). Default value 1000 m
     Ls :number, optional
@@ -118,7 +122,7 @@ def atmospheric_attenuation_slant_path(
         Section 1. Default, 'approx'
     return_contributions: bool, optional
         Determines whether individual contributions from gases, rain, clouds
-        and scintillation are returned in addition ot the total attenuation
+        and scintillation are returned in addition to the total attenuation
         (True), or just the total atmospheric attenuation (False).
         Default is False
     include_rain: bool, optional
@@ -136,7 +140,7 @@ def atmospheric_attenuation_slant_path(
 
 
     Returns
-    ---------
+    -------
     A : Quantity
         Total atmospheric attenuation (dB)
 
@@ -147,7 +151,7 @@ def atmospheric_attenuation_slant_path(
 
 
     References
-    -------------
+    ----------
     [1] Propagation data and prediction methods required for the design of
     Earth-space telecommunication systems:
     https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
@@ -211,7 +215,7 @@ def atmospheric_attenuation_slant_path(
         As = 0 * u.dB
 
     # Compute the total attenuation according to
-    A = Ag + np.sqrt((Ar + Ac)**2 + As**2)
+    A = Ag + np.sqrt((Ar + Ac) ** 2 + As ** 2)
 
     if return_contributions:
         return Ag, Ac, Ar, As, A
