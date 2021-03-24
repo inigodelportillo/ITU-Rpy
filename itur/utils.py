@@ -17,8 +17,6 @@ import numbers
 import numpy as np
 
 from pyproj import Geod
-from joblib import Memory
-from tempfile import mkdtemp
 from astropy import units as u
 
 
@@ -26,10 +24,6 @@ from astropy import units as u
 dir_path = os.path.dirname(os.path.realpath(__file__))
 dataset_dir = os.path.join(dir_path, 'data/')
 
-# Create a temporary directory for a memory cache to memoize results of
-# some functions
-cachedir = mkdtemp()
-memory = Memory(location=cachedir, verbose=0)
 
 # Define numeric types including numpy types
 __NUMERIC_TYPES__ = [numbers.Number, int, float, complex,

@@ -257,10 +257,10 @@ def change_version(new_version):
     new_version : int
         Number of the version to use.
         Valid values are:
-        *  3: Activates recommendation ITU-R P.838-3 (03/05) (Current version)
-        *  2: Activates recommendation ITU-R P.838-2 (04/03) (Superseded)
-        *  1: Activates recommendation ITU-R P.838-1 (10/99) (Superseded)
-        *  0: Activates recommendation ITU-R P.838-0 (03/92) (Superseded)
+          *  3: Activates recommendation ITU-R P.838-3 (03/05) (Current version)
+          *  2: Activates recommendation ITU-R P.838-2 (04/03) (Superseded)
+          *  1: Activates recommendation ITU-R P.838-1 (10/99) (Superseded)
+          *  0: Activates recommendation ITU-R P.838-0 (03/92) (Superseded)
 
     """
     global __model

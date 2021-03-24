@@ -6,6 +6,7 @@ from __future__ import print_function
 import os
 import warnings
 
+
 import numpy as np
 from astropy import units as u
 
@@ -17,7 +18,7 @@ from itur.models.itu836 import total_water_vapour_content
 from itur.models.itu1510 import surface_mean_temperature
 from itur.models.itu1511 import topographic_altitude
 from itur.utils import (prepare_quantity, prepare_output_array,
-                        prepare_input_array, load_data, dataset_dir, memory)
+                        prepare_input_array, load_data, dataset_dir)
 
 
 def __gamma0_exact__(self, f, p, rho, T):
@@ -93,6 +94,7 @@ class __ITU676__():
        * P.676-10 (09/13) (Superseded)
        * P.676-11 (09/16) (Superseded)
        * P.676-11 (08/19) (Current version)
+
     Not available versions:
        * P.676-1 (03/92) (Superseded)
        * P.676-2 (10/95) (Superseded)
@@ -102,6 +104,7 @@ class __ITU676__():
        * P.676-6 (03/05) (Superseded)
        * P.676-7 (02/07) (Superseded)
        * P.676-8 (10/09) (Superseded)
+
     """
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.676 recommendation.
@@ -1217,14 +1220,14 @@ def change_version(new_version):
     new_version : int
         Number of the version to use.
         Valid values are:
-        *  12: Activates recommendation ITU-R P.676-12 (08/19) (Current version)
-        *  11: Activates recommendation ITU-R P.676-11 (09/16) (Superseded)
-        *  10: Activates recommendation ITU-R P.676-10 (09/13) (Superseded)
-        *  9: Activates recommendation ITU-R P.676-9 (02/12) (Superseded)
+          *  12: Activates recommendation ITU-R P.676-12 (08/19) (Current version)
+          *  11: Activates recommendation ITU-R P.676-11 (09/16) (Superseded)
+          *  10: Activates recommendation ITU-R P.676-10 (09/13) (Superseded)
+          *  9: Activates recommendation ITU-R P.676-9 (02/12) (Superseded)
+
     """
     global __model
     __model = __ITU676__(new_version)
-    utils.memory.clear()
 
 
 def get_version():
@@ -1239,12 +1242,11 @@ def gaseous_attenuation_terrestrial_path(r, f, el, rho, P, T, mode):
     """
     Estimate the attenuation of atmospheric gases on terrestrial paths.
     This function operates in two modes, 'approx', and 'exact':
-
-    * 'approx': a simplified approximate method to estimate gaseous attenuation
-    that is applicable in the frequency range 1-350 GHz.
-    * 'exact': an estimate of gaseous attenuation computed by summation of
-    individual absorption lines that is valid for the frequency
-    range 1-1,000 GHz
+      * 'approx': a simplified approximate method to estimate gaseous attenuation
+        that is applicable in the frequency range 1-350 GHz.
+      * 'exact': an estimate of gaseous attenuation computed by summation of
+        individual absorption lines that is valid for the frequency
+        range 1-1,000 GHz
 
 
     Parameters
@@ -1294,12 +1296,11 @@ def gaseous_attenuation_slant_path(f, el, rho, P, T, V_t=None, h=None,
     """
     Estimate the attenuation of atmospheric gases on slant paths. This function
     operates in two modes, 'approx', and 'exact':
-
-    * 'approx': a simplified approximate method to estimate gaseous attenuation
-    that is applicable in the frequency range 1-350 GHz.
-    * 'exact': an estimate of gaseous attenuation computed by summation of
-    individual absorption lines that is valid for the frequency
-    range 1-1,000 GHz
+      * 'approx': a simplified approximate method to estimate gaseous attenuation
+        that is applicable in the frequency range 1-350 GHz.
+      * 'exact': an estimate of gaseous attenuation computed by summation of
+        individual absorption lines that is valid for the frequency
+        range 1-1,000 GHz
 
 
     Parameters
@@ -1360,12 +1361,11 @@ def gaseous_attenuation_inclined_path(f, el, rho, P, T, h1, h2, mode='approx'):
     Estimate the attenuation of atmospheric gases on inclined paths between two
     ground stations at heights h1 and h2. This function operates in two modes,
     'approx', and 'exact':
-
-    * 'approx': a simplified approximate method to estimate gaseous attenuation
-    that is applicable in the frequency range 1-350 GHz.
-    * 'exact': an estimate of gaseous attenuation computed by summation of
-    individual absorption lines that is valid for the frequency
-    range 1-1,000 GHz
+      * 'approx': a simplified approximate method to estimate gaseous attenuation
+        that is applicable in the frequency range 1-350 GHz.
+      * 'exact': an estimate of gaseous attenuation computed by summation of
+        individual absorption lines that is valid for the frequency
+        range 1-1,000 GHz
 
 
     Parameters
@@ -1442,7 +1442,6 @@ def slant_inclined_path_equivalent_height(f, p):
     return prepare_output_array(val, type_output) * u.m
 
 
-@memory.cache
 def zenit_water_vapour_attenuation(lat, lon, p, f, V_t=None, h=None):
     """
     An alternative method may be used to compute the slant path attenuation by

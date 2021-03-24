@@ -5,6 +5,8 @@ from __future__ import print_function
 
 import os
 import numpy as np
+
+
 from astropy import units as u
 
 from itur import utils
@@ -12,7 +14,7 @@ from itur.models.itu1511 import topographic_altitude
 from itur.models.itu1144 import (bilinear_2D_interpolator,
                                  bicubic_2D_interpolator)
 from itur.utils import (prepare_input_array, prepare_output_array,
-                        dataset_dir, prepare_quantity, memory,
+                        dataset_dir, prepare_quantity,
                         load_data_interpolator)
 
 
@@ -374,14 +376,13 @@ def change_version(new_version):
     new_version : int
         Number of the version to use.
         Valid values are:
-        *  6: Activates recommendation ITU-R P.836-6 (12/17) (Current version)
-        *  5: Activates recommendation ITU-R P.836-5 (09/13) (Superseded)
-        *  4: Activates recommendation ITU-R P.836-4 (10/09) (Superseded)
+          *  6: Activates recommendation ITU-R P.836-6 (12/17) (Current version)
+          *  5: Activates recommendation ITU-R P.836-5 (09/13) (Superseded)
+          *  4: Activates recommendation ITU-R P.836-4 (10/09) (Superseded)
 
     """
     global __model
     __model = __ITU836(new_version)
-    utils.memory.clear()
 
 
 def get_version():
@@ -392,7 +393,6 @@ def get_version():
     return __model.__version__
 
 
-@memory.cache
 def surface_water_vapour_density(lat, lon, p, alt=None):
     """
     Method to compute the surface water vapour density along a path  at any
@@ -434,7 +434,6 @@ def surface_water_vapour_density(lat, lon, p, alt=None):
     return prepare_output_array(val, type_output) * u.g / u.m**3
 
 
-@memory.cache
 def total_water_vapour_content(lat, lon, p, alt=None):
     """
     Method to compute the total water vapour content along a path  at any

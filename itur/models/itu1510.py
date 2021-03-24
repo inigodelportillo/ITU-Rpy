@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+
 import numpy as np
 from astropy import units as u
 
@@ -10,7 +11,8 @@ from itur import utils
 from itur.models.itu1144 import (bilinear_2D_interpolator,
                                  bicubic_2D_interpolator)
 from itur.utils import (prepare_input_array, prepare_output_array,
-                        memory, load_data_interpolator)
+                        load_data_interpolator)
+
 
 
 class __ITU1510__():
@@ -139,12 +141,12 @@ def change_version(new_version):
     new_version : int
         Number of the version to use.
         Valid values are:
+
         * 1: Activates recommendation ITU-R P.1510-0 (02/01) (Current version)
         * 0: Activates recommendation ITU-R P.1510-0 (02/01) (Current version)
     """
     global __model
     __model = __ITU1510__(new_version)
-    utils.memory.clear()
 
 
 def get_version():
@@ -155,7 +157,6 @@ def get_version():
     return __model.__version__
 
 
-@memory.cache
 def surface_mean_temperature(lat, lon):
     """
     A method to estimate the annual mean surface temperature (K) at 2 m
@@ -191,7 +192,6 @@ def surface_mean_temperature(lat, lon):
     return prepare_output_array(val, type_output) * u.Kelvin
 
 
-@memory.cache
 def surface_month_mean_temperature(lat, lon, m):
     """
     A method to estimate the annual mean surface temperature (K) at 2 m

@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+
 import numpy as np
 from astropy import units as u
 from scipy.optimize import bisect
@@ -12,7 +13,7 @@ from itur import utils
 from itur.models.itu1510 import surface_month_mean_temperature
 from itur.models.itu1144 import bilinear_2D_interpolator
 from itur.utils import (prepare_input_array, prepare_output_array,
-                        memory, load_data_interpolator)
+                        load_data_interpolator)
 
 
 class __ITU837():
@@ -311,13 +312,12 @@ def change_version(new_version):
     new_version : int
         Number of the version to use.
         Valid values are:
-        *  7: Activates recommendation ITU-R P.837-7 (12/17) (Current version)
-        *  6: Activates recommendation ITU-R P.837-6 (02/12) (Superseded)
+          *  7: Activates recommendation ITU-R P.837-7 (12/17) (Current version)
+          *  6: Activates recommendation ITU-R P.837-6 (02/12) (Superseded)
 
     """
     global __model
     __model = __ITU837(new_version)
-    utils.memory.clear()
 
 
 def get_version():
@@ -328,7 +328,6 @@ def get_version():
     return __model.__version__
 
 
-@memory.cache
 def rainfall_probability(lat, lon):
     """
     A method to compute the percentage probability of rain in an average
@@ -363,7 +362,6 @@ def rainfall_probability(lat, lon):
     return prepare_output_array(val, type_output) * u.pct
 
 
-@memory.cache
 def rainfall_rate(lat, lon, p):
     """
     A method to compute the rainfall rate exceeded for p% of the average year

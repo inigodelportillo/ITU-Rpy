@@ -4,12 +4,13 @@ from __future__ import division
 from __future__ import print_function
 
 import os
+
 import numpy as np
 from astropy import units as u
 
 from itur.models.itu1144 import bilinear_2D_interpolator
 from itur.utils import (dataset_dir, prepare_input_array, prepare_output_array,
-                        prepare_quantity, memory, load_data_interpolator)
+                        prepare_quantity, load_data_interpolator)
 
 
 def __fcn_columnar_content_reduced_liquid__(Lred, lat, lon, p):
@@ -520,9 +521,9 @@ def change_version(new_version):
     new_version : int
         Number of the version to use.
         Valid values are:
-        * Activates recommendation ITU-R 6: P.840-6 (09/13) (Current version)
-        * Activates recommendation ITU-R 5: P.840-5 (02/12) (Superseded)
-        * Activates recommendation ITU-R 4: P.840-4 (10/09) (Superseded)
+          * 6: Activates recommendation ITU-R P.840-6 (09/13) (Current version)
+          * 5: Activates recommendation ITU-R P.840-5 (02/12) (Superseded)
+          * 4: Activates recommendation ITU-R P.840-4 (10/09) (Superseded)
     """
     global __model
     __model = __ITU840__(new_version)
@@ -571,7 +572,6 @@ def specific_attenuation_coefficients(f, T):
     return __model.specific_attenuation_coefficients(f, T)
 
 
-@memory.cache
 def columnar_content_reduced_liquid(lat, lon, p):
     """
     A method to compute the total columnar content of reduced cloud liquid
@@ -653,7 +653,6 @@ def cloud_attenuation(lat, lon, el, f, p):
     return prepare_output_array(val, type_output) * u.dB
 
 
-@memory.cache
 def lognormal_approximation_coefficient(lat, lon):
     """
     A method to estimate the paramerts of the lognormla distribution used to

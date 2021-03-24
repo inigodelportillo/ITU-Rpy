@@ -3,13 +3,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+
 import numpy as np
 from astropy import units as u
 
 from itur import utils
 from itur.models.itu1144 import bilinear_2D_interpolator
 from itur.utils import (prepare_input_array, prepare_output_array,
-                        memory, load_data_interpolator)
+                        load_data_interpolator)
 
 
 class __ITU839__():
@@ -177,15 +178,14 @@ def change_version(new_version):
     new_version : int
         Number of the version to use.
         Valid values are:
-        * 4: Activates recommendation ITU-R P.839-4 (09/2013) (Current version)
-        * 3: Activates recommendation ITU-R P.839-3 (02/01) (Superseded)
-        * 2: Activates recommendation ITU-R P.839-2 (10/99) (Superseded)
+          * 4: Activates recommendation ITU-R P.839-4 (09/2013) (Current version)
+          * 3: Activates recommendation ITU-R P.839-3 (02/01) (Superseded)
+          * 2: Activates recommendation ITU-R P.839-2 (10/99) (Superseded)
 
 
     """
     global __model
     __model = __ITU839__(new_version)
-    utils.memory.clear()
 
 
 def get_version():
@@ -196,7 +196,6 @@ def get_version():
     return __model.__version__
 
 
-@memory.cache
 def isoterm_0(lat, lon):
     """
     A method to estimate the zero isoterm height for propagation prediction.
@@ -231,7 +230,6 @@ def isoterm_0(lat, lon):
     return prepare_output_array(val, type_output) * u.km
 
 
-@memory.cache
 def rain_height(lat, lon):
     """
     A method to estimate the rain height for propagation prediction.
