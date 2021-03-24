@@ -58,8 +58,11 @@ def nearest_2D_interpolator(lats_o, lons_o, values):
     otherwise, scipy.intepolate.griddata
 
     Values can be interpolated from the returned function as follows:
-       f = nearest_2D_interpolator(lat_origin, lon_origin, values_origin)
-       interp_values = f(lat_interp, lon_interp)
+
+    .. code-block:: python
+
+      f = nearest_2D_interpolator(lat_origin, lon_origin, values_origin)
+      interp_values = f(lat_interp, lon_interp)
 
 
     Parameters
@@ -108,8 +111,11 @@ def bilinear_2D_interpolator(lats_o, lons_o, values):
     otherwise, scipy.intepolate.griddata
 
     Values can be interpolated from the returned function as follows:
-       f = nearest_2D_interpolator(lat_origin, lon_origin, values_origin)
-       interp_values = f(lat_interp, lon_interp)
+
+    .. code-block:: python
+
+      f = nearest_2D_interpolator(lat_origin, lon_origin, values_origin)
+      interp_values = f(lat_interp, lon_interp)
 
 
     Parameters
@@ -155,8 +161,11 @@ def bicubic_2D_interpolator(lats_o, lons_o, values):
     method. Uses the scipy.intepolate.griddata method.
 
     Values can be interpolated from the returned function as follows:
-       f = nearest_2D_interpolator(lat_origin, lon_origin, values_origin)
-       interp_values = f(lat_interp, lon_interp)
+
+    .. code-block:: python
+
+      f = nearest_2D_interpolator(lat_origin, lon_origin, values_origin)
+      interp_values = f(lat_interp, lon_interp)
 
 
     Parameters
