@@ -4,23 +4,20 @@ Recommendation ITU-R P.676
 
 Implementation of the methods in Recommendation ITU-R P.676 "Attenuation by atmospheric gases".
 
-This Recommendation provides methods to estimate the attenuation of atmospheric gases on terrestrial and
-slant paths using:
-   * an estimate of gaseous attenuation computed by a summation of individual absorption lines that is valid for the frequency range 1-1 000 GHz; and
-   * a simplified approximate method to estimate gaseous attenuation that is applicable in the frequency range 1-350 GHz.
+Introduction
+************
 
-Available versions include:
-   * P.676-1 (03/92) (Superseded)
-   * P.676-2 (10/95) (Superseded)
-   * P.676-3 (08/97) (Superseded)
-   * P.676-4 (10/99) (Superseded)
-   * P.676-5 (02/01) (Superseded)
-   * P.676-6 (03/05) (Superseded)
-   * P.676-7 (02/07) (Superseded)
-   * P.676-8 (10/09) (Superseded)
-   * P.676-9 (02/12) (Superseded)
-   * P.676-10 (09/13) (Superseded)
-   * P.676-11 (09/16) (Current version)
+This Recommendation provides the following three methods of predicting the specific and path gaseous attenuation due to oxygen and water vapour:
+* Calculation of specific and path gaseous attenuation using the line-by-line summation assuming the atmospheric pressure, temperature, and water vapour density vs. height;
+* An approximate estimate of specific and path gaseous attenuation assuming the water vapour density at the surface of the Earth;
+* An approximate estimate of path attenuation assuming the integrated water vapour content along the path.
+
+These prediction methods can use local meteorological data, or reference atmospheres or meteorological maps corresponding to a desired probability of exceedance that are provided in other ITU-R P-series Recommendations. In the absence of local data, a combination of: a) the reference atmospheric profiles given in Recommendation ITU-R P.835 may be used, b) the mean annual global reference atmosphere given in Recommendation ITU-R P.835, c) the map of mean annual surface temperature in Recommendation ITU-R P.1510 and d) the maps of surface water vapour density vs. exceedance probability given in Recommendation ITU-R P.836 may be used in lieu of the standard ground-level surface water vapour density of 7.5 g/m3.
+
+The method to compute an estimate of gaseous attenuation computed by a summation of individual absorption lines that is valid for the frequency range 1-1 000 GHz, and the method to compute a simplified approximate method to estimate gaseous attenuation that is applicable in the frequency range 1-350 GHz.
+
+Module description
+******************
 
 .. automodule:: itur.models.itu676
     :members:

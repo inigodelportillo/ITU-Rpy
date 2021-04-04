@@ -2,17 +2,26 @@
 Recommendation ITU-R P.453
 --------------------------
 
-Implementation of the methods in Recommendation ITU-R P.453 "The radio refractive index: its formula and refractivity data"
+This Recommendation provides a method to estimate the radio refractive index and its behaviour for locations worldwide; describes both surface and vertical profile characteristics; and provides global maps for the distribution of refractivity parameters and their statistical variation.
 
-Available versions:
-   * P.453-12 (07/15)
+Introduction
+************
 
-TODO: Implement version P.453-13
+The atmospheric radio refractive index, n, can be computed by the following formula:
+.. math::
+    n = 1 + N\cdot 10^{-6}
+    N = 77.6 \frac{P_d}{T} + 72\frac{e}{T} +3.75\cdot10^{5}\frac{e}{T^2}
+    
+where
+    * :math:`P_d` :: dry atmospheric pressure (hPa)
+    * :math:`P` :: total atmospheric pressure (hPa)
+    * :math:`e` :: water vapour pressure (hPa)
+    * :math:`T` :: absolute tempreature (K)
+    
+Furthermore, in the absence of reliable local data, data on refractivity and refractivity gradients all over the world can be computed using global numerical maps provided in this recommendation.
 
-Recommendation ITU-R P.453 provides methods to estimate the radio refractive
-index and its behaviour for locations worldwide; describes both surface and
-vertical profile characteristics; and provides global maps for the
-distribution of refractivity parameters and their statistical variation.
+Module description
+******************
 
 .. automodule:: itur.models.itu453
     :members:

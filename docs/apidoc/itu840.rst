@@ -2,19 +2,34 @@
 Recommendation ITU-R P.840
 --------------------------
 
-Implementation of the methods in Recommendation ITU-R P.840 "Attenuation due to clouds and fog"
 This Recommendation provides methods to predict the attenuation due to clouds and fog on Earth-space paths.
 
-Available versions include:
-    * P.840-4 (10/09) (Superseded)
-    * P.840-5 (02/12) (Superseded)
-    * P.840-6 (09/13) (Current version)
+Introduction
+************
 
-Non-available versions include:
-    * P.840-1 (08/94) (Superseded) - Looks similar to P.840-4
-    * P.840-2 (08/97) (Superseded) - Looks similar to P.840-4
-    * P.840-3 (10/99) (Superseded) - Looks similar to P.840-4
-	
+For clouds or fog consisting entirely of small droplets, generally less than 0.01 cm, the Rayleigh
+approximation is valid for frequencies below 200 GHz and it is possible to express the attenuation
+in terms of the total water content per unit volume. Thus the specific attenuation within a cloud or
+fog can be written as:
+
+.. math::
+
+    \gamma_c(f, T) = M \cdot K_l(f, T) \qquad \text{[dB/km]}
+
+where:
+    * :math:`\gamma_c` : specific attenuation (dB/km) within the cloud;
+    * :math:`K_l` : specific attenuation coefficient ((dB/km)/(g/m3));
+    * :math:`M` : liquid water density in the cloud or fog (g/m3).
+    * :math:`f` : frequency (GHz).
+    * :math:`T` : cloud liquid water temperature (K).
+
+At frequencies of the order of 100 GHz and above, attenuation due to fog may be significant.
+The liquid water density in fog is typically about 0.05 g/m3 for medium fog (visibility of the order
+of 300 m) and 0.5 g/m3 for thick fog (visibility of the order of 50 m).
+
+Module description
+******************
+
 .. automodule:: itur.models.itu840
     :members:
     :undoc-members:
