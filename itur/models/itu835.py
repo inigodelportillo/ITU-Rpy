@@ -1,16 +1,4 @@
 # -*- coding: utf-8 -*-
-"""A package that contains the models of ITU-R P.835 Recommendation, Reference Standard Atmospheres.
-
-Available versions:
-       * P.835-6 (12/17) (Current version)
-       * P.835-5 (02/12) (Superseded)
-
-    Not available versions:
-       * P.835-1 (08/94) (Superseded)
-       * P.835-2 (08/97) (Superseded)
-       * P.835-3 (10/99) (Superseded)
-       * P.835-4 (03/05) (Superseded)
-"""
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function

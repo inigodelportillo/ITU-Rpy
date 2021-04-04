@@ -10,12 +10,10 @@ import warnings
 import numpy as np
 from astropy import units as u
 
-from itur import utils
 from itur.models.itu453 import radio_refractive_index
 from itur.models.itu835 import (standard_pressure, standard_temperature,
                                 standard_water_vapour_density)
 from itur.models.itu836 import total_water_vapour_content
-from itur.models.itu1510 import surface_mean_temperature
 from itur.models.itu1511 import topographic_altitude
 from itur.utils import (prepare_quantity, prepare_output_array,
                         prepare_input_array, load_data, dataset_dir)
@@ -1233,8 +1231,12 @@ def change_version(new_version):
 def get_version():
     """
     Obtain the version of the ITU-R P.676 recommendation currently being used.
+
+    Returns
+    -------
+    version: int
+       The version of the ITU-R P.530 recommendation being used.
     """
-    global __model
     return __model.__version__
 
 
@@ -1522,7 +1524,6 @@ def gammaw_approx(f, P, rho, T):
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
-    global __model
     type_output = type(f)
     f = prepare_quantity(f, u.GHz, 'Frequency')
     P = prepare_quantity(P, u.hPa, 'Atmospheric pressure ')
@@ -1559,7 +1560,6 @@ def gamma0_approx(f, P, rho, T):
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
-    global __model
     type_output = type(f)
     f = prepare_quantity(f, u.GHz, 'Frequency')
     P = prepare_quantity(P, u.hPa, 'Atmospheric pressure')
@@ -1597,7 +1597,6 @@ def gammaw_exact(f, P, rho, T):
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
-    global __model
     type_output = type(f)
     f = prepare_quantity(f, u.GHz, 'Frequency')
     P = prepare_quantity(P, u.hPa, 'Atmospheric pressure ')
@@ -1634,7 +1633,6 @@ def gamma0_exact(f, P, rho, T):
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
-    global __model
     type_output = type(f)
     f = prepare_quantity(f, u.GHz, 'Frequency')
     P = prepare_quantity(P, u.hPa, 'Atmospheric pressure')
@@ -1671,7 +1669,6 @@ def gamma_exact(f, P, rho, T):
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
-    global __model
     f = prepare_quantity(f, u.GHz, 'Frequency')
     type_output = type(f)
 

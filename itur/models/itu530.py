@@ -18,8 +18,7 @@ from itur.utils import (prepare_input_array, prepare_quantity,
 
 
 class __ITU530__():
-
-    """Private class to model the ITU-R P.530 recommendations
+    """Private class to model the ITU-R P.530 recommendations.
 
     Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems
@@ -37,6 +36,7 @@ class __ITU530__():
     final outage predicted is the base for other Recommendations addressing
     error performance and availability.
     """
+
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.530 recommendation.
 
@@ -103,7 +103,7 @@ class _ITU530_17_():
     @classmethod
     def s_a(self, lat, lon):
         """
-        Standard deviation of terrain heights
+        Standard deviation of terrain heights.
 
         Computes the Standard deviation of terrain heights (m) within a
         110 km × 110 km area with a 30 s resolution (e.g. the Globe “gtopo30”
@@ -127,7 +127,7 @@ class _ITU530_17_():
     @classmethod
     def fresnel_ellipse_radius(self, d1, d2, f):
         """
-        Computes the Fresnel ellipse radius at a given frequency
+        Compute the Fresnel ellipse radius at a given frequency.
 
         Implementation of 'fresnel_ellipse_radius' method for recommendation
         ITU-P R.530-16. See documentation for function
@@ -138,7 +138,7 @@ class _ITU530_17_():
     @classmethod
     def diffraction_loss(self, d1, d2, h, f):
         """
-        Computes the diffraction losses at a given frequency
+        Compute the diffraction losses at a given frequency.
 
         Implementation of 'diffraction_loss' method for recommendation
         ITU-P R.530-16. See documentation for function
@@ -155,13 +155,12 @@ class _ITU530_17_():
     def multipath_loss_for_A(self, lat, lon, h_e, h_r, d, f, A):
         """
         Computes the percentage of time that a fade depth A is exceeded
-        due to multi-path losses
+        due to multi-path losses.
 
         Implementation of 'multipath_loss_for_A' method for recommendation
         ITU-P R.530-16. See documentation for function
         'ITUR530.multipath_loss_for_A'
         """
-
         # Step 1: Estimate the geoclimatic factor K
         # DN1 point refractivity gradient in the lowest 65 m of the atmosphere
         # not exceeded for 1% of an average year
@@ -188,7 +187,6 @@ class _ITU530_17_():
         """
         Estimate the number of fade events exceeding attenuation 'A'
         for 10 seconds or longer.
-
 
         Implementation of 'multipath_loss' method for recommendation
         ITU-P R.530-16. See documentation for function
@@ -276,6 +274,7 @@ class _ITU530_17_():
         recommendation ITU-P R.530-16. See documentation for function
         'ITUR530.inverse_rain_attenuation'
         """
+
         # Step 1: Obtain the rain rate R0.01 exceeded for 0.01% of the time
         # (with an integration time of 1 min).
         if R001 is None:
@@ -349,7 +348,7 @@ class _ITU530_17_():
 
         # Step 2: Evaluate the multi-path activity parameter:
         P0 = self.multipath_loss_for_A(lat, lon, h_e, h_r, d, f, 0)
-        eta = 1 - np.exp(-0.2 * P0**0.75)                      # Eq. 102
+        eta = 1 - np.exp(-0.2 * P0**0.75)                       # Eq. 102
 
         # Step 3:
         kXP = 0.7                                               # Eq. 104
@@ -371,7 +370,6 @@ class _ITU530_17_():
         Estimate the probability of outage due to cross-polar discrimination
         reduction due to clear-air effects, assuming that a target C0_I is
         required.
-
 
         Implementation of 'XPD_outage_precipitation' method for recommendation
         ITU-P R.530-16. See documentation for function
@@ -465,7 +463,6 @@ def change_version(new_version):
     """
     Change the version of the ITU-R P.530 recommendation currently being used.
 
-
     This function changes the model used for the ITU-R P.530 recommendation
     to a different version.
 
@@ -481,9 +478,7 @@ def change_version(new_version):
 
 
 def get_version():
-    """ The version of the current model for the ITU-R P.530 recommendation.
-
-
+    """
     Obtain the version of the ITU-R P.530 recommendation currently being used.
 
     Returns
@@ -491,15 +486,11 @@ def get_version():
     version: int
        The version of the ITU-R P.530 recommendation being used.
     """
-    global __model
     return __model.__version__
 
 
 def fresnel_ellipse_radius(d1, d2, f):
-    """
-    Computes the radius of the first Fresnel ellipsoid.
-
-
+    """Compute the radius of the first Fresnel ellipsoid.
 
     Parameters
     ----------
@@ -522,7 +513,6 @@ def fresnel_ellipse_radius(d1, d2, f):
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
-    global __model
     type_output = type(d1)
     d1 = prepare_quantity(d1, u.km, 'Distance to the first terminal')
     d2 = prepare_quantity(d2, u.km, 'Distance to the second terminal')
@@ -533,8 +523,7 @@ def fresnel_ellipse_radius(d1, d2, f):
 
 
 def diffraction_loss(d1, d2, h, f):
-    """ Esitmate the diffraction loss over average terrain.
-
+    """Estimate the diffraction loss over average terrain.
 
     Diffraction loss over average terrain. This value is valid for losses
     greater than 15 dB.
@@ -565,7 +554,6 @@ def diffraction_loss(d1, d2, h, f):
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
-    global __model
     type_output = type(d1)
     d1 = prepare_quantity(d1, u.km, 'Distance to the first terminal')
     d2 = prepare_quantity(d2, u.km, 'Distance to the second terminal')
@@ -577,8 +565,7 @@ def diffraction_loss(d1, d2, h, f):
 
 
 def multipath_loss_for_A(lat, lon, h_e, h_r, d, f, A):
-    """
-    Estimate the single-frequency (or narrow-band) fading distribution
+    """Estimate the single-frequency (or narrow-band) fading distribution.
 
     Method for predicting the single-frequency (or narrow-band) fading
     distribution at large fade depths in the average worst month in any part
@@ -624,7 +611,6 @@ def multipath_loss_for_A(lat, lon, h_e, h_r, d, f, A):
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
@@ -642,8 +628,7 @@ def multipath_loss_for_A(lat, lon, h_e, h_r, d, f, A):
 
 
 def multipath_loss(lat, lon, h_e, h_r, d, f, A):
-    """
-    Estimate the percentage of time that any fade depth is exceeded.
+    """Estimate the percentage of time that any fade depth is exceeded.
 
     Method for predicting the percentage of time that any fade depth is
     exceeded. This method combines the deep fading distribution given in the
@@ -687,7 +672,6 @@ def multipath_loss(lat, lon, h_e, h_r, d, f, A):
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
@@ -705,8 +689,7 @@ def multipath_loss(lat, lon, h_e, h_r, d, f, A):
 
 
 def rain_attenuation(lat, lon, d, f, el, p, tau=45, R001=None):
-    """
-    Estimate long-term statistics of rain attenuation.
+    """Estimate long-term statistics of rain attenuation.
 
     Attenuation can also
     occur as a result of absorption and scattering by such hydro-meteors as
@@ -756,7 +739,6 @@ def rain_attenuation(lat, lon, d, f, el, p, tau=45, R001=None):
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
@@ -771,7 +753,7 @@ def rain_attenuation(lat, lon, d, f, el, p, tau=45, R001=None):
 
 
 def inverse_rain_attenuation(lat, lon, d, f, el, Ap, tau=45, R001=None):
-    """ Estimate the percentage of time a given attenuation is exceeded
+    """Estimate the percentage of time a given attenuation is exceeded.
 
     Estimate the percentage of time a given attenuation is exceeded due to
     rain events.
@@ -818,7 +800,6 @@ def inverse_rain_attenuation(lat, lon, d, f, el, Ap, tau=45, R001=None):
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
@@ -834,7 +815,7 @@ def inverse_rain_attenuation(lat, lon, d, f, el, Ap, tau=45, R001=None):
 
 
 def rain_event_count(lat, lon, d, f, el, A, tau=45, R001=None):
-    """ Estimate the number of fade events exceeding attenuation 'A'
+    """Estimate the number of fade events exceeding attenuation 'A'.
 
     Estimate the number of fade events exceeding attenuation 'A'
     for 10 seconds or longer.
@@ -881,7 +862,6 @@ def rain_event_count(lat, lon, d, f, el, A, tau=45, R001=None):
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
@@ -897,7 +877,7 @@ def rain_event_count(lat, lon, d, f, el, A, tau=45, R001=None):
 
 
 def XPD_outage_clear_air(lat, lon, h_e, h_r, d, f, XPD_g, C0_I, XPIF=0):
-    """ Estimate the probability of outage due to cross-polar discrimination
+    """Estimate the probability of outage due to cross-polar discrimination.
 
     Estimate the probability of outage due to cross-polar discrimination
     reduction due to clear-air effects, assuming that a target C0_I is
@@ -943,7 +923,6 @@ def XPD_outage_clear_air(lat, lon, h_e, h_r, d, f, XPD_g, C0_I, XPIF=0):
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
@@ -966,7 +945,7 @@ def XPD_outage_clear_air(lat, lon, h_e, h_r, d, f, XPD_g, C0_I, XPIF=0):
 
 def XPD_outage_precipitation(lat, lon, d, f, el, C0_I, tau=45,
                              U0=15, XPIF=0):
-    """ Estimate the probability of outage due to cross-polar discrimination
+    """Estimate the probability of outage due to cross-polar discrimination.
 
     Estimate the probability of outage due to cross-polar discrimination
     reduction due to clear-air effects, assuming that a target C0_I is
@@ -1013,7 +992,6 @@ def XPD_outage_precipitation(lat, lon, d, f, el, C0_I, tau=45,
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)

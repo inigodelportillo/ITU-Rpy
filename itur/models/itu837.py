@@ -13,7 +13,7 @@ from itur import utils
 from itur.models.itu1510 import surface_month_mean_temperature
 from itur.models.itu1144 import bilinear_2D_interpolator
 from itur.utils import (prepare_input_array, prepare_output_array,
-                        load_data_interpolator)
+                        load_data_interpolator, prepare_quantity)
 
 
 class __ITU837():
@@ -323,15 +323,19 @@ def change_version(new_version):
 def get_version():
     """
     Obtain the version of the ITU-R P.837 recommendation currently being used.
+
+    Returns
+    -------
+    version: int
+        Version currently being used.
     """
-    global __model
     return __model.__version__
 
 
 def rainfall_probability(lat, lon):
     """
-    A method to compute the percentage probability of rain in an average
-    year, P0
+    Compute the percentage probability of rain in an average year, P0,  at a
+    given location.
 
 
     Parameters
@@ -353,7 +357,6 @@ def rainfall_probability(lat, lon):
     [1] Characteristics of precipitation for propagation modelling
     https://www.itu.int/rec/R-REC-P.837/en
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
@@ -364,7 +367,8 @@ def rainfall_probability(lat, lon):
 
 def rainfall_rate(lat, lon, p):
     """
-    A method to compute the rainfall rate exceeded for p% of the average year
+    Compute the rainfall rate exceeded for p% of the average year at a
+    given location.
 
 
     Parameters
@@ -388,7 +392,6 @@ def rainfall_rate(lat, lon, p):
     [1] Characteristics of precipitation for propagation modelling
     https://www.itu.int/rec/R-REC-P.837/en
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
@@ -398,10 +401,11 @@ def rainfall_rate(lat, lon, p):
 
 
 def unavailability_from_rainfall_rate(lat, lon, R):
-    """
-    A method to estimate the percentage of time of the average year that a
-    given rainfall rate (R) is exceeded. This method calls successively to the
-    `rainfall_rate` method and interpolates its value.
+    """Compute the percentage of time of the average year that a given rainfall
+    rate (R) is exceeded at a given location
+
+    This method calls successively to `rainfall_rate` (sing bisection) with
+    different values of p.
 
 
     Parameters
@@ -425,8 +429,14 @@ def unavailability_from_rainfall_rate(lat, lon, R):
     [1] Characteristics of precipitation for propagation modelling
     https://www.itu.int/rec/R-REC-P.837/en
     """
-    global __model
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
-    # TODO: write this function
+    R = prepare_quantity(R, u.mm / u.hr, 'Rain rate')
+
+    #TODO: Cehck for bound on R (between 0 and 200 mm/hr?)
+
+    def fcn(x):
+        return (rainfall_rate(lat, lon, x).value - R - 1e-6)
+
+    return bisect(fcn, 1e-5, 100, maxiter=50)

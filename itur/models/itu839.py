@@ -191,14 +191,18 @@ def change_version(new_version):
 def get_version():
     """
     Obtain the version of the ITU-R P.839 recommendation currently being used.
+
+    Returns
+    -------
+    version: int
+        Version currently being used.
     """
-    global __model
     return __model.__version__
 
 
 def isoterm_0(lat, lon):
     """
-    A method to estimate the zero isoterm height for propagation prediction.
+    Estimate the zero degree Celsius isoterm height for propagation prediction.
 
 
     Parameters
@@ -211,8 +215,8 @@ def isoterm_0(lat, lon):
 
     Returns
     -------
-    zero_isoterm: numpy.ndarray
-        Zero isoterm height (km)
+    h0: numpy.ndarray
+        Zero degree Celsius isoterm height (km)
 
 
     References
@@ -221,7 +225,6 @@ def isoterm_0(lat, lon):
     https://www.itu.int/rec/R-REC-P.839/en
 
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
@@ -232,7 +235,14 @@ def isoterm_0(lat, lon):
 
 def rain_height(lat, lon):
     """
-    A method to estimate the rain height for propagation prediction.
+    Estimate the annual mean rain height for propagation prediction.
+
+    The mean annual rain height above mean sea level, :math:`h_R`,
+    may be obtained from the 0° C isotherm as:
+
+    .. math::
+
+      h_R = h_0 + 0.36 \\qquad \\text{km}
 
 
     Parameters
@@ -245,8 +255,8 @@ def rain_height(lat, lon):
 
     Returns
     -------
-    rain_height: numpy.ndarray
-        Rain height (km)
+    hR: numpy.ndarray
+        Annual mean rain height (km)
 
 
     References
@@ -254,7 +264,6 @@ def rain_height(lat, lon):
     [1] Rain height model for prediction methods:
     https://www.itu.int/rec/R-REC-P.839/en
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)

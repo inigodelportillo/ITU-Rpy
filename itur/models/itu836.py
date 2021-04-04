@@ -9,7 +9,6 @@ import numpy as np
 
 from astropy import units as u
 
-from itur import utils
 from itur.models.itu1511 import topographic_altitude
 from itur.models.itu1144 import (bilinear_2D_interpolator,
                                  bicubic_2D_interpolator)
@@ -91,9 +90,7 @@ def __interpolator_836__(self, data, lat, lon, p, alt=None,
 
 
 class __ITU836():
-
-    """
-    Private class to model the ITU-R P.836 recommendations
+    """Private class to model the ITU-R P.836 recommendations.
 
     Water vapour: surface density and total columnar content
 
@@ -108,6 +105,7 @@ class __ITU836():
        * P.836-2 (02/01) (Superseded)
        * P.836-3 (11/01) (Superseded)
     """
+
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.836 recommendation.
 
@@ -208,15 +206,11 @@ class _ITU836_6():
                 np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def surface_water_vapour_density(self, lat, lon, p, alt=None):
-        """
-        """
         return __interpolator_836__(
             self, data=self.rho, lat=lat, lon=lon, p=p, alt=alt,
             alt_res_fcn=self.topo_alt)
 
     def total_water_vapour_content(self, lat, lon, p, alt=None):
-        """
-        """
         return __interpolator_836__(
             self, data=self.V, lat=lat, lon=lon, p=p, alt=alt,
             alt_res_fcn=self.topo_alt)
@@ -277,15 +271,11 @@ class _ITU836_5():
                 np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def surface_water_vapour_density(self, lat, lon, p, alt=None):
-        """
-        """
         return __interpolator_836__(
             self, data=self.rho, lat=lat, lon=lon, p=p, alt=alt,
             alt_res_fcn=topographic_altitude)
 
     def total_water_vapour_content(self, lat, lon, p, alt=None):
-        """
-        """
         return __interpolator_836__(
             self, data=self.V, lat=lat, lon=lon, p=p, alt=alt,
             alt_res_fcn=topographic_altitude)
@@ -354,8 +344,6 @@ class _ITU836_4():
             alt_res_fcn=topographic_altitude)
 
     def total_water_vapour_content(self, lat, lon, p, alt=None):
-        """
-        """
         return __interpolator_836__(
             self, data=self.V, lat=lat, lon=lon, p=p, alt=alt,
             alt_res_fcn=topographic_altitude)
@@ -388,16 +376,21 @@ def change_version(new_version):
 def get_version():
     """
     Obtain the version of the ITU-R P.836 recommendation currently being used.
+
+    Returns
+    -------
+    version: int
+        Version currently being used.
     """
-    global __model
     return __model.__version__
 
 
 def surface_water_vapour_density(lat, lon, p, alt=None):
     """
-    Method to compute the surface water vapour density along a path  at any
-    desired location on the surface of the Earth.
+    Compute the surface water vapour density along a path.
 
+    This method computes the surface water vapour density along a path at a
+    desired location on the surface of the Earth.
 
     Parameters
     ----------
@@ -423,7 +416,6 @@ def surface_water_vapour_density(lat, lon, p, alt=None):
     [1] Water vapour: surface density and total columnar content
     https://www.itu.int/rec/R-REC-P.836/en
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
@@ -436,9 +428,10 @@ def surface_water_vapour_density(lat, lon, p, alt=None):
 
 def total_water_vapour_content(lat, lon, p, alt=None):
     """
-    Method to compute the total water vapour content along a path  at any
-    desired location on the surface of the Earth.
+    Compute the total water vapour content along a path.
 
+    This method computes the total water vapour content along a path at a
+    desired location on the surface of the Earth.
 
     Parameters
     ----------
@@ -464,7 +457,6 @@ def total_water_vapour_content(lat, lon, p, alt=None):
     [1] Water vapour: surface density and total columnar content
     https://www.itu.int/rec/R-REC-P.836/en
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)

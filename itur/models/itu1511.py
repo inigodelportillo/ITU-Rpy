@@ -188,19 +188,22 @@ def change_version(new_version):
     global __model
     __model = __ITU1511(new_version)
 
+
 def get_version():
     """
     Obtain the version of the ITU-R P.1511 recommendation currently being used.
+
+    Returns
+    -------
+    version: int
+        Version currently being used.
     """
-    global __model
     return __model.__version__
 
 
 def topographic_altitude(lat, lon):
     """
-    The values of topographical height (km) above mean sea level of the surface
-    of the Earth a
-
+    Topographical height (km) above mean sea level of the surface of the Earth.
 
 
     Parameters
@@ -223,7 +226,6 @@ def topographic_altitude(lat, lon):
     https://www.itu.int/rec/R-REC-P.1511/en
 
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)

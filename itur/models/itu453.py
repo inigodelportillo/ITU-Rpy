@@ -13,7 +13,7 @@ from itur.utils import (prepare_input_array, prepare_quantity, load_data,
 
 
 class __ITU453__():
-    """ Private class to model the ITU-R P.453 recommendations
+    """ Private class to model the ITU-R P.453 recommendations.
 
     Implementation of the methods in Recommendation ITU-R P.453
     "The radio refractive index: its formula and refractivity data"
@@ -30,6 +30,7 @@ class __ITU453__():
     the distribution of refractivity parameters and their statistical
     variation.
     """
+
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.453 recommendation.
 
@@ -184,8 +185,6 @@ class _ITU453_13_():
         return e_s
 
     def map_wet_term_radio_refractivity(self, lat, lon, p):
-        """
-        """
         # Fix lon because the data-set is now indexed -180 to 180 instead
         # of 0 to 360
         lon[lon > 180] = lon[lon > 180] - 360
@@ -330,7 +329,6 @@ def change_version(new_version):
     """
     Change the version of the ITU-R P.453 recommendation currently being used.
 
-
     This function changes the model used for the ITU-R P.453 recommendation
     to a different version.
 
@@ -348,9 +346,7 @@ def change_version(new_version):
 
 
 def get_version():
-    """ The version of the current model for the ITU-R P.453 recommendation.
-
-
+    """
     Obtain the version of the ITU-R P.453 recommendation currently being used.
 
     Returns
@@ -358,14 +354,11 @@ def get_version():
     version: int
        The version of the ITU-R P.453 recommendation being used.
     """
-    global __model
     return __model.__version__
 
 
 def wet_term_radio_refractivity(e, T):
-    """
-    Method to determine the wet term of the radio refractivity
-
+    """Determine the wet term of the radio refractivity.
 
     Parameters
     ----------
@@ -388,7 +381,6 @@ def wet_term_radio_refractivity(e, T):
     https://www.itu.int/rec/R-REC-P.453/en
 
     """
-    global __model
     e = prepare_quantity(e, u.hPa, 'Water vapour pressure ')
     T = prepare_quantity(T, u.K, 'Absolute temperature')
     val = __model.wet_term_radio_refractivity(e, T)
@@ -396,9 +388,7 @@ def wet_term_radio_refractivity(e, T):
 
 
 def dry_term_radio_refractivity(Pd, T):
-    """
-    Method to determine the dry term of the radio refractivity
-
+    """Determine the dry term of the radio refractivity.
 
     Parameters
     ----------
@@ -421,7 +411,6 @@ def dry_term_radio_refractivity(Pd, T):
     https://www.itu.int/rec/R-REC-P.453/en
 
     """
-    global __model
     Pd = prepare_quantity(Pd, u.hPa, 'Dry atmospheric pressure')
     T = prepare_quantity(T, u.K, 'Absolute temperature')
     val = __model.dry_term_radio_refractivity(Pd, T)
@@ -429,9 +418,7 @@ def dry_term_radio_refractivity(Pd, T):
 
 
 def radio_refractive_index(P, e, T):
-    """
-    Method to compute the radio refractive index
-
+    """Compute the radio refractive index.
 
     Parameters
     ----------
@@ -456,7 +443,6 @@ def radio_refractive_index(P, e, T):
     https://www.itu.int/rec/R-REC-P.453/en
 
     """
-    global __model
     P = prepare_quantity(P, u.hPa, 'Total atmospheric pressure')
     e = prepare_quantity(e, u.hPa, 'Water vapour pressure ')
     T = prepare_quantity(T, u.K, 'Absolute temperature')
@@ -465,9 +451,7 @@ def radio_refractive_index(P, e, T):
 
 
 def water_vapour_pressure(T, P, H, type_hydrometeor='water'):
-    """
-    Method to determine the water vapour pressure
-
+    """Determine the water vapour pressure.
 
     Parameters
     ----------
@@ -494,7 +478,6 @@ def water_vapour_pressure(T, P, H, type_hydrometeor='water'):
     https://www.itu.int/rec/R-REC-P.453/en
 
     """
-    global __model
     T = prepare_quantity(T, u.deg_C, 'Absolute temperature')
     P = prepare_quantity(P, u.hPa, 'Total atmospheric pressure')
     H = prepare_quantity(H, u.percent, 'Total atmospheric pressure')
@@ -503,9 +486,7 @@ def water_vapour_pressure(T, P, H, type_hydrometeor='water'):
 
 
 def saturation_vapour_pressure(T, P, type_hydrometeor='water'):
-    """
-    Method to determine the saturation water vapour pressure
-
+    """Determine the saturation water vapour pressure.
 
     Parameters
     ----------
@@ -530,7 +511,6 @@ def saturation_vapour_pressure(T, P, type_hydrometeor='water'):
     https://www.itu.int/rec/R-REC-P.453/en
 
     """
-    global __model
     T = prepare_quantity(T, u.deg_C, 'Absolute temperature')
     P = prepare_quantity(P, u.hPa, 'Total atmospheric pressure')
     val = __model.saturation_vapour_pressure(T, P, type_hydrometeor)
@@ -538,9 +518,7 @@ def saturation_vapour_pressure(T, P, type_hydrometeor='water'):
 
 
 def map_wet_term_radio_refractivity(lat, lon, p=50):
-    """
-    Method to determine the wet term of the radio refractivity
-
+    """Determine the wet term of the radio refractivity.
 
     Parameters
     ----------
@@ -562,7 +540,6 @@ def map_wet_term_radio_refractivity(lat, lon, p=50):
     [1] The radio refractive index: its formula and refractivity data
     https://www.itu.int/rec/R-REC-P.453/en
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
@@ -572,10 +549,8 @@ def map_wet_term_radio_refractivity(lat, lon, p=50):
 
 
 def DN65(lat, lon, p):
-    """
-    Method to determine the statistics of the vertical gradient of radio
-    refractivity in the lowest 65 m from the surface of the Earth.
-
+    """Determine the statistics of the vertical gradient of radio
+       refractivity in the lower 65 m from the surface of the Earth.
 
     Parameters
     ----------
@@ -601,7 +576,6 @@ def DN65(lat, lon, p):
     https://www.itu.int/rec/R-REC-P.453/en
 
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
@@ -611,10 +585,8 @@ def DN65(lat, lon, p):
 
 
 def DN1(lat, lon, p):
-    """
-    Method to determine the statistics of the vertical gradient of radio
-    refractivity over a 1 km layer from the surface.
-
+    """Determine the statistics of the vertical gradient of radio
+       refractivity over 1 km layer from the surface.
 
     Parameters
     ----------
@@ -632,14 +604,11 @@ def DN1(lat, lon, p):
         Vertical gradient of radio refractivity over a 1 km layer from the
         surface exceeded for p% of the average year
 
-
-
     References
     ----------
     [1] The radio refractive index: its formula and refractivity data
     https://www.itu.int/rec/R-REC-P.453/en
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
