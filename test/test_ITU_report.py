@@ -12,7 +12,7 @@ from itur import atmospheric_attenuation_slant_path
 
 pd.set_option('display.max_colwidth', -1)
 test_data = path.join(path.dirname(path.realpath(__file__)), 'test_data')
-html_path = path.join(path.dirname(path.realpath(__file__)), '../html/validation')
+html_path = path.join(path.dirname(path.realpath(__file__)), '../docs/validation')
 
 
 def create_ITU_suite():
@@ -80,25 +80,25 @@ def create_ITU_suite():
 
 
 def formatter_fcn(s):
-    return '<td style="text-align:left">' + str(s)
+    return '\t\t\t<td style="text-align:left">' + str(s)
 
 
 def formatter_rel_error_cell(s):
     if np.isnan(float(s)) or np.isinf(float(s)):
-        return '<td bgcolor="cornflowerblue">{0:.3f}'.format(s)
+        return '\t\t\t<td bgcolor="cornflowerblue">{0:.3f}'.format(s)
     elif abs(float(s)) < 0.01:
-        return '<td bgcolor="lightgreen">{0:.3f}'.format(s)
+        return '\t\t\t<td bgcolor="lightgreen">{0:.3f}'.format(s)
     else:
-        return '<td bgcolor="salmon">{0:.3f}'.format(s)
+        return '\t\t\t<td bgcolor="salmon">{0:.3f}'.format(s)
 
 
 def formatter_error(s):
     if np.isnan(float(s)):
-        return '<td bgcolor="cornflowerblue">{0:.2e}'.format(s)
+        return '\t\t\t<td bgcolor="cornflowerblue">{0:.2e}'.format(s)
     elif abs(float(s)) < 0.1:
-        return '<td bgcolor="lightgreen">{0:.2e}'.format(s)
+        return '\t\t\t<td bgcolor="lightgreen">{0:.2e}'.format(s)
     else:
-        return '<td bgcolor="salmon">{0:.3e}'.format(s)
+        return '\t\t\t<td bgcolor="salmon">{0:.3e}'.format(s)
 
 
 def format_table(table):
@@ -182,7 +182,9 @@ class ITU_Suite(test.TestSuite):
         for test_name, test_case in self.test_cases.items():
             ret = test_case.produce_html_report()
             if path_report:
-                fpath = path.join(path_report, test_name.lower() + '.html')
+                fpath = path.join(
+                  path_report,
+                  test_name.lower().replace('testcase', '_table') + '.html')
                 with open(fpath, 'w') as fd:
                     fd.write(ret)
 
@@ -219,8 +221,12 @@ class ITU_TestCase(test.TestCase):
             line['res_fcn'] = res_fcn.value
             line['res_val'] = res_val
             line['error'] = (res_val - res_fcn.value)
-            line['error_rel'] = round(
-                    (res_val - res_fcn.value) / res_val * 100, 3)
+            if res_val == 0 and abs(line['error']) < 1e-6:
+                line['error_rel'] = 0
+            else:
+                line['error_rel'] = round(
+                      (res_val - res_fcn.value) / res_val * 100, 3)
+
             res.append(line)
 
         # Create data frame with the report
@@ -245,7 +251,9 @@ class ITU_TestCase(test.TestCase):
           <style>
               table {{
                   border-collapse: collapse;
+                  font-size: 10px;
                   width: 100%;
+                  padding: 2px;
                 }}
 
                 th {{
@@ -255,8 +263,9 @@ class ITU_TestCase(test.TestCase):
 
                 th, td {{
                   text-align: center;
-                  padding: 8px;
+                  padding: 2px;
                   width: 1%;
+                  font-family: Arial, Helvetica, sans-serif;
                   white-space: nowrap;
                 }}
 
@@ -265,12 +274,12 @@ class ITU_TestCase(test.TestCase):
 
           </style>
           </head>
-          <body><h1>Validation results for {1}</h1><h2>{2}</h2>
-        """.format(self.itu_name, self.itu_name, self.itu_description)
+          <body><h2>{1}</h2>
+        """.format(self.itu_name, self.itu_description)
 
         html_footer = """
           </body>
-        </html>.
+        </html>
         """
 
         html_source = html_header
@@ -288,7 +297,8 @@ class ITU_TestCase(test.TestCase):
                                formatters=fmtrs)
 
             table = format_table(table)
-            html_source += '\n<h2>{0}</h2>'.format(test_name)
+            html_source += '\n<br><br><h3>{0}</h3>'.\
+                format(test_name.replace('test_', 'Validation of function '))
             html_source += table
 
         html_source += html_footer
