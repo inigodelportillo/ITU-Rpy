@@ -64,7 +64,7 @@ setup(
 
     # This should be a valid email address corresponding to the author listed
     # above.
-    author_email='portillo@mit.edu',
+    author_email='inigo.del.portillo@gmail.com',
 
     license='MIT',
 
