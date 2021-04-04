@@ -1,10 +1,7 @@
 API Documentation
 =================
 
-.. automodule:: itur
-    :members:
-    :undoc-members:
-    :show-inheritance:
+ITU-Rpy
 
 .. toctree::
 
