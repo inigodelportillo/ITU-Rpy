@@ -580,7 +580,7 @@ class TestFunctionsRecommendation1510(test.TestCase):
 
     def test_1510(self):
         for version in self.versions:
-                        models.itu1510.change_version(version)
+            models.itu1510.change_version(version)
             self.test_all_functions_1510()
             self.assertEqual(models.itu1510.get_version(), version)
 
