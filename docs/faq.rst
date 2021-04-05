@@ -41,4 +41,4 @@ One can access to the values and units using the ``.value`` and ``.unit`` method
 I discovered a bug/have criticism or ideas on *ITU-Rpy*. Where should I report to?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-*ITU-Rpy* uses the `GitHub issue-tracker <https://github.com/iportillo/ITU-Rpy/issues>`_ to take care of bugs and questions. If you experience problems with *ITU-Rpy*, try to provide a full error report with all the typical information (OS, version, console-output, minimum working example, ...). This makes it a lot easier to reproduce the error and locate the problem.
+*ITU-Rpy* uses the `GitHub issue-tracker <https://github.com/inigodelportillo/ITU-Rpy/issues>`_ to take care of bugs and questions. If you experience problems with *ITU-Rpy*, try to provide a full error report with all the typical information (OS, version, console-output, minimum working example, ...). This makes it a lot easier to reproduce the error and locate the problem.

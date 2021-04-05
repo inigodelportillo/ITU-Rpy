@@ -20,7 +20,7 @@ To install the development version of ITU-Rpy, please type the following command
 
 .. code-block:: bash
 
-    git clone https://github.com/iportillo/ITU-Rpy
+    git clone https://github.com/inigodelportillo/ITU-Rpy
     cd ITU-Rpy
     pip install -U -r requirements.txt
     python setup.py install
@@ -47,7 +47,7 @@ If that does not work, you can try to download it using conda:
 
     conda -c conda-forge install basemap
 
-If you are using Windows, you cna also install basemap using the appropriate pre-compiled wheels file from `this webpage <https://www.lfd.uci.edu/~gohlke/pythonlibs/#basemap>`_. 
+If you are using Windows, you can also install basemap using the appropriate pre-compiled wheels file from `this webpage <https://www.lfd.uci.edu/~gohlke/pythonlibs/#basemap>`_. 
 After downloading the .whl file, basemap can be installed running:
 
 

@@ -1,5 +1,5 @@
 # ITU-Rpy 
-[![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg)](https://raw.githubusercontent.com/Carthage/Carthage/master/LICENSE.md) [![Build Status](https://travis-ci.org/iportillo/ITU-Rpy.svg?branch=master)](https://travis-ci.org/iportillo/ITU-Rpy) [![PyPI version](https://badge.fury.io/py/itur.svg)](https://badge.fury.io/py/itur) [![Coverage Status](https://coveralls.io/repos/github/iportillo/ITU-Rpy/badge.svg?branch=master)](https://coveralls.io/github/iportillo/ITU-Rpy?branch=master)
+[![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg)](https://raw.githubusercontent.com/Carthage/Carthage/master/LICENSE.md) [![Build Status](https://travis-ci.org/inigodelportillo/ITU-Rpy.svg?branch=master)](https://travis-ci.org/inigodelportillo/ITU-Rpy) [![PyPI version](https://badge.fury.io/py/itur.svg)](https://badge.fury.io/py/itur) [![Coverage Status](https://coveralls.io/repos/github/inigodelportillo/ITU-Rpy/badge.svg?branch=master)](https://coveralls.io/github/inigodelportillo/ITU-Rpy?branch=master)
 
 A python implementation of the ITU-R P. Recommendations to compute atmospheric attenuation in slant and horizontal paths.
 
@@ -8,7 +8,7 @@ The propagation loss on an Earth-space path and a horizontal-path, relative to t
 ## Documentation
 The documentation can be found at [ITU-Rpy documentation](http://itu-rpy.readthedocs.io/en/latest/index.html) in Read the docs.
 
-Examples of use cases can be found in the [examples folder](https://github.com/iportillo/ITU-Rpy/tree/master/examples).
+Examples of use cases can be found in the [examples folder](https://github.com/inigodelportillo/ITU-Rpy/tree/master/examples).
 
 ## Installation
 ITU-Rpy has the followind dependencies: `numpy`, `scipy`, `joblib`, `pyproj`, and `astropy`. Installation of `basemap` and `matplotlib` is recommended to display results in a map.
@@ -18,7 +18,7 @@ Using pip, you can install all of them by running:
 pip install itur
 ```
 
-More information about the installation process can be found on the [documentation](https://github.com/iportillo/ITU-Rpy/blob/master/docs/installation.rst).
+More information about the installation process can be found on the [documentation](https://github.com/inigodelportillo/ITU-Rpy/blob/master/docs/installation.rst).
 
 ## ITU-R Recommendations implemented
 The following ITU-R Recommendations are implemented in ITU-Rpy
@@ -38,7 +38,7 @@ The following ITU-R Recommendations are implemented in ITU-Rpy
 The individual models can be accessed using the `itur.models` package.
 
 ## Usage
-The following code example shows the usage of ITU-Rpy. More examples can be found in the [examples folder](https://github.com/iportillo/ITU-Rpy/tree/master/examples).
+The following code example shows the usage of ITU-Rpy. More examples can be found in the [examples folder](https://github.com/inigodelportillo/ITU-Rpy/tree/master/examples).
 ```python
 import itur
 
@@ -56,7 +56,7 @@ itur.utils.plot_in_map(Att.value, lat, lon,
                        cbar_text='Atmospheric attenuation [dB]')
 ```
 which produces:
-![Attenuation worldmap](https://raw.githubusercontent.com/iportillo/ITU-Rpy/master/docs/images/att_world.png)
+![Attenuation worldmap](https://raw.githubusercontent.com/inigodelportillo/ITU-Rpy/master/docs/images/att_world.png)
 
 ## Citation
 If you use ITU-Rpy in one of your research projects, please cite it as:
@@ -68,6 +68,6 @@ If you use ITU-Rpy in one of your research projects, please cite it as:
       author={Inigo del Portillo},
       year={2017},
       publisher={GitHub},
-      howpublished={\url{https://github.com/iportillo/ITU-Rpy/}}
+      howpublished={\url{https://github.com/inigodelportillo/ITU-Rpy/}}
 }
 ```

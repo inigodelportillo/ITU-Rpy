@@ -56,7 +56,7 @@ setup(
     #
     # This field corresponds to the "Home-Page" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#home-page-optional
-    url='https://github.com/iportillo/ITU-Rpy',
+    url='https://github.com/inigodelportillo/ITU-Rpy',
 
     # This should be your name or the name of the organization which owns the
     # project.
@@ -141,7 +141,7 @@ setup(
     },
 
 	project_urls={  # Optional
-        'Bug Reports': 'https://github.com/iportillo/ITU-Rpy/issues',
-        'Source': 'https://github.com/iportillo/ITU-Rpy/',
+        'Bug Reports': 'https://github.com/inigodelportillo/ITU-Rpy/issues',
+        'Source': 'https://github.com/inigodelportillo/ITU-Rpy/',
     },
 )

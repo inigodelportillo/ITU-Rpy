@@ -23,7 +23,7 @@ documentation <http://itu-rpy.readthedocs.io/en/latest/index.html>`__ in
 Read the docs.
 
 Examples of use cases can be found in the `examples
-folder <https://github.com/iportillo/ITU-Rpy/tree/master/examples>`__.
+folder <https://github.com/inigodelportillo/ITU-Rpy/tree/master/examples>`__.
 
 Installation
 ------------
@@ -39,7 +39,7 @@ Using pip, you can install all of them by running:
     pip install itur
 
 More information about the installation process can be found on the
-`documentation <https://github.com/iportillo/ITU-Rpy/blob/master/docs/installation.rst>`__.
+`documentation <https://github.com/inigodelportillo/ITU-Rpy/blob/master/docs/installation.rst>`__.
 
 ITU-R Recommendations implemented:
 ----------------------------------
@@ -67,7 +67,7 @@ Usage
 
 The following code example shows the usage of ITU-Rpy. More examples can
 be found in the `examples
-folder <https://github.com/iportillo/ITU-Rpy/tree/master/examples>`__.
+folder <https://github.com/inigodelportillo/ITU-Rpy/tree/master/examples>`__.
 
 .. code:: python
 
@@ -101,16 +101,16 @@ If you use ITU-Rpy in one of your research projects, please cite it as:
           author={Inigo del Portillo},
           year={2017},
           publisher={GitHub},
-          howpublished={\url{https://github.com/iportillo/ITU-Rpy/}}
+          howpublished={\url{https://github.com/inigodelportillo/ITU-Rpy/}}
     }
 
 .. |GitHub license| image:: https://img.shields.io/badge/license-MIT-lightgrey.svg
    :target: https://raw.githubusercontent.com/Carthage/Carthage/master/LICENSE.md
-.. |Build Status| image:: https://travis-ci.org/iportillo/ITU-Rpy.svg?branch=master
-   :target: https://travis-ci.org/iportillo/ITU-Rpy
+.. |Build Status| image:: https://travis-ci.org/inigodelportillo/ITU-Rpy.svg?branch=master
+   :target: https://travis-ci.org/inigodelportillo/ITU-Rpy
 .. |PyPI version| image:: https://badge.fury.io/py/itur.svg
    :target: https://badge.fury.io/py/itur
-.. |Coverage Status| image:: https://coveralls.io/repos/github/iportillo/ITU-Rpy/badge.svg?branch=master
-   :target: https://coveralls.io/github/iportillo/ITU-Rpy?branch=master
-.. |Attenuation worldmap| image:: https://raw.githubusercontent.com/iportillo/ITU-Rpy/master/docs/images/att_world.png
+.. |Coverage Status| image:: https://coveralls.io/repos/github/inigodelportillo/ITU-Rpy/badge.svg?branch=master
+   :target: https://coveralls.io/github/inigodelportillo/ITU-Rpy?branch=master
+.. |Attenuation worldmap| image:: https://raw.githubusercontent.com/inigodelportillo/ITU-Rpy/master/docs/images/att_world.png
 

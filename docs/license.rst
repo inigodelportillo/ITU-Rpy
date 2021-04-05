@@ -45,5 +45,5 @@ If you use ITU-Rpy in one of your research projects, please cite it as:
           author={Inigo del Portillo},
           year={2017},
           publisher={GitHub},
-          howpublished={\url{https://github.com/iportillo/ITU-Rpy/}}
+          howpublished={\url{https://github.com/inigodelportillo/ITU-Rpy/}}
     }

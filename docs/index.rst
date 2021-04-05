@@ -4,10 +4,34 @@ ITU-Rpy documentation
 
 ITU-Rpy is a python implementation of the ITU-R P. Recommendations to compute atmospheric attenuation in slant and horizontal paths.
 
-Usage
------
+A complete overview of the contents of this documentation can be found in the :ref:`Table of Contents` at the bottom of this page.
 
-The following code example shows the usage of ITU-Rpy. More examples can be found in the `examples folder <https://github.com/iportillo/ITU-Rpy/tree/master/examples>`_.
+Instructions on how to install ITU-Rpy can be found at the :ref:`Installation` page.
+
+Results of validating ITU-Rpy against the validation examples provided by the ITU (where available) are at the :ref:`Validation` page.
+
+Citation
+--------
+
+If you use ITU-Rpy in one of your research projects, please cite it as:
+
+::
+
+    @misc{iturpy-2017,
+          title={ITU-Rpy: A python implementation of the ITU-R P. Recommendations to compute 
+             atmospheric attenuation in slant and horizontal paths.},
+          author={Inigo del Portillo},
+          year={2017},
+          publisher={GitHub},
+          howpublished={\url{https://github.com/inigodelportillo/ITU-Rpy/}}
+    }
+
+Usage and examples
+------------------
+
+The :ref:`Quick Start` guide provides different examples on how to use ITUR-py. 
+
+Additional examples can be found in the `examples folder <https://github.com/inigodelportillo/ITU-Rpy/tree/master/examples>`_, and the snippet of code below.
 
 .. code-block:: python
      
@@ -28,31 +52,15 @@ The following code example shows the usage of ITU-Rpy. More examples can be foun
 						   
 which produces 
 
-.. figure:: https://raw.githubusercontent.com/iportillo/ITU-Rpy/master/docs/images/att_world.png
+.. figure:: https://raw.githubusercontent.com/inigodelportillo/ITU-Rpy/master/docs/images/att_world.png
    :align: center   
    :figclass: align-center   
    :alt: attenuation to single ground station
 
    Atmospheric attenuation worldmap @ 22.5 GHz.
    
-Citation
---------
-
-If you use ITU-Rpy in one of your research projects, please cite it as:
-
-::
-
-    @misc{iturpy-2017,
-          title={ITU-Rpy: A python implementation of the ITU-R P. Recommendations to compute 
-             atmospheric attenuation in slant and horizontal paths.},
-          author={Inigo del Portillo},
-          year={2017},
-          publisher={GitHub},
-          howpublished={\url{https://github.com/iportillo/ITU-Rpy/}}
-    }
-
-Contents
---------
+Table of Contents
+-----------------
 
 .. toctree::
    :titlesonly:
