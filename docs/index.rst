@@ -4,11 +4,9 @@ ITU-Rpy documentation
 
 ITU-Rpy is a python implementation of the ITU-R P. Recommendations to compute atmospheric attenuation in slant and horizontal paths.
 
-A complete overview of the contents of this documentation can be found in the :ref:`Table of Contents` at the bottom of this page.
-
-Instructions on how to install ITU-Rpy can be found at the :ref:`Installation` page.
-
-Results of validating ITU-Rpy against the validation examples provided by the ITU (where available) are at the :ref:`Validation` page.
+* A complete overview of the contents of this documentation can be found in the :ref:`Table of Contents` at the bottom of this page.
+* Instructions on how to install ITU-Rpy are located at the :ref:`Installation` page.
+* Results of running ITU-Rpy against the validation examples provided by the ITU (where available) are available at the :ref:`Validation` page.
 
 Citation
 --------
