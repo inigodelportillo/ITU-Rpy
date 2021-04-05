@@ -4,6 +4,8 @@ Recommendation ITU-R P.1511
 
 Implementation of the methods in Recommendation ITU-R P.1511 "Topography for Earth-to-space propagation modelling".
 
+.. include:: itu1511_table.rst
+
 Introduction
 ************
 

@@ -4,6 +4,8 @@ Recommendation ITU-R P.453
 
 This Recommendation provides a method to estimate the radio refractive index and its behaviour for locations worldwide; describes both surface and vertical profile characteristics; and provides global maps for the distribution of refractivity parameters and their statistical variation.
 
+.. include:: itu453_table.rst
+
 Introduction
 ************
 

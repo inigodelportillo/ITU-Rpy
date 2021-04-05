@@ -3,6 +3,8 @@ Recommendation ITU-R P.837
 --------------------------
 This Recommendation provides a method to compute the characteristics of precipitation for propagation modelling
 
+.. include:: itu837_table.rst
+
 Introduction
 ************
 

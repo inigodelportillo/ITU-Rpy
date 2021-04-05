@@ -4,6 +4,8 @@ Recommendation ITU-R P.838
 
 This Recommendation provides a method to compute the specific attenuation for rain for use in prediction methods.
 
+.. include:: itu838_table.rst
+
 Introduction
 ************
 

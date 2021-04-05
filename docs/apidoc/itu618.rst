@@ -2,8 +2,9 @@
 Recommendation ITU-R P.618
 --------------------------
 
-
 This Recommendation provides methods to predict the various propagation parameters needed in planning Earth-space systems operating in either the Earth-to-space or space-to-Earth direction.
+
+.. include:: itu618_table.rst
 
 Introduction
 ************

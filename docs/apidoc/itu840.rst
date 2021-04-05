@@ -4,6 +4,8 @@ Recommendation ITU-R P.840
 
 This Recommendation provides methods to predict the attenuation due to clouds and fog on Earth-space paths.
 
+.. include:: itu840_table.rst
+
 Introduction
 ************
 

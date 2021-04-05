@@ -4,6 +4,8 @@ Recommendation ITU-R P.839
 
 This Recommendation provides a method to predict the rain height for propagation prediction.
 
+.. include:: itu839_table.rst
+
 Introduction
 ************
 

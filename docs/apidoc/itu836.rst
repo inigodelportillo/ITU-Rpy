@@ -1,8 +1,9 @@
 
 Recommendation ITU-R P.836
 --------------------------
-Implementation of the methods in Recommendation ITU-R P.836 "Water vapour: surface density and total columnar content".
 This Recommendation provides methods to predict the surface water vapour density and total columnar water vapour content on Earth-space paths.
+
+.. include:: itu836_table.rst
 
 Introduction
 ************

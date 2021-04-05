@@ -4,6 +4,8 @@ Recommendation ITU-R P.676
 
 Implementation of the methods in Recommendation ITU-R P.676 "Attenuation by atmospheric gases".
 
+.. include:: itu676_table.rst
+
 Introduction
 ************
 

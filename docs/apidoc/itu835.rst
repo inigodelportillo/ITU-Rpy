@@ -4,14 +4,7 @@ Recommendation ITU-R P.835
 
 Implementation of the methods in Recommendation ITU-R P.835 "Reference Standard Atmospheres".
 
-Available versions:
-   * P.835-5 (02/12) (Current version)
-
-Not available versions:
-   * P.835-1 (08/94) (Superseded)
-   * P.835-2 (08/97) (Superseded)
-   * P.835-3 (10/99) (Superseded)
-   * P.835-4 (03/05) (Superseded)
+.. include:: itu835_table.rst
 
 The procedures to compute the reference standard atmosphere parameters
 pressented in these versions are identical to those included in version
