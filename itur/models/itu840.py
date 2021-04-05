@@ -522,7 +522,9 @@ def change_version(new_version):
     new_version : int
         Number of the version to use.
         Valid values are:
-          * 6: Activates recommendation ITU-R P.840-6 (09/13) (Current version)
+          * 8: Activates recommendation ITU-R P.840-8 (08/19) (Current version)
+          * 7: Activates recommendation ITU-R P.840-7 (12/17) (Superseded)
+          * 6: Activates recommendation ITU-R P.840-6 (09/13) (Superseded)
           * 5: Activates recommendation ITU-R P.840-5 (02/12) (Superseded)
           * 4: Activates recommendation ITU-R P.840-4 (10/09) (Superseded)
     """
