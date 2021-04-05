@@ -19,11 +19,11 @@ Documentation
 -------------
 
 The documentation can be found at `ITU-Rpy
-documentation <http://itu-rpy.readthedocs.io/en/latest/index.html>`__ in
+documentation <http://itu-rpy.readthedocs.io/en/latest/index.html>`_ in
 Read the docs.
 
 Examples of use cases can be found in the `examples
-folder <https://github.com/inigodelportillo/ITU-Rpy/tree/master/examples>`__.
+folder <https://github.com/inigodelportillo/ITU-Rpy/tree/master/examples>`_.
 
 Installation
 ------------
@@ -39,7 +39,7 @@ Using pip, you can install all of them by running:
     pip install itur
 
 More information about the installation process can be found on the
-`documentation <https://github.com/inigodelportillo/ITU-Rpy/blob/master/docs/installation.rst>`__.
+`documentation <https://github.com/inigodelportillo/ITU-Rpy/blob/master/docs/installation.rst>`_.
 
 ITU-R Recommendations implemented
 ---------------------------------
@@ -68,7 +68,7 @@ Usage
 
 The following code example shows the usage of ITU-Rpy. More examples can
 be found in the `examples
-folder <https://github.com/inigodelportillo/ITU-Rpy/tree/master/examples>`__.
+folder <https://github.com/inigodelportillo/ITU-Rpy/tree/master/examples>`_.
 
 .. code:: python
 
@@ -88,6 +88,15 @@ folder <https://github.com/inigodelportillo/ITU-Rpy/tree/master/examples>`__.
                            cbar_text='Atmospheric attenuation [dB]')
 
 which produces: |Attenuation worldmap|
+
+
+Validation
+----------
+
+ITU-Rpy has been validated using the `ITU Validation examples (rev 5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`_ , which provides test cases for parts of Recommendations ITU-R P.453-14, P.618-13, P.676-12, P.836-6, P.837-7, P.838-3, P.839-4, P.840-8, P.1511-2, P.1623-1.
+
+The results of this validation exercise are available at the `validation page <https://itu-rpy.readthedocs.io/en/latest/validation.html>`_ in the documentation.
+
 
 Citation
 --------

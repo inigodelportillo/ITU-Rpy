@@ -60,6 +60,12 @@ itur.utils.plot_in_map(Att.value, lat, lon,
 which produces:
 ![Attenuation worldmap](https://raw.githubusercontent.com/inigodelportillo/ITU-Rpy/master/docs/images/att_world.png)
 
+##  Validation
+
+ITU-Rpy has been validated using the [ITU Validation examples (rev 5.1)](https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx) , which provides test cases for parts of Recommendations ITU-R P.453-14, P.618-13, P.676-12, P.836-6, P.837-7, P.838-3, P.839-4, P.840-8, P.1511-2, P.1623-1.
+
+The results of this validation exercise are available at the [validation page](https://itu-rpy.readthedocs.io/en/latest/validation.html) in the documentation.
+
 ## Citation
 If you use ITU-Rpy in one of your research projects, please cite it as:
 
