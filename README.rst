@@ -34,31 +34,32 @@ ITU-Rpy has the followind dependencies: ``numpy``, ``scipy``,
 
 Using pip, you can install all of them by running:
 
-::
+.. code:: console
 
     pip install itur
 
 More information about the installation process can be found on the
 `documentation <https://github.com/inigodelportillo/ITU-Rpy/blob/master/docs/installation.rst>`__.
 
-ITU-R Recommendations implemented:
-----------------------------------
+ITU-R Recommendations implemented
+---------------------------------
 
-The following ITU-R Recommendations are implemented in ITU-Rpy \*
-**ITU-R P.453-13:** The radio refractive index: its formula and
-refractivity data \  * **ITU-R P.618-13:** Propagation data and prediction
-methods required for the design of Earth-space telecommunication systems
-\  * **ITU-R P.676-11:** Attenuation by atmospheric gases \  * **ITU-R
-P.835-6:** Reference Standard Atmospheres \  * **ITU-R P.836-6:** Water
-vapour: surface density and total columnar content \  * **ITU-R P.837-7:**
-Characteristics of precipitation for propagation modelling \  * **ITU-R
-P.838-3:** Specific attenuation model for rain for use in prediction
-methods \  * **ITU-R P.839-4:** Rain height model for prediction methods.
-\  * **ITU-R P.840-7:** Attenuation due to clouds and fog \  * **ITU-R
-P.1144-7:** Interpolation methods for the geophysical properties used to
-compute propagation effects \  * **ITU-R P.1511-1:** Topography for
-Earth-to-space propagation modelling \  * **ITU-R P.1853-1:** Tropospheric
-attenuation time series synthesis
+The following ITU-R Recommendations are implemented in ITU-Rpy 
+*   **ITU-R P.453-13:** The radio refractive index: its formula and refractivity data
+*   **ITU-R P.530-17:** Propagation data and prediction methods required for the design of terrestrial line-of-sight systems
+*   **ITU-R P.618-13:** Propagation data and prediction methods required for the design of Earth-space telecommunication systems
+*   **ITU-R P.676-12:** Attenuation by atmospheric gases
+*   **ITU-R P.835-6:** Reference Standard Atmospheres
+*   **ITU-R P.836-6:** Water vapour: surface density and total columnar content
+*   **ITU-R P.837-7:** Characteristics of precipitation for propagation modelling
+*   **ITU-R P.838-3:** Specific attenuation model for rain for use in prediction methods
+*   **ITU-R P.839-4:** Rain height model for prediction methods.
+*   **ITU-R P.840-8:** Attenuation due to clouds and fog 
+*   **ITU-R P.1144-10:** Interpolation methods for the geophysical properties used to compute propagation effects 
+*   **ITU-R P.1510-1:** Mean surface temperature
+*   **ITU-R P.1511-2:** Topography for Earth-to-space propagation modelling
+*   **ITU-R P.1853-1:** Tropospheric attenuation time series synthesis
+
 
 The individual models can be accessed using the ``itur.models`` package.
 
