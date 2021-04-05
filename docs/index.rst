@@ -1,11 +1,58 @@
 
 ITU-Rpy documentation
 =====================
-ITU-RPy is a python implementation of the ITU-P R Recommendations to compute 
-atmospheric attenuation for Earth-to-space and horizontal paths,
-for frequencies in the GHz range.
 
-The propagation loss on an Earth-space path and a horizontal-path, relative to the free-space loss, is the sum of different contributions, namely: attenuation by atmospheric gases; attenuation by rain, other precipitation and clouds; scintillation and multipath effects; attenuation by sand and dust storms. Each of these contributions has its own characteristics as a function of frequency, geographic location and elevation angle. ITU-Rpy allows for fast, vectorial computation of the different contributions to the atmospheric attenuation.
+ITU-Rpy is a python implementation of the ITU-R P. Recommendations to compute atmospheric attenuation in slant and horizontal paths.
+
+Usage
+-----
+
+The following code example shows the usage of ITU-Rpy. More examples can be found in the `examples folder <https://github.com/iportillo/ITU-Rpy/tree/master/examples>`_.
+
+.. code-block:: python
+     
+    import itur
+
+    f = 22.5 * itur.u.GHz    # Link frequency
+    D = 1 * itur.u.m         # Size of the receiver antenna
+    el = 60                  # Elevation angle constant of 60 degrees
+    p = 3                    # Percentage of time that attenuation values are exceeded.
+        
+    # Generate a regular grid latitude and longitude points with 1 degrees resolution	
+    lat, lon = itur.utils.regular_lat_lon_grid() 
+
+    # Comute the atmospheric attenuation
+    Att = itur.atmospheric_attenuation_slant_path(lat, lon, f, el, p, D) 
+    itur.utils.plot_in_map(Att.value, lat, lon, 
+                           cbar_text='Atmospheric attenuation [dB]')
+						   
+which produces 
+
+.. figure:: https://raw.githubusercontent.com/iportillo/ITU-Rpy/master/docs/images/att_world.png
+   :align: center   
+   :figclass: align-center   
+   :alt: attenuation to single ground station
+
+   Atmospheric attenuation worldmap @ 22.5 GHz.
+   
+Citation
+--------
+
+If you use ITU-Rpy in one of your research projects, please cite it as:
+
+::
+
+    @misc{iturpy-2017,
+          title={ITU-Rpy: A python implementation of the ITU-R P. Recommendations to compute 
+             atmospheric attenuation in slant and horizontal paths.},
+          author={Inigo del Portillo},
+          year={2017},
+          publisher={GitHub},
+          howpublished={\url{https://github.com/iportillo/ITU-Rpy/}}
+    }
+
+Contents
+--------
 
 .. toctree::
    :titlesonly:
@@ -29,6 +76,8 @@ The propagation loss on an Earth-space path and a horizontal-path, relative to t
    :caption: Miscellaneous
    :maxdepth: 1
       
+   
+   contributing
    license
    contact
 
@@ -39,9 +88,11 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+Other
+-----
 
 ITU-Rpy is mainly written in Python 3 and continuously tested with Python 3.5-3.9.
 
-ITU-Rpy has the followind dependencies: `numpy`, `scipy`, `joblib`, `pyproj`, and `astropy`. Installation of `basemap` and `matplotlib` is recommended to display results in a map.
+ITU-Rpy has the following dependencies: `numpy`, `scipy`, `joblib`, `pyproj`, and `astropy`. Installing `basemap` and `matplotlib` is recommended to display results in a map.
 
 
