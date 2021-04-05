@@ -1,6 +1,49 @@
 Validation results for ITU-R P.838-3
 ====================================
 
+This page contains the validation examples for Recommendation ITU-R P.838-3: Specific attenuation model for rain for use in prediction methods.
+
+All test cases were extracted from the
+`ITU Validation examples file (rev 5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`_.
+
+.. contents:: Functions tested
+    :depth: 2
+
+
+Function rain_specific_attenuation
+----------------------------------
+
+The table below contains the results of testing function ``rain_specific_attenuation``.
+The test cases were extracted from spreadsheet ``ITURP838-3_rain_specific_attenuation.csv`` from the
+`ITU Validation examples file (rev 5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`_.
+In addition to the input-arguments, expected result (``ITU Validation``), and
+ITU-Rpy computed result (``ITUR-py Result``), the absolute and relative errors
+are shown. Each test case is color-coded depending on the magnitude of the
+errors (green = pass, errors are negligible, red = fail, relative error is
+above 0.01%).
+
+In addition, the code snippet below shows an example of how to generate the
+first row of the results in the table:
+
+.. code-block:: python
+
+    import itur
+
+    # Define input attributes
+    el = 31.07699124  # ?(°)
+    f = 14.25  # (GHz)
+    R = 26.48052  # (mm/h)
+    tau = 0.0  #  t(°)
+
+    # Make call to test-function rain_specific_attenuation
+    itur_val = itur.models.itu838.rain_specific_attenuation(el=el, f=f, R=R, tau=tau)
+
+    # Compute error with respect to value in ITU example file
+    ITU_example_val = 1.58130839  # (dB/km)
+    error = ITU_example_val - itur_val.value
+    error_rel = error / ITU_example_val * 100  # (%)
+
+
 .. raw:: html
-    :file: itur838_3_table.html
-        
+    :file: test_rain_specific_attenuation_table.html
+
