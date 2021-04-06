@@ -2,7 +2,7 @@
 Recommendation ITU-R P.676
 --------------------------
 
-Implementation of the methods in Recommendation ITU-R P.676 "Attenuation by atmospheric gases".
+This Recommendation provides methods to estimate the attenuation of atmospheric gases on terrestrial and slant paths
 
 .. include:: itu676_table.rst
 

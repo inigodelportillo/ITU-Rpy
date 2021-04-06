@@ -2,7 +2,7 @@
 Recommendation ITU-R P.1510
 ---------------------------
 
-Implementation of the methods in Recommendation ITU-R P.1510 "Annual mean surface temperature"
+This Recommendation contains monthly and annual maps of mean surface temperature that are recommended for the prediction of statistics of different propagation effects such as rainfall rate, rain attenuation and gaseous attenuation due to water vapour and oxygen.
 
 .. include:: itu1510_table.rst
 

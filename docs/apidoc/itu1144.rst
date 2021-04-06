@@ -2,7 +2,19 @@
 Recommendation ITU-R P.1144
 ---------------------------
 
+This Recommendation provides a guide to the Recommendations of Radiocommunication Study Group 3
+which contain propagation prediction methods. It advises users on the most appropriate methods for
+particular applications as well as the limits, required input information, and output for each of these methods.
+
 .. include:: itu1144_table.rst
+
+Introduction
+************
+
+Recommendation ITU-R P.1144 provides . In particular, the recommendation describes how to perform bi-linear and bi-cubic interpolation over the geophysical maps included in other recommendations.
+
+Module description
+******************
 
 .. automodule:: itur.models.itu1144
     :members:

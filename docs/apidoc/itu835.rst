@@ -2,17 +2,18 @@
 Recommendation ITU-R P.835
 --------------------------
 
-Implementation of the methods in Recommendation ITU-R P.835 "Reference Standard Atmospheres".
+This Recommendation provides expressions and data for reference standard atmospheres required for the calculation of gaseous attenuation on Earth-space paths.
 
 .. include:: itu835_table.rst
 
-The procedures to compute the reference standard atmosphere parameters
-pressented in these versions are identical to those included in version
-ITU_T P.835-5. Version 3 includes a dataset with vertical profiles for
-353 locations over the world using 10 years of radiosonde observations
-. Version 4 includes another dataset with monthly vertical profiles worldwide
-(grid of 1.5 by 1.5 deg). None of these are currently implemente but TODO
-work.
+Introduction
+************
+
+This recommendation provides the equations to determine the temperature, pressure and water-vapour pressure as a function of altitude,  as described in the `U.S. Standard Atmosphere 1976 <https://ntrs.nasa.gov/api/citations/19770009539/downloads/19770009539.pdf?attachment=true>`_. These values should be used for calculating gaseous attenuation when more reliable local data are not available.
+
+
+Module description
+******************
 
 .. automodule:: itur.models.itu835
     :members:
