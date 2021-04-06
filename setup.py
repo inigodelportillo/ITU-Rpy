@@ -95,6 +95,9 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
     ],
 
     # This field adds keywords for your project which will appear on the
@@ -120,7 +123,7 @@ setup(
     #
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=['joblib', 'astropy', 'scipy', 'numpy', 'pyproj'],  # Optional
+    install_requires=['astropy', 'scipy', 'numpy', 'pyproj'],  # Optional
 
     # If there are data files included in your packages that need to be
     # installed, specify them here.

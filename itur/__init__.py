@@ -7,10 +7,10 @@ and horizontal paths, for frequencies in the GHz range.
 
 The propagation loss on an Earth-space path and a horizontal-path, relative to
 the free-space loss, is the sum of different contributions, namely:
-* attenuation by atmospheric gases;
-* attenuation by rain, other precipitation and clouds;
-* scintillation and multipath effects;
-* attenuation by sand and dust storms.
+ * attenuation by atmospheric gases;
+ * attenuation by rain, other precipitation and clouds;
+ * scintillation and multipath effects;
+ * attenuation by sand and dust storms.
 
 Each of these contributions has its own characteristics as a function of
 frequency, geographic location and elevation angle. ITU-Rpy allows for fast,
@@ -20,6 +20,10 @@ attenuation.
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+
+__all__ = ['utils', 'plotting']
+import itur.utils
+import itur.plotting
 
 from .models.itu618 import rain_attenuation, scintillation_attenuation
 from .models.itu676 import gaseous_attenuation_slant_path, \
