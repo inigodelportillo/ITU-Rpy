@@ -1,11 +1,34 @@
 # -*- coding: utf-8 -*-
-"""``itur.utils`` is a utilities library for ITU-Rpy.
+"""``itur.plotting`` provides convenient function to plot maps in ITU-Rpy.
 
-This utility library for ITU-Rpy contains methods to:
-    * Load data and build an interpolator object.
-    * Prepare the input and output arrays, and handle unit transformations.
-    * Compute distances and elevation angles between two points on Earth and
-      or space.
+This submodule uses ``matplotlib`` and ``cartopy`` as the default library to
+plot maps. Alternatively, the user can use ``basemap`` (if installed).
+
+The example below shows the use of ``plot_in_map`` to display the mean surface
+temperature on the Earth.
+
+.. code-block:: python
+
+    import itur
+
+    # Generate a regular grid of latitude and longitudes with 0.1 degree
+    #  resolution.
+    lat, lon = itur.utils.regular_lat_lon_grid(resolution_lat=0.1,
+                                               resolution_lon=0.1)
+
+    # Compute the surface mean temperature
+    T = itur.models.itu1510.surface_mean_temperature(lat, lon)
+
+    # Display the results in a map (using cartopy)
+    ax = itur.plotting.plot_in_map(
+            T, lat, lon, cmap='jet', vmin=230, vmax=310,
+            cbar_text='Annual mean surface temperature [K]')
+
+    # Display the results in a map (using basemap)
+    ax = itur.plotting.plot_in_map_basemap(
+            T, lat, lon, cmap='jet', vmin=230, vmax=310,
+            cbar_text='Annual mean surface temperature [K]')
+
 """
 from __future__ import absolute_import
 from __future__ import division
@@ -25,12 +48,12 @@ except BaseException:
 def plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
                 lon_min=None, lon_max=None, cbar_text='', ax=None,
                 figsize=(6, 4), **kwargs):
-    """Plot the values in `data` in a map.
+    """Plot the values in `data` in a map using ``cartopy``.
 
-    The map uses an equidistant cylindrical projection. Either
-    {`lat`, `lon`} or {`lat_min`, `lat_max`, `lon_min`, `lon_max`} need
-    to be provided as inputs. This function requires that `basemap` and
-    `matplotlib` are installed.
+    The map uses an PlateCarree projection. Either
+    {``lat``, ``lon``} or {``lat_min``, ``lat_max``, ``lon_min``, ``lon_max``}
+    need to be provided as inputs. This function requires that ``cartopy``
+    and ``matplotlib`` are installed.
 
     Parameters
     ----------
@@ -93,14 +116,12 @@ def plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
     ax.set_extent([lon_min, lon_max, lat_min, lat_max],
                   crs=ccrs.PlateCarree())
     ax.coastlines(color='grey', linewidth=0.8)
-    ax.add_feature(cpf.BORDERS, edgecolor='grey', linestyle=':')
+    ax.add_feature(cpf.BORDERS, edgecolor='grey')
 
     parallels = np.arange(-80, 81, 20)
     meridians = np.arange(-180., 181., 30.)
 
     ax.gridlines(xlocs=meridians, ylocs=parallels, draw_labels=True,
-                 xformatter=cmpl.LONGITUDE_FORMATTER,
-                 # yformatter=cmpl.LATITUDE_FORMATTER,
                  color='white', linestyle=':', linewidth=0.2)
 
     im = ax.contourf(lon, lat, data, 100, transform=ccrs.PlateCarree(),
@@ -115,12 +136,12 @@ def plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
 def plot_in_map_basemap(data, lat=None, lon=None, lat_min=None,
                         lat_max=None, lon_min=None, lon_max=None,
                         cbar_text='', ax=None, figsize=(6, 4), **kwargs):
-    """Plot the values in `data` in a map.
+    """Plot the values in `data` in a map using ``basemap``.
 
     The map uses an equidistant cylindrical projection. Either
-    {`lat`, `lon`} or {`lat_min`, `lat_max`, `lon_min`, `lon_max`} need
-    to be provided as inputs. This function requires that `basemap` and
-    `matplotlib` are installed.
+    {``lat``, ``lon``} or {``lat_min``, ``lat_max``, ``lon_min``, ``lon_max``}
+    to be provided as inputs. This function requires that ``basemap`` and
+    ``matplotlib`` are installed.
 
     Parameters
     ----------
