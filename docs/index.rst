@@ -99,6 +99,6 @@ Other
 
 ITU-Rpy is mainly written in Python 3 and continuously tested with Python 3.5-3.9.
 
-ITU-Rpy has the following dependencies: `numpy`, `scipy`, `joblib`, `pyproj`, and `astropy`. Installing `basemap` and `matplotlib` is recommended to display results in a map.
+ITU-Rpy has the following dependencies: `numpy`, `scipy`, `pyproj`, and `astropy`. Installing `cartopy` and `matplotlib` is recommended to display results in a map.
 
 

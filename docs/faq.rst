@@ -4,7 +4,7 @@ F.A.Q.
 I cannot install Basemap
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-This happens most likely because you are using python  version > 3.X. You can try to install from conda-forge  ``conda install -c conda-forge basemap`` or, if you are using Windows, using the appropriate pre-compiled wheels file from `this webpage <https://www.lfd.uci.edu/~gohlke/pythonlibs/#basemap>`_. Once you download the .whl file you can install it using ``pip install name_of_whl_file.whl``.
+This happens most likely because you are using python  version > 3.X. You can try to install from conda-forge  ``conda install -c conda-forge cartopy`` or, if you are using Windows, using the appropriate pre-compiled wheels file from `this webpage <https://www.lfd.uci.edu/~gohlke/pythonlibs/#cartopy>`_. Once you download the ``.whl`` file you can install it using ``pip install name_of_whl_file.whl``.
 
 The first time I run *ITU-Rpy* is considerable slower
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

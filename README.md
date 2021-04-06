@@ -11,7 +11,7 @@ The documentation can be found at [ITU-Rpy documentation](http://itu-rpy.readthe
 Examples of use cases can be found in the [examples folder](https://github.com/inigodelportillo/ITU-Rpy/tree/master/examples).
 
 ## Installation
-ITU-Rpy has the followind dependencies: `numpy`, `scipy`, `joblib`, `pyproj`, and `astropy`. Installation of `basemap` and `matplotlib` is recommended to display results in a map.
+ITU-Rpy has the followind dependencies: `numpy`, `scipy`, `pyproj`, and `astropy`. Installation of `cartopy` and `matplotlib` is recommended to display results in a map.
 
 Using pip, you can install all of them by running:
 ```console
