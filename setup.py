@@ -5,6 +5,7 @@ from setuptools import setup, find_packages
 # To use a consistent encoding
 from codecs import open as open_codecs
 from os import path
+import itur
 
 here = path.abspath(path.dirname(__file__))
 
@@ -35,7 +36,7 @@ setup(
     # For a discussion on single-sourcing the version across setup.py and the
     # project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.2.1',
+    version=itur.__version__,
 
     # This is a one-line description or tagline of what your project does. This
     # corresponds to the "Summary" metadata field:
@@ -56,7 +57,7 @@ setup(
     #
     # This field corresponds to the "Home-Page" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#home-page-optional
-    url='https://github.com/iportillo/ITU-Rpy',
+    url='https://github.com/inigodelportillo/ITU-Rpy',
 
     # This should be your name or the name of the organization which owns the
     # project.
@@ -64,7 +65,7 @@ setup(
 
     # This should be a valid email address corresponding to the author listed
     # above.
-    author_email='portillo@mit.edu',
+    author_email='inigo.del.portillo@gmail.com',
 
     license='MIT',
 
@@ -94,6 +95,9 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
     ],
 
     # This field adds keywords for your project which will appear on the
@@ -119,7 +123,7 @@ setup(
     #
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=['joblib', 'astropy', 'scipy', 'numpy', 'pyproj'],  # Optional
+    install_requires=['astropy', 'scipy', 'numpy', 'pyproj'],  # Optional
 
     # If there are data files included in your packages that need to be
     # installed, specify them here.
@@ -141,7 +145,7 @@ setup(
     },
 
 	project_urls={  # Optional
-        'Bug Reports': 'https://github.com/iportillo/ITU-Rpy/issues',
-        'Source': 'https://github.com/iportillo/ITU-Rpy/',
+        'Bug Reports': 'https://github.com/inigodelportillo/ITU-Rpy/issues',
+        'Source': 'https://github.com/inigodelportillo/ITU-Rpy/',
     },
 )

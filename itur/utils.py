@@ -1,4 +1,12 @@
 # -*- coding: utf-8 -*-
+"""``itur.utils`` is a utilities library for ITU-Rpy.
+
+This utility library for ITU-Rpy contains methods to:
+    * Load data and build an interpolator object.
+    * Prepare the input and output arrays, and handle unit transformations.
+    * Compute distances and elevation angles between two points on Earth and
+      or space.
+"""
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -7,29 +15,27 @@ import os
 import numbers
 import numpy as np
 
-from joblib import Memory
-from tempfile import mkdtemp
+from pyproj import Geod
 from astropy import units as u
 
-from pyproj import Geod
 
+# Set the basepath for the module and the basepath for the data
 dir_path = os.path.dirname(os.path.realpath(__file__))
 dataset_dir = os.path.join(dir_path, 'data/')
 
-# Create a memory cache to memoize results of some functions
-cachedir = mkdtemp()
-memory = Memory(location=cachedir, verbose=0)
 
+# Define numeric types including numpy types
 __NUMERIC_TYPES__ = [numbers.Number, int, float, complex,
                      np.float, np.float16, np.float32, np.float64,
                      np.int, np.int8, np.int16, np.int32, np.int64]
+
+# Define the geodetic system using the WSG-84 ellipsoid
 __wgs84_geod__ = Geod(ellps='WGS84')
 
 
 def load_data_interpolator(path_lat, path_lon, path_data, interp_fcn,
                            flip_ud=True):
-    """
-    Loads a lat-lon tabulated dataset and build an interpolator
+    """Load a lat-lon tabulated dataset and build an interpolator.
 
     Parameters
     ----------
@@ -42,10 +48,10 @@ def load_data_interpolator(path_lat, path_lon, path_data, interp_fcn,
     interp_fcn : string
         The interpolation function to be used
     flip_ud : boolean
-        Wether to flip the latitude and data arrays along the first axis. This
+        Whether to flip the latitude and data arrays along the first axis. This
         is an artifact of the format that the ITU uses to encode its data,
-        which is inconsistent across recommendations (in some latitude are
-        sorted in ascending order, in others they are sorted in
+        which is inconsistent across recommendations (in some recommendations,
+        latitude are sorted in ascending order, in others they are sorted in
         descending order).
 
     Returns
@@ -64,19 +70,18 @@ def load_data_interpolator(path_lat, path_lon, path_data, interp_fcn,
 
 
 def load_data(path, is_text=False, **kwargs):
-    """
-    Loads data files from /itur/data/
+    """Load data files from `./itur/data/`.
 
-    Loads data from a comma-separated file. The contents of the file can be
-    numeric or text-based.
+    Loads data from a comma-separated values file. The contents of the file
+    can be numeric or text-based.
 
     Parameters
     ----------
     path : string
         Path of the data to load
     is_text : bool
-        Indicates whether the data is numerical or text
-
+        Indicates whether the data is text (`True`) or numerical (`False`).
+        Default value is `False`.
 
     Returns
     -------
@@ -104,11 +109,21 @@ def load_data(path, is_text=False, **kwargs):
 
 
 def prepare_input_array(input_array):
-    """
-    Formats an array to be a 2-D numpy-array.
+    """Format an array to be a 2-D numpy-array.
 
-    If the contents of input_array are 0-D or 1D, it converts is to an
+    If the contents of `input_array` are 0-D or 1-D, it converts is to an
     array with at least two dimensions.
+
+    Parameters
+    ----------
+    input_array : numpy.ndarray, sequence, or number
+        The input value. It can be a scalar, 1-D array, or 2-D array.
+
+    Returns
+    -------
+    output_array : numpy.ndarray
+        An 2-D numpy array with the input values
+
     """
     if input_array is None:
         return None
@@ -117,15 +132,13 @@ def prepare_input_array(input_array):
 
 
 def prepare_output_array(output_array, type_input=None):
-    """
-    Formats the output to have the same shape and type as the input.
+    """Format the output to have the same shape and type as the input.
 
     This function is a generic wrapper to format the output of a function
     to have the same type as the input. ITU-Rpy makes extensive use of numpy
-    arrays, but uses this fucntion to return outputs having the same type
+    arrays, but uses this function to return outputs having the same type
     that was provided in the input of the function.
     """
-
     # First, differentiate between the units and the value of the output_array
     # since the rest of the funcion is mainly focused on casting the value
     # of the output_array to the type in type_input
@@ -169,15 +182,27 @@ def prepare_output_array(output_array, type_input=None):
 
 
 def prepare_quantity(value, units=None, name_val=None):
-    """
-    Convert the input to the required units
+    """Convert the input to the required units.
 
     The function verifies that the input has the right units and converts
     it to the desired units. For example, if a value is introduced in km
     but posterior frequencies require this value to be in meters, this
     function would be called with `units=u.m`
-    """
 
+    Parameters
+    ----------
+    value : astropy.units.Quantity, number, sequence, or np.ndarry
+        The input value
+    units : astropy.units
+        Desired units of the output
+    name_val : string
+        Name of the variable (for debugging purposes)
+
+    Returns
+    -------
+    q : numpy.ndarray
+        An numpy array with the values converted to the desired units.
+    """
     if value is None:
         return None
 
@@ -208,21 +233,19 @@ def compute_distance_earth_to_earth(lat_p, lon_p, lat_grid, lon_grid,
     """
     Compute the distance between a point and a matrix of (lat, lons).
 
-    If the number of elements in lat_grid is smaller than 100,000, uses the
-    WGS84 method, otherwise, uses the harvesine formula.
-
+    If the number of elements in `lat_grid` is smaller than 100,000, uses the
+    WGS84 method, otherwise, uses the Haversine formula.
 
     Parameters
     ----------
     lat_p : number
-        latitude projection of the point P (degrees)
+        Latitude projection of the point P (degrees)
     lon_p : number
-        longitude projection of the point P (degrees)
+        Longitude projection of the point P (degrees)
     lat_grid : number, sequence of np.ndarray
         Grid of latitude points to which compute the distance (degrees)
     lon_grid : number, sequence of np.ndarray
         Grid of longitude points to which compute the distance (degrees)
-
 
     Returns
     -------
@@ -239,29 +262,27 @@ def compute_distance_earth_to_earth(lat_p, lon_p, lat_grid, lon_grid,
             return compute_distance_earth_to_earth_wgs84(
                     lat_p, lon_p, lat_grid, lon_grid)
     else:
-            return compute_distance_earth_to_earth_haversine(
-                    lat_p, lon_p, lat_grid, lon_grid)
+        return compute_distance_earth_to_earth_haversine(
+                lat_p, lon_p, lat_grid, lon_grid)
 
 
 def compute_distance_earth_to_earth_wgs84(lat_p, lon_p, lat_grid, lon_grid):
-    """
-    Computes the distance between points using the WGS84 inverse method.
+    """Compute the distance between points using the WGS84 inverse method.
 
-    Compute the distance between a point (P) in (lat_s, lon_s) and a matrix of
-    latitude and longitudes (lat_grid, lon_grid) using the WGS84 inverse method
-
+    Compute the distance between a point (P) in (`lat_p`, `lon_p`) and a matrix
+    of latitude and longitudes (`lat_grid`, `lon_grid`) using the WGS84 inverse
+    method.
 
     Parameters
     ----------
     lat_p : number
-        latitude projection of the point P (degrees)
+        Latitude projection of the point P (degrees)
     lon_p : number
-        longitude projection of the point P (degrees)
+        Longitude projection of the point P (degrees)
     lat_grid : number, sequence of np.ndarray
         Grid of latitude points to which compute the distance (degrees)
     lon_grid : number, sequence of np.ndarray
         Grid of longitude points to which compute the distance (degrees)
-
 
     Returns
     -------
@@ -273,29 +294,27 @@ def compute_distance_earth_to_earth_wgs84(lat_p, lon_p, lat_grid, lon_grid):
     lat_p = lat_p * np.ones_like(lat_grid)
     lon_p = lon_p * np.ones_like(lon_grid)
     _a, _b, d = __wgs84_geod__.inv(lon_p, lat_p, lon_grid, lat_grid)
-    return d/1e3
+    return d / 1e3
 
 
 def compute_distance_earth_to_earth_haversine(lat_p, lon_p,
                                               lat_grid, lon_grid):
-    """
-    Computes the distance between points using the Haversine formula
+    """Compute the distance between points using the Haversine formula.
 
-    Compute the distance between a point (P) in (lat_s, lon_s) and a matrix of
-    latitude and longitudes (lat_grid, lon_grid) using the Haversine formula
-
+    Compute the distance between a point (P) in (`lat_s`, `lon_s`) and a matrix
+    of latitude and longitudes (`lat_grid`, `lon_grid`) using the Haversine
+    formula.
 
     Parameters
     ----------
     lat_p : number
-        latitude projection of the point P (degrees)
+        Latitude projection of the point P (degrees)
     lon_p : number
-        longitude projection of the point P (degrees)
+        Longitude projection of the point P (degrees)
     lat_grid : number, sequence of np.ndarray
         Grid of latitude points to which compute the distance (degrees)
     lon_grid : number, sequence of np.ndarray
         Grid of longitude points to which compute the distance (degrees)
-
 
     Returns
     -------
@@ -303,8 +322,8 @@ def compute_distance_earth_to_earth_haversine(lat_p, lon_p,
         Distance between the point P and each point in (lat_grid, lon_grid)
         (km)
 
-
     References
+    ----------
     This is based on the Haversine formula
     """
     RE = 6371.0  # Radius of the Earth, km
@@ -328,11 +347,10 @@ def compute_distance_earth_to_earth_haversine(lat_p, lon_p,
 def regular_lat_lon_grid(resolution_lat=1, resolution_lon=1, lon_start_0=False,
                          lat_min=-90, lat_max=90, lon_min=-180, lon_max=180):
     """
-    Builds regular latitude and longitude matrices.
-
+    Build regular latitude and longitude matrices.
 
     Builds a latitude and longitude coordinate matrix with resolution
-    resolution_lat, resolution_lon.
+    `resolution_lat`, `resolution_lon`.
 
     Parameters
     ----------
@@ -344,13 +362,12 @@ def regular_lat_lon_grid(resolution_lat=1, resolution_lon=1, lon_start_0=False,
         Indicates whether the longitude is indexed using a 0 - 360 scale (True)
         or using -180 - 180 scale (False). Default value is False
 
-
     Returns
     -------
     lat: numpy.ndarray
         Grid of coordinates of the latitude point
     lon: numpy.ndarray
-        Grid of coordinates of the latitude point
+        Grid of coordinates of the longitude point
     """
     if lon_start_0:
         lon, lat = np.meshgrid(np.arange(lon_min + 180.0, lon_max + 180.0,
@@ -365,26 +382,24 @@ def regular_lat_lon_grid(resolution_lat=1, resolution_lon=1, lon_start_0=False,
 
 def elevation_angle(h, lat_s, lon_s, lat_grid, lon_grid):
     """
-    Computes the elevation angle between a satellite and a point.
+    Compute the elevation angle between a satellite and a point on Earth.
 
     Compute the elevation angle between a satellite located in an orbit
-    at height h and located above coordinates (lat_s, lon_s) and a matrix of
-    latitude and longitudes (lat_grid, lon_grid)
-
+    at height h and located above coordinates (`lat_s`, `lon_s`) and a matrix
+    of latitude and longitudes (`lat_grid`, `lon_grid`).
 
     Parameters
     ----------
     h : float
         Orbital altitude of the satellite (km)
     lat_s : float
-        latitude of the projection of the satellite (degrees)
+        Latitude of the projection of the satellite (degrees)
     lon_s : float
-        longitude of the projection of the satellite (degrees)
+        Longitude of the projection of the satellite (degrees)
     lat_grid :  number, sequence of np.ndarray
         Grid of latitude points to which compute the elevation angle (degrees)
     lon_grid :  number, sequence of np.ndarray
         Grid of longitude points to which compute the elevation angle (degrees)
-
 
     Returns
     -------
@@ -392,8 +407,8 @@ def elevation_angle(h, lat_s, lon_s, lat_grid, lon_grid):
         Elevation angle between the satellite and each point in
         (lat_grid, lon_grid) (degrees)
 
-
     References
+    ----------
     [1] http://www.propagation.gatech.edu/ECE6390/notes/ASD5.pdf - Slides 3, 4
     """
     h = prepare_quantity(h, u.km, name_val='Orbital altitude of the satellite')
@@ -416,88 +431,3 @@ def elevation_angle(h, lat_s, lon_s, lat_grid, lon_grid):
                                   2 * (RE / rs) * np.cos(gamma)))  # In radians
 
     return np.rad2deg(elevation)
-
-
-def plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
-                lon_min=None, lon_max=None, cbar_text='', ax=None,
-                figsize=(6, 4), **kwargs):
-    """
-    Displays the values in data in a map.
-
-    Either {lat, lon} or {lat_min, lat_max, lon_min, lon_max} need to be
-    provided as inputs. This function required that basemap is installed
-
-    Parameters
-    ----------
-    data : np.ndarray
-        Data values to be plotted.
-    lat : np.ndarray
-        Matrix with the latitudes for each point in data (deg N)
-    lon : np.ndarray
-        Matrix with the longitudes for each point in data (deg E)
-    lat_min :  float
-        Minimum latitude of the data (deg N)
-    lat_max :  float
-        Maximum latitude of the data (deg N)
-    lon_min :  float
-        Minimum longitude of the data (deg E)
-    lat_max :  float
-        Maximum longitude of the data (deg E)
-    cbar_text : string
-        Colorbar text caption.
-    ax : Axes
-        matplotlib axes where the data will be plotted.
-    **kwargs: dict
-        Key-value arguments that will be passed to the imshow function.
-
-
-    Returns
-    -------
-    m : Basemap
-        The map object generated by Basemap
-    """
-    import matplotlib.pyplot as plt
-
-    try:
-        from mpl_toolkits.basemap import Basemap
-    except BaseException:
-        raise RuntimeError('Basemap is not installed and therefore plot_in_map'
-                           ' cannot be used. To use this function you need'
-                           ' to install the basemap library')
-
-    if all([el is None for el in [lat, lon, lat_min, lon_min,
-                                  lat_max, lon_max]]):
-        raise ValueError('Either \{lat, lon\} or \{lat_min, lon_min, lat_max,'
-                         'lon_max\} need to be provided')
-
-    elif lat is not None and lon is not None:
-        if not(np.shape(lat) == np.shape(lon) and
-               np.shape(lat) == np.shape(data)):
-            raise RuntimeError('Shape of latitude grid is not equal to shape'
-                               'of longitude grid')
-        lat_max = np.max(lat)
-        lat_min = np.min(lat)
-        lon_max = np.max(lon)
-        lon_min = np.min(lon)
-
-    if ax is None:
-        fig = plt.figure(figsize=figsize)
-        ax = fig.add_subplot(111)
-
-    m = Basemap(ax=ax, projection='cyl', llcrnrlat=lat_min,
-                urcrnrlat=lat_max, llcrnrlon=lon_min, urcrnrlon=lon_max,
-                resolution='l')
-
-    m.drawcoastlines(color='grey', linewidth=0.8)
-    m.drawcountries(color='grey', linewidth=0.8)
-    parallels = np.arange(-80, 81, 20)
-    m.drawparallels(parallels, labels=[1, 0, 0, 1], dashes=[2, 1],
-                    linewidth=0.2, color='white')
-    meridians = np.arange(0., 360., 30.)
-    m.drawmeridians(meridians, labels=[1, 0, 0, 1], dashes=[2, 1],
-                    linewidth=0.2, color='white')
-
-    im = m.imshow(np.flipud(data), **kwargs)
-    cbar = m.colorbar(im, location='bottom', pad="8%")
-    cbar.set_label(cbar_text)
-    return m

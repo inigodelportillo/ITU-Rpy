@@ -1,17 +1,23 @@
 
 Recommendation ITU-R P.837
------------------------------------
+--------------------------
+This Recommendation provides a method to compute the characteristics of precipitation for propagation modelling
 
-Implementation of the methods in Recommendation ITU-R P.837 "Characteristics of precipitation for propagation modeling"
+.. include:: itu837_table.rst
 
-Available versions include:
-   * P.837-1 (08/94) (Superseded)
-   * P.837-2 (10/99) (Superseded)
-   * P.837-3 (02/01) (Superseded)
-   * P.837-4 (04/03) (Superseded)
-   * P.837-5 (08/07) (Superseded)
-   * P.837-6 (02/12) (Current version)
-	
+Introduction
+************
+
+Rainfall rate statistics with a 1-min integration time are required for the prediction of rain
+attenuation in terrestrial and satellite links. Data of long-term measurements of rainfall rate may be
+available from local sources, but only with higher integration times. This Recommendation provides
+maps of meteorological parameters that have been obtained using the European Centre for Medium-Range 
+Weather Forecast (ECMWF) ERA-40 re-analysis database, which are recommended for the prediction of 
+rainfall rate statistics with a 1-min integration time, when local measurements are missing.
+
+Module description
+******************
+
 .. automodule:: itur.models.itu837
     :members:
     :undoc-members:

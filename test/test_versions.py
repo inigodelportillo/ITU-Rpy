@@ -162,7 +162,6 @@ class TestFunctionsRecommendation453(test.TestCase):
     def test_453(self):
 
         for version in self.versions:
-            utils.memory.clear()
             models.itu453.change_version(version)
             self.test_all_functions_453()
             self.assertEqual(models.itu453.get_version(), version)
@@ -261,7 +260,6 @@ class TestFunctionsRecommendation618(test.TestCase):
     def test_618(self):
 
         for version in self.versions:
-            utils.memory.clear()
             models.itu618.change_version(version)
             self.test_all_functions_618()
             self.assertEqual(models.itu618.get_version(), version)
@@ -341,7 +339,6 @@ class TestFunctionsRecommendation676(test.TestCase):
     def test_676(self):
 
         for version in self.versions:
-            utils.memory.clear()
             models.itu676.change_version(version)
             self.test_all_functions_676()
             self.assertEqual(models.itu676.get_version(), version)
@@ -388,7 +385,6 @@ class TestFunctionsRecommendation835(test.TestCase):
     def test_835(self):
 
         for version in self.versions:
-            utils.memory.clear()
             models.itu835.change_version(version)
             self.test_all_functions_835()
             self.assertEqual(models.itu835.get_version(), version)
@@ -433,7 +429,6 @@ class TestFunctionsRecommendation836(test.TestCase):
     def test_836(self):
 
         for version in self.versions:
-            utils.memory.clear()
             models.itu836.change_version(version)
             self.test_all_functions_836()
             self.assertEqual(models.itu836.get_version(), version)
@@ -459,7 +454,6 @@ class TestFunctionsRecommendation837(test.TestCase):
     def test_837(self):
 
         for version in self.versions:
-            utils.memory.clear()
             models.itu837.change_version(version)
             self.test_all_functions_837()
             self.assertEqual(models.itu837.get_version(), version)
@@ -492,7 +486,6 @@ class TestFunctionsRecommendation838(test.TestCase):
 
     def test_838(self):
         for version in self.versions:
-            utils.memory.clear()
             models.itu838.change_version(version)
             self.test_all_functions_838()
             self.assertEqual(models.itu838.get_version(), version)
@@ -516,7 +509,6 @@ class TestFunctionsRecommendation839(test.TestCase):
     def test_839(self):
 
         for version in self.versions:
-            utils.memory.clear()
             models.itu839.change_version(version)
             self.test_all_functions_839()
             self.assertEqual(models.itu839.get_version(), version)
@@ -561,7 +553,6 @@ class TestFunctionsRecommendation840(test.TestCase):
     def test_840(self):
 
         for version in self.versions:
-            utils.memory.clear()
             models.itu840.change_version(version)
             self.test_all_functions_840()
             self.assertEqual(models.itu840.get_version(), version)
@@ -589,7 +580,6 @@ class TestFunctionsRecommendation1510(test.TestCase):
 
     def test_1510(self):
         for version in self.versions:
-            utils.memory.clear()
             models.itu1510.change_version(version)
             self.test_all_functions_1510()
             self.assertEqual(models.itu1510.get_version(), version)
@@ -610,7 +600,6 @@ class TestFunctionsRecommendation1511(test.TestCase):
     def test_1511(self):
 
         for version in self.versions:
-            utils.memory.clear()
             models.itu1511.change_version(version)
             self.test_all_functions_1511()
             self.assertEqual(models.itu1511.get_version(), version)

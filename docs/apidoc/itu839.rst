@@ -1,16 +1,24 @@
 
 Recommendation ITU-R P.839
----------------------
+--------------------------
 
-Implementation of the methods in Recommendation ITU-R P.839 "Rain height model for prediction methods."
+This Recommendation provides a method to predict the rain height for propagation prediction.
 
-Available versions include:
-   * P.839-2 (10/99) (Superseded)
-   * P.839-3 (02/01) (Superseded)
-   * P.839-4 (09/2013) (Current version)
-Not available versions:
-   * P.839-0 (03/92) (Superseded)
-   * P.839-1 (83/97) (Superseded)
+.. include:: itu839_table.rst
+
+Introduction
+************
+
+The mean annual rain height above mean sea level, hR, may be obtained from the 0° C isotherm as:
+
+.. math::
+    
+    h_R = h_0 + 0.36 \qquad \text{km}
+
+for areas of the world where no specific information is available, the mean annual 0° C isotherm height above mean sea level, h0, is an integral part of this Recommendation. The data is provided from 0° to 360° in longitude and from +90° to –90° in latitude. For a location different from the grid-points, the mean annual 0° C isotherm height above mean sea level at the desired location can be derived by performing a bilinear interpolation on the values at the four closest gridpoints.
+
+Module description
+******************
 
 .. automodule:: itur.models.itu839
     :members:

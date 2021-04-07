@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+
 import numpy as np
 from astropy import units as u
 from scipy.optimize import bisect
@@ -12,7 +13,7 @@ from itur import utils
 from itur.models.itu1510 import surface_month_mean_temperature
 from itur.models.itu1144 import bilinear_2D_interpolator
 from itur.utils import (prepare_input_array, prepare_output_array,
-                        memory, load_data_interpolator)
+                        load_data_interpolator, prepare_quantity)
 
 
 class __ITU837():
@@ -303,36 +304,38 @@ def change_version(new_version):
     Change the version of the ITU-R P.837 recommendation currently being used.
 
 
+    This function changes the model used for the ITU-R P.837 recommendation
+    to a different version.
+
     Parameters
     ----------
     new_version : int
         Number of the version to use.
         Valid values are:
-           * P.837-1 (08/94) (Superseded)
-           * P.837-2 (10/99) (Superseded)
-           * P.837-3 (02/01) (Superseded)
-           * P.837-4 (04/03) (Superseded)
-           * P.837-5 (08/07) (Superseded)
-           * P.837-6 (02/12) (Current version)
+          *  7: Activates recommendation ITU-R P.837-7 (12/17) (Current version)
+          *  6: Activates recommendation ITU-R P.837-6 (02/12) (Superseded)
+
     """
     global __model
     __model = __ITU837(new_version)
-    utils.memory.clear()
 
 
 def get_version():
     """
     Obtain the version of the ITU-R P.837 recommendation currently being used.
+
+    Returns
+    -------
+    version: int
+        Version currently being used.
     """
-    global __model
     return __model.__version__
 
 
-@memory.cache
 def rainfall_probability(lat, lon):
     """
-    A method to compute the percentage probability of rain in an average
-    year, P0
+    Compute the percentage probability of rain in an average year, P0,  at a
+    given location.
 
 
     Parameters
@@ -354,7 +357,6 @@ def rainfall_probability(lat, lon):
     [1] Characteristics of precipitation for propagation modelling
     https://www.itu.int/rec/R-REC-P.837/en
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
@@ -363,10 +365,10 @@ def rainfall_probability(lat, lon):
     return prepare_output_array(val, type_output) * u.pct
 
 
-@memory.cache
 def rainfall_rate(lat, lon, p):
     """
-    A method to compute the rainfall rate exceeded for p% of the average year
+    Compute the rainfall rate exceeded for p% of the average year at a
+    given location.
 
 
     Parameters
@@ -390,7 +392,6 @@ def rainfall_rate(lat, lon, p):
     [1] Characteristics of precipitation for propagation modelling
     https://www.itu.int/rec/R-REC-P.837/en
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
@@ -400,10 +401,11 @@ def rainfall_rate(lat, lon, p):
 
 
 def unavailability_from_rainfall_rate(lat, lon, R):
-    """
-    A method to estimate the percentage of time of the average year that a
-    given rainfall rate (R) is exceeded. This method calls successively to the
-    `rainfall_rate` method and interpolates its value.
+    """Compute the percentage of time of the average year that a given rainfall
+    rate (R) is exceeded at a given location
+
+    This method calls successively to `rainfall_rate` (sing bisection) with
+    different values of p.
 
 
     Parameters
@@ -427,8 +429,14 @@ def unavailability_from_rainfall_rate(lat, lon, R):
     [1] Characteristics of precipitation for propagation modelling
     https://www.itu.int/rec/R-REC-P.837/en
     """
-    global __model
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
-    # TODO: write this function
+    R = prepare_quantity(R, u.mm / u.hr, 'Rain rate')
+
+    #TODO: Cehck for bound on R (between 0 and 200 mm/hr?)
+
+    def fcn(x):
+        return (rainfall_rate(lat, lon, x).value - R - 1e-6)
+
+    return bisect(fcn, 1e-5, 100, maxiter=50)

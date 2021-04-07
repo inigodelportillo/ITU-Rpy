@@ -10,31 +10,99 @@ import unittest as test
 import itur.models as models
 from itur import atmospheric_attenuation_slant_path
 
-pd.set_option('display.max_colwidth', -1)
-test_data = path.join(path.dirname(path.realpath(__file__)), 'test_data')
-html_path = path.join(path.dirname(path.realpath(__file__)), '../html/validation')
 
+pd.set_option('display.max_colwidth', -1)
+basepath = path.dirname(path.realpath(__file__))
+test_data = path.join(basepath, 'test_data')
+html_path = path.join(basepath, '../docs/validation')
+
+
+desc_validation =\
+"""This page contains the validation examples for Recommendation {0}: {1}.
+
+All test cases were extracted from the
+`ITU Validation examples file (rev 5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`_.
+
+.. contents:: Functions tested
+    :depth: 2
+
+"""
+
+desc_test_case =\
+"""The table below contains the results of testing function ``{0}``.
+The test cases were extracted from spreadsheet ``{1}`` from the
+`ITU Validation examples file (rev 5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`_.
+In addition to the input-arguments, expected result (``ITU Validation``), and
+ITU-Rpy computed result (``ITUR-py Result``), the absolute and relative errors
+are shown. Each test case is color-coded depending on the magnitude of the
+errors (green = pass, errors are negligible, red = fail, relative error is
+above 0.01%).
+
+In addition, the code snippet below shows an example of how to generate the
+first row of the results in the table:
+
+.. code-block:: python
+
+{2}
+
+"""
+
+html_header = """
+       <html>
+         <head>
+             <title>Validation results for {0}</title>
+             <style>
+                   table {{
+                       border-collapse: collapse;
+                       font-size: 10px;
+                       width: 100%;
+                       padding: 2px;
+                     }}
+
+                     th {{
+                         background-color: black;
+                         color: white;
+                     }}
+
+                     th, td {{
+                       text-align: center;
+                       padding: 2px;
+                       width: 1%;
+                       font-family: Arial, Helvetica, sans-serif;
+                       white-space: nowrap;
+                     }}
+
+                     tr:nth-child(even) {{background-color: #f2f2f2;}}
+                     tr:hover {{background-color: khaki;}}
+
+               </style>
+         </head>
+         <body>
+   """
+
+html_footer = """
+            <br><br>
+          </body>
+        </html>
+        """
 
 def create_ITU_suite():
     """ A test suite for the ITU-P Recommendations. Recommendations tested:
-    * ITU-P R-676-9
     * ITU-P R-676-11
-    * ITU-P R-618-12
     * ITU-P R-618-13
-    * ITU-P R-453-12
-    * ITU-P R-837-6
+    * ITU-P R-453-14
     * ITU-P R-837-7
     * ITU-P R-838-3
     * ITU-P R-839-4
-    * ITU-P R-840-4
-    * ITU-P R-840-7
+    * ITU-P R-840-8
     * ITU-P R-1511-1
+    * ITU-P R-1511-2
     """
     suite = ITU_Suite()
 
-    # ITU-R P.676 tests (Gaseous attenuation)
+    # ITU-R P.453 tests (Gaseous attenuation)
     suite.addTest(ITUR453_14TestCase('test_wet_term_radio_refractivity'))
-#
+
     # ITU-R P.618
     suite.add_test(ITUR618_13TestCase('test_rain_attenuation'))
     suite.add_test(ITUR618_13TestCase('test_rain_probability'))
@@ -78,27 +146,28 @@ def create_ITU_suite():
 
     return suite
 
+# Format HTML code
 
 def formatter_fcn(s):
-    return '<td style="text-align:left">' + str(s)
+    return '\t\t\t<td style="text-align:left">' + str(s)
 
 
 def formatter_rel_error_cell(s):
     if np.isnan(float(s)) or np.isinf(float(s)):
-        return '<td bgcolor="cornflowerblue">{0:.3f}'.format(s)
+        return '\t\t\t<td bgcolor="cornflowerblue">{0:.3f}'.format(s)
     elif abs(float(s)) < 0.01:
-        return '<td bgcolor="lightgreen">{0:.3f}'.format(s)
+        return '\t\t\t<td bgcolor="lightgreen">{0:.3f}'.format(s)
     else:
-        return '<td bgcolor="salmon">{0:.3f}'.format(s)
+        return '\t\t\t<td bgcolor="salmon">{0:.3f}'.format(s)
 
 
 def formatter_error(s):
     if np.isnan(float(s)):
-        return '<td bgcolor="cornflowerblue">{0:.2e}'.format(s)
+        return '\t\t\t<td bgcolor="cornflowerblue">{0:.2e}'.format(s)
     elif abs(float(s)) < 0.1:
-        return '<td bgcolor="lightgreen">{0:.2e}'.format(s)
+        return '\t\t\t<td bgcolor="lightgreen">{0:.2e}'.format(s)
     else:
-        return '<td bgcolor="salmon">{0:.3e}'.format(s)
+        return '\t\t\t<td bgcolor="salmon">{0:.3e}'.format(s)
 
 
 def format_table(table):
@@ -155,46 +224,26 @@ class ITU_Suite(test.TestSuite):
         self.test_cases[test_case.__class__.__name__] = test_case
         self.addTest(test_case)
 
-    def report_index(self, path_report):
-        html_header = """
-        <html>
-          <head><title>Validation results</title></head>
-          <body><h1>Validation results</h1>
-        """
-
-        html_footer = """
-          </body>
-        </html>.
-        """
-
-        s = html_header + '\n<ul>'
-        for test_name in self.test_cases:
-            s += '<li><a href="./{0}.html">{1}</a></li>'.format(
-                    test_name.lower(), test_name)
-
-        s += '</ul>' + html_footer
-        if path_report:
-            with open(path.join(path_report, 'index.html'), 'w') as fd:
-                fd.write(s)
-
-    def html_reports(self, path_report=None):
-        self.report_index(path_report)
+    def rst_reports(self, path_report=None):
         for test_name, test_case in self.test_cases.items():
-            ret = test_case.produce_html_report()
+            ret = test_case.produce_rst_report()
             if path_report:
-                fpath = path.join(path_report, test_name.lower() + '.html')
-                with open(fpath, 'w') as fd:
+                fpath = path.join(
+                  path_report,
+                  test_name.lower().replace('testcase', '') + '.rst')
+                with open(fpath, 'w', encoding='utf-8') as fd:
                     fd.write(ret)
 
 
 class ITU_TestCase(test.TestCase):
     report = defaultdict(dict)
 
-    @staticmethod
-    def read_csv(path_name, columns):
+    def read_csv(self, path_name, columns):
+        self.path_name = path_name
         df = pd.read_csv(path_name, sep=',', skiprows=range(1, 2))
-#        units = pd.read_csv(path_name, sep=',', nrows=2)
-        return df[columns]  # , units[columns].iloc(0)
+        units = pd.read_csv(path_name, sep=',', nrows=2, encoding='cp1252')
+        self.units = dict(units[columns].iloc[0])
+        return df[columns]
 
     def setUp(self):
         self.tests = []
@@ -204,6 +253,12 @@ class ITU_TestCase(test.TestCase):
 
         test_fcn_name = test_fcn
         test_fcn = eval(test_fcn)
+
+        # Add units for the result value and function
+        self.units['res_val'] = self.units[result_value]
+        self.units['res_fcn'] = self.units[result_value]
+        # self.units['error'] = self.units[result_value]
+        # self.units['error_rel'] = '(%)'
 
         # Evaluate all the functions
         res = []
@@ -219,15 +274,29 @@ class ITU_TestCase(test.TestCase):
             line['res_fcn'] = res_fcn.value
             line['res_val'] = res_val
             line['error'] = (res_val - res_fcn.value)
-            line['error_rel'] = round(
-                    (res_val - res_fcn.value) / res_val * 100, 3)
+            if res_val == 0 and abs(line['error']) < 1e-6:
+                line['error_rel'] = 0
+            else:
+                line['error_rel'] = round(
+                      (res_val - res_fcn.value) / res_val * 100, 3)
+
             res.append(line)
 
         # Create data frame with the report
         order = ['fcn'] + attributes + ['res_val', 'res_fcn', 'error',
                                         'error_rel']
         df = pd.DataFrame(res)
-        self.report[self.__class__.__name__][test_name] = df[order]
+        self.report[self.__class__.__name__][test_name] = {
+            'df': df,
+            'class_name': self.__class__.__name__,
+            'test_name': test_name,
+            'units': self.units,
+            'path_csv': self.path_name,
+            'test_fcn': test_fcn_name,
+            'attributes': attributes,
+            'n_places': n_places,
+            'report_html': df[order]
+          }
 
         # Do the assert equal for all the tests
         for ret in res:
@@ -238,61 +307,111 @@ class ITU_TestCase(test.TestCase):
             except AssertionError as e:
                 print(e)
 
-    def produce_html_report(self):
-        html_header = """
-        <html>
-          <head><title>Validation results for {0}</title>
-          <style>
-              table {{
-                  border-collapse: collapse;
-                  width: 100%;
-                }}
+    def generate_code_example(self, report):
+        """Generate a code example of the call used for this function
 
-                th {{
-                    background-color: black;
-                    color: white;
-                }}
+        Parameters
+        ----------
+        report : dict
+          The dictionary containing the parameters used in a test case.
 
-                th, td {{
-                  text-align: center;
-                  padding: 8px;
-                  width: 1%;
-                  white-space: nowrap;
-                }}
-
-                tr:nth-child(even) {{background-color: #f2f2f2;}}
-                tr:hover {{background-color: khaki;}}
-
-          </style>
-          </head>
-          <body><h1>Validation results for {1}</h1><h2>{2}</h2>
-        """.format(self.itu_name, self.itu_name, self.itu_description)
-
-        html_footer = """
-          </body>
-        </html>.
+        Returns
+        -------
+        str
+          A string with an example of code used to call this test.
         """
+        ret = ["    import itur", "", "    # Define input attributes"]
+        attributes = report['attributes']
+        test_fcn = report['test_fcn']
+        test_fcn_name = report['test_fcn'].split('.')[-1]
 
-        html_source = html_header
+        row_1 = report['df'].iloc[0]
+        units = report['units']
 
-        fmtrs = {'error_rel': formatter_rel_error_cell,
-                 'error': formatter_error,
-                 'fcn': formatter_fcn
-                 }
+        # Write the attributesf
+        for attr_name, attr_val in zip(attributes, row_1[attributes]):
+            ret.append('    {0} = {1}  # {2}'.format(
+                attr_name, attr_val, units[attr_name]))
+
+        # Add call to test-function
+        ret.extend([
+            "", "    # Make call to test-function {0}".format(test_fcn_name),
+            '    itur_val = itur.{0}({1})'.format(
+              test_fcn, ", ".join([att + '=' + att for att in attributes]))])
+
+        # Compute errors
+        ret.extend([
+            "",
+            "    # Compute error with respect to value in ITU example file",
+            '    ITU_example_val = {0}  # {1}'.format(
+                        row_1['res_val'], units['res_val']),
+            '    error = ITU_example_val - itur_val.value',
+            '    error_rel = error / ITU_example_val * 100  # (%)'])
+
+        return "\n".join(ret)
+
+    def produce_rst_report(self):
+
+        ret = []
+        title = "Validation results for {0}".format(self.itu_name)
+        ret.append(title)
+        ret.append('=' * len(title))
+        ret.append('')
+        ret.append(desc_validation.format(self.itu_name, self.itu_description))
 
         for test_name in self.report[self.__class__.__name__]:
-            df = self.report[self.__class__.__name__][test_name]
-            df['res_fcn'] = formatter_digits(df['res_fcn'], df['res_val'])
-            table = df.to_html(bold_rows=True, index=False, justify='center',
-                               table_id=test_name.lower(), escape=False,
-                               formatters=fmtrs)
 
-            table = format_table(table)
-            html_source += '\n<h2>{0}</h2>'.format(test_name)
-            html_source += table
+            # Create HTML table for this test
+            report = self.report[self.__class__.__name__][test_name]
+            table = self.create_html_table(report, include_header=True)
+            html_file = path.join(html_path, test_name + '_table.html')
+            with open(html_file, 'w', encoding='utf-8') as fd:
+                fd.write(table)
 
-        html_source += html_footer
-        return html_source
+            # Create HTML table for this test
+            test_fcn_name = report['test_fcn'].split('.')[-1]
+            test_case_name = "Function {0}".format(test_fcn_name)
+            ret.append(test_case_name)
+            ret.append("-" * len(test_case_name))
+            ret.append("")
+            ret.append(desc_test_case.format(
+                    test_fcn_name, path.basename(report['path_csv']),
+                    self.generate_code_example(report)))
+
+            ret.extend(['.. raw:: html',
+                        '    :file: {0}'.format(test_name + '_table.html'),
+                        '', ''])
+
+        return "\n".join(ret)
+
+    def create_html_table(self, report, include_header=False):
+        fmtrs = {'error_rel': formatter_rel_error_cell,
+                 'error': formatter_error,
+                 'fcn': formatter_fcn}
+
+        if include_header:
+            table = html_header.format(report['test_fcn'])
+
+        df = report['report_html']
+        df['res_fcn'] = formatter_digits(df['res_fcn'], df['res_val'])
+
+        # Add units to header attributes
+        col_dict = {}
+        for col in df.columns:
+            if col in report['units']:
+                col_dict[col] = '{0} {1}'.format(col, report['units'][col])
+            else:
+                col_dict[col] = col
+
+        df.rename(columns=col_dict, inplace=True)
+        table += df.to_html(bold_rows=True, index=False, justify='center',
+                            table_id=report['test_name'].lower(), escape=False,
+                            formatters=fmtrs)
+
+        table = format_table(table)
+        if include_header:
+            table += html_footer
+        return table
 
 
 class ITUR453_14TestCase(ITU_TestCase):
@@ -534,7 +653,8 @@ class ITUR836_6TestCase(ITU_TestCase):
 class ITUR837_7TestCase(ITU_TestCase):
 
     itu_name = 'ITU-R P.837-7'
-    itu_description = 'Characteristics of precipitation for propagation modelling'
+    itu_description = 'Characteristics of precipitation for propagation ' +\
+                      'modelling'
 
     def test_rainfall_rate(self):
         # Set the version to the
@@ -588,7 +708,8 @@ class ITUR837_7TestCase(ITU_TestCase):
 class ITUR838_3TestCase(ITU_TestCase):
 
     itu_name = 'ITU-R P.838-3'
-    itu_description = ' Specific attenuation model for rain for use in prediction methods'
+    itu_description = 'Specific attenuation model for rain for use in ' +\
+                      'prediction methods'
 
     def test_rain_specific_attenuation(self):
         # Set the version to the
@@ -757,4 +878,5 @@ if __name__ == '__main__':
           suite.countTestCases())
     sys.stdout.flush()
     test.TextTestRunner(verbosity=2).run(suite)
-    suite.html_reports(html_path)
+    # suite.html_reports(html_path)
+    suite.rst_reports(html_path)

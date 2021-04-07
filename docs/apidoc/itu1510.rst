@@ -1,12 +1,27 @@
 
 Recommendation ITU-R P.1510
--------------------------------------
+---------------------------
 
-Implementation of the methods in Recommendation ITU-R P.1510 "Annual mean surface temperature"
+This Recommendation contains monthly and annual maps of mean surface temperature that are recommended for the prediction of statistics of different propagation effects such as rainfall rate, rain attenuation and gaseous attenuation due to water vapour and oxygen.
 
-Available versions include:
-    * P.1510-0 (02/01) (Current version)
-	
+.. include:: itu1510_table.rst
+
+Introduction
+************
+
+Recommendation ITU-R P.1510 contains monthly and annual maps of mean surface temperature that are recommended for the prediction of statistics of different propagation effects such as rainfall rate, rain attenuation and gaseous attenuation due to water vapour and oxygen.
+
+The monthly and annual mean surface temperature data (K) at 2 m above the surface of the Earth is an integral part of this Recommendation, and is provided as a grid. 
+The latitude grid is from −90° N to +90° N in 0.75° steps, and the longitude grid is from −180° E to +180° E in 0.75° steps.
+
+The monthly mean surface temperature maps have been derived from 36 years (1979-2014) of
+European Centre of Medium-range Weather Forecast (ECMWF) ERA Interim data, and the annual
+mean surface temperature map is the average of the monthly mean surface temperature maps
+weighted by the relative number of days in each calendar month.
+
+Module description
+******************
+
 .. automodule:: itur.models.itu1510
     :members:
     :undoc-members:

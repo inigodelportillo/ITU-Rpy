@@ -6,9 +6,8 @@ This image is similar to the one plotted in page 3 of Recommendation
 ITU-R P.1510-1.
 """
 import itur
-import matplotlib.pyplot as plt
 
-# Set Recommendation ITU-R P.837 to version 7
+# Set Recommendation ITU-R P.1510 to version 1
 itur.models.itu1510.change_version(1)
 
 # Generate a regular grid of latitude and longitudes with 0.1 degree resolution
@@ -20,8 +19,6 @@ lat, lon = itur.utils.regular_lat_lon_grid(resolution_lat=0.1,
 T = itur.models.itu1510.surface_mean_temperature(lat, lon)
 
 # Display the results in a map
-fig = plt.figure(figsize=(16, 8))
-ax = fig.add_subplot(1, 1, 1)
-m = itur.utils.plot_in_map(
-        T, lat, lon, cmap='jet', vmin=230, vmax=310, ax=ax,
+ax = itur.plotting.plot_in_map(
+        T, lat, lon, cmap='jet', vmin=230, vmax=310,
         cbar_text='Annual mean surface temperature [K]')

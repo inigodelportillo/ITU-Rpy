@@ -1,0 +1,206 @@
+Validation results for ITU-R P.676-12
+=====================================
+
+This page contains the validation examples for Recommendation ITU-R P.676-12: Attenuation by atmospheric gases and related effects.
+
+All test cases were extracted from the
+`ITU Validation examples file (rev 5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`_.
+
+.. contents:: Functions tested
+    :depth: 2
+
+
+Function gamma0_exact
+---------------------
+
+The table below contains the results of testing function ``gamma0_exact``.
+The test cases were extracted from spreadsheet ``ITURP676-12_gamma.csv`` from the
+`ITU Validation examples file (rev 5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`_.
+In addition to the input-arguments, expected result (``ITU Validation``), and
+ITU-Rpy computed result (``ITUR-py Result``), the absolute and relative errors
+are shown. Each test case is color-coded depending on the magnitude of the
+errors (green = pass, errors are negligible, red = fail, relative error is
+above 0.01%).
+
+In addition, the code snippet below shows an example of how to generate the
+first row of the results in the table:
+
+.. code-block:: python
+
+    import itur
+
+    # Define input attributes
+    f = 12.0  # GHz
+    P = 1013.25  # hPA
+    rho = 7.5  # g/cm3
+    T = 288.15  # K
+
+    # Make call to test-function gamma0_exact
+    itur_val = itur.models.itu676.gamma0_exact(f=f, P=P, rho=rho, T=T)
+
+    # Compute error with respect to value in ITU example file
+    ITU_example_val = 0.008698264  # dB/km
+    error = ITU_example_val - itur_val.value
+    error_rel = error / ITU_example_val * 100  # (%)
+
+
+.. raw:: html
+    :file: test_gamma0_table.html
+
+
+Function gaseous_attenuation_slant_path
+---------------------------------------
+
+The table below contains the results of testing function ``gaseous_attenuation_slant_path``.
+The test cases were extracted from spreadsheet ``ITURP676-12_A_gas.csv`` from the
+`ITU Validation examples file (rev 5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`_.
+In addition to the input-arguments, expected result (``ITU Validation``), and
+ITU-Rpy computed result (``ITUR-py Result``), the absolute and relative errors
+are shown. Each test case is color-coded depending on the magnitude of the
+errors (green = pass, errors are negligible, red = fail, relative error is
+above 0.01%).
+
+In addition, the code snippet below shows an example of how to generate the
+first row of the results in the table:
+
+.. code-block:: python
+
+    import itur
+
+    # Define input attributes
+    f = 14.25  # (GHz)
+    el = 31.07699124  # ?(°)
+    rho = 13.79653679  # (g/m3)
+    P = 1009.485611798  # (hPA)
+    T = 283.6108756  #  (C)
+    h = 0.031382983999999996  # (km)
+    V_t = 33.72946527  #  (kg/m2)
+
+    # Make call to test-function gaseous_attenuation_slant_path
+    itur_val = itur.models.itu676.gaseous_attenuation_slant_path(f=f, el=el, rho=rho, P=P, T=T, h=h, V_t=V_t)
+
+    # Compute error with respect to value in ITU example file
+    ITU_example_val = 0.226874038  # (dB)
+    error = ITU_example_val - itur_val.value
+    error_rel = error / ITU_example_val * 100  # (%)
+
+
+.. raw:: html
+    :file: test_attenuation_gas_table.html
+
+
+Function gamma_exact
+--------------------
+
+The table below contains the results of testing function ``gamma_exact``.
+The test cases were extracted from spreadsheet ``ITURP676-12_gamma.csv`` from the
+`ITU Validation examples file (rev 5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`_.
+In addition to the input-arguments, expected result (``ITU Validation``), and
+ITU-Rpy computed result (``ITUR-py Result``), the absolute and relative errors
+are shown. Each test case is color-coded depending on the magnitude of the
+errors (green = pass, errors are negligible, red = fail, relative error is
+above 0.01%).
+
+In addition, the code snippet below shows an example of how to generate the
+first row of the results in the table:
+
+.. code-block:: python
+
+    import itur
+
+    # Define input attributes
+    f = 12.0  # GHz
+    P = 1013.25  # hPA
+    rho = 7.5  # g/cm3
+    T = 288.15  # K
+
+    # Make call to test-function gamma_exact
+    itur_val = itur.models.itu676.gamma_exact(f=f, P=P, rho=rho, T=T)
+
+    # Compute error with respect to value in ITU example file
+    ITU_example_val = 0.018233652  # dB/km
+    error = ITU_example_val - itur_val.value
+    error_rel = error / ITU_example_val * 100  # (%)
+
+
+.. raw:: html
+    :file: test_gamma_table.html
+
+
+Function gammaw_exact
+---------------------
+
+The table below contains the results of testing function ``gammaw_exact``.
+The test cases were extracted from spreadsheet ``ITURP676-12_gamma.csv`` from the
+`ITU Validation examples file (rev 5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`_.
+In addition to the input-arguments, expected result (``ITU Validation``), and
+ITU-Rpy computed result (``ITUR-py Result``), the absolute and relative errors
+are shown. Each test case is color-coded depending on the magnitude of the
+errors (green = pass, errors are negligible, red = fail, relative error is
+above 0.01%).
+
+In addition, the code snippet below shows an example of how to generate the
+first row of the results in the table:
+
+.. code-block:: python
+
+    import itur
+
+    # Define input attributes
+    f = 12.0  # GHz
+    P = 1013.25  # hPA
+    rho = 7.5  # g/cm3
+    T = 288.15  # K
+
+    # Make call to test-function gammaw_exact
+    itur_val = itur.models.itu676.gammaw_exact(f=f, P=P, rho=rho, T=T)
+
+    # Compute error with respect to value in ITU example file
+    ITU_example_val = 0.009535388  # dB/km
+    error = ITU_example_val - itur_val.value
+    error_rel = error / ITU_example_val * 100  # (%)
+
+
+.. raw:: html
+    :file: test_gammaw_table.html
+
+
+Function zenit_water_vapour_attenuation
+---------------------------------------
+
+The table below contains the results of testing function ``zenit_water_vapour_attenuation``.
+The test cases were extracted from spreadsheet ``ITURP676-12_zenith_attenuation.csv`` from the
+`ITU Validation examples file (rev 5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`_.
+In addition to the input-arguments, expected result (``ITU Validation``), and
+ITU-Rpy computed result (``ITUR-py Result``), the absolute and relative errors
+are shown. Each test case is color-coded depending on the magnitude of the
+errors (green = pass, errors are negligible, red = fail, relative error is
+above 0.01%).
+
+In addition, the code snippet below shows an example of how to generate the
+first row of the results in the table:
+
+.. code-block:: python
+
+    import itur
+
+    # Define input attributes
+    lat = 0.0  # (deg N)
+    lon = 0.0  # (deg E)
+    p = 0.0  # (hPa)
+    f = 14.25  # (GHz)
+    h = 0.031382983999999996  # (km)
+    V_t = 33.72946527  #  (kg/m2)
+
+    # Make call to test-function zenit_water_vapour_attenuation
+    itur_val = itur.models.itu676.zenit_water_vapour_attenuation(lat=lat, lon=lon, p=p, f=f, h=h, V_t=V_t)
+
+    # Compute error with respect to value in ITU example file
+    ITU_example_val = 0.070935174  # (dB/km)
+    error = ITU_example_val - itur_val.value
+    error_rel = error / ITU_example_val * 100  # (%)
+
+
+.. raw:: html
+    :file: test_zenith_attenuation_table.html
+

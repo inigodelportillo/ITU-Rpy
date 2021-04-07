@@ -249,15 +249,19 @@ def change_version(new_version):
     Change the version of the ITU-R P.838 recommendation currently being used.
 
 
+    This function changes the model used for the ITU-R P.838 recommendation
+    to a different version.
+
     Parameters
     ----------
     new_version : int
         Number of the version to use.
         Valid values are:
-        * P.838-0 (03/92) (Superseded)
-        * P.838-1 (10/99) (Superseded)
-        * P.838-2 (04/03) (Superseded)
-        * P.838-3 (03/05) (Current version)
+          *  3: Activates recommendation ITU-R P.838-3 (03/05) (Current version)
+          *  2: Activates recommendation ITU-R P.838-2 (04/03) (Superseded)
+          *  1: Activates recommendation ITU-R P.838-1 (10/99) (Superseded)
+          *  0: Activates recommendation ITU-R P.838-0 (03/92) (Superseded)
+
     """
     global __model
     __model = __ITU838__(new_version)
@@ -266,15 +270,20 @@ def change_version(new_version):
 def get_version():
     """
     Obtain the version of the ITU-R P.838 recommendation currently being used.
+
+    Returns
+    -------
+    version: int
+        Version currently being used.
     """
-    global __model
     return __model.__version__
 
 
 def rain_specific_attenuation_coefficients(f, el, tau):
-    """
+    """Compute the values for the coefficients k and α.
+
     A method to compute the values for the coefficients k and α to compute
-    the specific attenuation γ_R (dB/km)
+    the rain specific attenuation :math:`\gamma_R` (dB/km) (dB/km)
 
 
     Parameters
@@ -291,9 +300,9 @@ def rain_specific_attenuation_coefficients(f, el, tau):
     Returns
     -------
     k: number
-        Zero isoterm height (km)
-    alpha: number
-        Zero isoterm height (km)
+        Coefficient k (non-dimensional)
+    α: number
+        Coefficient α (non-dimensional)
 
 
     References
@@ -301,18 +310,18 @@ def rain_specific_attenuation_coefficients(f, el, tau):
     [1] Rain height model for prediction methods:
     https://www.itu.int/rec/R-REC-P.838/en
     """
-    global __model
     f = prepare_quantity(f, u.GHz, 'Frequency')
     return __model.rain_specific_attenuation_coefficients(f, el, tau)
 
 
 def rain_specific_attenuation(R, f, el, tau):
-    """
+    """Compute the specific attenuation γ_R (dB/km) given the rainfall rate.
+
     A method to compute the specific attenuation γ_R (dB/km) from rain. The
-    value is obtained from hte rain rate R (mm/h) using a power law
+    value is obtained from the rainfall rate R (mm/h) using a power law
     relationship.
 
-    ..math:
+    .. math::
         \\gamma_R = k R^\\alpha
 
 
@@ -331,7 +340,7 @@ def rain_specific_attenuation(R, f, el, tau):
 
     Returns
     -------
-    gamma_R: numpy.ndarray
+    γ_R: numpy.ndarray
         Specific attenuation from rain (dB/km)
 
 
@@ -340,7 +349,6 @@ def rain_specific_attenuation(R, f, el, tau):
     [1] Rain height model for prediction methods:
     https://www.itu.int/rec/R-REC-P.838/en
     """
-    global __model
     R = prepare_quantity(R, u.mm / u.hr, 'Rain rate')
     f = prepare_quantity(f, u.GHz, 'Frequency')
     return __model.rain_specific_attenuation(R, f, el, tau) * u.dB / u.km

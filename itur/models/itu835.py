@@ -1,16 +1,4 @@
 # -*- coding: utf-8 -*-
-"""A package that contains the models of ITU-R P.835 Recommendation, Reference Standard Atmospheres.
-
-Available versions:
-       * P.835-6 (12/17) (Current version)
-       * P.835-5 (02/12) (Superseded)
-
-    Not available versions:
-       * P.835-1 (08/94) (Superseded)
-       * P.835-2 (08/97) (Superseded)
-       * P.835-3 (10/99) (Superseded)
-       * P.835-4 (03/05) (Superseded)
-"""
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -667,8 +655,8 @@ def change_version(new_version):
     new_version : int
         Number of the version to use.
         Valid values are:
-           * 5: Sets the current version to ITU-R P.835-5 (08/07) (Superseded)
-           * 6: Sets the current version to ITU-R P.835-6 (02/12) (Current version)
+          *  6: Activates recommendation ITU-R P.835-6 (12/17) (Current version)
+          *  5: Activates recommendation ITU-R P.835-5 (02/12) (Superseded)
     """
     global __model
     __model = __ITU835__(new_version)
@@ -679,7 +667,7 @@ def get_version():
 
     Obtain the version of the ITU-R P.835 recommendation currently being used.
 
-     Returns
+    Returns
     -------
     version: int
        The version of the ITU-R P.835 recommendation being used.

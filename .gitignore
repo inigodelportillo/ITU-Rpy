@@ -127,3 +127,18 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# HTML documentation
+html/
+slides/
+*.xlsx
+conda-build.bat
+build.bat
+process_ITU_txt_files.py
+write_test_cases.py
+.idea/workspace.xml
+.idea/modules.xml
+.idea/ITU_models.iml
+.idea/misc.xml
+.idea/vcs.xml
+*.yaml

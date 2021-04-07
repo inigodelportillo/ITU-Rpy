@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+
 import numpy as np
 from astropy import units as u
 
@@ -10,7 +11,8 @@ from itur import utils
 from itur.models.itu1144 import (bilinear_2D_interpolator,
                                  bicubic_2D_interpolator)
 from itur.utils import (prepare_input_array, prepare_output_array,
-                        memory, load_data_interpolator)
+                        load_data_interpolator)
+
 
 
 class __ITU1510__():
@@ -131,29 +133,38 @@ def change_version(new_version):
     Change the version of the ITU-R P.1510 recommendation currently being used.
 
 
+    This function changes the model used for the ITU-R P.1510 recommendation
+    to a different version.
+
     Parameters
     ----------
     new_version : int
         Number of the version to use.
         Valid values are:
-        *version 0: P.1510-0 (02/01) (Current version)
+
+        * 1: Activates recommendation ITU-R P.1510-1 (06/17) (Current version)
+        * 0: Activates recommendation ITU-R P.1510-0 (02/01) (Current version)
     """
     global __model
     __model = __ITU1510__(new_version)
-    utils.memory.clear()
 
 
 def get_version():
     """
     Obtain the version of the ITU-R P.1510 recommendation currently being used.
+
+    Returns
+    -------
+    version: int
+        Version currently being used.
     """
-    global __model
     return __model.__version__
 
 
-@memory.cache
 def surface_mean_temperature(lat, lon):
     """
+    Annual mean surface temperature (K) at 2 m above the surface of the Earth.
+
     A method to estimate the annual mean surface temperature (K) at 2 m
     above the surface of the Earth
 
@@ -168,8 +179,8 @@ def surface_mean_temperature(lat, lon):
 
     Returns
     -------
-    temperature: numpy.ndarray
-        Annual mean surface temperature (K)
+    annual_temperature: numpy.ndarray
+        Annual mean surface temperature (K). Same dimensions as lat and lon.
 
 
     References
@@ -178,7 +189,6 @@ def surface_mean_temperature(lat, lon):
     https://www.itu.int/rec/R-REC-P.1510/en
 
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
@@ -187,10 +197,11 @@ def surface_mean_temperature(lat, lon):
     return prepare_output_array(val, type_output) * u.Kelvin
 
 
-@memory.cache
 def surface_month_mean_temperature(lat, lon, m):
     """
-    A method to estimate the annual mean surface temperature (K) at 2 m
+    Monthly mean surface temperature (K) at 2 m above the surface of the Earth.
+
+    A method to estimate the monthly mean surface temperature (K) at 2 m
     above the surface of the Earth
 
 
@@ -200,12 +211,14 @@ def surface_month_mean_temperature(lat, lon, m):
         Latitudes of the receiver points
     lon : number, sequence, or numpy.ndarray
         Longitudes of the receiver points
+    m : integer
+      Index of the month (1=Jan, 2=Feb, 3=Mar, 4=Apr, ...)
 
 
     Returns
     -------
-    temperature: numpy.ndarray
-        Annual mean surface temperature (K)
+    monthly_temperature: numpy.ndarray
+        Monthly mean surface temperature (K). Same dimensions as lat and lon.
 
 
     References
@@ -214,7 +227,6 @@ def surface_month_mean_temperature(lat, lon, m):
     https://www.itu.int/rec/R-REC-P.1510/en
 
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)

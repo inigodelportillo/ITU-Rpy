@@ -19,8 +19,8 @@ lat, lon = itur.utils.regular_lat_lon_grid(lat_max=60,
                                            lat_min=-60,
                                            lon_max=65,
                                            lon_min=-35,
-                                           resolution_lon=0.1,
-                                           resolution_lat=0.1)
+                                           resolution_lon=1,
+                                           resolution_lat=1)
 
 # Satellite coordinates (GEO, 4 E)
 lat_sat = 0
@@ -39,9 +39,9 @@ p = 0.1                  # Unavailability (Values exceeded 0.1% of time)
 Att = itur.atmospheric_attenuation_slant_path(lat, lon, f, el, p, D)
 
 # Plot the results
-m = itur.utils.plot_in_map(Att, lat, lon,
-                           cbar_text='Atmospheric attenuation [dB]',
-                           cmap='magma')
+m = itur.plotting.plot_in_map(Att, lat, lon,
+                              cbar_text='Atmospheric attenuation [dB]',
+                              cmap='magma')
 
 # Plot the satellite location
 m.scatter(lon_sat, lat_sat, c='white', s=20)
@@ -49,6 +49,6 @@ m.scatter(lon_sat, lat_sat, c='white', s=20)
 # Now we show the surface mean temperature distribution
 T = itur.surface_mean_temperature(lat, lon)\
     .to(itur.u.Celsius, equivalencies=itur.u.temperature())
-m = itur.utils.plot_in_map(T, lat, lon,
-                           cbar_text='Surface mean temperature [C]',
-                           cmap='RdBu_r')
+m = itur.plotting.plot_in_map(T, lat, lon,
+                              cbar_text='Surface mean temperature [C]',
+                              cmap='RdBu_r')

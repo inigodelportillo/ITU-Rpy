@@ -64,12 +64,13 @@ class _ITU618():
     Recommendation ITU-R P.618 provides methods to estimate the propagation
     loss on an Earth-space path, relative to the free-space loss. This value
     is the sum of different contributions as follows:
-    * attenuation by atmospheric gases;
-    * attenuation by rain, other precipitation and clouds;
-    * focusing and defocusing;
-    * decrease in antenna gain due to wave-front incoherence;
-    * scintillation and multipath effects;
-    * attenuation by sand and dust storms.
+      * attenuation by atmospheric gases;
+      * attenuation by rain, other precipitation and clouds;
+      * focusing and defocusing;
+      * decrease in antenna gain due to wave-front incoherence;
+      * scintillation and multipath effects;
+      * attenuation by sand and dust storms.
+
     Each of these contributions has its own characteristics as a function of
     frequency, geographic location and elevation angle. As a rule, at elevation
     angles above 10°, only gaseous attenuation, rain and cloud attenuation and
@@ -611,13 +612,34 @@ __model = _ITU618()
 
 
 def change_version(new_version):
+    """
+    Change the version of the ITU-R P.618 recommendation currently being used.
+
+    This function changes the model used for the ITU-R P.618 recommendation
+    to a different version.
+
+    Parameters
+    ----------
+    new_version : int
+        Number of the version to use.
+        Valid values are:
+          *  13: Activates recommendation ITU-R P.618-13 (12/17) (Current version)
+          *  12: Activates recommendation ITU-R P.618-12 (07/15) (Superseded)
+    """
     global __model
     __model = _ITU618(new_version)
-    utils.memory.clear()
 
 
 def get_version():
-    global __model
+    """ The version of the current model for the ITU-R P.618 recommendation.
+
+    Obtain the version of the ITU-R P.618 recommendation currently being used.
+
+    Returns
+    -------
+    version: int
+       The version of the ITU-R P.618 recommendation being used.
+    """
     return __model.__version__
 
 
@@ -680,7 +702,6 @@ def rain_attenuation(lat, lon, f, el, hs=None, p=0.01, R001=None,
     Earth-space telecommunication systems:
     https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
     """
-    global __model
     type_output = type(lat)
 
     lat = prepare_input_array(lat)
@@ -740,7 +761,6 @@ def rain_attenuation_probability(lat, lon, el, hs=None, Ls=None, P0=None):
     Earth-space telecommunication systems:
     https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
     """
-    global __model
     type_output = type(lat)
 
     lat = prepare_input_array(lat)
@@ -820,7 +840,6 @@ def site_diversity_rain_outage_probability(lat1, lon1, a1, el1, lat2,
     Earth-space telecommunication systems:
     https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
     """
-    global __model
     type_output = type(lat1)
     lon1 = np.mod(lon1, 360)
     lat1 = prepare_quantity(lat1, u.deg, 'Latitude in ground station 1')
@@ -895,7 +914,6 @@ def scintillation_attenuation(lat, lon, f, el, p, D, eta=0.5, T=None,
     Earth-space telecommunication systems:
     https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
     """
-    global __model
     type_output = type(lat)
 
     lat = prepare_input_array(lat)
@@ -966,7 +984,6 @@ def scintillation_attenuation_sigma(lat, lon, f, el, p, D, eta=0.5, T=None,
     Earth-space telecommunication systems:
     https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
     """
-    global __model
     type_output = type(lat)
 
     lat = prepare_input_array(lat)
@@ -1025,7 +1042,6 @@ def rain_cross_polarization_discrimination(Ap, f, el, p, tau=45):
     Earth-space telecommunication systems:
     https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
     """
-    global __model
     type_output = type(Ap)
     Ap = prepare_input_array(Ap)
     f = prepare_quantity(f, u.GHz, 'Frequency')
@@ -1076,8 +1092,6 @@ def fit_rain_attenuation_to_lognormal(lat, lon, f, el, hs, P_k, tau):
     https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
 
     """
-    global __model
-
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)

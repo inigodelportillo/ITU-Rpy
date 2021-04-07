@@ -2,6 +2,5 @@ setuptools
 numpy>=1.14.0
 pandas>=0.24.2
 scipy>=0.18.1
-joblib
 astropy
 pyproj

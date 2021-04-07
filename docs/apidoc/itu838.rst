@@ -1,15 +1,27 @@
 
 Recommendation ITU-R P.838
------------------------------------
+--------------------------
 
-Implementation of the methods in Recommendation ITU-R P.838 "Specific attenuation model for rain for use in prediction methods"
+This Recommendation provides a method to compute the specific attenuation for rain for use in prediction methods.
 
-Available versions include:
-    * P.838-0 (03/92) (Superseded)
-    * P.838-1 (10/99) (Superseded)
-    * P.838-2 (04/03) (Superseded)
-    * P.838-3 (03/05) (Current version)
-	
+.. include:: itu838_table.rst
+
+Introduction
+************
+
+The specific attenuation :math:`\gamma_R` (dB/km) is obtained from the rain rate :math:`R:math:` (mm/h) using the power-law
+relationship:
+
+.. math::
+    \gamma_R = k R^{\alpha}
+    
+Values for the coefficients :math:`k` and :math:`\alpha` are determined as functions of frequency, f (GHz), and this
+recommendation provides value valid in the range from 1 to 1 000 GHz. The models from Recommendation ITU-R P.838 have 
+been developed from curve-fitting to power-law coefficients derived from scattering calculations:
+
+Module description
+******************
+
 .. automodule:: itur.models.itu838
     :members:
     :undoc-members:

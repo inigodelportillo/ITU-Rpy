@@ -2,11 +2,13 @@ License
 =======
 
 This program is free software: you can redistribute it and/or modify
-it under the terms of the MIT license (see below).
+it under the terms of the :ref:`MIT license <MIT>` (see below).
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+If you use ITU-Rpy in one of your research projects, please use the :ref:`citation <Citation>`  provided below.
 
 MIT
 ---
@@ -30,3 +32,18 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+Citation
+--------
+If you use ITU-Rpy in one of your research projects, please cite it as:
+
+::
+
+    @misc{iturpy-2017,
+          title={ITU-Rpy: A python implementation of the ITU-R P. Recommendations to compute 
+             atmospheric attenuation in slant and horizontal paths.},
+          author={Inigo del Portillo},
+          year={2017},
+          publisher={GitHub},
+          howpublished={\url{https://github.com/inigodelportillo/ITU-Rpy/}}
+    }

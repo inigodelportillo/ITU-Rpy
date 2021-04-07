@@ -3,13 +3,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+
 import numpy as np
 from astropy import units as u
 
 from itur import utils
 from itur.models.itu1144 import bicubic_2D_interpolator
 from itur.utils import (prepare_input_array, prepare_output_array,
-                        memory, load_data_interpolator)
+                        load_data_interpolator)
 
 
 class __ITU1511():
@@ -180,28 +181,29 @@ def change_version(new_version):
     new_version : int
         Number of the version to use.
         Valid values are:
-        *0: P.1511-0 (02/01) (Superseded)
-        *1: P.1511-1 (07/15) (Current version)
+          * 1:  Activates recommendation ITU-R P.1511-1 (07/15) (Current version)
+          * 0:  Activates recommendation ITU-R P.1511-0 (02/01) (Superseded)
+
     """
     global __model
     __model = __ITU1511(new_version)
-    utils.memory.clear()
 
 
 def get_version():
     """
     Obtain the version of the ITU-R P.1511 recommendation currently being used.
+
+    Returns
+    -------
+    version: int
+        Version currently being used.
     """
-    global __model
     return __model.__version__
 
 
-@memory.cache
 def topographic_altitude(lat, lon):
     """
-    The values of topographical height (km) above mean sea level of the surface
-    of the Earth a
-
+    Topographical height (km) above mean sea level of the surface of the Earth.
 
 
     Parameters
@@ -224,7 +226,6 @@ def topographic_altitude(lat, lon):
     https://www.itu.int/rec/R-REC-P.1511/en
 
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)

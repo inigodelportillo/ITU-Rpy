@@ -203,12 +203,12 @@ A second use case for vectorization is computation of the atmospheric attenuatio
 	p = 1               # Unavailability (Values exceeded 1% of time)
 	Att = itur.atmospheric_attenuation_slant_path(lat, lon, f, el, p, D)
 
-If you have installed Basemap (see `installation instructions <installation.html>`_ ), you can use function `itur.utils.plot_in_map()` to display the results as an image:
+If you have installed Basemap (see `installation instructions <installation.html>`_ ), you can use function `itur.plotting.plot_in_map()` to display the results as an image:
 
 .. code-block:: python
 
 	# Plot the results
-	m = itur.utils.plot_in_map(Att.value, lat, lon, 
+	m = itur.plotting.plot_in_map(Att.value, lat, lon, 
                                    cbar_text='Atmospheric attenuation [dB]',
                                    cmap='magma')
 	

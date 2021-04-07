@@ -6,18 +6,17 @@ from __future__ import print_function
 import os
 import warnings
 
+
 import numpy as np
 from astropy import units as u
 
-from itur import utils
 from itur.models.itu453 import radio_refractive_index
 from itur.models.itu835 import (standard_pressure, standard_temperature,
                                 standard_water_vapour_density)
 from itur.models.itu836 import total_water_vapour_content
-from itur.models.itu1510 import surface_mean_temperature
 from itur.models.itu1511 import topographic_altitude
 from itur.utils import (prepare_quantity, prepare_output_array,
-                        prepare_input_array, load_data, dataset_dir, memory)
+                        prepare_input_array, load_data, dataset_dir)
 
 
 def __gamma0_exact__(self, f, p, rho, T):
@@ -93,6 +92,7 @@ class __ITU676__():
        * P.676-10 (09/13) (Superseded)
        * P.676-11 (09/16) (Superseded)
        * P.676-11 (08/19) (Current version)
+
     Not available versions:
        * P.676-1 (03/92) (Superseded)
        * P.676-2 (10/95) (Superseded)
@@ -102,6 +102,7 @@ class __ITU676__():
        * P.676-6 (03/05) (Superseded)
        * P.676-7 (02/07) (Superseded)
        * P.676-8 (10/09) (Superseded)
+
     """
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.676 recommendation.
@@ -1208,29 +1209,34 @@ def change_version(new_version):
     """
     Change the version of the ITU-R P.676 recommendation currently being used.
 
+    This function changes the model used for the ITU-R P.676 recommendation
+    to a different version.
+
 
     Parameters
     ----------
     new_version : int
         Number of the version to use.
         Valid values are:
-           * P.676-1 (08/94) (Superseded)
-           * P.676-2 (10/99) (Superseded)
-           * P.676-3 (02/01) (Superseded)
-           * P.676-4 (04/03) (Superseded)
-           * P.676-5 (08/07) (Superseded)
-           * P.676-6 (02/12) (Current version)
+          *  12: Activates recommendation ITU-R P.676-12 (08/19) (Current version)
+          *  11: Activates recommendation ITU-R P.676-11 (09/16) (Superseded)
+          *  10: Activates recommendation ITU-R P.676-10 (09/13) (Superseded)
+          *  9: Activates recommendation ITU-R P.676-9 (02/12) (Superseded)
+
     """
     global __model
     __model = __ITU676__(new_version)
-    utils.memory.clear()
 
 
 def get_version():
     """
     Obtain the version of the ITU-R P.676 recommendation currently being used.
+
+    Returns
+    -------
+    version: int
+       The version of the ITU-R P.530 recommendation being used.
     """
-    global __model
     return __model.__version__
 
 
@@ -1238,12 +1244,11 @@ def gaseous_attenuation_terrestrial_path(r, f, el, rho, P, T, mode):
     """
     Estimate the attenuation of atmospheric gases on terrestrial paths.
     This function operates in two modes, 'approx', and 'exact':
-
-    * 'approx': a simplified approximate method to estimate gaseous attenuation
-    that is applicable in the frequency range 1-350 GHz.
-    * 'exact': an estimate of gaseous attenuation computed by summation of
-    individual absorption lines that is valid for the frequency
-    range 1-1,000 GHz
+      * 'approx': a simplified approximate method to estimate gaseous attenuation
+        that is applicable in the frequency range 1-350 GHz.
+      * 'exact': an estimate of gaseous attenuation computed by summation of
+        individual absorption lines that is valid for the frequency
+        range 1-1,000 GHz
 
 
     Parameters
@@ -1293,12 +1298,11 @@ def gaseous_attenuation_slant_path(f, el, rho, P, T, V_t=None, h=None,
     """
     Estimate the attenuation of atmospheric gases on slant paths. This function
     operates in two modes, 'approx', and 'exact':
-
-    * 'approx': a simplified approximate method to estimate gaseous attenuation
-    that is applicable in the frequency range 1-350 GHz.
-    * 'exact': an estimate of gaseous attenuation computed by summation of
-    individual absorption lines that is valid for the frequency
-    range 1-1,000 GHz
+      * 'approx': a simplified approximate method to estimate gaseous attenuation
+        that is applicable in the frequency range 1-350 GHz.
+      * 'exact': an estimate of gaseous attenuation computed by summation of
+        individual absorption lines that is valid for the frequency
+        range 1-1,000 GHz
 
 
     Parameters
@@ -1359,12 +1363,11 @@ def gaseous_attenuation_inclined_path(f, el, rho, P, T, h1, h2, mode='approx'):
     Estimate the attenuation of atmospheric gases on inclined paths between two
     ground stations at heights h1 and h2. This function operates in two modes,
     'approx', and 'exact':
-
-    * 'approx': a simplified approximate method to estimate gaseous attenuation
-    that is applicable in the frequency range 1-350 GHz.
-    * 'exact': an estimate of gaseous attenuation computed by summation of
-    individual absorption lines that is valid for the frequency
-    range 1-1,000 GHz
+      * 'approx': a simplified approximate method to estimate gaseous attenuation
+        that is applicable in the frequency range 1-350 GHz.
+      * 'exact': an estimate of gaseous attenuation computed by summation of
+        individual absorption lines that is valid for the frequency
+        range 1-1,000 GHz
 
 
     Parameters
@@ -1441,7 +1444,6 @@ def slant_inclined_path_equivalent_height(f, p):
     return prepare_output_array(val, type_output) * u.m
 
 
-@memory.cache
 def zenit_water_vapour_attenuation(lat, lon, p, f, V_t=None, h=None):
     """
     An alternative method may be used to compute the slant path attenuation by
@@ -1522,7 +1524,6 @@ def gammaw_approx(f, P, rho, T):
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
-    global __model
     type_output = type(f)
     f = prepare_quantity(f, u.GHz, 'Frequency')
     P = prepare_quantity(P, u.hPa, 'Atmospheric pressure ')
@@ -1559,7 +1560,6 @@ def gamma0_approx(f, P, rho, T):
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
-    global __model
     type_output = type(f)
     f = prepare_quantity(f, u.GHz, 'Frequency')
     P = prepare_quantity(P, u.hPa, 'Atmospheric pressure')
@@ -1597,7 +1597,6 @@ def gammaw_exact(f, P, rho, T):
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
-    global __model
     type_output = type(f)
     f = prepare_quantity(f, u.GHz, 'Frequency')
     P = prepare_quantity(P, u.hPa, 'Atmospheric pressure ')
@@ -1634,7 +1633,6 @@ def gamma0_exact(f, P, rho, T):
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
-    global __model
     type_output = type(f)
     f = prepare_quantity(f, u.GHz, 'Frequency')
     P = prepare_quantity(P, u.hPa, 'Atmospheric pressure')
@@ -1671,7 +1669,6 @@ def gamma_exact(f, P, rho, T):
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
-    global __model
     f = prepare_quantity(f, u.GHz, 'Frequency')
     type_output = type(f)
 

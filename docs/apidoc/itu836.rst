@@ -1,18 +1,23 @@
 
 Recommendation ITU-R P.836
------------------------------------
+--------------------------
+This Recommendation provides methods to predict the surface water vapour density and total columnar water vapour content on Earth-space paths.
 
-Implementation of the methods in Recommendation ITU-R P.836 "Water vapour: surface density and total columnar content"
+.. include:: itu836_table.rst
 
-Available versions:
-   * P.836-5 (09/13) (Current version)
-   * P.836-4 (10/09) (Superseded)
+Introduction
+************
+Atmospheric water vapour and oxygen cause absorption at millimetre wavelengths especially in the proximity of absorption lines (see Recommendation ITU-R P.676). The concentration of atmospheric oxygen is relatively constant; however, the concentration of water vapour varies both geographically and with time.
 
-Not available versions:
-   * P.836-0 (03/92) (Superseded)
-   * P.836-1 (08/97) (Superseded)
-   * P.836-2 (02/01) (Superseded)
-   * P.836-3 (11/01) (Superseded)
+For some applications, the total water vapour content along a path can be used for the calculation of
+excess path length and for the attenuation due to atmospheric water vapour, where the attenuation
+due to atmospheric water vapour is assumed to be proportional to the total water vapour content
+through its specific mass absorption coefficient.
+
+This Recommendation provides method used for global calculations of propagation effects that require an estimate of surface water vapour density or total columnar content of water vapour and its seasonal variation, when more accurate local data are not available.
+
+Module description
+******************
 
 .. automodule:: itur.models.itu836
     :members:

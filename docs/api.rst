@@ -1,12 +1,21 @@
 API Documentation
 =================
 
-.. automodule:: itur
-    :members:
-    :undoc-members:
-    :show-inheritance:
+ITU-Rpy 
 
+
+Contents
+--------
 .. toctree::
+   :maxdepth: 1
 
-    apidoc/itur
-    apidoc/models
+   apidoc/itur
+   apidoc/utils
+   apidoc/plotting
+   apidoc/models
+   
+It is also advisable that developers use the index, module index, and search page below for quick access to specific functions:
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

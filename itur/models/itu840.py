@@ -4,12 +4,13 @@ from __future__ import division
 from __future__ import print_function
 
 import os
+
 import numpy as np
 from astropy import units as u
 
 from itur.models.itu1144 import bilinear_2D_interpolator
 from itur.utils import (dataset_dir, prepare_input_array, prepare_output_array,
-                        prepare_quantity, memory, load_data_interpolator)
+                        prepare_quantity, load_data_interpolator)
 
 
 def __fcn_columnar_content_reduced_liquid__(Lred, lat, lon, p):
@@ -90,10 +91,11 @@ class __ITU840__():
                            excluded=[0, 1, 2], otypes=[np.ndarray])
         return np.array(fcn(self.instance.Lred, lat, lon, p).tolist())
 
-    def cloud_attenuation(self, lat, lon, el, f, p):
+    def cloud_attenuation(self, lat, lon, el, f, p, Lred=None):
         # Abstract method to compute the cloud attenuation
         Kl = self.specific_attenuation_coefficients(f, T=0)
-        Lred = self.columnar_content_reduced_liquid(lat, lon, p)
+        if Lred is None:
+            Lred = self.columnar_content_reduced_liquid(lat, lon, p)
         A = Lred * Kl / np.sin(np.deg2rad(el))
 
         return A
@@ -520,9 +522,11 @@ def change_version(new_version):
     new_version : int
         Number of the version to use.
         Valid values are:
-        * 4: P.840-4 (10/09) (Superseded)
-        * 5: P.840-5 (02/12) (Superseded)
-        * 6: P.840-6 (09/13) (Current version)
+          * 8: Activates recommendation ITU-R P.840-8 (08/19) (Current version)
+          * 7: Activates recommendation ITU-R P.840-7 (12/17) (Superseded)
+          * 6: Activates recommendation ITU-R P.840-6 (09/13) (Superseded)
+          * 5: Activates recommendation ITU-R P.840-5 (02/12) (Superseded)
+          * 4: Activates recommendation ITU-R P.840-4 (10/09) (Superseded)
     """
     global __model
     __model = __ITU840__(new_version)
@@ -531,13 +535,19 @@ def change_version(new_version):
 def get_version():
     """
     Obtain the version of the ITU-R P.840 recommendation currently being used.
+
+    Returns
+    -------
+    version: int
+        Version currently being used.
     """
-    global __model
     return __model.__version__
 
 
 def specific_attenuation_coefficients(f, T):
     """
+    Compute the specific attenuation coefficient for cloud attenuation.
+
     A method to compute the specific attenuation coefficient. The method is
     based on Rayleigh scattering, which uses a double-Debye model for the
     dielectric permittivity of water.
@@ -565,15 +575,15 @@ def specific_attenuation_coefficients(f, T):
     [1] Attenuation due to clouds and fog:
     https://www.itu.int/rec/R-REC-P.840/en
     """
-    global __model
     f = prepare_quantity(f, u.GHz, 'Frequency')
     T = prepare_quantity(T, u.deg_C, 'Temperature')
     return __model.specific_attenuation_coefficients(f, T)
 
 
-@memory.cache
 def columnar_content_reduced_liquid(lat, lon, p):
     """
+    Compute the total columnar contents of reduced cloud liquid water.
+
     A method to compute the total columnar content of reduced cloud liquid
     water, Lred (kg/m2), exceeded for p% of the average year
 
@@ -601,7 +611,6 @@ def columnar_content_reduced_liquid(lat, lon, p):
     [1] Attenuation due to clouds and fog:
     https://www.itu.int/rec/R-REC-P.840/en
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
@@ -610,10 +619,31 @@ def columnar_content_reduced_liquid(lat, lon, p):
     return prepare_output_array(val, type_output) * u.kg / u.m**2
 
 
-def cloud_attenuation(lat, lon, el, f, p):
+def cloud_attenuation(lat, lon, el, f, p, Lred=None):
     """
+    Compute the cloud attenuation in a slant path.
+
     A method to estimate the attenuation due to clouds along slant paths for
-    a given probability.
+    a given probability. If local measured data of the total columnar content
+    of cloud liquid water reduced to a temperature of 273.15 K, Lred, is
+    available from other sources, (e.g., from ground radiometric measurements,
+    Earth observation products, or meteorological numerical products), the
+    value should be used directly.
+
+    The value of the cloud attenuation is computed as:
+
+    .. math::
+      A=\\frac{L_{red}(\\text{lat}, \\text{lon}, p, T) \\cdot K_l(f, T)}{\\sin(\\text{el})}
+
+
+    where:
+        * :math:`L_{red}` : total columnar content of liquid water reduced to a
+          temperature of 273.15 K (kg/m2);
+        * :math:`K_l` : specific attenuation coefficient ((dB/km)/(g/m3));
+        * :math:`el` : path elevation angle (deg).
+        * :math:`f` : frequency (GHz).
+        * :math:`p` : Percentage of time exceeded for p% of the average year (%).
+        * :math:`T` : temperature (K). Equal to 273.15 K.
 
 
     Parameters
@@ -628,12 +658,15 @@ def cloud_attenuation(lat, lon, el, f, p):
         Frequency (GHz)
     p : number
          Percentage of time exceeded for p% of the average year
+    Lred: number
+        Total columnar contents of reduced cloud liquid water. (kg/m2)
+
 
 
     Returns
     -------
-    p: numpy.ndarray
-        Rainfall rate exceeded for p% of the average year
+    A: numpy.ndarray
+        Cloud attenuation, A (dB), exceeded for p% of the average year
 
 
 
@@ -642,22 +675,29 @@ def cloud_attenuation(lat, lon, el, f, p):
     [1] Attenuation due to clouds and fog:
     https://www.itu.int/rec/R-REC-P.840/en
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
     el = prepare_quantity(el, u.deg, 'Elevation angle')
     f = prepare_quantity(f, u.GHz, 'Frequency')
-    val = __model.cloud_attenuation(lat, lon, el, f, p)
+    Lred = prepare_quantity(
+      Lred, u.kg / u.m**2,
+      'Total columnar contents of reduced cloud liquid water.')
+    val = __model.cloud_attenuation(lat, lon, el, f, p, Lred)
     return prepare_output_array(val, type_output) * u.dB
 
 
-@memory.cache
 def lognormal_approximation_coefficient(lat, lon):
     """
-    A method to estimate the paramerts of the lognormla distribution used to
-    approximate the total columnar content of cloud liquid water
+    Total columnar contents of cloud liquid water distribution coefficients.
+
+    The annual statistics of the total columnar content of reduced cloud
+    liquid water content can be approximated by a log-normal distribution.
+    This function computes the coefficients for the mean, :math:`m`,
+    standard deviation, :math:`\sigma`, and probability of non-zero reduced
+    total columnar content of cloud liquid water, :math:`Pclw`, for such the
+    log-normal distribution.
 
 
     Parameters
@@ -672,10 +712,10 @@ def lognormal_approximation_coefficient(lat, lon):
     -------
     m: numpy.ndarray
         Mean of the lognormal distribution
-    sigma: numpy.ndarray
+    σ: numpy.ndarray
         Standard deviation of the lognormal distribution
     Pclw: numpy.ndarray
-        Probability of liquid water of the lognormal distribution
+        Probability of cloud liquid water of the lognormal distribution
 
 
 

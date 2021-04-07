@@ -23,6 +23,6 @@ R001 = itur.models.itu837.rainfall_rate(lat, lon, p)
 # Display the results in a map
 fig = plt.figure(figsize=(16, 8))
 ax = fig.add_subplot(1, 1, 1)
-m = itur.utils.plot_in_map(
+m = itur.plotting.plot_in_map(
     R001, lat, lon, cmap='jet', vmin=0, vmax=90, ax=ax,
     cbar_text='Rainfall rate exceeded for 0.01% of an average year [mm/hr]')

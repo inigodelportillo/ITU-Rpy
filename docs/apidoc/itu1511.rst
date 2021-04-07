@@ -1,14 +1,22 @@
 
 Recommendation ITU-R P.1511
----------------------
+---------------------------
 
-Implementation of the methods in Recommendation ITU-R P.1511 "Topography for Earth-to-space propagation modelling".
+This Recommendation provides global topographical data, information on geographic coordinates, and height data for the prediction of propagation effects for Earth-space paths in ITU-R recommendations.
+
+.. include:: itu1511_table.rst
+
+Introduction
+************
 
 This model shall be used to obtain the height above mean sea level when no local data are available or when no data with a better spatial resolution is available.
 
-Available versions include:
-   * P.1511-0 (02/01) (Superseded)
-   * P.1511-1 (07/15) (Current version)
+The values of topographic height of the surface of the Earth above mean sea level (km) are an integral part of this Recommendation. The data is provided on a 1/12° 
+grid in both latitude and longitude. For a location different from the grid points, the height above mean sea level at the desired location can be obtained by 
+performing a bi-cubic interpolation on the values at the sixteen closest grid points
+
+Module description
+******************
 
 .. automodule:: itur.models.itu1511
     :members:

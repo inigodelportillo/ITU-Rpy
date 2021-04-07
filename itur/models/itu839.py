@@ -3,13 +3,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+
 import numpy as np
 from astropy import units as u
 
 from itur import utils
 from itur.models.itu1144 import bilinear_2D_interpolator
 from itur.utils import (prepare_input_array, prepare_output_array,
-                        memory, load_data_interpolator)
+                        load_data_interpolator)
 
 
 class __ITU839__():
@@ -169,35 +170,39 @@ def change_version(new_version):
     """
     Change the version of the ITU-R P.839 recommendation currently being used.
 
+    This function changes the model used for the ITU-R P.839 recommendation
+    to a different version.
 
     Parameters
     ----------
     new_version : int
         Number of the version to use.
         Valid values are:
-        * version 0: P.839-0 (03/92) (Superseded)
-        * version 1: P.839-1 (83/97) (Superseded)
-        * version 2: P.839-2 (10/99) (Superseded)
-        * version 3: P.839-3 (02/01) (Superseded)
-        * version 4: P.839-4 (09/2013) (Current version)
+          * 4: Activates recommendation ITU-R P.839-4 (09/2013) (Current version)
+          * 3: Activates recommendation ITU-R P.839-3 (02/01) (Superseded)
+          * 2: Activates recommendation ITU-R P.839-2 (10/99) (Superseded)
+
+
     """
     global __model
     __model = __ITU839__(new_version)
-    utils.memory.clear()
 
 
 def get_version():
     """
     Obtain the version of the ITU-R P.839 recommendation currently being used.
+
+    Returns
+    -------
+    version: int
+        Version currently being used.
     """
-    global __model
     return __model.__version__
 
 
-@memory.cache
 def isoterm_0(lat, lon):
     """
-    A method to estimate the zero isoterm height for propagation prediction.
+    Estimate the zero degree Celsius isoterm height for propagation prediction.
 
 
     Parameters
@@ -210,8 +215,8 @@ def isoterm_0(lat, lon):
 
     Returns
     -------
-    zero_isoterm: numpy.ndarray
-        Zero isoterm height (km)
+    h0: numpy.ndarray
+        Zero degree Celsius isoterm height (km)
 
 
     References
@@ -220,7 +225,6 @@ def isoterm_0(lat, lon):
     https://www.itu.int/rec/R-REC-P.839/en
 
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
@@ -229,10 +233,16 @@ def isoterm_0(lat, lon):
     return prepare_output_array(val, type_output) * u.km
 
 
-@memory.cache
 def rain_height(lat, lon):
     """
-    A method to estimate the rain height for propagation prediction.
+    Estimate the annual mean rain height for propagation prediction.
+
+    The mean annual rain height above mean sea level, :math:`h_R`,
+    may be obtained from the 0° C isotherm as:
+
+    .. math::
+
+      h_R = h_0 + 0.36 \\qquad \\text{km}
 
 
     Parameters
@@ -245,8 +255,8 @@ def rain_height(lat, lon):
 
     Returns
     -------
-    rain_height: numpy.ndarray
-        Rain height (km)
+    hR: numpy.ndarray
+        Annual mean rain height (km)
 
 
     References
@@ -254,7 +264,6 @@ def rain_height(lat, lon):
     [1] Rain height model for prediction methods:
     https://www.itu.int/rec/R-REC-P.839/en
     """
-    global __model
     type_output = type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)

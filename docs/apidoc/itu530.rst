@@ -1,22 +1,25 @@
 
 Recommendation ITU-R P.530
------------------------------------
+--------------------------
 
-Propagation data and prediction methods required for the design of
-terrestrial line-of-sight systems
+This Recommendation provides prediction methods for the propagation effects that should be taken into account in the design of digital fixed line-of-sight links, both in clear-air and rainfall conditions. It also provides link design guidance in clear step-by-step procedures including the use of mitigation techniques to minimize propagation impairments. The final outage predicted is the base for other Recommendations addressing error performance and availability.
 
-Available versions:
-   * P.530-16 (07/15) (Current version)
+.. include:: itu530_table.rst
 
-Not available versions:
+Introduction
+************
 
-This recommendation includes prediction methods for the propagation effects
-that should be taken into account in the design of digital fixed
-line-of-sight links, both in clear-air and rainfall conditions. It also
-provides link design guidance in clear step-by-step procedures including
-the use of mitigation techniques to minimize propagation impairments. The
-final outage predicted is the base for other Recommendations addressing
-error performance and availability.
+The propagation loss on a terrestrial line-of-sight path relative to the free-space loss (see Recommendation ITU-R P.525) is the sum of different contributions as follows:
+* attenuation due to atmospheric gases;
+* diffraction fading due to obstruction or partial obstruction of the path;
+* fading due to multipath, beam spreading and scintillation;
+* attenuation due to variation of the angle-of-arrival/launch;
+* attenuation due to precipitation;
+* attenuation due to sand and dust storms.
+Each of these contributions has its own characteristics as a function of frequency, path length and geographic location. These are described in the paragraphs that follow.
+
+Module description
+******************
 
 .. automodule:: itur.models.itu530
     :members:
