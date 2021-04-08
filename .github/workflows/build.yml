@@ -22,15 +22,24 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest
+        pip install flake8 pytest coverage
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        pip install matplotlib
+    - name: Intall cartopy
+      run: |
+        sudo apt-get install libgeos++-dev libproj-dev proj-data proj-bin 
+        pip3 install --upgrade cython numpy pyshp six
+        pip3 install shapely --no-binary shapely
+        pip install matplotlib cartopy
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
+    - name: Test with coverage
       run: |
-        pytest
+        coverage run -m pytest
+    - name: "Upload coverage to Codecov"
+      uses: codecov/codecov-action@v1
+      with:
+        fail_ci_if_error: true
