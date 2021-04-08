@@ -24,6 +24,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest coverage
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        sudo apt-get install libgeos++-dev
         pip install matplotlib cartopy
     - name: Lint with flake8
       run: |
