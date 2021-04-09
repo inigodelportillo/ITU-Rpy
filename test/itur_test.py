@@ -34,12 +34,14 @@ def suite():
     suite.addTest(TestFunctionsRecommendation840('test_840'))
     suite.addTest(TestFunctionsRecommendation1510('test_1510'))
     suite.addTest(TestFunctionsRecommendation1511('test_1511'))
+    suite.addTest(TestFunctionsRecommendation1853('test_1853'))
 
     # Basic import module functionality
     suite.addTest(TestImportModules('test_import_itur'))
     suite.addTest(TestImportModules('test_import_itur_utils'))
     suite.addTest(TestImportModules('test_import_itur_plotting'))
     suite.addTest(TestImportModules('test_import_itur_models'))
+    suite.addTest(TestImportModules('test_import_itur_models_1853'))
     suite.addTest(TestImportModules('test_import_itur_models_1511'))
     suite.addTest(TestImportModules('test_import_itur_models_1510'))
     suite.addTest(TestImportModules('test_import_itur_models_453'))
@@ -161,6 +163,10 @@ class TestImportModules(test.TestCase):
     @staticmethod
     def test_import_itur_models_1511():
         import itur.models.itu1511
+
+    @staticmethod
+    def test_import_itur_models_1853():
+        import itur.models.itu1853
 
     @staticmethod
     def test_import_itur_models_453():
@@ -909,6 +915,37 @@ class TestFunctionsRecommendation1511(test.TestCase):
             models.itu1511.change_version(version)
             self.test_all_functions_1511()
             self.assertEqual(models.itu1511.get_version(), version)
+
+
+class TestFunctionsRecommendation1853(test.TestCase):
+
+    def setUp(self):
+        self.versions = [1]
+
+    @staticmethod
+    def test_all_functions_1853():
+        lat = 51
+        lon = -63
+        f = 29 * itur.u.GHz
+        el = 32
+        p = 0.05
+        D = 1 * itur.u.m
+        hs = 100 * itur.u.m
+        Ns = 60 * 60 * 24
+
+        models.itu1853.cloud_liquid_water_synthesis(lat, lon, Ns)
+        models.itu1853.integrated_water_vapour_synthesis(lat, lon, Ns)
+        models.itu1853.scintillation_attenuation_synthesis(Ns)
+        models.itu1853.rain_attenuation_synthesis(lat, lon, f, el, hs, Ns)
+        models.itu1853.total_attenuation_synthesis(lat, lon, f, el, p, D, Ns)
+
+    def test_1853(self):
+
+        for version in self.versions:
+            models.itu1511.change_version(version)
+            self.test_all_functions_1853()
+            self.assertEqual(models.itu1511.get_version(), version)
+
 
 if __name__ == '__main__':
 

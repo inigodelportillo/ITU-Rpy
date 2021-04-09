@@ -227,7 +227,7 @@ class _ITU1853_1():
         ln_Vi = np.log(Vi)
 
         a, b = np.linalg.lstsq(np.vstack([ln_Vi, np.ones(len(ln_Vi))]).T,
-                               ln_lnPi)[0]
+                               ln_lnPi, rcond=None)[0]
         kappa = a
         lambd = np.exp(-b / a)
         return kappa, lambd
@@ -480,7 +480,7 @@ def rain_attenuation_synthesis(lat, lon, f, el, hs, Ns, Ts=1, tau=45, n=None):
     el = prepare_quantity(el, u.deg, 'Elevation angle')
     hs = prepare_quantity(
         hs, u.km, 'Heigh above mean sea level of the earth station')
-    Ts = prepare_quantity(f, u.second, 'Time step between samples')
+    Ts = prepare_quantity(Ts, u.second, 'Time step between samples')
     val = __model.rain_attenuation_synthesis(lat, lon, f, el, hs, Ns,
                                              Ts=Ts, tau=tau, n=n)
     return val * u.dB
