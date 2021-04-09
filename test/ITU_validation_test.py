@@ -66,8 +66,8 @@ def suite():
     suite.addTest(ITUR453_13TestCase('test_wet_term_radio_refractivity'))
 
     # ITU-R P.836 tests (Water vapour density)
-    suite.addTest(ITUR836_6TestCase('surface_water_vapour_density'))
-    suite.addTest(ITUR836_6TestCase('total_water_vapour_content'))
+    suite.addTest(ITUR836_6TestCase('test_surface_water_vapour_density'))
+    suite.addTest(ITUR836_6TestCase('test_total_water_vapour_content'))
 
     # ITU-R P.836 tests (Rainfall rate)
     suite.addTest(ITUR837_6TestCase('test_rainfall_rate'))
@@ -3856,7 +3856,7 @@ class ITUR836_6TestCase(test.TestCase):
     def setUp(self):
         models.itu836.change_version(6)
 
-    def surface_water_vapour_density(self):
+    def test_surface_water_vapour_density(self):
         self.assertAlmostEqual(
             models.itu836.surface_water_vapour_density(
                 3.133, 101.7, 0.1, 0.236104459).value,
@@ -3986,7 +3986,7 @@ class ITUR836_6TestCase(test.TestCase):
                 51.5, -0.14, 0.35, 0.069164224).value,
             14.50640729, places=5)
 
-    def total_water_vapour_content(self):
+    def test_total_water_vapour_content(self):
         self.assertAlmostEqual(
             models.itu836.total_water_vapour_content(
                 3.133, 101.7, 0.1, 0.23610446).value,
