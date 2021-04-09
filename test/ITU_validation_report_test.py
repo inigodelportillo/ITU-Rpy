@@ -872,6 +872,8 @@ class ITUR1511_2TestCase(ITU_TestCase):
 
 class TestValidationReports(test.TestCase):
 
+    @test.skipIf(sys.version_info[0] < 3,
+                 "Only supported in Python 3+ (open does not have encoding)")
     def test_validation_reports(self):
         # Test valid versions
         suite = create_ITU_suite()
