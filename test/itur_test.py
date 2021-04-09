@@ -20,7 +20,7 @@ def suite():
     suite = test.TestSuite()
 
     # Test valid versions
-    suite.addTest(TestVersions('change_versions'))
+    suite.addTest(TestVersions('change_to_not_implemented_versions'))
 
     # For each version test all functions for vectorization and for
     suite.addTest(TestFunctionsRecommendation453('test_453'))
@@ -83,9 +83,8 @@ def suite():
 
 class TestVersions(test.TestCase):
 
-    def change_versions(self):
+    def change_to_not_implemented_versions(self):
 
-        # For
         for i in range(1, 12):
             self.assertRaises(ValueError,
                               models.itu453.change_version, i)
@@ -920,7 +919,7 @@ class TestFunctionsRecommendation1511(test.TestCase):
 class TestFunctionsRecommendation1853(test.TestCase):
 
     def setUp(self):
-        self.versions = [1]
+        self.versions = [0, 1]
 
     @staticmethod
     def test_all_functions_1853():
@@ -933,18 +932,25 @@ class TestFunctionsRecommendation1853(test.TestCase):
         hs = 100 * itur.u.m
         Ns = 60 * 60 * 24
 
-        models.itu1853.cloud_liquid_water_synthesis(lat, lon, Ns)
-        models.itu1853.integrated_water_vapour_synthesis(lat, lon, Ns)
-        models.itu1853.scintillation_attenuation_synthesis(Ns)
-        models.itu1853.rain_attenuation_synthesis(lat, lon, f, el, hs, Ns)
-        models.itu1853.total_attenuation_synthesis(lat, lon, f, el, p, D, Ns)
+        models.itu1853.set_seed(42)
+        models.itu1853.scintillation_attenuation_synthesis(Ns=Ns)
+        models.itu1853.rain_attenuation_synthesis(
+            lat=lat, lon=lon, f=f, el=el, hs=hs, Ns=Ns)
+
+        if models.itu1853.get_version() > 0:
+            models.itu1853.cloud_liquid_water_synthesis(lat, lon, Ns)
+            models.itu1853.integrated_water_vapour_synthesis(lat, lon, Ns)
+            models.itu1853.total_attenuation_synthesis(
+                lat, lon, f, el, p, D, Ns)
+            models.itu1853.total_attenuation_synthesis(
+                lat, lon, f, el, p, D, Ns, return_contributions=True)
 
     def test_1853(self):
 
         for version in self.versions:
-            models.itu1511.change_version(version)
+            models.itu1853.change_version(version)
             self.test_all_functions_1853()
-            self.assertEqual(models.itu1511.get_version(), version)
+            self.assertEqual(models.itu1853.get_version(), version)
 
 
 if __name__ == '__main__':
