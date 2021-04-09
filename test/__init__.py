@@ -1,1 +1,1 @@
-__all__ = ['test_ITU', 'test_version', 'test_examples']
+__all__ = ['itur_test', 'ITU_validation_report_test', 'ITU_validation_test', 'examples_test']
