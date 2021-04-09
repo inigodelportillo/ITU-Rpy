@@ -35,6 +35,7 @@ def suite():
     suite.addTest(TestFunctionsRecommendation840('test_840'))
     suite.addTest(TestFunctionsRecommendation1510('test_1510'))
     suite.addTest(TestFunctionsRecommendation1511('test_1511'))
+    suite.addTest(TestFunctionsRecommendation1623('test_1623'))
     suite.addTest(TestFunctionsRecommendation1853('test_1853'))
 
     # Basic import module functionality
@@ -43,6 +44,7 @@ def suite():
     suite.addTest(TestImportModules('test_import_itur_plotting'))
     suite.addTest(TestImportModules('test_import_itur_models'))
     suite.addTest(TestImportModules('test_import_itur_models_1853'))
+    suite.addTest(TestImportModules('test_import_itur_models_1623'))
     suite.addTest(TestImportModules('test_import_itur_models_1511'))
     suite.addTest(TestImportModules('test_import_itur_models_1510'))
     suite.addTest(TestImportModules('test_import_itur_models_453'))
@@ -163,6 +165,10 @@ class TestImportModules(test.TestCase):
     @staticmethod
     def test_import_itur_models_1511():
         import itur.models.itu1511
+
+    @staticmethod
+    def test_import_itur_models_1623():
+        import itur.models.itu1853
 
     @staticmethod
     def test_import_itur_models_1853():
@@ -989,6 +995,41 @@ class TestFunctionsRecommendation1511(test.TestCase):
             models.itu1511.change_version(version)
             self.test_all_functions_1511()
             self.assertEqual(models.itu1511.get_version(), version)
+
+
+class TestFunctionsRecommendation1623(test.TestCase):
+    def setUp(self):
+        self.versions = [0, 1]
+
+    @staticmethod
+    def test_all_functions_1623():
+        T_tot = 0.224 * 365.25 * 24 * 3600
+        D = np.array([1, 10, 30, 60, 120, 180, 300, 600, 900, 1200, 1500,
+                      1800, 2400, 3600])
+
+        z = np.linspace(-2,2,100)
+        A = 10
+        f_B = 0.02
+        delta_t = 1
+        N_target = 25
+        D_target = 60
+        PofA = np.array([50, 30, 20, 10, 5, 3, 2, 1, .5, .3, .2, .1, .05, .03,
+                         .02, .01, .005, .003, .002, .001])
+        A_arr = np.array([0.4, 0.6, 0.8, 1.8, 2.70, 3.5, 4.20, 5.7, 7.4, 9,
+                          10.60, 14, 18.3, 22.3, 25.8, 32.6, 40.1, 46.1, 50.8,
+                          58.8])
+        el = 38.5
+        f = 28
+
+        models.itu1623.fade_duration(D, A, el, f, T_tot)
+        models.itu1623.fade_slope(z, A, f_B, delta_t)
+        models.itu1623.fade_depth(N_target, D_target, A_arr, PofA, el, f)
+
+    def test_1623(self):
+        for version in self.versions:
+            models.itu1623.change_version(version)
+            self.test_all_functions_1623()
+            self.assertEqual(models.itu1623.get_version(), version)
 
 
 class TestFunctionsRecommendation1853(test.TestCase):
