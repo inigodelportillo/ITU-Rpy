@@ -1,5 +1,5 @@
-Validation results for ITU-R P.836-6
-====================================
+Validation results ITU-R P.836-6
+================================
 
 This page contains the validation examples for Recommendation ITU-R P.836-6: Water vapour: surface density and total columnar content.
 

@@ -285,9 +285,6 @@ class _ITU676_12_():
 
     @classmethod
     def gaseous_attenuation_approximation(self, f, el, rho, P, T):
-        """
-        T goes in Kelvin
-        """
         if np.any(f > 350):
             warnings.warn(
                 RuntimeWarning(

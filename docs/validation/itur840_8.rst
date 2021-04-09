@@ -1,5 +1,5 @@
-Validation results for ITU-R P.840-8
-====================================
+Validation results ITU-R P.840-8
+================================
 
 This page contains the validation examples for Recommendation ITU-R P.840-8: Attenuation due to clouds and fog.
 
