@@ -10,11 +10,11 @@ All test cases were extracted from the
     :depth: 2
 
 
-Function rainfall_probability
------------------------------
+Function rainfall_rate
+----------------------
 
-The table below contains the results of testing function ``rainfall_probability``.
-The test cases were extracted from spreadsheet ``ITURP837-7_rainfall_rate_probability.csv`` from the
+The table below contains the results of testing function ``rainfall_rate``.
+The test cases were extracted from spreadsheet ``ITURP837-7_rainfall_rate_R001.csv`` from the
 `ITU Validation examples file (rev 5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`_.
 In addition to the input-arguments, expected result (``ITU Validation``), and
 ITU-Rpy computed result (``ITUR-py Result``), the absolute and relative errors
@@ -32,18 +32,19 @@ first row of the results in the table:
     # Define input attributes
     lat = 3.133  #  (°N)
     lon = 101.7  # (°E)
+    p = 0.01  # (%)
 
-    # Make call to test-function rainfall_probability
-    itur_val = itur.models.itu837.rainfall_probability(lat=lat, lon=lon)
+    # Make call to test-function rainfall_rate
+    itur_val = itur.models.itu837.rainfall_rate(lat=lat, lon=lon, p=p)
 
     # Compute error with respect to value in ITU example file
-    ITU_example_val = 4.53654368  # (%)
+    ITU_example_val = 99.14811359999999  # (mm/hr)
     error = ITU_example_val - itur_val.value
     error_rel = error / ITU_example_val * 100  # (%)
 
 
 .. raw:: html
-    :file: test_rainfall_rate_probability_table.html
+    :file: test_rainfall_rate_R001_table.html
 
 
 Function rainfall_rate
@@ -83,11 +84,11 @@ first row of the results in the table:
     :file: test_rainfall_rate_table.html
 
 
-Function rainfall_rate
-----------------------
+Function rainfall_probability
+-----------------------------
 
-The table below contains the results of testing function ``rainfall_rate``.
-The test cases were extracted from spreadsheet ``ITURP837-7_rainfall_rate_R001.csv`` from the
+The table below contains the results of testing function ``rainfall_probability``.
+The test cases were extracted from spreadsheet ``ITURP837-7_rainfall_rate_probability.csv`` from the
 `ITU Validation examples file (rev 5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`_.
 In addition to the input-arguments, expected result (``ITU Validation``), and
 ITU-Rpy computed result (``ITUR-py Result``), the absolute and relative errors
@@ -105,17 +106,16 @@ first row of the results in the table:
     # Define input attributes
     lat = 3.133  #  (°N)
     lon = 101.7  # (°E)
-    p = 0.01  # (%)
 
-    # Make call to test-function rainfall_rate
-    itur_val = itur.models.itu837.rainfall_rate(lat=lat, lon=lon, p=p)
+    # Make call to test-function rainfall_probability
+    itur_val = itur.models.itu837.rainfall_probability(lat=lat, lon=lon)
 
     # Compute error with respect to value in ITU example file
-    ITU_example_val = 99.14811359999999  # (mm/hr)
+    ITU_example_val = 4.53654368  # (%)
     error = ITU_example_val - itur_val.value
     error_rel = error / ITU_example_val * 100  # (%)
 
 
 .. raw:: html
-    :file: test_rainfall_rate_R001_table.html
+    :file: test_rainfall_rate_probability_table.html
 
