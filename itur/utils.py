@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-"""``itur.utils`` is a utilities library for ITU-Rpy.
+""" ``itur.utils`` is a utilities library for ITU-Rpy.
 
 This utility library for ITU-Rpy contains methods to:
-    * Load data and build an interpolator object.
-    * Prepare the input and output arrays, and handle unit transformations.
-    * Compute distances and elevation angles between two points on Earth and
-      or space.
+* Load data and build an interpolator object.
+* Prepare the input and output arrays, and handle unit transformations.
+* Compute distances and elevation angles between two points on Earth and
+  or space.
 """
 from __future__ import absolute_import
 from __future__ import division
@@ -108,6 +108,28 @@ def load_data(path, is_text=False, **kwargs):
     return data
 
 
+def get_input_type(inpt):
+    """Return the type of the input.
+
+    If the input is an object of type Quantity, it returns the type of the
+    associated value
+
+    Parameters
+    ----------
+    inpt : object
+        The input object.
+
+    Returns
+    -------
+    type: type
+        The type of the input.
+    """
+    if isinstance(inpt, u.Quantity):
+        return type(inpt.value)
+    else:
+        return type(inpt)
+
+
 def prepare_input_array(input_array):
     """Format an array to be a 2-D numpy-array.
 
@@ -153,7 +175,7 @@ def prepare_output_array(output_array, type_input=None):
     if isinstance(value, np.ndarray) or isinstance(value, list):
         value = np.array(value).squeeze()
 
-    type_output = type(output_array)
+    type_output = get_input_type(output_array)
     # First, cast the output_array to the same type of the input
     # Check if the output array is a 0-D number and cast it to a float
     if (type_input in __NUMERIC_TYPES__ and

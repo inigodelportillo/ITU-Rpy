@@ -870,6 +870,17 @@ class ITUR1511_2TestCase(ITU_TestCase):
                      n_places=5)
 
 
+class TestValidationReports(test.TestCase):
+
+    @test.skipIf(sys.version_info[0] < 3,
+                 "Only supported in Python 3+ (open does not have encoding)")
+    def test_validation_reports(self):
+        # Test valid versions
+        suite = create_ITU_suite()
+        test.TextTestRunner(verbosity=0).run(suite)
+        suite.rst_reports(html_path)
+
+
 if __name__ == '__main__':
     suite = create_ITU_suite()
     print('Validation tests for the ITU-R models')

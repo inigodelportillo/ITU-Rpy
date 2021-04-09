@@ -10,7 +10,7 @@ from astropy import units as u
 from itur import utils
 from itur.models.itu1144 import bicubic_2D_interpolator
 from itur.utils import (prepare_input_array, prepare_output_array,
-                        load_data_interpolator)
+                        load_data_interpolator, get_input_type)
 
 
 class __ITU1511():
@@ -226,7 +226,7 @@ def topographic_altitude(lat, lon):
     https://www.itu.int/rec/R-REC-P.1511/en
 
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)

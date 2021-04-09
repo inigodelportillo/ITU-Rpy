@@ -18,7 +18,7 @@ from itur.models.itu837 import rainfall_probability
 from itur.models.itu676 import zenit_water_vapour_attenuation
 from itur.models.itu1510 import surface_mean_temperature
 from itur.models.itu1511 import topographic_altitude
-from itur.utils import prepare_quantity
+from itur.utils import prepare_quantity, get_input_type
 
 from astropy import units as u
 
@@ -147,8 +147,8 @@ class _ITU1853_1():
 
         return A_rain.flatten()
 
-    @staticmethod
-    def fftnoise(f):
+    @classmethod
+    def fftnoise(cls, f):
         f = np.array(f, dtype='complex')
         Np = (len(f) - 1) // 2
         phases = np.random.rand(Np) * 2 * np.pi
@@ -157,7 +157,8 @@ class _ITU1853_1():
         f[-1:-1 - Np:-1] = np.conj(f[1:Np + 1])
         return np.fft.ifft(f).real
 
-    def scintillation_attenuation_synthesis(self, Ns, f_c=0.1, Ts=1):
+    @staticmethod
+    def scintillation_attenuation_synthesis(Ns, f_c=0.1, Ts=1):
         """
         For Earth-space paths, the time series synthesis method is valid for
         frequencies between 4 GHz and 55 GHz and elevation angles between
@@ -167,7 +168,7 @@ class _ITU1853_1():
         H_f = np.where(freqs <= f_c, 1, 10 **
                        ((np.log10(freqs) - np.log10(f_c)) * (-8 / 3)))
         H_f = H_f[0:int(Ns + 2e5)]
-        sci = self.fftnoise(np.fft.fftshift(H_f))
+        sci = _ITU1853_1.fftnoise(np.fft.fftshift(H_f))
         return sci[200000:].flatten()
 
     @staticmethod
@@ -227,7 +228,7 @@ class _ITU1853_1():
         ln_Vi = np.log(Vi)
 
         a, b = np.linalg.lstsq(np.vstack([ln_Vi, np.ones(len(ln_Vi))]).T,
-                               ln_lnPi)[0]
+                               ln_lnPi, rcond=None)[0]
         kappa = a
         lambd = np.exp(-b / a)
         return kappa, lambd
@@ -334,7 +335,7 @@ class _ITU1853_1():
 
         e = Tm * rho / 216.7
         go = gamma0_exact(f, P, rho, Tm).value
-        ho, _ = slant_inclined_path_equivalent_height(f, P + e).value
+        ho, _ = slant_inclined_path_equivalent_height(f, P + e, rho).value
         Ao = ho * go * np.ones_like(Ar)
 
         # Step C15: Synthesize unit variance scintillation time series
@@ -418,6 +419,7 @@ def change_version(new_version):
         Number of the version to use.
         Valid values are:
           * 1:  Activates recommendation ITU-R P.1853-1 (02/12) (Current version)
+          * 0:  Activates recommendation ITU-R P.1853-0 (10/09) (Superseded)
     """
     global __model
     __model = __ITU1853(new_version)
@@ -426,9 +428,27 @@ def change_version(new_version):
 def get_version():
     """
     Obtain the version of the ITU-R P.1853 recommendation currently being used.
+
+    Returns
+    -------
+    version: int
+        Version currently being used.
+
     """
     global __model
     return __model.__version__
+
+
+def set_seed(seed):
+    """
+    Set the seed used to generate random numbers.
+
+    Parameters
+    ----------
+    seed : int
+        Seed used to generate random numbers
+    """
+    __model.set_seed(seed)
 
 
 def rain_attenuation_synthesis(lat, lon, f, el, hs, Ns, Ts=1, tau=45, n=None):
@@ -480,7 +500,7 @@ def rain_attenuation_synthesis(lat, lon, f, el, hs, Ns, Ts=1, tau=45, n=None):
     el = prepare_quantity(el, u.deg, 'Elevation angle')
     hs = prepare_quantity(
         hs, u.km, 'Heigh above mean sea level of the earth station')
-    Ts = prepare_quantity(f, u.second, 'Time step between samples')
+    Ts = prepare_quantity(Ts, u.second, 'Time step between samples')
     val = __model.rain_attenuation_synthesis(lat, lon, f, el, hs, Ns,
                                              Ts=Ts, tau=tau, n=n)
     return val * u.dB

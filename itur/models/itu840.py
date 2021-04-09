@@ -10,7 +10,8 @@ from astropy import units as u
 
 from itur.models.itu1144 import bilinear_2D_interpolator
 from itur.utils import (dataset_dir, prepare_input_array, prepare_output_array,
-                        prepare_quantity, load_data_interpolator)
+                        prepare_quantity, load_data_interpolator,
+                        get_input_type)
 
 
 def __fcn_columnar_content_reduced_liquid__(Lred, lat, lon, p):
@@ -611,7 +612,7 @@ def columnar_content_reduced_liquid(lat, lon, p):
     [1] Attenuation due to clouds and fog:
     https://www.itu.int/rec/R-REC-P.840/en
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
@@ -675,7 +676,7 @@ def cloud_attenuation(lat, lon, el, f, p, Lred=None):
     [1] Attenuation due to clouds and fog:
     https://www.itu.int/rec/R-REC-P.840/en
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
@@ -724,7 +725,7 @@ def lognormal_approximation_coefficient(lat, lon):
     [1] Attenuation due to clouds and fog:
     https://www.itu.int/rec/R-REC-P.840/en
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)

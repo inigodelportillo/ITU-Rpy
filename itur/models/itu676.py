@@ -15,7 +15,7 @@ from itur.models.itu835 import (standard_pressure, standard_temperature,
                                 standard_water_vapour_density)
 from itur.models.itu836 import total_water_vapour_content
 from itur.models.itu1511 import topographic_altitude
-from itur.utils import (prepare_quantity, prepare_output_array,
+from itur.utils import (prepare_quantity, prepare_output_array, get_input_type,
                         prepare_input_array, load_data, dataset_dir)
 
 
@@ -156,10 +156,10 @@ class __ITU676__():
         fcn = np.vectorize(self.instance.gaseous_attenuation_slant_path)
         return fcn(f, el, rho, P, T, V_t, h, mode)
 
-    def slant_inclined_path_equivalent_height(self, f, p):
+    def slant_inclined_path_equivalent_height(self, f, p, rho, T):
         fcn = np.vectorize(self.instance.slant_inclined_path_equivalent_height,
                            excluded=[0], otypes=[np.ndarray])
-        return np.array(fcn(f, p).tolist())
+        return np.array(fcn(f, p, rho, T).tolist())
 
     def zenit_water_vapour_attenuation(
             self, lat, lon, p, f, V_t=None, h=None):
@@ -430,7 +430,7 @@ class _ITU676_12_():
             gammaw = 0
 
         e = rho * T / 216.7
-        h0, hw = self.slant_inclined_path_equivalent_height(f, P + e)
+        h0, hw = self.slant_inclined_path_equivalent_height(f, P + e, rho, T)
 
         if 5 < el and el < 90:
             h0_p = h0 * (np.exp(-h1 / h0) - np.exp(-h2 / h0))
@@ -632,7 +632,7 @@ class _ITU676_11_():
         return gamma0, gammaw
 
     @classmethod
-    def slant_inclined_path_equivalent_height(self, f, p):
+    def slant_inclined_path_equivalent_height(self, f, p, rho=None, T=None):
         """
         """
         rp = p / 1013.25
@@ -973,7 +973,7 @@ class _ITU676_10_():
         return gamma0, gammaw
 
     @classmethod
-    def slant_inclined_path_equivalent_height(self, f, p):
+    def slant_inclined_path_equivalent_height(self, f, p, rho=None, T=None):
         """
         """
         rp = p / 1013.0
@@ -1281,7 +1281,7 @@ def gaseous_attenuation_terrestrial_path(r, f, el, rho, P, T, mode):
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
-    type_output = type(el)
+    type_output = get_input_type(el)
     r = prepare_quantity(r, u.km, 'Path Length')
     f = prepare_quantity(f, u.GHz, 'Frequency')
     el = prepare_quantity(prepare_input_array(el), u.deg, 'Elevation angle')
@@ -1344,7 +1344,7 @@ def gaseous_attenuation_slant_path(f, el, rho, P, T, V_t=None, h=None,
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
-    type_output = type(el)
+    type_output = get_input_type(el)
     f = prepare_quantity(f, u.GHz, 'Frequency')
     el = prepare_quantity(prepare_input_array(el), u.deg, 'Elevation angle')
     rho = prepare_quantity(rho, u.g / u.m**3, 'Water vapor density')
@@ -1404,7 +1404,7 @@ def gaseous_attenuation_inclined_path(f, el, rho, P, T, h1, h2, mode='approx'):
     """
     f = prepare_quantity(f, u.GHz, 'Frequency')
     el = prepare_quantity(el, u.deg, 'Elevation angle')
-    type_output = type(el)
+    type_output = get_input_type(el)
     rho = prepare_quantity(rho, u.g / u.m**3, 'Water vapor density')
     P = prepare_quantity(P, u.hPa, 'Atospheric pressure')
     T = prepare_quantity(T, u.K, 'Temperature')
@@ -1415,7 +1415,7 @@ def gaseous_attenuation_inclined_path(f, el, rho, P, T, h1, h2, mode='approx'):
     return prepare_output_array(val, type_output) * u.dB
 
 
-def slant_inclined_path_equivalent_height(f, p):
+def slant_inclined_path_equivalent_height(f, p, rho=7.5, T=298.15):
     """ Computes the equivalent height to be used for oxygen and water vapour
     gaseous attenuation computations.
 
@@ -1425,6 +1425,12 @@ def slant_inclined_path_equivalent_height(f, p):
         Frequency (GHz)
     p : number
         Percentage of the time the gaseous attenuation value is exceeded.
+    rho : number or Quantity
+        Water vapor density (g/m3)
+    P : number or Quantity
+        Atmospheric pressure (hPa)
+    T : number or Quantity
+        Absolute temperature (K)
 
     Returns
     -------
@@ -1437,10 +1443,12 @@ def slant_inclined_path_equivalent_height(f, p):
     https://www.itu.int/rec/R-REC-P.676/en
 
     """
-    type_output = type(f)
+    type_output = get_input_type(f)
     f = prepare_quantity(f, u.GHz, 'Frequency')
+    rho = prepare_quantity(rho, u.g / u.m**3, 'Water vapor density')
+    T = prepare_quantity(T, u.K, 'Temperature')
 
-    val = __model.slant_inclined_path_equivalent_height(f, p)
+    val = __model.slant_inclined_path_equivalent_height(f, p, rho, T)
     return prepare_output_array(val, type_output) * u.m
 
 
@@ -1481,7 +1489,7 @@ def zenit_water_vapour_attenuation(lat, lon, p, f, V_t=None, h=None):
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
@@ -1524,7 +1532,7 @@ def gammaw_approx(f, P, rho, T):
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
-    type_output = type(f)
+    type_output = get_input_type(f)
     f = prepare_quantity(f, u.GHz, 'Frequency')
     P = prepare_quantity(P, u.hPa, 'Atmospheric pressure ')
     rho = prepare_quantity(rho, u.g / u.m**3, 'Water vapour density')
@@ -1560,7 +1568,7 @@ def gamma0_approx(f, P, rho, T):
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
-    type_output = type(f)
+    type_output = get_input_type(f)
     f = prepare_quantity(f, u.GHz, 'Frequency')
     P = prepare_quantity(P, u.hPa, 'Atmospheric pressure')
     rho = prepare_quantity(rho, u.g / u.m**3, 'Water vapour density')
@@ -1597,7 +1605,7 @@ def gammaw_exact(f, P, rho, T):
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
-    type_output = type(f)
+    type_output = get_input_type(f)
     f = prepare_quantity(f, u.GHz, 'Frequency')
     P = prepare_quantity(P, u.hPa, 'Atmospheric pressure ')
     rho = prepare_quantity(rho, u.g / u.m**3, 'Water vapour density')
@@ -1633,7 +1641,7 @@ def gamma0_exact(f, P, rho, T):
     [1] Attenuation by atmospheric gases:
     https://www.itu.int/rec/R-REC-P.676/en
     """
-    type_output = type(f)
+    type_output = get_input_type(f)
     f = prepare_quantity(f, u.GHz, 'Frequency')
     P = prepare_quantity(P, u.hPa, 'Atmospheric pressure')
     rho = prepare_quantity(rho, u.g / u.m**3, 'Water vapour density')
@@ -1670,7 +1678,7 @@ def gamma_exact(f, P, rho, T):
     https://www.itu.int/rec/R-REC-P.676/en
     """
     f = prepare_quantity(f, u.GHz, 'Frequency')
-    type_output = type(f)
+    type_output = get_input_type(f)
 
     P = prepare_quantity(P, u.hPa, 'Atmospheric pressure ')
     rho = prepare_quantity(rho, u.g / u.m**3, 'Water vapour density')

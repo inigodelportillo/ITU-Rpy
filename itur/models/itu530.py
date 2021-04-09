@@ -14,6 +14,7 @@ from itur.models.itu1144 import bilinear_2D_interpolator
 from itur.models.itu838 import (rain_specific_attenuation,
                                 rain_specific_attenuation_coefficients)
 from itur.utils import (prepare_input_array, prepare_quantity,
+                        get_input_type,
                         prepare_output_array, load_data_interpolator)
 
 
@@ -92,13 +93,14 @@ class __ITU530__():
 
 class _ITU530_17_():
 
+    _s_a = {}
+
     def __init__(self):
         self.__version__ = 17
         self.year = 2017
         self.month = 12
         self.link = 'https://www.itu.int/rec/R-REC-P.530-17-201712-S/en'
 
-        self._s_a = {}
 
     @classmethod
     def s_a(self, lat, lon):
@@ -113,12 +115,13 @@ class _ITU530_17_():
         with 0.5 × 0.5 degree resolution of geographical coordinates
         using bi-linear interpolation.
         """
-        if not self._s_a:
-            self._Pr6 = self._altitude = load_data_interpolator(
+        if not _ITU530_17_._s_a:
+            _ITU530_17_._s_a = load_data_interpolator(
                 '530/v16_lat.npz', '530/v16_lon.npz',
-                '530/v16_gtopo_30.npz', bilinear_2D_interpolator)
+                '530/v16_gtopo_30.npz', bilinear_2D_interpolator,
+                flip_ud=False)
 
-        return self._Pr6(
+        return _ITU530_17_._s_a(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     ###########################################################################
@@ -254,7 +257,7 @@ class _ITU530_17_():
 
         # Step 5: The attenuation exceeded for other percentages of time p in
         # the range 0.001% to 1% may be deduced from the following power law
-        C0 = np.where(f >= 10, 0.12 * 0.4 * (np.log10(f / 10)**0.8), 0.12)
+        C0 = np.where(f >= 10, 0.12 + 0.4 * (np.log10(f / 10)**0.8), 0.12)
         # Eq. 35a [-]
         C1 = (0.07**C0) * (0.12**(1 - C0))
         # Eq. 35b [-]
@@ -284,29 +287,31 @@ class _ITU530_17_():
         # frequency, polarization and rain rate of interest using
         # Recommendation ITU-R P.838
         gammar = rain_specific_attenuation(R001, f, el, tau).value
-        _, alpha = rain_specific_attenuation_coefficients(f, el, tau).value
+        _, alpha = rain_specific_attenuation_coefficients(f, el, tau)
 
         # Step 3: Compute the effective path length, 'deff', of the link by
         # multiplying the actual path length d by a distance factor r
         r = 1 / (0.477 * d ** 0.633 * R001 ** (0.073 * alpha) *
-                 f**(0.123) - 10.579 * (1 - np.exp(-0.024 * d)))
+                 f**(0.123) - 10.579 * (1 - np.exp(-0.024 * d)))  # Eq. 32 [-]
         deff = np.minimum(r, 2.5) * d
 
         # Step 4: An estimate of the path attenuation exceeded for 0.01% of
         # the time is given by:
-        A001 = gammar * deff
+        A001 = gammar * deff                                    # Eq. 33 [dB]
 
         # Step 5: The attenuation exceeded for other percentages of time p in
         # the range 0.001% to 1% may be deduced from the following power law
-        C0 = np.where(f >= 10, 0.12 * 0.4 * (np.log10(f / 10)**0.8), 0.12)
+        C0 = np.where(f >= 10, 0.12 + 0.4 * (np.log10(f / 10)**0.8), 0.12)
+        # Eq. 35a [-]
         C1 = (0.07**C0) * (0.12**(1 - C0))
+        # Eq. 35b [-]
         C2 = 0.855 * C0 + 0.546 * (1 - C0)
-        C3 = 0.139 * C0 + 0.043 * (1 - C0)
+        C3 = 0.139 * C0 + 0.043 * (1 - C0)                      # Eq. 35c [-]
 
         def func_bisect(p):
-            return A001 * C1 * p ** (- (C2 + C3 * np.log10(p))) - Ap
+            return A001 * C1 * p ** (- (C2 + C3 * np.log10(p)))  - Ap
 
-        return bisect(func_bisect, 0, 100)
+        return bisect(func_bisect, 0.000001, 100)
 
     @classmethod
     def rain_event_count(self, lat, lon, d, f, el, A, tau=45, R001=None):
@@ -513,7 +518,7 @@ def fresnel_ellipse_radius(d1, d2, f):
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
-    type_output = type(d1)
+    type_output = get_input_type(d1)
     d1 = prepare_quantity(d1, u.km, 'Distance to the first terminal')
     d2 = prepare_quantity(d2, u.km, 'Distance to the second terminal')
     f = prepare_quantity(f, u.GHz, 'Frequency')
@@ -554,7 +559,7 @@ def diffraction_loss(d1, d2, h, f):
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
-    type_output = type(d1)
+    type_output = get_input_type(d1)
     d1 = prepare_quantity(d1, u.km, 'Distance to the first terminal')
     d2 = prepare_quantity(d2, u.km, 'Distance to the second terminal')
     h = prepare_quantity(h, u.m, 'Height difference')
@@ -611,7 +616,7 @@ def multipath_loss_for_A(lat, lon, h_e, h_r, d, f, A):
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
@@ -672,7 +677,7 @@ def multipath_loss(lat, lon, h_e, h_r, d, f, A):
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
@@ -739,7 +744,7 @@ def rain_attenuation(lat, lon, d, f, el, p, tau=45, R001=None):
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
@@ -800,7 +805,7 @@ def inverse_rain_attenuation(lat, lon, d, f, el, Ap, tau=45, R001=None):
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
@@ -862,7 +867,7 @@ def rain_event_count(lat, lon, d, f, el, A, tau=45, R001=None):
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
@@ -923,7 +928,7 @@ def XPD_outage_clear_air(lat, lon, h_e, h_r, d, f, XPD_g, C0_I, XPIF=0):
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
@@ -992,7 +997,7 @@ def XPD_outage_precipitation(lat, lon, d, f, el, C0_I, tau=45,
     [1] Propagation data and prediction methods required for the design of
     terrestrial line-of-sight systems: https://www.itu.int/rec/R-REC-P.530/en
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)

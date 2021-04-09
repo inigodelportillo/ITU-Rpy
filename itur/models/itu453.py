@@ -9,7 +9,7 @@ from astropy import units as u
 
 from itur.models.itu1144 import bilinear_2D_interpolator
 from itur.utils import (prepare_input_array, prepare_quantity, load_data,
-                        prepare_output_array, dataset_dir)
+                        prepare_output_array, dataset_dir, get_input_type)
 
 
 class __ITU453__():
@@ -540,7 +540,7 @@ def map_wet_term_radio_refractivity(lat, lon, p=50):
     [1] The radio refractive index: its formula and refractivity data
     https://www.itu.int/rec/R-REC-P.453/en
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
@@ -576,7 +576,7 @@ def DN65(lat, lon, p):
     https://www.itu.int/rec/R-REC-P.453/en
 
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
@@ -609,7 +609,7 @@ def DN1(lat, lon, p):
     [1] The radio refractive index: its formula and refractivity data
     https://www.itu.int/rec/R-REC-P.453/en
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
