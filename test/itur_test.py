@@ -826,6 +826,7 @@ class TestFunctionsRecommendation837(test.TestCase):
         lat = 51
         lon = -63
         p = 0.51
+        R = 10
 
         models.itu837.rainfall_probability(lat, lon)
         models.itu837.rainfall_probability([lat, lat], [lon, lon])
@@ -833,6 +834,8 @@ class TestFunctionsRecommendation837(test.TestCase):
         models.itu837.rainfall_rate(lat, lon, p)
         models.itu837.rainfall_rate([lat, lat], [lon, lon], p)
         models.itu837.rainfall_rate([lat, lat], [lon, lon], [p, p])
+
+        models.itu837.unavailability_from_rainfall_rate(lat, lon, R)
 
     def test_837(self):
 
