@@ -24,6 +24,7 @@ def suite():
 
     # For each version test all functions for vectorization and for
     suite.addTest(TestFunctionsRecommendation453('test_453'))
+    suite.addTest(TestFunctionsRecommendation530('test_530'))
     suite.addTest(TestFunctionsRecommendation618('test_618'))
     suite.addTest(TestFunctionsRecommendation676('test_676'))
     suite.addTest(TestFunctionsRecommendation835('test_835'))
@@ -476,6 +477,44 @@ class TestFunctionsRecommendation453(test.TestCase):
             models.itu453.change_version(version)
             self.test_all_functions_453()
             self.assertEqual(models.itu453.get_version(), version)
+
+
+
+class TestFunctionsRecommendation530(test.TestCase):
+    def setUp(self):
+        self.versions = [16, 17]
+
+    @staticmethod
+    def test_all_functions_530():
+
+        d1 = d2 = d = 10 * itur.u.km
+        f = 29 * itur.u.GHz
+        h = h_e = h_r = 100 * itur.u.m
+        A = Ap = 10 * itur.u.dB
+        el = 45
+        XPD_g = 20 * itur.u.dB
+        C0_I = 20 * itur.u.dB
+        lat = 51
+        lon = -53
+        p = 0.05
+
+        models.itu530.fresnel_ellipse_radius(d1, d2, f)
+        models.itu530.diffraction_loss(d1, d2, h, f)
+        models.itu530.multipath_loss_for_A(lat, lon, h_e, h_r, d, f, A)
+        models.itu530.multipath_loss(lat, lon, h_e, h_r, d, f, A)
+        models.itu530.rain_attenuation(lat, lon, d, f, el, p)
+        models.itu530.inverse_rain_attenuation(lat, lon, d, f, el, Ap)
+
+        models.itu530.rain_event_count(lat, lon, d, f, el, A)
+        models.itu530.XPD_outage_clear_air(lat, lon, h_e, h_r, d, f, XPD_g, C0_I)
+        models.itu530.XPD_outage_precipitation(lat, lon, d, f, el, C0_I)
+
+    def test_530(self):
+
+        for version in self.versions:
+            models.itu530.change_version(version)
+            self.test_all_functions_530()
+            self.assertEqual(models.itu530.get_version(), version)
 
 
 class TestFunctionsRecommendation618(test.TestCase):
