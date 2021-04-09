@@ -617,7 +617,7 @@ class TestFunctionsRecommendation618(test.TestCase):
 
 class TestFunctionsRecommendation676(test.TestCase):
     def setUp(self):
-        self.versions = [9, 10, 11]
+        self.versions = [9, 10, 11, 12]
 
     @staticmethod
     def test_all_functions_676():
@@ -630,6 +630,8 @@ class TestFunctionsRecommendation676(test.TestCase):
         T = 15 * itur.u.deg_C
         V_t = 20 * itur.u.kg / itur.u.m**2
         h = 0.05 * itur.u.km
+        h1 = 0.05 * itur.u.km
+        h2 = 0.15 * itur.u.km
         lat = 51
         lon = -53
         p = 0.51
@@ -642,6 +644,21 @@ class TestFunctionsRecommendation676(test.TestCase):
             r, [f, f], [el, el], [rho, rho], [P, P], [T, T], 'approx')
         models.itu676.gaseous_attenuation_terrestrial_path(
             r, [f, f], [el, el], [rho, rho], [P, P], [T, T], 'exact')
+
+        models.itu676.gaseous_attenuation_inclined_path(
+            f, el, rho, P, T, h1=h1, h2=h2, mode='approx')
+        models.itu676.gaseous_attenuation_inclined_path(
+            f, el, rho, P, T, h1=h1, h2=h2, mode='exact')
+        models.itu676.gaseous_attenuation_inclined_path(
+            [f, f], [el, el], [rho, rho], [P, P], [T, T],
+            h1=h1, h2=h2, mode='approx')
+        models.itu676.gaseous_attenuation_inclined_path(
+            [f, f], [el, el], [rho, rho], [P, P], [T, T],
+            h1=h1, h2=h2, mode='exact')
+        models.itu676.gaseous_attenuation_inclined_path(
+            f, el, rho, P, T, h1=h1, h2=h2, mode='approx')
+        models.itu676.gaseous_attenuation_inclined_path(
+            f, el, rho, P, T, h1=h1, h2=h2, mode='exact')
 
         models.itu676.gaseous_attenuation_slant_path(
             f, el, rho, P, T, V_t=None, h=None, mode='approx')
@@ -866,7 +883,7 @@ class TestFunctionsRecommendation839(test.TestCase):
 
 class TestFunctionsRecommendation840(test.TestCase):
     def setUp(self):
-        self.versions = [4, 5, 6, 7]
+        self.versions = [4, 5, 6, 7, 8]
 
     @staticmethod
     def test_all_functions_840():
