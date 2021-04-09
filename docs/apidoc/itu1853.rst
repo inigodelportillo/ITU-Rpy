@@ -1,0 +1,22 @@
+
+Recommendation ITU-R P.1853
+---------------------------
+
+This Recommendation provides methods to synthesize rain attenuation and scintillation for terrestrial and Earth-space paths and total attenuation and tropospheric scintillation for Earth-space paths.
+
+.. include:: itu1853_table.rst
+
+Introduction
+************
+
+The planning and design of terrestrial and Earth-space radiocommunication systems requires the ability to synthesize the time dynamics of the propagation channel. For example, this information may be required to design various fade mitigation techniques such as, *inter alia*, adaptive coding and modulation, and transmit power control.
+
+The methodology presented in this Recommendation provides a technique to synthesize rain attenuation and scintillation time series for terrestrial and Earth-space paths and total attenuation and tropospheric scintillation for Earth-space paths that approximate the rain attenuation statistics at a particular location.
+
+Module description
+******************
+
+.. automodule:: itur.models.itu1853
+    :members:
+    :undoc-members:
+    :show-inheritance:
