@@ -1,7 +1,8 @@
 ITU-Rpy
 =======
 
-|GitHub license| |Build Status| |PyPI version| |Coverage Status|
+|GitHub license| |Build Status| |PyPI version| |Coverage Status| |PyPI
+pyversions| |Documentation Status|
 
 A python implementation of the ITU-R P. Recommendations to compute
 atmospheric attenuation in slant and horizontal paths.
@@ -19,18 +20,18 @@ Documentation
 -------------
 
 The documentation can be found at `ITU-Rpy
-documentation <http://itu-rpy.readthedocs.io/en/latest/index.html>`_ in
+documentation <http://itu-rpy.readthedocs.io/en/latest/index.html>`__ in
 Read the docs.
 
 Examples of use cases can be found in the `examples
-folder <https://github.com/inigodelportillo/ITU-Rpy/tree/master/examples>`_.
+folder <https://github.com/inigodelportillo/ITU-Rpy/tree/master/examples>`__.
 
 Installation
 ------------
 
-ITU-Rpy has the followind dependencies: ``numpy``, ``scipy``, 
-``pyproj``, and ``astropy``. Installation of ``matplotlib`` and
-``cartopy`` is recommended to display results in a map.
+ITU-Rpy has the followind dependencies: ``numpy``, ``scipy``,
+``pyproj``, and ``astropy``. Installation of ``cartopy`` and
+``matplotlib`` is recommended to display results in a map.
 
 Using pip, you can install all of them by running:
 
@@ -39,27 +40,29 @@ Using pip, you can install all of them by running:
     pip install itur
 
 More information about the installation process can be found on the
-`documentation <https://github.com/inigodelportillo/ITU-Rpy/blob/master/docs/installation.rst>`_.
+`documentation <https://github.com/inigodelportillo/ITU-Rpy/blob/master/docs/installation.rst>`__.
 
 ITU-R Recommendations implemented
 ---------------------------------
 
-The following ITU-R Recommendations are implemented in ITU-Rpy 
-*   **ITU-R P.453-13:** The radio refractive index: its formula and refractivity data
-*   **ITU-R P.530-17:** Propagation data and prediction methods required for the design of terrestrial line-of-sight systems
-*   **ITU-R P.618-13:** Propagation data and prediction methods required for the design of Earth-space telecommunication systems
-*   **ITU-R P.676-12:** Attenuation by atmospheric gases
-*   **ITU-R P.835-6:** Reference Standard Atmospheres
-*   **ITU-R P.836-6:** Water vapour: surface density and total columnar content
-*   **ITU-R P.837-7:** Characteristics of precipitation for propagation modelling
-*   **ITU-R P.838-3:** Specific attenuation model for rain for use in prediction methods
-*   **ITU-R P.839-4:** Rain height model for prediction methods.
-*   **ITU-R P.840-8:** Attenuation due to clouds and fog 
-*   **ITU-R P.1144-10:** Interpolation methods for the geophysical properties used to compute propagation effects 
-*   **ITU-R P.1510-1:** Mean surface temperature
-*   **ITU-R P.1511-2:** Topography for Earth-to-space propagation modelling
-*   **ITU-R P.1853-1:** Tropospheric attenuation time series synthesis
-
+The following ITU-R Recommendations are implemented in ITU-Rpy \*
+**ITU-R P.453-13:** The radio refractive index: its formula and
+refractivity data \* **ITU-R P.530-17:** Propagation data and prediction
+methods required for the design of terrestrial line-of-sight systems \*
+**ITU-R P.618-13:** Propagation data and prediction methods required for
+the design of Earth-space telecommunication systems \* **ITU-R
+P.676-12:** Attenuation by atmospheric gases \* **ITU-R P.835-6:**
+Reference Standard Atmospheres \* **ITU-R P.836-6:** Water vapour:
+surface density and total columnar content \* **ITU-R P.837-7:**
+Characteristics of precipitation for propagation modelling \* **ITU-R
+P.838-3:** Specific attenuation model for rain for use in prediction
+methods \* **ITU-R P.839-4:** Rain height model for prediction methods.
+\* **ITU-R P.840-8:** Attenuation due to clouds and fog \* **ITU-R
+P.1144-10:** Interpolation methods for the geophysical properties used
+to compute propagation effects \* **ITU-R P.1510-1:** Mean surface
+temperature \* **ITU-R P.1511-2:** Topography for Earth-to-space
+propagation modelling \* **ITU-R P.1853-1:** Tropospheric attenuation
+time series synthesis
 
 The individual models can be accessed using the ``itur.models`` package.
 
@@ -68,7 +71,7 @@ Usage
 
 The following code example shows the usage of ITU-Rpy. More examples can
 be found in the `examples
-folder <https://github.com/inigodelportillo/ITU-Rpy/tree/master/examples>`_.
+folder <https://github.com/inigodelportillo/ITU-Rpy/tree/master/examples>`__.
 
 .. code:: python
 
@@ -89,14 +92,18 @@ folder <https://github.com/inigodelportillo/ITU-Rpy/tree/master/examples>`_.
 
 which produces: |Attenuation worldmap|
 
-
 Validation
 ----------
 
-ITU-Rpy has been validated using the `ITU Validation examples (rev 5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`_ , which provides test cases for parts of Recommendations ITU-R P.453-14, P.618-13, P.676-12, P.836-6, P.837-7, P.838-3, P.839-4, P.840-8, P.1511-2, P.1623-1.
+ITU-Rpy has been validated using the `ITU Validation examples (rev
+5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`__
+, which provides test cases for parts of Recommendations ITU-R P.453-14,
+P.618-13, P.676-12, P.836-6, P.837-7, P.838-3, P.839-4, P.840-8,
+P.1511-2, P.1623-1.
 
-The results of this validation exercise are available at the `validation page <https://itu-rpy.readthedocs.io/en/latest/validation.html>`_ in the documentation.
-
+The results of this validation exercise are available at the `validation
+page <https://itu-rpy.readthedocs.io/en/latest/validation.html>`__ in
+the documentation.
 
 Citation
 --------
@@ -122,5 +129,9 @@ If you use ITU-Rpy in one of your research projects, please cite it as:
    :target: https://badge.fury.io/py/itur
 .. |Coverage Status| image:: https://coveralls.io/repos/github/inigodelportillo/ITU-Rpy/badge.svg?branch=master
    :target: https://coveralls.io/github/inigodelportillo/ITU-Rpy?branch=master
+.. |PyPI pyversions| image:: https://img.shields.io/pypi/pyversions/itur.svg
+   :target: https://pypi.python.org/pypi/itur/
+.. |Documentation Status| image:: https://readthedocs.org/projects/itu-rpy/badge/?version=latest
+   :target: http://itu-rpy.readthedocs.io/?badge=latest
 .. |Attenuation worldmap| image:: https://raw.githubusercontent.com/inigodelportillo/ITU-Rpy/master/docs/images/att_world.png
 

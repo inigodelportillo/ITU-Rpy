@@ -1,5 +1,5 @@
-Validation results for ITU-R P.618-13
-=====================================
+Validation results ITU-R P.618-13
+=================================
 
 This page contains the validation examples for Recommendation ITU-R P.618-13: Propagation data and prediction methods required for the design of Earth-space telecommunication systems.
 
