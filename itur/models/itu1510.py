@@ -11,7 +11,7 @@ from itur import utils
 from itur.models.itu1144 import (bilinear_2D_interpolator,
                                  bicubic_2D_interpolator)
 from itur.utils import (prepare_input_array, prepare_output_array,
-                        load_data_interpolator)
+                        load_data_interpolator, get_input_type)
 
 
 
@@ -189,7 +189,7 @@ def surface_mean_temperature(lat, lon):
     https://www.itu.int/rec/R-REC-P.1510/en
 
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
@@ -227,7 +227,7 @@ def surface_month_mean_temperature(lat, lon, m):
     https://www.itu.int/rec/R-REC-P.1510/en
 
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)

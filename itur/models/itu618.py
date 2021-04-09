@@ -17,7 +17,7 @@ from itur.models.itu838 import rain_specific_attenuation
 from itur.models.itu839 import rain_height
 from itur.models.itu1511 import topographic_altitude
 from itur.utils import prepare_input_array, prepare_output_array,\
-    prepare_quantity, compute_distance_earth_to_earth
+    prepare_quantity, compute_distance_earth_to_earth, get_input_type
 
 import warnings
 
@@ -702,7 +702,7 @@ def rain_attenuation(lat, lon, f, el, hs=None, p=0.01, R001=None,
     Earth-space telecommunication systems:
     https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
 
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
@@ -761,7 +761,7 @@ def rain_attenuation_probability(lat, lon, el, hs=None, Ls=None, P0=None):
     Earth-space telecommunication systems:
     https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
 
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
@@ -840,7 +840,7 @@ def site_diversity_rain_outage_probability(lat1, lon1, a1, el1, lat2,
     Earth-space telecommunication systems:
     https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
     """
-    type_output = type(lat1)
+    type_output = get_input_type(lat1)
     lon1 = np.mod(lon1, 360)
     lat1 = prepare_quantity(lat1, u.deg, 'Latitude in ground station 1')
     lon1 = prepare_quantity(lon1, u.deg, 'Longitude in ground station 1')
@@ -914,7 +914,7 @@ def scintillation_attenuation(lat, lon, f, el, p, D, eta=0.5, T=None,
     Earth-space telecommunication systems:
     https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
 
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
@@ -984,7 +984,7 @@ def scintillation_attenuation_sigma(lat, lon, f, el, p, D, eta=0.5, T=None,
     Earth-space telecommunication systems:
     https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
 
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
@@ -1042,7 +1042,7 @@ def rain_cross_polarization_discrimination(Ap, f, el, p, tau=45):
     Earth-space telecommunication systems:
     https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
     """
-    type_output = type(Ap)
+    type_output = get_input_type(Ap)
     Ap = prepare_input_array(Ap)
     f = prepare_quantity(f, u.GHz, 'Frequency')
     el = prepare_quantity(el, u.deg, 'Elevation angle')

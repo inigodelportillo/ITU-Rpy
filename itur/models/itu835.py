@@ -8,6 +8,7 @@ from astropy import units as u
 
 from itur.utils import (prepare_input_array,
                         prepare_output_array,
+                        get_input_type,
                         prepare_quantity)
 
 
@@ -708,7 +709,7 @@ def temperature(lat, h, season='summer'):
 
     """
     global __model
-    type_output = type(lat)
+    type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     h = prepare_quantity(h, u.km, 'Height')
     val = __model.temperature(lat, h, season)
@@ -745,7 +746,7 @@ def pressure(lat, h, season='summer'):
     https://www.itu.int/rec/R-REC-P.835/en
     """
     global __model
-    type_output = type(lat)
+    type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     h = prepare_quantity(h, u.km, 'Height')
     val = __model.pressure(lat, h, season)
@@ -784,7 +785,7 @@ def water_vapour_density(lat, h, season='summer'):
     https://www.itu.int/rec/R-REC-P.835/en
     """
     global __model
-    type_output = type(lat)
+    type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     h = prepare_quantity(h, u.km, 'Height')
     val = __model.water_vapour_density(lat, h, season)
@@ -860,7 +861,7 @@ def standard_pressure(h, T_0=288.15, P_0=1013.25):
     """
     global __model
 
-    type_output = type(h)
+    type_output = get_input_type(h)
     h = prepare_quantity(h, u.km, 'Height')
     h = np.atleast_1d(h)
     T_0 = prepare_quantity(T_0, u.Kelvin, 'Surface temperature')

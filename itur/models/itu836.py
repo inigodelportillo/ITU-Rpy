@@ -13,7 +13,7 @@ from itur.models.itu1511 import topographic_altitude
 from itur.models.itu1144 import (bilinear_2D_interpolator,
                                  bicubic_2D_interpolator)
 from itur.utils import (prepare_input_array, prepare_output_array,
-                        dataset_dir, prepare_quantity,
+                        dataset_dir, prepare_quantity, get_input_type,
                         load_data_interpolator)
 
 
@@ -416,7 +416,7 @@ def surface_water_vapour_density(lat, lon, p, alt=None):
     [1] Water vapour: surface density and total columnar content
     https://www.itu.int/rec/R-REC-P.836/en
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
@@ -457,7 +457,7 @@ def total_water_vapour_content(lat, lon, p, alt=None):
     [1] Water vapour: surface density and total columnar content
     https://www.itu.int/rec/R-REC-P.836/en
     """
-    type_output = type(lat)
+    type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
