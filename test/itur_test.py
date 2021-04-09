@@ -625,6 +625,7 @@ class TestFunctionsRecommendation676(test.TestCase):
         r = 5 * itur.u.km
         f = 29 * itur.u.GHz
         el = 31
+        el_low = 4
         rho = 7.5
         P = 1013 * itur.u.hPa
         T = 15 * itur.u.deg_C
@@ -659,6 +660,21 @@ class TestFunctionsRecommendation676(test.TestCase):
             f, el, rho, P, T, h1=h1, h2=h2, mode='approx')
         models.itu676.gaseous_attenuation_inclined_path(
             f, el, rho, P, T, h1=h1, h2=h2, mode='exact')
+
+        models.itu676.gaseous_attenuation_inclined_path(
+            f, el_low, rho, P, T, h1=h1, h2=h2, mode='approx')
+        models.itu676.gaseous_attenuation_inclined_path(
+            f, el_low, rho, P, T, h1=h1, h2=h2, mode='exact')
+        models.itu676.gaseous_attenuation_inclined_path(
+            [f, f], [el_low, el_low], [rho, rho], [P, P], [T, T],
+            h1=h1, h2=h2, mode='approx')
+        models.itu676.gaseous_attenuation_inclined_path(
+            [f, f], [el_low, el_low], [rho, rho], [P, P], [T, T],
+            h1=h1, h2=h2, mode='exact')
+        models.itu676.gaseous_attenuation_inclined_path(
+            f, el_low, rho, P, T, h1=h1, h2=h2, mode='approx')
+        models.itu676.gaseous_attenuation_inclined_path(
+            f, el_low, rho, P, T, h1=h1, h2=h2, mode='exact')
 
         models.itu676.gaseous_attenuation_slant_path(
             f, el, rho, P, T, V_t=None, h=None, mode='approx')
