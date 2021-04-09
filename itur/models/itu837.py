@@ -408,13 +408,14 @@ def unavailability_from_rainfall_rate(lat, lon, R):
     This method calls successively to `rainfall_rate` (sing bisection) with
     different values of p.
 
+    Note: This method cannot operate in a vectorized manner.
 
     Parameters
     ----------
-    lat : number, sequence, or numpy.ndarray
-        Latitudes of the receiver points
-    lon : number, sequence, or numpy.ndarray
-        Longitudes of the receiver points
+    lat : number
+        Latitude of the receiver point
+    lon : number
+        Longitude of the receiver point
     R : number, sequence, or numpy.ndarray
         Rainfall rate (mm/h)
 
