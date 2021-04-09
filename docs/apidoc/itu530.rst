@@ -10,12 +10,14 @@ Introduction
 ************
 
 The propagation loss on a terrestrial line-of-sight path relative to the free-space loss (see Recommendation ITU-R P.525) is the sum of different contributions as follows:
-* attenuation due to atmospheric gases;
-* diffraction fading due to obstruction or partial obstruction of the path;
-* fading due to multipath, beam spreading and scintillation;
-* attenuation due to variation of the angle-of-arrival/launch;
-* attenuation due to precipitation;
-* attenuation due to sand and dust storms.
+  
+    * attenuation due to atmospheric gases;
+    * diffraction fading due to obstruction or partial obstruction of the path;
+    * fading due to multipath, beam spreading and scintillation;
+    * attenuation due to variation of the angle-of-arrival/launch;
+    * attenuation due to precipitation;
+    * attenuation due to sand and dust storms.
+
 Each of these contributions has its own characteristics as a function of frequency, path length and geographic location. These are described in the paragraphs that follow.
 
 Module description

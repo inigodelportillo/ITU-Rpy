@@ -10,12 +10,13 @@ Introduction
 ************
 
 The propagation loss on an Earth-space path, relative to the free-space loss, is the sum of different contributions as follows:
-* attenuation by atmospheric gases;
-* attenuation by rain, other precipitation and clouds;
-* focusing and defocusing;
-* decrease in antenna gain due to wave-front incoherence;
-* scintillation and multipath effects;
-* attenuation by sand and dust storms.
+   
+    * attenuation by atmospheric gases;
+    * attenuation by rain, other precipitation and clouds;
+    * focusing and defocusing;
+    * decrease in antenna gain due to wave-front incoherence;
+    * scintillation and multipath effects;
+    * attenuation by sand and dust storms.
 
 Each of these contributions has its own characteristics as a function of frequency, geographic location and elevation angle. As a rule, at elevation angles above 10 degrees, only gaseous attenuation, rain and cloud attenuation and possibly scintillation will be significant, depending on propagation conditions. 
 
