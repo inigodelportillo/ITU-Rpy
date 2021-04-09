@@ -30,9 +30,9 @@ first row of the results in the table:
     import itur
 
     # Define input attributes
-    el = 31.07699124  # ?(°)
+    el = 31.07699124  # (°)
     f = 14.25  # (GHz)
-    R = 26.48052  # (mm/h)
+    R = 26.480520000000002  # (mm/h)
     tau = 0.0  #  t(°)
 
     # Make call to test-function rain_specific_attenuation

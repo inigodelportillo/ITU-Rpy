@@ -33,7 +33,7 @@ first row of the results in the table:
     lat = 51.5  #  (°N)
     lon = -0.14  # (°E)
     f = 14.25  # (GHz)
-    el = 31.07699124  # ?(°)
+    el = 31.07699124  # (°)
     p = 1.0  # (%)
 
     # Make call to test-function cloud_attenuation
