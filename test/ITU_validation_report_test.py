@@ -870,6 +870,15 @@ class ITUR1511_2TestCase(ITU_TestCase):
                      n_places=5)
 
 
+class TestValidationReports(test.TestCase):
+
+    def test_validation_reports(self):
+        # Test valid versions
+        suite = create_ITU_suite()
+        test.TextTestRunner(verbosity=0).run(suite)
+        suite.rst_reports(html_path)
+
+
 if __name__ == '__main__':
     suite = create_ITU_suite()
     print('Validation tests for the ITU-R models')
