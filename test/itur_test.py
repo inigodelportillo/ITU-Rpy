@@ -20,7 +20,7 @@ def suite():
     suite = test.TestSuite()
 
     # Test valid versions
-    suite.addTest(TestVersions('change_to_not_implemented_versions'))
+    suite.addTest(TestVersions('test_change_to_not_implemented_versions'))
 
     # For each version test all functions for vectorization and for
     suite.addTest(TestFunctionsRecommendation453('test_453'))
@@ -84,7 +84,7 @@ def suite():
 
 class TestVersions(test.TestCase):
 
-    def change_to_not_implemented_versions(self):
+    def test_change_to_not_implemented_versions(self):
 
         for i in range(1, 12):
             self.assertRaises(ValueError,
