@@ -18,10 +18,10 @@ The atmospheric radio refractive index, n, can be computed by the following form
     N &= 77.6 \frac{P_d}{T} + 72\frac{e}{T} +3.75\cdot10^{5}\frac{e}{T^2}
     
 where
- * :math:`P_d` : dry atmospheric pressure (hPa)
- * :math:`P` : total atmospheric pressure (hPa)
- * :math:`e` : water vapour pressure (hPa)
- * :math:`T` : absolute temperature (K)
+     * :math:`P_d` : dry atmospheric pressure (hPa)
+     * :math:`P` : total atmospheric pressure (hPa)
+     * :math:`e` : water vapour pressure (hPa)
+     * :math:`T` : absolute temperature (K)
 
 Furthermore, in the absence of reliable local data, data on refractivity and refractivity gradients all over the world can be computed using global numerical maps provided in this recommendation.
 
