@@ -4,12 +4,13 @@ from __future__ import division
 from __future__ import print_function
 
 
+import warnings
 import numpy as np
 from astropy import units as u
 from scipy.optimize import fsolve
 from scipy.special import erf as erf
 
-from itur.utils import get_input_type, prepare_quantity
+from itur.utils import get_input_type, prepare_quantity, prepare_output_array, prepare_input_array
 
 
 def Qfunc(z):
@@ -87,6 +88,20 @@ class _ITU1623_1_:
 
     @classmethod
     def fade_duration(self, D_arr, A, el, f, T_tot):
+        if np.any(f < 10) or np.any(f > 50):
+            warnings.warn(
+                RuntimeWarning(
+                    'The method to compute fade duration parameters '
+                    'in recommendation ITU-P 1623-11 is only '
+                    'recommended for frequencies in the 10-50GHz range'))
+
+        if np.any(el < 5) or np.any(el > 60):
+            warnings.warn(
+                RuntimeWarning(
+                    'The method to compute fade duration parameters '
+                    'in recommendation ITU-P 1623-11 is only '
+                    'recommended for elevation angles in the 5-60deg range'))
+
         # Step 1: Calculate the mean duration D0 of the log-normal
         # distribution of the fraction of fading time due to fades of long
         # duration, given that the attenuation is greater than A:
@@ -120,7 +135,7 @@ class _ITU1623_1_:
 
         # Step 7: Calculate the probability of occurrence of fade events
         # duration d longer than D given that attenuation a is greater than A:
-        p = np.zeros(np.shape(D_arr)[0])  # initializes p for indexing ops.
+        p = np.zeros_like(D_arr)  # initializes p for indexing ops.
         Q_ratio_p = (Qfunc(np.log(D_arr / D_2) / sigma) /
                      Qfunc(np.log(D_t / D_2) / sigma))
 
@@ -132,7 +147,7 @@ class _ITU1623_1_:
 
         # Step 8: Calculate the cumulative probability of exceedance, i.e. the
         # total fraction of fade time due to fades of duration d longer than D:
-        F = np.zeros(np.shape(D_arr)[0])
+        F = np.zeros_like(D_arr)
         Q_ratio_F = (Qfunc(np.log(D_arr / D_0) / sigma) /
                      Qfunc(np.log(D_t / D_0) / sigma))  # or divide by Q_2
 
@@ -145,7 +160,7 @@ class _ITU1623_1_:
         # Step 9: Compute N(D,A), The total number of fades of duration d
         # longer than D for a given threshold A.
 
-        # Step 9a. Compute Ntot, using the Ttot(A) parameter
+        # Step 9a. Compute Ntot, using  the Ttot(A) parameter
         N_tot = T_tot * (k / gamma) * ((1 - gamma) / (D_t ** (1 - gamma)))
 
         # Compute number of fades N(D,A)
@@ -267,6 +282,195 @@ def get_version():
     return __model.__version__
 
 
+def fade_duration_probability(D, A, el, f):
+    """Compute the probability of occurrence of fades of duration longer than D.
+
+    Compute the probability of occurrence of fades of duration d longer than
+    D (s), given that the attenuation a is greater than A (dB).
+
+    This probability can be estimated from the ratio of the number of fades
+    of duration longer than D to the total number of fades observed,
+    given that the threshold A is exceeded.
+
+    Parameters
+    ----------
+    D: number, sequence, or numpy.ndarray
+        Event durations, array, (s)
+    A: number
+        Attenuation threshold, scalar, (dB)
+    el: number
+        Elevation angle towards the satellite, deg (5 - 60)
+    f:  number
+        Frequency, GHz (between 10 and 50 GHz)
+
+    Returns
+    -------
+    p: number, sequence, or numpy.ndarray
+        Probability of occurence of fade events of duration d longer than D
+        given a>A, P(d > D|a > A)
+
+
+    References
+    ----------
+    [1] Prediction method of fade dynamics on Earth-space paths:
+    https://www.itu.int/rec/R-REC-P.1623/en
+
+    """
+    type_output = get_input_type(D)
+
+    A = prepare_quantity(A, u.dB / u.s, 'Attenuation threshold')
+    el = prepare_quantity(el, u.deg, 'Elevation angle')
+    f = prepare_quantity(f, u.GHz, 'Frequency')
+
+    val = __model.fade_duration(D, A, el, f, 1)[0]
+    return prepare_output_array(val, type_output) * u.dimensionless_unscaled
+
+
+def fade_duration_cummulative_probability(D, A, el, f):
+    """Compute the cumulative probability of exceedance of fades of duration
+    longer than D.
+
+    Compute the cummulative exceedance probability F(d > D|a > A),
+    the total fraction (between 0 and 1) of fade time due to fades of duration
+    d longer than D (s), given that the attenuation a is greater than A (dB).
+
+    Parameters
+    ----------
+    D: number, sequence, or numpy.ndarray
+        Event durations, array, (s)
+    A: number
+        Attenuation threshold, scalar, (dB)
+    el: number
+        Elevation angle towards the satellite, deg (5 - 60)
+    f:  number
+        Frequency, GHz (between 10 and 50 GHz)
+
+    Returns
+    -------
+
+    F:  number, sequence, or numpy.ndarray
+        Cumulative probability of exceedance, total fraction of fade time
+        due to fades of d > D
+
+    References
+    ----------
+    [1] Prediction method of fade dynamics on Earth-space paths:
+    https://www.itu.int/rec/R-REC-P.1623/en
+
+    """
+    type_output = get_input_type(D)
+
+    A = prepare_quantity(A, u.dB / u.s, 'Attenuation threshold')
+    el = prepare_quantity(el, u.deg, 'Elevation angle')
+    f = prepare_quantity(f, u.GHz, 'Frequency')
+
+    val = __model.fade_duration(D, A, el, f, 1)[1]
+    return prepare_output_array(val, type_output) * u.dimensionless_unscaled
+
+
+def fade_duration_number_fades(D, A, el, f, T_tot):
+    """Compute the number of fades of duration longer than D.
+
+    For a given reference period, the number of fades of duration longer
+    D is estimated by multiplying the probability of occurrence P(d > D|a > A)
+    by the total number of fades exceeding the threshold, Ntot(A).
+
+    Parameters
+    ----------
+    D: number, sequence, or numpy.ndarray
+        Event durations, array, (s)
+    A: number
+        Attenuation threshold, scalar, (dB)
+    el: number
+        Elevation angle towards the satellite, deg (5 - 60)
+    f:  number
+        Frequency, GHz (between 10 and 50 GHz)
+    T_tot: number
+        Total fade time from cumulative distribution (P(A)/100)*Reference time
+        period. T_tot should be obtained from local data. If this long-term
+        statistic is not available, an estimate can be calculated from
+        Recommendation ITU-R P.618. In this case the procedure consists in
+        calculating the CDF of total attenuation, deriving the percentage of
+        time the considered attenuation threshold A is exceeded and then the
+        associated total exceedance time T_tot for the reference period
+        considered.
+
+        For a reference period of a year,
+        T_tot = ((100-availability_in_pctg)/100)*365.25*24*3600   [s]
+
+
+    Returns
+    -------
+    N:  Total number of fades of duration d longer than D, for a given
+        threshold A
+
+    References
+    ----------
+    [1] Prediction method of fade dynamics on Earth-space paths:
+    https://www.itu.int/rec/R-REC-P.1623/en
+
+    """
+    type_output = get_input_type(D)
+    D = prepare_input_array(D)
+    A = prepare_quantity(A, u.dB / u.s, 'Attenuation threshold')
+    el = prepare_quantity(el, u.deg, 'Elevation angle')
+    f = prepare_quantity(f, u.GHz, 'Frequency')
+
+    val = __model.fade_duration(D, A, el, f, T_tot)[2]
+    return prepare_output_array(val, type_output) * u.dimensionless_unscaled
+
+
+def fade_duration_total_exceedance_time(D, A, el, f, T_tot):
+    """Compute the total exceedance time of fades of duration longer than D.
+
+    The total exceedance time due to fade events of duration longer than D is
+    obtained by multiplying the fraction of time F(d > D|a > A) by the total
+    time that the threshold is exceeded, Ttot(A).
+
+    Parameters
+    ----------
+    D: number, sequence, or numpy.ndarray
+        Event durations, array, (s)
+    A: number
+        Attenuation threshold, scalar, (dB)
+    el: number
+        Elevation angle towards the satellite, deg (5 - 60)
+    f:  number
+        Frequency, GHz (between 10 and 50 GHz)
+    T_tot: number
+        Total fade time from cumulative distribution (P(A)/100)*Reference time
+        period. T_tot should be obtained from local data. If this long-term
+        statistic is not available, an estimate can be calculated from
+        Recommendation ITU-R P.618. In this case the procedure consists in
+        calculating the CDF of total attenuation, deriving the percentage of
+        time the considered attenuation threshold A is exceeded and then the
+        associated total exceedance time T_tot for the reference period
+        considered.
+
+        For a reference period of a year,
+        T_tot = ((100-availability_in_pctg)/100)*365.25*24*3600   [s]
+
+    Returns
+    -------
+    T:    Total fading time due to fades of d > D for A threshold.
+
+
+    References
+    ----------
+    [1] Prediction method of fade dynamics on Earth-space paths:
+    https://www.itu.int/rec/R-REC-P.1623/en
+
+    """
+    type_output = get_input_type(D)
+
+    A = prepare_quantity(A, u.dB / u.s, 'Attenuation threshold')
+    el = prepare_quantity(el, u.deg, 'Elevation angle')
+    f = prepare_quantity(f, u.GHz, 'Frequency')
+
+    val = __model.fade_duration(D, A, el, f, T_tot)[3]
+    return prepare_output_array(val, type_output) * u.s
+
+
 def fade_duration(D, A, el, f, T_tot):
     """Compute the probability of occurrence of fades of duration longer than D.
 
@@ -291,8 +495,16 @@ def fade_duration(D, A, el, f, T_tot):
         Frequency, GHz (between 10 and 50 GHz)
     T_tot: number
         Total fade time from cumulative distribution (P(A)/100)*Reference time
-        period.
+        period. T_tot should be obtained from local data. If this long-term
+        statistic is not available, an estimate can be calculated from
+        Recommendation ITU-R P.618. In this case the procedure consists in
+        calculating the CDF of total attenuation, deriving the percentage of
+        time the considered attenuation threshold A is exceeded and then the
+        associated total exceedance time T_tot for the reference period
+        considered.
 
+        For a reference period of a year,
+        T_tot = ((100-availability_in_pctg)/100)*365.25*24*3600   [s]
 
     Returns
     -------
@@ -302,17 +514,7 @@ def fade_duration(D, A, el, f, T_tot):
           fraction of fade time due to fades of d > D
     N:    total number of fades of duration d longer than D, for a given
         threshold A
-    T:    total fading time due to fades of d > D for A
-               threshold
-          Ttot(A) should be obtained from local data. If this long-term
-          statistic is not available, an estimate can be calculated from
-          Recommendation ITU-R P.618. In this case the procedure consists in
-          calculating the CDF of total attenuation, deriving the percentage of
-          time the considered attenuation threshold A is exceeded and then the
-          associated total exceedance time Ttot(A) for the reference period
-          considered.
-          For a reference period of a year,
-          T_tot = ((100-availability_in_pctg)/100)*365.25*24*3600   [s]
+    T:    total fading time due to fades of d > D for A threshold
 
 
     References

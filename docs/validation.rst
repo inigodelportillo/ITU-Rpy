@@ -19,3 +19,4 @@ The links below show the validation results for each of the recommendations:
     validation/itur1510_1
     validation/itur1511_1
     validation/itur1511_2
+    validation/itur1623_1
