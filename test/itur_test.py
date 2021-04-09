@@ -74,6 +74,7 @@ def suite():
     suite.addTest(TestIturUtils('test_distance_haversine'))
     suite.addTest(TestIturUtils('test_prepare_quantity'))
     suite.addTest(TestIturUtils('test_prepare_output_array'))
+    suite.addTest(TestIturUtils('test_regular_lat_lon_grid'))
 
     return suite
 
@@ -217,19 +218,19 @@ class TestIturMainFunctions(test.TestCase):
             lat=self.lat, lon=self.lon, f=self.f, el=self.el, p=self.p,
             D=self.D)
 
+    @test.skipIf(sys.version_info[0] < 3, "Only supported in Python 3+")
     def test_slant_path_attenuation_p_below(self):
-        with warnings.catch_warnings(record=True) as w:
+        with self.assertWarns(RuntimeWarning):
             itur.atmospheric_attenuation_slant_path(
                 lat=self.lat, lon=self.lon, f=self.f, el=self.el, p=1e-4,
                 D=self.D)
-            self.assertEqual(len(w), 2)
 
+    @test.skipIf(sys.version_info[0] < 3, "Only supported in Python 3+")
     def test_slant_path_attenuation_p_above(self):
-        with warnings.catch_warnings(record=True) as w:
+        with self.assertWarns(RuntimeWarning):
             itur.atmospheric_attenuation_slant_path(
                 lat=self.lat, lon=self.lon, f=self.f, el=self.el, p=90,
                 D=self.D)
-            self.assertEqual(len(w), 2)
 
     def test_slant_path_attenuation_without_rain(self):
         itur.atmospheric_attenuation_slant_path(
@@ -364,9 +365,16 @@ class TestIturUtils(test.TestCase):
         val = itur.utils.prepare_output_array(5, type_input=float)
         self.assertEqual(val, 5.0)
 
+        val = itur.utils.prepare_output_array([5, 10], type_input=list)
+        self.assertEqual(val, [5, 10])
+
         # Check values with units
         val = itur.utils.prepare_output_array(5 * itur.u.m, type_input=float)
         self.assertEqual(val, 5.0 * itur.u.m)
+
+        val = itur.utils.prepare_output_array([5, 10] * itur.u.m,
+                                              type_input=list)
+        np.testing.assert_array_equal(val, [5, 10] * itur.u.m)
 
         val = itur.utils.prepare_output_array(out_array * itur.u.m,
                                               type_input=list)
@@ -375,6 +383,10 @@ class TestIturUtils(test.TestCase):
         val = itur.utils.prepare_output_array(out_array * itur.u.m,
                                               type_input=np.ndarray)
         np.testing.assert_array_equal(val, out_array.tolist() * itur.u.m)
+
+    def test_regular_lat_lon_grid(self):
+        itur.utils.regular_lat_lon_grid(lon_start_0=True)
+        itur.utils.regular_lat_lon_grid(lon_start_0=False)
 
 
 class TestFunctionsRecommendation453(test.TestCase):
