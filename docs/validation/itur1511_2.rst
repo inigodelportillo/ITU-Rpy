@@ -1,5 +1,5 @@
-Validation results ITU-R P.1511-2
-=================================
+Validation results for ITU-R P.1511-2
+=====================================
 
 This page contains the validation examples for Recommendation ITU-R P.1511-2: Topography for Earth-to-space propagation modelling.
 

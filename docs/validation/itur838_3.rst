@@ -1,5 +1,5 @@
-Validation results ITU-R P.838-3
-================================
+Validation results for ITU-R P.838-3
+====================================
 
 This page contains the validation examples for Recommendation ITU-R P.838-3: Specific attenuation model for rain for use in prediction methods.
 

@@ -3,7 +3,7 @@ import sys
 import numpy as np
 import pandas as pd
 import os.path as path
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 import unittest as test
 
@@ -101,7 +101,7 @@ def create_ITU_suite():
     suite = ITU_Suite()
 
     # ITU-R P.453 tests (Gaseous attenuation)
-    suite.addTest(ITUR453_14TestCase('test_wet_term_radio_refractivity'))
+    suite.add_test(ITUR453_14TestCase('test_wet_term_radio_refractivity'))
 
     # ITU-R P.618
     suite.add_test(ITUR618_13TestCase('test_rain_attenuation'))
@@ -218,7 +218,7 @@ class ITU_Suite(test.TestSuite):
 
     def __init__(self):
         test.TestSuite.__init__(self)
-        self.test_cases = {}
+        self.test_cases = OrderedDict({})
 
     def add_test(self, test_case):
         self.test_cases[test_case.__class__.__name__] = test_case
@@ -479,7 +479,7 @@ class ITUR618_13TestCase(ITU_TestCase):
         models.itu618.change_version(13)
 
         # Read the test data
-        df = self.read_csv(path.join(test_data, '618/ITURP618-13_A_rain.csv'),
+        df = self.read_csv(path.join(test_data, '618/ITURP618-13_A_sci.csv'),
                            columns=['lat', 'lon', 'f', 'el', 'p', 'D', 'eta',
                                     'A_scin'])
 
