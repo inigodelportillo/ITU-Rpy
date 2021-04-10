@@ -231,5 +231,5 @@ def topographic_altitude(lat, lon):
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
     val = __model.topographic_altitude(lat, lon)
-    val = np.maximum(val, 1e-7)
+    val = np.maximum(val, 1e-9)
     return prepare_output_array(val, type_output) * u.km
