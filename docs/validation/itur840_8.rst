@@ -10,6 +10,43 @@ All test cases were extracted from the
     :depth: 2
 
 
+Function columnar_content_reduced_liquid
+----------------------------------------
+
+The table below contains the results of testing function ``columnar_content_reduced_liquid``.
+The test cases were extracted from spreadsheet ``ITURP840-8_columnar_content_reduced_liquid.csv`` from the
+`ITU Validation examples file (rev 5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`_.
+In addition to the input-arguments, expected result (``ITU Validation``), and
+ITU-Rpy computed result (``ITUR-py Result``), the absolute and relative errors
+are shown. Each test case is color-coded depending on the magnitude of the
+errors (green = pass, errors are negligible, red = fail, relative error is
+above 0.01%).
+
+In addition, the code snippet below shows an example of how to generate the
+first row of the results in the table:
+
+.. code-block:: python
+
+    import itur
+
+    # Define input attributes
+    lat = 3.13  #  (°N)
+    lon = 101.7  # (°E)
+    p = 0.2  # (%)
+
+    # Make call to test-function columnar_content_reduced_liquid
+    itur_val = itur.models.itu840.columnar_content_reduced_liquid(lat=lat, lon=lon, p=p)
+
+    # Compute error with respect to value in ITU example file
+    ITU_example_val = 3.70165196  # (kg/m2)
+    error = ITU_example_val - itur_val.value
+    error_rel = error / ITU_example_val * 100  # (%)
+
+
+.. raw:: html
+    :file: test_columnar_content_reduced_liquid_table.html
+
+
 Function cloud_attenuation
 --------------------------
 
@@ -47,41 +84,4 @@ first row of the results in the table:
 
 .. raw:: html
     :file: test_cloud_attenuation_table.html
-
-
-Function columnar_content_reduced_liquid
-----------------------------------------
-
-The table below contains the results of testing function ``columnar_content_reduced_liquid``.
-The test cases were extracted from spreadsheet ``ITURP840-8_columnar_content_reduced_liquid.csv`` from the
-`ITU Validation examples file (rev 5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`_.
-In addition to the input-arguments, expected result (``ITU Validation``), and
-ITU-Rpy computed result (``ITUR-py Result``), the absolute and relative errors
-are shown. Each test case is color-coded depending on the magnitude of the
-errors (green = pass, errors are negligible, red = fail, relative error is
-above 0.01%).
-
-In addition, the code snippet below shows an example of how to generate the
-first row of the results in the table:
-
-.. code-block:: python
-
-    import itur
-
-    # Define input attributes
-    lat = 3.133  #  (°N)
-    lon = 101.7  # (°E)
-    p = 0.1  # (%)
-
-    # Make call to test-function columnar_content_reduced_liquid
-    itur_val = itur.models.itu840.columnar_content_reduced_liquid(lat=lat, lon=lon, p=p)
-
-    # Compute error with respect to value in ITU example file
-    ITU_example_val = 3.805251208  # (kg/m2)
-    error = ITU_example_val - itur_val.value
-    error_rel = error / ITU_example_val * 100  # (%)
-
-
-.. raw:: html
-    :file: test_columnar_content_reduced_liquid_table.html
 

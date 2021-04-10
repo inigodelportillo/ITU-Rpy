@@ -440,7 +440,6 @@ class _ITU618_13():
         return XPD_p
 
     @classmethod
-
     def scintillation_attenuation_sigma(self, lat, lon, f, el, p, D, eta=0.5,
                                         T=None, H=None, P=None, hL=1000):
         # Step 1: For the value of t, calculate the saturation water vapour
