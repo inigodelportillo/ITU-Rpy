@@ -29,7 +29,8 @@ jobs:
         sudo apt-get install libgeos++-dev libproj-dev proj-data proj-bin 
         pip3 install --upgrade cython numpy pyshp six
         pip3 install shapely --no-binary shapely
-        pip install matplotlib cartopy==0.18.0
+        FORCE_CYTHON=1
+        pip install matplotlib cartopy
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
