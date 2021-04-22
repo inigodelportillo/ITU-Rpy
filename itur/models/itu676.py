@@ -390,8 +390,8 @@ class _ITU676_12_():
             press_n = standard_pressure(h_n).value
             rho_n = standard_water_vapour_density(h_n, rho_0=rho).value
 
-            e = rho * T / 216.7
-            n_n = radio_refractive_index(press_n, e, T).value
+            e_n = rho_n * T_n / 216.7
+            n_n = radio_refractive_index(press_n, e_n, T_n).value
             n_ratio = np.pad(n_n[1:], (0, 1), mode='edge') / n_n
             r_n = 6371 + h_n
 
@@ -700,8 +700,8 @@ class _ITU676_11_():
             press_n = standard_pressure(h_n).value
             rho_n = standard_water_vapour_density(h_n, rho_0=rho).value
 
-            e = rho * T / 216.7
-            n_n = radio_refractive_index(press_n, e, T).value
+            e_n = rho_n * T_n / 216.7
+            n_n = radio_refractive_index(press_n, e_n, T_n).value
             n_ratio = np.pad(n_n[1:], (0, 1), mode='edge') / n_n
             r_n = 6371 + h_n
 
@@ -1040,8 +1040,8 @@ class _ITU676_10_():
             press_n = standard_pressure(h_n).value
             rho_n = standard_water_vapour_density(h_n, rho_0=rho).value
 
-            e = rho * T / 216.7
-            n_n = radio_refractive_index(press_n, e, T).value
+            e_n = rho_n * T_n / 216.7
+            n_n = radio_refractive_index(press_n, e_n, T_n).value
             n_ratio = np.pad(n_n[1:], (0, 1), mode='edge') / n_n
             r_n = 6371 + h_n
 
