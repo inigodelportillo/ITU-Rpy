@@ -406,7 +406,7 @@ class _ITU676_12_():
                 alpha = np.pi - np.arccos(a_cos_arg)
                 gamma = self.gamma_exact(f, press, rho, t)
                 Agas += a * gamma
-                b = np.arcsin(n_r * np.sin(alpha))
+                b = np.arcsin(np.sin(alpha) / n_r)
 
             return Agas
 
@@ -716,7 +716,7 @@ class _ITU676_11_():
                 alpha = np.pi - np.arccos(a_cos_arg)
                 gamma = self.gamma_exact(f, press, rho, t)
                 Agas += a * gamma
-                b = np.arcsin(n_r * np.sin(alpha))
+                b = np.arcsin(np.sin(alpha) / n_r)
 
             return Agas
 
@@ -1056,7 +1056,7 @@ class _ITU676_10_():
                 alpha = np.pi - np.arccos(a_cos_arg)
                 gamma = self.gamma_exact(f, press, rho, t)
                 Agas += a * gamma
-                b = np.arcsin(n_r * np.sin(alpha))
+                b = np.arcsin(np.sin(alpha) / n_r)
 
             return Agas
 
