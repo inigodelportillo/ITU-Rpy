@@ -384,7 +384,7 @@ class _ITU676_12_():
             return (A0 + Aw) / np.sin(np.deg2rad(el))
 
         else:
-            delta_h = 0.0001 * np.exp((np.arange(0, 923)) / 100)
+            delta_h = 0.0001 * np.exp((np.arange(0, 922)) / 100)
             h_n = np.cumsum(delta_h)
             T_n = standard_temperature(h_n).to(u.K).value
             press_n = standard_pressure(h_n).value
@@ -694,7 +694,7 @@ class _ITU676_11_():
             return (A0 + Aw) / np.sin(np.deg2rad(el))
 
         else:
-            delta_h = 0.0001 * np.exp((np.arange(0, 923)) / 100)
+            delta_h = 0.0001 * np.exp((np.arange(0, 922)) / 100)
             h_n = np.cumsum(delta_h)
             T_n = standard_temperature(h_n).to(u.K).value
             press_n = standard_pressure(h_n).value
