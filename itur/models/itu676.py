@@ -385,7 +385,8 @@ class _ITU676_12_():
 
         else:
             delta_h = 0.0001 * np.exp((np.arange(0, 922)) / 100)
-            h_n = np.cumsum(delta_h)
+            h_n = 0.0001 * ((np.exp(np.arange(0, 922) / 100.0) -
+                             1.0) / (np.exp(1.0 / 100.0) - 1.0))
             T_n = standard_temperature(h_n).to(u.K).value
             press_n = standard_pressure(h_n).value
             rho_n = standard_water_vapour_density(h_n, rho_0=rho).value
@@ -695,7 +696,8 @@ class _ITU676_11_():
 
         else:
             delta_h = 0.0001 * np.exp((np.arange(0, 922)) / 100)
-            h_n = np.cumsum(delta_h)
+            h_n = 0.0001 * ((np.exp(np.arange(0, 922) / 100.0) -
+                             1.0) / (np.exp(1.0 / 100.0) - 1.0))
             T_n = standard_temperature(h_n).to(u.K).value
             press_n = standard_pressure(h_n).value
             rho_n = standard_water_vapour_density(h_n, rho_0=rho).value
@@ -1035,7 +1037,8 @@ class _ITU676_10_():
 
         else:
             delta_h = 0.0001 * np.exp((np.arange(1, 923) - 1) / 100)
-            h_n = np.cumsum(delta_h)
+            h_n = 0.0001 * ((np.exp(np.arange(0, 922) / 100.0) -
+                             1.0) / (np.exp(1.0 / 100.0) - 1.0))
             T_n = standard_temperature(h_n).to(u.K).value
             press_n = standard_pressure(h_n).value
             rho_n = standard_water_vapour_density(h_n, rho_0=rho).value
