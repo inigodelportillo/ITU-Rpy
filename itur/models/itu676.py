@@ -381,16 +381,16 @@ class _ITU676_12_():
             return (A0 + Aw) / np.sin(np.deg2rad(el))
 
         else:
-            delta_h = 0.0001 * np.exp((np.arange(0, 922)) / 100)
+            delta_h = 0.0001 * np.exp((np.arange(0, 922)) / 100)             # Eq. 14
             h_n = 0.0001 * ((np.exp(np.arange(0, 922) / 100.0) -
-                             1.0) / (np.exp(1.0 / 100.0) - 1.0))
+                             1.0) / (np.exp(1.0 / 100.0) - 1.0))             # Eq. 15
             T_n = standard_temperature(h_n).to(u.K).value
             press_n = standard_pressure(h_n).value
             rho_n = standard_water_vapour_density(h_n, rho_0=rho).value
 
             e_n = rho_n * T_n / 216.7
             n_n = radio_refractive_index(press_n, e_n, T_n).value
-            n_ratio = np.pad(n_n[1:], (0, 1), mode='edge') / n_n
+            n_ratio = n_n / np.pad(n_n[1:], (0, 1), mode='edge')  
             r_n = 6371 + h_n
 
             b = np.pi / 2 - np.deg2rad(el)
@@ -398,13 +398,13 @@ class _ITU676_12_():
             for t, press, rho, r, delta, n_r in zip(
                     T_n, press_n, rho_n, r_n, delta_h, n_ratio):
                 a = - r * np.cos(b) + 0.5 * np.sqrt(
-                    4 * r**2 * np.cos(b)**2 + 8 * r * delta + 4 * delta**2)
+                    4 * r**2 * np.cos(b)**2 + 8 * r * delta + 4 * delta**2)  # Eq. 17
                 a_cos_arg = np.clip((-a**2 - 2 * r * delta - delta**2) /
                                     (2 * a * r + 2 * a * delta), -1, 1)
-                alpha = np.pi - np.arccos(a_cos_arg)
+                alpha = np.pi - np.arccos(a_cos_arg)                         # Eq. 18a
                 gamma = self.gamma_exact(f, press, rho, t)
-                Agas += a * gamma
-                b = np.arcsin(np.sin(alpha) / n_r)
+                Agas += a * gamma                                            # Eq. 13
+                b = np.arcsin(np.sin(alpha) * n_r)                           # Eq. 19a
 
             return Agas
 
@@ -692,7 +692,7 @@ class _ITU676_11_():
             return (A0 + Aw) / np.sin(np.deg2rad(el))
 
         else:
-            delta_h = 0.0001 * np.exp((np.arange(0, 922)) / 100)
+            delta_h = 0.0001 * np.exp((np.arange(0, 922)) / 100)             # Eq. 21
             h_n = 0.0001 * ((np.exp(np.arange(0, 922) / 100.0) -
                              1.0) / (np.exp(1.0 / 100.0) - 1.0))
             T_n = standard_temperature(h_n).to(u.K).value
@@ -701,7 +701,7 @@ class _ITU676_11_():
 
             e_n = rho_n * T_n / 216.7
             n_n = radio_refractive_index(press_n, e_n, T_n).value
-            n_ratio = np.pad(n_n[1:], (0, 1), mode='edge') / n_n
+            n_ratio = n_n / np.pad(n_n[1:], (0, 1), mode='edge')
             r_n = 6371 + h_n
 
             b = np.pi / 2 - np.deg2rad(el)
@@ -709,13 +709,13 @@ class _ITU676_11_():
             for t, press, rho, r, delta, n_r in zip(
                     T_n, press_n, rho_n, r_n, delta_h, n_ratio):
                 a = - r * np.cos(b) + 0.5 * np.sqrt(
-                    4 * r**2 * np.cos(b)**2 + 8 * r * delta + 4 * delta**2)
+                    4 * r**2 * np.cos(b)**2 + 8 * r * delta + 4 * delta**2)  # Eq. 17
                 a_cos_arg = np.clip((-a**2 - 2 * r * delta - delta**2) /
                                     (2 * a * r + 2 * a * delta), -1, 1)
-                alpha = np.pi - np.arccos(a_cos_arg)
+                alpha = np.pi - np.arccos(a_cos_arg)                         # Eq. 18
                 gamma = self.gamma_exact(f, press, rho, t)
-                Agas += a * gamma
-                b = np.arcsin(np.sin(alpha) / n_r)
+                Agas += a * gamma                                            # Eq. 20
+                b = np.arcsin(np.sin(alpha) * n_r)                           # Eq. 19
 
             return Agas
 
@@ -1033,7 +1033,7 @@ class _ITU676_10_():
             return (A0 + Aw) / np.sin(np.deg2rad(el))
 
         else:
-            delta_h = 0.0001 * np.exp((np.arange(1, 923) - 1) / 100)
+            delta_h = 0.0001 * np.exp((np.arange(0, 922)) / 100)             # Eq. 21
             h_n = 0.0001 * ((np.exp(np.arange(0, 922) / 100.0) -
                              1.0) / (np.exp(1.0 / 100.0) - 1.0))
             T_n = standard_temperature(h_n).to(u.K).value
@@ -1042,7 +1042,7 @@ class _ITU676_10_():
 
             e_n = rho_n * T_n / 216.7
             n_n = radio_refractive_index(press_n, e_n, T_n).value
-            n_ratio = np.pad(n_n[1:], (0, 1), mode='edge') / n_n
+            n_ratio = n_n / np.pad(n_n[1:], (0, 1), mode='edge')
             r_n = 6371 + h_n
 
             b = np.pi / 2 - np.deg2rad(el)
@@ -1050,13 +1050,13 @@ class _ITU676_10_():
             for t, press, rho, r, delta, n_r in zip(
                     T_n, press_n, rho_n, r_n, delta_h, n_ratio):
                 a = - r * np.cos(b) + 0.5 * np.sqrt(
-                    4 * r**2 * np.cos(b)**2 + 8 * r * delta + 4 * delta**2)
+                    4 * r**2 * np.cos(b)**2 + 8 * r * delta + 4 * delta**2)  # Eq. 17
                 a_cos_arg = np.clip((-a**2 - 2 * r * delta - delta**2) /
                                     (2 * a * r + 2 * a * delta), -1, 1)
-                alpha = np.pi - np.arccos(a_cos_arg)
+                alpha = np.pi - np.arccos(a_cos_arg)                         # Eq. 18
                 gamma = self.gamma_exact(f, press, rho, t)
-                Agas += a * gamma
-                b = np.arcsin(np.sin(alpha) / n_r)
+                Agas += a * gamma                                            # Eq. 20
+                b = np.arcsin(np.sin(alpha) * n_r)                           # Eq. 19
 
             return Agas
 
