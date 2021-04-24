@@ -381,14 +381,15 @@ class _ITU676_12_():
             return (A0 + Aw) / np.sin(np.deg2rad(el))
 
         else:
-            delta_h = 0.0001 * np.exp((np.arange(0, 923)) / 100)
-            h_n = np.cumsum(delta_h)
+            delta_h = 0.0001 * np.exp((np.arange(0, 922)) / 100)
+            h_n = 0.0001 * ((np.exp(np.arange(0, 922) / 100.0) -
+                             1.0) / (np.exp(1.0 / 100.0) - 1.0))
             T_n = standard_temperature(h_n).to(u.K).value
             press_n = standard_pressure(h_n).value
             rho_n = standard_water_vapour_density(h_n, rho_0=rho).value
 
-            e = rho * T / 216.7
-            n_n = radio_refractive_index(press_n, e, T).value
+            e_n = rho_n * T_n / 216.7
+            n_n = radio_refractive_index(press_n, e_n, T_n).value
             n_ratio = np.pad(n_n[1:], (0, 1), mode='edge') / n_n
             r_n = 6371 + h_n
 
@@ -403,7 +404,7 @@ class _ITU676_12_():
                 alpha = np.pi - np.arccos(a_cos_arg)
                 gamma = self.gamma_exact(f, press, rho, t)
                 Agas += a * gamma
-                b = np.arcsin(n_r * np.sin(alpha))
+                b = np.arcsin(np.sin(alpha) / n_r)
 
             return Agas
 
@@ -691,14 +692,15 @@ class _ITU676_11_():
             return (A0 + Aw) / np.sin(np.deg2rad(el))
 
         else:
-            delta_h = 0.0001 * np.exp((np.arange(0, 923)) / 100)
-            h_n = np.cumsum(delta_h)
+            delta_h = 0.0001 * np.exp((np.arange(0, 922)) / 100)
+            h_n = 0.0001 * ((np.exp(np.arange(0, 922) / 100.0) -
+                             1.0) / (np.exp(1.0 / 100.0) - 1.0))
             T_n = standard_temperature(h_n).to(u.K).value
             press_n = standard_pressure(h_n).value
             rho_n = standard_water_vapour_density(h_n, rho_0=rho).value
 
-            e = rho * T / 216.7
-            n_n = radio_refractive_index(press_n, e, T).value
+            e_n = rho_n * T_n / 216.7
+            n_n = radio_refractive_index(press_n, e_n, T_n).value
             n_ratio = np.pad(n_n[1:], (0, 1), mode='edge') / n_n
             r_n = 6371 + h_n
 
@@ -713,7 +715,7 @@ class _ITU676_11_():
                 alpha = np.pi - np.arccos(a_cos_arg)
                 gamma = self.gamma_exact(f, press, rho, t)
                 Agas += a * gamma
-                b = np.arcsin(n_r * np.sin(alpha))
+                b = np.arcsin(np.sin(alpha) / n_r)
 
             return Agas
 
@@ -1032,13 +1034,14 @@ class _ITU676_10_():
 
         else:
             delta_h = 0.0001 * np.exp((np.arange(1, 923) - 1) / 100)
-            h_n = np.cumsum(delta_h)
+            h_n = 0.0001 * ((np.exp(np.arange(0, 922) / 100.0) -
+                             1.0) / (np.exp(1.0 / 100.0) - 1.0))
             T_n = standard_temperature(h_n).to(u.K).value
             press_n = standard_pressure(h_n).value
             rho_n = standard_water_vapour_density(h_n, rho_0=rho).value
 
-            e = rho * T / 216.7
-            n_n = radio_refractive_index(press_n, e, T).value
+            e_n = rho_n * T_n / 216.7
+            n_n = radio_refractive_index(press_n, e_n, T_n).value
             n_ratio = np.pad(n_n[1:], (0, 1), mode='edge') / n_n
             r_n = 6371 + h_n
 
@@ -1053,7 +1056,7 @@ class _ITU676_10_():
                 alpha = np.pi - np.arccos(a_cos_arg)
                 gamma = self.gamma_exact(f, press, rho, t)
                 Agas += a * gamma
-                b = np.arcsin(n_r * np.sin(alpha))
+                b = np.arcsin(np.sin(alpha) / n_r)
 
             return Agas
 
