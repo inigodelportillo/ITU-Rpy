@@ -435,8 +435,8 @@ class _ITU618_13():
             # polarization tilt angle can be scaled to another frequency and
             # polarization tilt angle using the semi-empirical formula:
             XPD_p = XPD_p - 20 * np.log10(
-              f_orig * np.sqrt(1 - 0.484 * (1 - np.cos(np.deg2rad(4 * tau)))) /
-              (f * np.sqrt(1 - 0.484 * (1 - np.cos(np.deg2rad(4 * tau))))))
+              f_orig * np.sqrt(1 - 0.484 * (1 + np.cos(np.deg2rad(4 * tau)))) /
+              (f * np.sqrt(1 - 0.484 * (1 + np.cos(np.deg2rad(4 * tau))))))
         return XPD_p
 
     @classmethod
