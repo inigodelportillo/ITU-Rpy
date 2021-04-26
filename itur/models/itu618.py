@@ -339,7 +339,7 @@ class _ITU618_13():
             lat1, lon1, f, el1, hs1, P_1 * 100, tau)
 
         sigma_lna2, m_lna2 = self.fit_rain_attenuation_to_lognormal(
-            lat2, lon2, f, el2, hs1, P_2 * 100, tau)
+            lat2, lon2, f, el2, hs2, P_2 * 100, tau)
 
         rho_a = 0.94 * np.exp(-d / 30) + 0.06 * np.exp(-(d / 500)**2)
         lim_1 = (np.log(a1) - m_lna1) / sigma_lna1
@@ -435,8 +435,8 @@ class _ITU618_13():
             # polarization tilt angle can be scaled to another frequency and
             # polarization tilt angle using the semi-empirical formula:
             XPD_p = XPD_p - 20 * np.log10(
-              f_orig * np.sqrt(1 - 0.484 * (1 - np.cos(np.deg2rad(4 * tau)))) /
-              (f * np.sqrt(1 - 0.484 * (1 - np.cos(np.deg2rad(4 * tau))))))
+              f_orig * np.sqrt(1 - 0.484 * (1 + np.cos(np.deg2rad(4 * tau)))) /
+              (f * np.sqrt(1 - 0.484 * (1 + np.cos(np.deg2rad(4 * tau))))))
         return XPD_p
 
     @classmethod
