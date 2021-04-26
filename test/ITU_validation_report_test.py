@@ -50,7 +50,7 @@ first row of the results in the table:
 html_header = """
        <html>
          <head>
-             <title>Validation results for {0}</title>
+             <title>Validation results {0}</title>
              <style>
                    table {{
                        border-collapse: collapse;
@@ -144,10 +144,16 @@ def create_ITU_suite():
     suite.add_test(ITUR1511_1TestCase('test_topographic_altitude'))
     suite.add_test(ITUR1511_2TestCase('test_topographic_altitude'))
 
+    # ITU-R P.1623
+    suite.add_test(ITUR1623_1TestCase('test_fade_duration_cummulative_probability'))
+    suite.add_test(ITUR1623_1TestCase('test_fade_duration_number_fades'))
+    suite.add_test(ITUR1623_1TestCase('test_fade_duration_probability'))
+    suite.add_test(ITUR1623_1TestCase('test_fade_duration_total_exceedance_time'))
+
     return suite
 
-# Format HTML code
 
+# Format HTML code
 def formatter_fcn(s):
     return '\t\t\t<td style="text-align:left">' + str(s)
 
@@ -353,7 +359,7 @@ class ITU_TestCase(test.TestCase):
     def produce_rst_report(self):
 
         ret = []
-        title = "Validation results for {0}".format(self.itu_name)
+        title = "Validation results {0}".format(self.itu_name)
         ret.append(title)
         ret.append('=' * len(title))
         ret.append('')
@@ -867,6 +873,78 @@ class ITUR1511_2TestCase(ITU_TestCase):
                      test_fcn='models.itu1511.topographic_altitude',
                      df=df, attributes=['lat', 'lon'],
                      result_value='hs',
+                     n_places=5)
+
+
+class ITUR1623_1TestCase(ITU_TestCase):
+
+    itu_name = 'ITU-R P.1623-1'
+    itu_description = 'Prediction method of fade dynamics on Earth-space paths'
+
+
+    def test_fade_duration_probability(self):
+        # Set the version to the
+        models.itu1623.change_version(1)
+
+        path_file = '1623/ITURP1623-1_fade_duration_params.csv'
+        # Read the test data
+        df = self.read_csv(path.join(test_data, path_file),
+                           columns=['D', 'A', 'el', 'f', 'P'])
+
+        # Run test and generate the report
+        self.__run__('test_fade_duration_probability',
+                     test_fcn='models.itu1623.fade_duration_probability',
+                     df=df, attributes=['D', 'A', 'el', 'f'],
+                     result_value='P',
+                     n_places=5)
+
+    def test_fade_duration_cummulative_probability(self):
+        # Set the version to the
+        models.itu1623.change_version(1)
+
+        path_file = '1623/ITURP1623-1_fade_duration_params.csv'
+        # Read the test data
+        df = self.read_csv(path.join(test_data, path_file),
+                           columns=['D', 'A', 'el', 'f', 'F'])
+
+        # Run test and generate the report
+        self.__run__('test_fade_duration_cummulative_probability',
+                     test_fcn='models.itu1623.fade_duration_cummulative_probability',
+                     df=df, attributes=['D', 'A', 'el', 'f'],
+                     result_value='F',
+                     n_places=5)
+
+
+    def test_fade_duration_total_exceedance_time(self):
+        # Set the version to the
+        models.itu1623.change_version(1)
+
+        path_file = '1623/ITURP1623-1_fade_duration_params.csv'
+        # Read the test data
+        df = self.read_csv(path.join(test_data, path_file),
+                           columns=['D', 'A', 'el', 'f', 'T_tot', 'T'])
+
+        # Run test and generate the report
+        self.__run__('test_fade_duration_total_exceedance_time',
+                     test_fcn='models.itu1623.fade_duration_total_exceedance_time',
+                     df=df, attributes=['D', 'A', 'el', 'f', 'T_tot'],
+                     result_value='T',
+                     n_places=5)
+
+    def test_fade_duration_number_fades(self):
+        # Set the version to the
+        models.itu1623.change_version(1)
+
+        path_file = '1623/ITURP1623-1_number_of_fades.csv'
+        # Read the test data
+        df = self.read_csv(path.join(test_data, path_file),
+                           columns=['D', 'A', 'el', 'f', 'T_tot', 'N'])
+
+        # Run test and generate the report
+        self.__run__('test_fade_duration_number_fades',
+                     test_fcn='models.itu1623.fade_duration_number_fades',
+                     df=df, attributes=['D', 'A', 'el', 'f', 'T_tot'],
+                     result_value='N',
                      n_places=5)
 
 
