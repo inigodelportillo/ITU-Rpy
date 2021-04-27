@@ -39,7 +39,6 @@ import numpy as np
 try:
     import cartopy.crs as ccrs
     import cartopy.feature as cpf
-    import cartopy.mpl.gridliner as cmpl
     plotting_installed = True
 except BaseException:
     plotting_installed = False

@@ -7,7 +7,6 @@ from __future__ import print_function
 import numpy as np
 from astropy import units as u
 
-from itur import utils
 from itur.models.itu1144 import (bilinear_2D_interpolator,
                                  bicubic_2D_interpolator)
 from itur.utils import (prepare_input_array, prepare_output_array,

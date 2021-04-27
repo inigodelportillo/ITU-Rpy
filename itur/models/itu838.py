@@ -5,7 +5,7 @@ from __future__ import print_function
 
 import numpy as np
 from astropy import units as u
-from itur.utils import prepare_quantity, get_input_type
+from itur.utils import prepare_quantity
 
 
 class __ITU838__():

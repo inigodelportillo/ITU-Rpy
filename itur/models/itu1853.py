@@ -18,7 +18,7 @@ from itur.models.itu837 import rainfall_probability
 from itur.models.itu676 import zenit_water_vapour_attenuation
 from itur.models.itu1510 import surface_mean_temperature
 from itur.models.itu1511 import topographic_altitude
-from itur.utils import prepare_quantity, get_input_type
+from itur.utils import prepare_quantity
 
 from astropy import units as u
 

@@ -9,7 +9,6 @@ import scipy.special
 import scipy.integrate
 from astropy import units as u
 
-from itur import utils
 from itur.models.itu453 import water_vapour_pressure,\
     wet_term_radio_refractivity, map_wet_term_radio_refractivity
 from itur.models.itu837 import rainfall_rate, rainfall_probability

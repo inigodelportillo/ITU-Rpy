@@ -7892,7 +7892,6 @@ class ITUR1511_2TestCase(test.TestCase):
 
 
 if __name__ == '__main__':
-    pass
     suite = suite()
     print('Validation tests for the ITU-R models')
     print('------------------------')

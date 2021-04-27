@@ -9,7 +9,6 @@ from astropy import units as u
 from scipy.optimize import bisect
 import scipy.stats as stats
 
-from itur import utils
 from itur.models.itu1510 import surface_month_mean_temperature
 from itur.models.itu1144 import bilinear_2D_interpolator
 from itur.utils import (prepare_input_array, prepare_output_array,
