@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import matplotlib
+matplotlib.use('agg')
+
 import itur.models.itu835 as itu835
 import itur.models.itu676 as itu676
 import itur
@@ -6,8 +9,6 @@ import unittest as test
 import numpy as np
 import sys
 import matplotlib.pyplot as plt
-import matplotlib
-matplotlib.use('agg')
 
 
 def suite():
