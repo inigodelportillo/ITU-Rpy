@@ -17,7 +17,7 @@ from itur.utils import (dataset_dir, prepare_input_array, prepare_output_array,
 def __fcn_columnar_content_reduced_liquid__(Lred, lat, lon, p):
         available_p = np.array(
             [0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0, 30.0, 50.0,
-             60.0, 70.0, 80.0, 90.0, 95.0])
+             60.0, 70.0, 80.0, 90.0, 95.0, 99.0])
 
         if p in available_p:
             p_below = p_above = p
@@ -126,7 +126,7 @@ class _ITU840_8_():
     def Lred(self, lat, lon, p):
         if not self._Lred:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
-                  50, 60, 70, 80, 90, 95]
+                  50, 60, 70, 80, 90, 95, 99]
             d_dir = os.path.join(dataset_dir, '840/v7_lred_%s.npz')
             for p_load in ps:
                 self._Lred[float(p_load)] = load_data_interpolator(
@@ -158,8 +158,8 @@ class _ITU840_8_():
     def Pclw(self, lat, lon):
         if not self._Pclw:
             self._Pclw = load_data_interpolator(
-                '840/v6_lat.npz', '840/v6_lon.npz',
-                '840/v6_pclw.npz', bilinear_2D_interpolator, flip_ud=False)
+                '840/v7_lat.npz', '840/v7_lon.npz',
+                '840/v7_pclw.npz', bilinear_2D_interpolator, flip_ud=False)
 
         return self._Pclw(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
@@ -194,7 +194,7 @@ class _ITU840_7_():
     def Lred(self, lat, lon, p):
         if not self._Lred:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
-                  50, 60, 70, 80, 90, 95]
+                  50, 60, 70, 80, 90, 95, 99]
             d_dir = os.path.join(dataset_dir, '840/v7_lred_%s.npz')
             for p_load in ps:
                 self._Lred[float(p_load)] = load_data_interpolator(
@@ -226,8 +226,8 @@ class _ITU840_7_():
     def Pclw(self, lat, lon):
         if not self._Pclw:
             self._Pclw = load_data_interpolator(
-                '840/v6_lat.npz', '840/v6_lon.npz',
-                '840/v6_pclw.npz', bilinear_2D_interpolator, flip_ud=False)
+                '840/v7_lat.npz', '840/v7_lon.npz',
+                '840/v7_pclw.npz', bilinear_2D_interpolator, flip_ud=False)
 
         return self._Pclw(
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
@@ -263,7 +263,7 @@ class _ITU840_6_():
     def Lred(self, lat, lon, p):
         if not self._Lred:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
-                  50, 60, 70, 80, 90, 95]
+                  50, 60, 70, 80, 90, 95, 99]
             d_dir = os.path.join(dataset_dir, '840/v6_lred_%s.npz')
             for p_load in ps:
                 self._Lred[float(p_load)] = load_data_interpolator(
@@ -357,7 +357,7 @@ class _ITU840_5_():
     def Lred(self, lat, lon, p):
         if not self._Lred:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
-                  50, 60, 70, 80, 90, 95]
+                  50, 60, 70, 80, 90, 95, 99]
             d_dir = os.path.join(dataset_dir, '840/v4_esawred_%s.npz')
             for p_load in ps:
                 self._Lred[float(p_load)] = load_data_interpolator(
@@ -428,7 +428,7 @@ class _ITU840_4_():
     def Lred(self, lat, lon, p):
         if not self._Lred:
             ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
-                  50, 60, 70, 80, 90, 95]
+                  50, 60, 70, 80, 90, 95, 99]
             d_dir = os.path.join(dataset_dir, '840/v4_esawred_%s.npz')
             for p_load in ps:
                 self._Lred[float(p_load)] = load_data_interpolator(
