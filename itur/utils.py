@@ -280,12 +280,12 @@ def compute_distance_earth_to_earth(lat_p, lon_p, lat_grid, lon_grid,
         (type(lat_p) in __NUMERIC_TYPES__) or
         (type(lat_grid) in __NUMERIC_TYPES__) or
         (len(lat_grid) < 10000) or
-        (isinstance(lat_grid, np.ndarray) and lat_grid.size < 1e5)):
-            return compute_distance_earth_to_earth_wgs84(
-                    lat_p, lon_p, lat_grid, lon_grid)
+            (isinstance(lat_grid, np.ndarray) and lat_grid.size < 1e5)):
+        return compute_distance_earth_to_earth_wgs84(
+            lat_p, lon_p, lat_grid, lon_grid)
     else:
         return compute_distance_earth_to_earth_haversine(
-                lat_p, lon_p, lat_grid, lon_grid)
+            lat_p, lon_p, lat_grid, lon_grid)
 
 
 def compute_distance_earth_to_earth_wgs84(lat_p, lon_p, lat_grid, lon_grid):

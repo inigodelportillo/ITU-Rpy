@@ -212,9 +212,9 @@ def _bicubic_2D_interpolator_reg(lats_o, lons_o, values):
 
         # Make sure that we do not hit the limit cases
         R = ((np.searchsorted(lat_row, lat, 'right') - 1) +
-             (np.searchsorted(lat_row, lat, 'left') - 1))//2
+             (np.searchsorted(lat_row, lat, 'left') - 1)) // 2
         C = ((np.searchsorted(lon_row, lon, 'right') - 1) +
-             (np.searchsorted(lon_row, lon, 'right') - 1))//2
+             (np.searchsorted(lon_row, lon, 'right') - 1)) // 2
 
         diff_lats = np.diff(lat_row)[0]
         diff_lons = np.diff(lon_row)[0]

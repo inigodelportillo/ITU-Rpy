@@ -13,7 +13,6 @@ from itur.utils import (prepare_input_array, prepare_output_array,
                         load_data_interpolator, get_input_type)
 
 
-
 class __ITU1510__():
 
     """Annual mean surface temperature

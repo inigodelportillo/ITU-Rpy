@@ -15,30 +15,30 @@ from itur.utils import (dataset_dir, prepare_input_array, prepare_output_array,
 
 
 def __fcn_columnar_content_reduced_liquid__(Lred, lat, lon, p):
-        available_p = np.array(
-            [0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0, 30.0, 50.0,
-             60.0, 70.0, 80.0, 90.0, 95.0, 99.0])
+    available_p = np.array(
+        [0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0, 30.0, 50.0,
+         60.0, 70.0, 80.0, 90.0, 95.0, 99.0])
 
-        if p in available_p:
-            p_below = p_above = p
-            pExact = True
-        else:
-            pExact = False
-            idx = available_p.searchsorted(p, side='right') - 1
-            idx = np.clip(idx, 0, len(available_p))
+    if p in available_p:
+        p_below = p_above = p
+        pExact = True
+    else:
+        pExact = False
+        idx = available_p.searchsorted(p, side='right') - 1
+        idx = np.clip(idx, 0, len(available_p))
 
-            p_below = available_p[idx]
-            p_above = available_p[idx + 1]
+        p_below = available_p[idx]
+        p_above = available_p[idx + 1]
 
-        # Compute the values of Lred_a
-        Lred_a = Lred(lat, lon, p_above)
-        if not pExact:
-            Lred_b = Lred(lat, lon, p_below)
-            Lred = Lred_b + (Lred_a - Lred_b) * (np.log(p) - np.log(p_below)) \
-                / (np.log(p_above) - np.log(p_below))
-            return Lred
-        else:
-            return Lred_a
+    # Compute the values of Lred_a
+    Lred_a = Lred(lat, lon, p_above)
+    if not pExact:
+        Lred_b = Lred(lat, lon, p_below)
+        Lred = Lred_b + (Lred_a - Lred_b) * (np.log(p) - np.log(p_below)) \
+            / (np.log(p_above) - np.log(p_below))
+        return Lred
+    else:
+        return Lred_a
 
 
 class __ITU840__():
@@ -130,9 +130,9 @@ class _ITU840_8_():
             d_dir = os.path.join(dataset_dir, '840/v7_lred_%s.npz')
             for p_load in ps:
                 self._Lred[float(p_load)] = load_data_interpolator(
-                       '840/v7_lat.npz', '840/v7_lon.npz',
-                       d_dir % (str(p_load).replace('.', '')),
-                       bilinear_2D_interpolator, flip_ud=False)
+                    '840/v7_lat.npz', '840/v7_lon.npz',
+                    d_dir % (str(p_load).replace('.', '')),
+                    bilinear_2D_interpolator, flip_ud=False)
 
         return self._Lred[float(p)](
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
@@ -198,9 +198,9 @@ class _ITU840_7_():
             d_dir = os.path.join(dataset_dir, '840/v7_lred_%s.npz')
             for p_load in ps:
                 self._Lred[float(p_load)] = load_data_interpolator(
-                       '840/v7_lat.npz', '840/v7_lon.npz',
-                       d_dir % (str(p_load).replace('.', '')),
-                       bilinear_2D_interpolator, flip_ud=False)
+                    '840/v7_lat.npz', '840/v7_lon.npz',
+                    d_dir % (str(p_load).replace('.', '')),
+                    bilinear_2D_interpolator, flip_ud=False)
 
         return self._Lred[float(p)](
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
@@ -239,7 +239,7 @@ class _ITU840_7_():
         return _ITU840_6_.specific_attenuation_coefficients(f, T)
 
     def lognormal_approximation_coefficient(self, lat, lon):
-        #TODO: This is the wrong method, Need to update
+        # TODO: This is the wrong method, Need to update
         m = self.M(lat, lon)
         sigma = self.sigma(lat, lon)
         Pclw = self.Pclw(lat, lon)
@@ -267,9 +267,9 @@ class _ITU840_6_():
             d_dir = os.path.join(dataset_dir, '840/v6_lred_%s.npz')
             for p_load in ps:
                 self._Lred[float(p_load)] = load_data_interpolator(
-                       '840/v6_lat.npz', '840/v6_lon.npz',
-                       d_dir % (str(p_load).replace('.', '')),
-                       bilinear_2D_interpolator, flip_ud=False)
+                    '840/v6_lat.npz', '840/v6_lon.npz',
+                    d_dir % (str(p_load).replace('.', '')),
+                    bilinear_2D_interpolator, flip_ud=False)
 
         return self._Lred[float(p)](
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
@@ -361,9 +361,9 @@ class _ITU840_5_():
             d_dir = os.path.join(dataset_dir, '840/v4_esawred_%s.npz')
             for p_load in ps:
                 self._Lred[float(p_load)] = load_data_interpolator(
-                       '840/v4_lat.npz', '840/v4_lon.npz',
-                       d_dir % (str(p_load).replace('.', '')),
-                       bilinear_2D_interpolator, flip_ud=False)
+                    '840/v4_lat.npz', '840/v4_lon.npz',
+                    d_dir % (str(p_load).replace('.', '')),
+                    bilinear_2D_interpolator, flip_ud=False)
 
         return self._Lred[float(p)](
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
@@ -432,9 +432,9 @@ class _ITU840_4_():
             d_dir = os.path.join(dataset_dir, '840/v4_esawred_%s.npz')
             for p_load in ps:
                 self._Lred[float(p_load)] = load_data_interpolator(
-                       '840/v4_lat.npz', '840/v4_lon.npz',
-                       d_dir % (str(p_load).replace('.', '')),
-                       bilinear_2D_interpolator, flip_ud=False)
+                    '840/v4_lat.npz', '840/v4_lon.npz',
+                    d_dir % (str(p_load).replace('.', '')),
+                    bilinear_2D_interpolator, flip_ud=False)
 
         return self._Lred[float(p)](
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
@@ -683,8 +683,8 @@ def cloud_attenuation(lat, lon, el, f, p, Lred=None):
     el = prepare_quantity(el, u.deg, 'Elevation angle')
     f = prepare_quantity(f, u.GHz, 'Frequency')
     Lred = prepare_quantity(
-      Lred, u.kg / u.m**2,
-      'Total columnar contents of reduced cloud liquid water.')
+        Lred, u.kg / u.m**2,
+        'Total columnar contents of reduced cloud liquid water.')
     val = __model.cloud_attenuation(lat, lon, el, f, p, Lred)
     return prepare_output_array(val, type_output) * u.dB
 
@@ -696,7 +696,7 @@ def lognormal_approximation_coefficient(lat, lon):
     The annual statistics of the total columnar content of reduced cloud
     liquid water content can be approximated by a log-normal distribution.
     This function computes the coefficients for the mean, :math:`m`,
-    standard deviation, :math:`\sigma`, and probability of non-zero reduced
+    standard deviation, :math:`\\sigma`, and probability of non-zero reduced
     total columnar content of cloud liquid water, :math:`Pclw`, for such the
     log-normal distribution.
 
