@@ -523,7 +523,7 @@ def fade_duration(D, A, el, f, T_tot):
     https://www.itu.int/rec/R-REC-P.1623/en
 
     """
-    type_output = get_input_type(D)
+    get_input_type(D)
 
     A = prepare_quantity(A, u.dB / u.s, 'Attenuation threshold')
     el = prepare_quantity(el, u.deg, 'Elevation angle')
@@ -595,7 +595,7 @@ def fade_slope(z, A, f_B, delta_t):
     [1] Prediction method of fade dynamics on Earth-space paths:
     https://www.itu.int/rec/R-REC-P.1623/en
     """
-    type_output = get_input_type(z)
+    get_input_type(z)
     z = prepare_quantity(z, u.dB / u.s, 'Fade slope values')
     A = prepare_quantity(A, u.dB / u.s, 'Attenuation threshold')
     delta_t = prepare_quantity(delta_t, u.s, 'Time interval')
@@ -660,7 +660,7 @@ def fade_depth(N_target, D_target, A, PofA, el, f):
     [1] Prediction method of fade dynamics on Earth-space paths:
     https://www.itu.int/rec/R-REC-P.1623/en
     """
-    type_output = get_input_type(A)
+    get_input_type(A)
     el = prepare_quantity(el, u.deg, 'Elevation angle')
     f = prepare_quantity(f, u.GHz, 'Frequency')
 

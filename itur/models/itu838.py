@@ -5,7 +5,7 @@ from __future__ import print_function
 
 import numpy as np
 from astropy import units as u
-from itur.utils import prepare_quantity, get_input_type
+from itur.utils import prepare_quantity
 
 
 class __ITU838__():
@@ -238,7 +238,7 @@ class _ITU838_0_():
     @staticmethod
     def rain_specific_attenuation_coefficients(*args, **kwargs):
         return _ITU838_1_.rain_specific_attenuation_coefficients(*args,
-                                                                **kwargs)
+                                                                 **kwargs)
 
 
 __model = __ITU838__()
@@ -283,7 +283,7 @@ def rain_specific_attenuation_coefficients(f, el, tau):
     """Compute the values for the coefficients k and α.
 
     A method to compute the values for the coefficients k and α to compute
-    the rain specific attenuation :math:`\gamma_R` (dB/km) (dB/km)
+    the rain specific attenuation :math:`\\gamma_R` (dB/km) (dB/km)
 
 
     Parameters

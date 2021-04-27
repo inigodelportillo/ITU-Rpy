@@ -18,7 +18,7 @@ from itur.models.itu837 import rainfall_probability
 from itur.models.itu676 import zenit_water_vapour_attenuation
 from itur.models.itu1510 import surface_mean_temperature
 from itur.models.itu1511 import topographic_altitude
-from itur.utils import prepare_quantity, get_input_type
+from itur.utils import prepare_quantity
 
 from astropy import units as u
 
@@ -55,7 +55,7 @@ class __ITU1853():
     def rain_attenuation_synthesis(self, lat, lon, f, el, hs, Ns,
                                    Ts=1, tau=45, n=None):
         return self.instance.rain_attenuation_synthesis(
-                lat, lon, f, el, hs, Ns, Ts=Ts, tau=tau, n=n)
+            lat, lon, f, el, hs, Ns, Ts=Ts, tau=tau, n=n)
 
     def total_attenuation_synthesis(self, lat, lon, f, el, p, D, Ns, Ts=1,
                                     tau=45, hs=None, eta=0.65, rho=None,
@@ -67,15 +67,15 @@ class __ITU1853():
 
     def scintillation_attenuation_synthesis(self, Ns, f_c=0.1, Ts=1):
         return self.instance.scintillation_attenuation_synthesis(
-                Ns, f_c=f_c, Ts=Ts)
+            Ns, f_c=f_c, Ts=Ts)
 
     def cloud_liquid_water_synthesis(self, lat, lon, Ns, Ts=1, n=None):
         return self.instance.cloud_liquid_water_synthesis(
-                lat, lon, Ns, Ts=Ts, n=n)
+            lat, lon, Ns, Ts=Ts, n=n)
 
     def integrated_water_vapour_synthesis(self, lat, lon, Ns, Ts=1, n=None):
         return self.instance.integrated_water_vapour_synthesis(
-                lat, lon, Ns, Ts=Ts, n=n)
+            lat, lon, Ns, Ts=Ts, n=n)
 
 
 class _ITU1853_1():
@@ -143,7 +143,7 @@ class _ITU1853_1():
 
         # D6: Discard the first 200 000 samples from the synthesized
         if discard_samples:
-            A_rain = A_rain[np.ceil(200000/Ts).astype(int):]
+            A_rain = A_rain[np.ceil(200000 / Ts).astype(int):]
 
         return A_rain.flatten()
 
@@ -213,7 +213,7 @@ class _ITU1853_1():
 
         # D6: Discard the first 500 000 samples from the synthesized
         if discard_samples:
-            L = L[np.ceil(500000/Ts).astype(int):]
+            L = L[np.ceil(500000 / Ts).astype(int):]
 
         return L.flatten()
 
@@ -256,7 +256,7 @@ class _ITU1853_1():
         V = lambd * (- np.log10(stats.norm.sf(G_v)))**(1 / kappa)
         # Step C5: Discard the first 5 000 000 samples from the synthesized
         if discard_samples:
-            V = V[np.ceil(5000000/Ts).astype(int):]
+            V = V[np.ceil(5000000 / Ts).astype(int):]
 
         return V.flatten()
 
@@ -305,7 +305,7 @@ class _ITU1853_1():
         # Step C9: Identify time stamps where A_R > 0 L > 1
         idx = np.where(np.logical_and(Ar > 0, L > 1))[0]
         idx_no = np.where(np.logical_not(
-                    np.logical_and(Ar > 0, L > 1)))[0]
+            np.logical_and(Ar > 0, L > 1)))[0]
 
         # Step C10: Discard the previous values of Ac and re-compute them by
         # linear interpolation vs. time starting from the non-discarded cloud
@@ -612,7 +612,7 @@ def cloud_liquid_water_synthesis(lat, lon, Ns, Ts=1, n=None):
 
 
 def total_attenuation_synthesis(lat, lon, f, el, p, D, Ns, Ts=1, hs=None,
-                                tau=45, eta=0.65,  rho=None, H=None, P=None,
+                                tau=45, eta=0.65, rho=None, H=None, P=None,
                                 hL=1000, return_contributions=False):
     """ The time series synthesis method generates a time series that
     reproduces the spectral characteristics, rate of change and duration
@@ -695,8 +695,8 @@ def total_attenuation_synthesis(lat, lon, f, el, p, D, Ns, Ts=1, hs=None,
     hL = prepare_quantity(hL, u.m, 'Height of the turbulent layer')
 
     val = __model.total_attenuation_synthesis(
-            lat, lon, f, el, p, D, Ns, Ts=Ts, tau=tau, hs=hs, eta=eta, rho=rho,
-            H=H, P=P, hL=hL, return_contributions=return_contributions)
+        lat, lon, f, el, p, D, Ns, Ts=Ts, tau=tau, hs=hs, eta=eta, rho=rho,
+        H=H, P=P, hL=hL, return_contributions=return_contributions)
     if return_contributions:
         return tuple([v * u.dB for v in val])
     else:

@@ -101,7 +101,6 @@ class _ITU530_17_():
         self.month = 12
         self.link = 'https://www.itu.int/rec/R-REC-P.530-17-201712-S/en'
 
-
     @classmethod
     def s_a(self, lat, lon):
         """
@@ -309,7 +308,7 @@ class _ITU530_17_():
         C3 = 0.139 * C0 + 0.043 * (1 - C0)                      # Eq. 35c [-]
 
         def func_bisect(p):
-            return A001 * C1 * p ** (- (C2 + C3 * np.log10(p)))  - Ap
+            return A001 * C1 * p ** (- (C2 + C3 * np.log10(p))) - Ap
 
         return bisect(func_bisect, 0.000001, 100)
 

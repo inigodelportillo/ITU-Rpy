@@ -146,8 +146,10 @@ class __ITU676__():
         fcn = np.vectorize(self.instance.gaseous_attenuation_terrestrial_path)
         return fcn(r, f, el, rho, P, T, mode)
 
-    def gaseous_attenuation_inclined_path(self, f, el, rho, P, T, h1, h2, mode):
-        # Abstract method to compute the gaseous attenuation over an inclined path
+    def gaseous_attenuation_inclined_path(
+            self, f, el, rho, P, T, h1, h2, mode):
+        # Abstract method to compute the gaseous attenuation over an inclined
+        # path
         fcn = np.vectorize(self.instance.gaseous_attenuation_inclined_path)
         return fcn(f, el, rho, P, T, h1, h2, mode)
 
@@ -256,18 +258,18 @@ class _ITU676_12_():
 
     def gammaw_approx(self, f, p, rho, T):
         warnings.warn(
-                RuntimeWarning(
-                    'Recommendation ITU-R P.676-12 does not have an explicit '
-                    'method to approximate gamma_w. The exact method shall be '
-                    'used instead.'))
+            RuntimeWarning(
+                'Recommendation ITU-R P.676-12 does not have an explicit '
+                'method to approximate gamma_w. The exact method shall be '
+                'used instead.'))
         return self.gamma_exact(f, p, rho, T)
 
     def gamma0_approx(self, f, p, rho, T):
         warnings.warn(
-                RuntimeWarning(
-                    'Recommendation ITU-R P.676-12 does not have an explicit '
-                    'method to approximate gamma_w. The exact method shall be '
-                    'used instead.'))
+            RuntimeWarning(
+                'Recommendation ITU-R P.676-12 does not have an explicit '
+                'method to approximate gamma_w. The exact method shall be '
+                'used instead.'))
         return self.gamma_exact(f, p, rho, T)
 
     @classmethod
@@ -381,7 +383,8 @@ class _ITU676_12_():
             return (A0 + Aw) / np.sin(np.deg2rad(el))
 
         else:
-            delta_h = 0.0001 * np.exp((np.arange(0, 922)) / 100)             # Eq. 14
+            delta_h = 0.0001 * \
+                np.exp((np.arange(0, 922)) / 100)             # Eq. 14
             h_n = 0.0001 * ((np.exp(np.arange(0, 922) / 100.0) -
                              1.0) / (np.exp(1.0 / 100.0) - 1.0))             # Eq. 15
             T_n = standard_temperature(h_n).to(u.K).value
@@ -390,7 +393,7 @@ class _ITU676_12_():
 
             e_n = rho_n * T_n / 216.7
             n_n = radio_refractive_index(press_n, e_n, T_n).value
-            n_ratio = n_n / np.pad(n_n[1:], (0, 1), mode='edge')  
+            n_ratio = n_n / np.pad(n_n[1:], (0, 1), mode='edge')
             r_n = 6371 + h_n
 
             b = np.pi / 2 - np.deg2rad(el)
@@ -401,10 +404,12 @@ class _ITU676_12_():
                     4 * r**2 * np.cos(b)**2 + 8 * r * delta + 4 * delta**2)  # Eq. 17
                 a_cos_arg = np.clip((-a**2 - 2 * r * delta - delta**2) /
                                     (2 * a * r + 2 * a * delta), -1, 1)
-                alpha = np.pi - np.arccos(a_cos_arg)                         # Eq. 18a
+                # Eq. 18a
+                alpha = np.pi - np.arccos(a_cos_arg)
                 gamma = self.gamma_exact(f, press, rho, t)
                 Agas += a * gamma                                            # Eq. 13
-                b = np.arcsin(np.sin(alpha) * n_r)                           # Eq. 19a
+                b = np.arcsin(np.sin(alpha) *
+                              n_r)                           # Eq. 19a
 
             return Agas
 
@@ -441,7 +446,7 @@ class _ITU676_12_():
             el1 = el
             Re = 8500  # TODO: change to ITU-R P 834
             el2 = np.rad2deg(
-                np.arccos(((Re + h1)/(Re + h2))*np.cos(np.deg2rad(el1))))
+                np.arccos(((Re + h1) / (Re + h2)) * np.cos(np.deg2rad(el1))))
 
             def xi(eli, hi):
                 return np.tan(np.deg2rad(eli)) * np.sqrt((Re + hi) / h0)
@@ -474,9 +479,9 @@ class _ITU676_12_():
         rho_ref = V_t / 2.38
         t_ref = 14 * np.log(0.22 * V_t / 2.38) + 3    # [Celsius]
 
-        a = (0.2048 * np.exp(- ((f - 22.43)/3.097)**2) +
-             0.2326 * np.exp(- ((f - 183.5)/4.096)**2) +
-             0.2073 * np.exp(- ((f - 325)/3.651)**2) - 0.1113)
+        a = (0.2048 * np.exp(- ((f - 22.43) / 3.097)**2) +
+             0.2326 * np.exp(- ((f - 183.5) / 4.096)**2) +
+             0.2073 * np.exp(- ((f - 325) / 3.651)**2) - 0.1113)
 
         b = 8.741e4 * np.exp(-0.587 * f) + 312.2 * f**(-2.38) + 0.723
         h = np.clip(h, 0, 4)
@@ -692,7 +697,8 @@ class _ITU676_11_():
             return (A0 + Aw) / np.sin(np.deg2rad(el))
 
         else:
-            delta_h = 0.0001 * np.exp((np.arange(0, 922)) / 100)             # Eq. 21
+            delta_h = 0.0001 * \
+                np.exp((np.arange(0, 922)) / 100)             # Eq. 21
             h_n = 0.0001 * ((np.exp(np.arange(0, 922) / 100.0) -
                              1.0) / (np.exp(1.0 / 100.0) - 1.0))
             T_n = standard_temperature(h_n).to(u.K).value
@@ -712,10 +718,12 @@ class _ITU676_11_():
                     4 * r**2 * np.cos(b)**2 + 8 * r * delta + 4 * delta**2)  # Eq. 17
                 a_cos_arg = np.clip((-a**2 - 2 * r * delta - delta**2) /
                                     (2 * a * r + 2 * a * delta), -1, 1)
-                alpha = np.pi - np.arccos(a_cos_arg)                         # Eq. 18
+                # Eq. 18
+                alpha = np.pi - np.arccos(a_cos_arg)
                 gamma = self.gamma_exact(f, press, rho, t)
                 Agas += a * gamma                                            # Eq. 20
-                b = np.arcsin(np.sin(alpha) * n_r)                           # Eq. 19
+                b = np.arcsin(np.sin(alpha) *
+                              n_r)                           # Eq. 19
 
             return Agas
 
@@ -752,7 +760,7 @@ class _ITU676_11_():
             el1 = el
             Re = 8500  # TODO: change to ITU-R P 834
             el2 = np.rad2deg(
-                np.arccos(((Re + h1)/(Re + h2))*np.cos(np.deg2rad(el1))))
+                np.arccos(((Re + h1) / (Re + h2)) * np.cos(np.deg2rad(el1))))
 
             def xi(eli, hi):
                 return np.tan(np.deg2rad(eli)) * np.sqrt((Re + hi) / h0)
@@ -785,9 +793,9 @@ class _ITU676_11_():
         rho_ref = V_t / 3.67
         t_ref = 14 * np.log(0.22 * V_t / 3.67) + 3    # [Celsius]
 
-        a = (0.2048 * np.exp(- ((f - 22.43)/3.097)**2) +
-             0.2326 * np.exp(- ((f-183.5)/4.096)**2) +
-             0.2073 * np.exp(- ((f-325)/3.651)**2) - 0.113)
+        a = (0.2048 * np.exp(- ((f - 22.43) / 3.097)**2) +
+             0.2326 * np.exp(- ((f - 183.5) / 4.096)**2) +
+             0.2073 * np.exp(- ((f - 325) / 3.651)**2) - 0.113)
 
         b = 8.741e4 * np.exp(-0.587 * f) + 312.2 * f**(-2.38) + 0.723
         h = np.minimum(h, 4)
@@ -1033,7 +1041,8 @@ class _ITU676_10_():
             return (A0 + Aw) / np.sin(np.deg2rad(el))
 
         else:
-            delta_h = 0.0001 * np.exp((np.arange(0, 922)) / 100)             # Eq. 21
+            delta_h = 0.0001 * \
+                np.exp((np.arange(0, 922)) / 100)             # Eq. 21
             h_n = 0.0001 * ((np.exp(np.arange(0, 922) / 100.0) -
                              1.0) / (np.exp(1.0 / 100.0) - 1.0))
             T_n = standard_temperature(h_n).to(u.K).value
@@ -1053,10 +1062,12 @@ class _ITU676_10_():
                     4 * r**2 * np.cos(b)**2 + 8 * r * delta + 4 * delta**2)  # Eq. 17
                 a_cos_arg = np.clip((-a**2 - 2 * r * delta - delta**2) /
                                     (2 * a * r + 2 * a * delta), -1, 1)
-                alpha = np.pi - np.arccos(a_cos_arg)                         # Eq. 18
+                # Eq. 18
+                alpha = np.pi - np.arccos(a_cos_arg)
                 gamma = self.gamma_exact(f, press, rho, t)
                 Agas += a * gamma                                            # Eq. 20
-                b = np.arcsin(np.sin(alpha) * n_r)                           # Eq. 19
+                b = np.arcsin(np.sin(alpha) *
+                              n_r)                           # Eq. 19
 
             return Agas
 
@@ -1093,7 +1104,7 @@ class _ITU676_10_():
             el1 = el
             Re = 8500  # TODO: change to ITU-R P 834
             el2 = np.rad2deg(
-                np.arccos(((Re + h1)/(Re + h2))*np.cos(np.deg2rad(el1))))
+                np.arccos(((Re + h1) / (Re + h2)) * np.cos(np.deg2rad(el1))))
 
             def xi(eli, hi):
                 return np.tan(np.deg2rad(eli)) * np.sqrt((Re + hi) / h0)
@@ -1202,6 +1213,7 @@ class _ITU676_9_():
         return (self.gamma0_exact(f, p, rho, T) +
                 self.gammaw_exact(f, p, rho, T))
 
+
 __model = __ITU676__()
 
 
@@ -1289,7 +1301,7 @@ def gaseous_attenuation_terrestrial_path(r, f, el, rho, P, T, mode):
     P = prepare_quantity(P, u.hPa, 'Atospheric pressure')
     T = prepare_quantity(T, u.K, 'Temperature')
     val = __model.gaseous_attenuation_terrestrial_path(
-            r, f, el, rho, P, T, mode)
+        r, f, el, rho, P, T, mode)
     return prepare_output_array(val, type_output) * u.dB
 
 
@@ -1354,7 +1366,7 @@ def gaseous_attenuation_slant_path(f, el, rho, P, T, V_t=None, h=None,
                            'Integrated water vapour content')
     h = prepare_quantity(h, u.km, 'Altitude')
     val = __model.gaseous_attenuation_slant_path(
-            f, el, rho, P, T, V_t, h, mode)
+        f, el, rho, P, T, V_t, h, mode)
     return prepare_output_array(val, type_output) * u.dB
 
 

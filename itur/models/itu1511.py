@@ -7,7 +7,6 @@ from __future__ import print_function
 import numpy as np
 from astropy import units as u
 
-from itur import utils
 from itur.models.itu1144 import bicubic_2D_interpolator
 from itur.utils import (prepare_input_array, prepare_output_array,
                         load_data_interpolator, get_input_type)
@@ -75,7 +74,7 @@ class _ITU1511_2_():
                 '1511/v2_topo.npz', bicubic_2D_interpolator)
 
         return self._altitude(
-                np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def wgs4_altitude(self, lat, lon):
         if not self._wgs4_altitude:
@@ -84,7 +83,7 @@ class _ITU1511_2_():
                 '1511/v2_egm2008.npz', bicubic_2D_interpolator)
 
         return self._wgs4_altitude(
-                np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def topographic_altitude(self, lat_d, lon_d):
         """
@@ -123,7 +122,7 @@ class _ITU1511_1_():
                 '1511/v1_topo_0dot5.npz', bicubic_2D_interpolator)
 
         return self._altitude(
-                np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def topographic_altitude(self, lat_d, lon_d):
         """
@@ -158,7 +157,7 @@ class _ITU1511_0_():
                 '1511/v1_topo_0dot5.npz', bicubic_2D_interpolator)
 
         return self._altitude(
-                np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def topographic_altitude(self, lat_d, lon_d):
         """

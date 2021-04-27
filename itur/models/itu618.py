@@ -9,7 +9,6 @@ import scipy.special
 import scipy.integrate
 from astropy import units as u
 
-from itur import utils
 from itur.models.itu453 import water_vapour_pressure,\
     wet_term_radio_refractivity, map_wet_term_radio_refractivity
 from itur.models.itu837 import rainfall_rate, rainfall_probability
@@ -151,7 +150,7 @@ class _ITU618():
                                                lat2, lon2, a2, el2, f, tau=45,
                                                hs1=None, hs2=None):
         fcn = np.vectorize(
-                self.instance.site_diversity_rain_outage_probability)
+            self.instance.site_diversity_rain_outage_probability)
         return np.array(fcn(lat1, lon1, a1, el1,
                             lat2, lon2, a2, el2,
                             f, tau, hs1, hs2).tolist())
@@ -184,7 +183,7 @@ class _ITU618_13():
             Ls = np.where(
                 el >= 5, (hr - hs) / (np.sin(np.deg2rad(el))),         # Eq. 1
                 2 * (hr - hs) / (((np.sin(np.deg2rad(el)))**2 +
-                2 * (hr - hs) / Re)**0.5 + (np.sin(np.deg2rad(el)))))  # Eq. 2
+                                  2 * (hr - hs) / Re)**0.5 + (np.sin(np.deg2rad(el)))))  # Eq. 2
 
         # Step 3: Calculate the horizontal projection, LG, of the
         # slant-path length
@@ -271,7 +270,7 @@ class _ITU618_13():
             Ls = np.where(
                 el >= 5, (hr - hs) / (np.sin(np.deg2rad(el))),         # Eq. 1
                 2 * (hr - hs) / (((np.sin(np.deg2rad(el)))**2 +
-                2 * (hr - hs) / Re)**0.5 + (np.sin(np.deg2rad(el)))))  # Eq. 2
+                                  2 * (hr - hs) / Re)**0.5 + (np.sin(np.deg2rad(el)))))  # Eq. 2
 
         d = Ls * np.cos(np.deg2rad(el))
         rho = 0.59 * np.exp(-abs(d) / 31) + 0.41 * np.exp(-abs(d) / 800)
@@ -435,8 +434,8 @@ class _ITU618_13():
             # polarization tilt angle can be scaled to another frequency and
             # polarization tilt angle using the semi-empirical formula:
             XPD_p = XPD_p - 20 * np.log10(
-              f_orig * np.sqrt(1 - 0.484 * (1 + np.cos(np.deg2rad(4 * tau)))) /
-              (f * np.sqrt(1 - 0.484 * (1 + np.cos(np.deg2rad(4 * tau))))))
+                f_orig * np.sqrt(1 - 0.484 * (1 + np.cos(np.deg2rad(4 * tau)))) /
+                (f * np.sqrt(1 - 0.484 * (1 + np.cos(np.deg2rad(4 * tau))))))
         return XPD_p
 
     @classmethod
