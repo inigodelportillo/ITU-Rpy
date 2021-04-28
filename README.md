@@ -35,6 +35,7 @@ The following ITU-R Recommendations are implemented in ITU-Rpy
 *   **ITU-R P.1144-10:** Interpolation methods for the geophysical properties used to compute propagation effects 
 *   **ITU-R P.1510-1:** Mean surface temperature
 *   **ITU-R P.1511-2:** Topography for Earth-to-space propagation modelling
+*   **ITU-R P.1623-1:** Prediction method of fade dynamics on Earth-space paths
 *   **ITU-R P.1853-1:** Tropospheric attenuation time series synthesis
 
 The individual models can be accessed using the `itur.models` package.
