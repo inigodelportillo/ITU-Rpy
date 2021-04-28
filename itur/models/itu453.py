@@ -141,7 +141,7 @@ class _ITU453_13_():
 
         lon[lon > 180] = lon[lon > 180] - 360
         return self._N_wet[float(p)](
-                np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     @classmethod
     def wet_term_radio_refractivity(self, e, T):
@@ -168,15 +168,15 @@ class _ITU453_13_():
     def saturation_vapour_pressure(self, T, P, type_hydrometeor='water'):
 
         if type_hydrometeor == 'water':
-            EF = 1 + 1e-4 * (7.2 + P * (0.00320 + 5.9e-6 * T**2))
+            EF = 1 + 1e-4 * (7.2 + P * (0.0320 + 5.9e-6 * T**2))
             a = 6.1121
             b = 18.678
             c = 257.14
             d = 234.5
 
         elif type_hydrometeor == 'ice':
-            EF = 1 + 1e-4 * (2.2 + P * (0.00382 + 6.4e-7 * T**2))
-            a = 6.11215
+            EF = 1 + 1e-4 * (2.2 + P * (0.0383 + 6.4e-6 * T**2))
+            a = 6.1115
             b = 23.036
             c = 279.82
             d = 333.7

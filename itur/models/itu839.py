@@ -7,7 +7,6 @@ from __future__ import print_function
 import numpy as np
 from astropy import units as u
 
-from itur import utils
 from itur.models.itu1144 import bilinear_2D_interpolator
 from itur.utils import (prepare_input_array, prepare_output_array,
                         load_data_interpolator, get_input_type)
@@ -101,7 +100,7 @@ class _ITU839_3_():
 
     def isoterm_0(self, lat, lon):
         if not self._zero_isoterm_data:
-            self._zero_isoterm_data =  load_data_interpolator(
+            self._zero_isoterm_data = load_data_interpolator(
                 '839/v3_esalat.npz', '839/v3_esalon.npz',
                 '839/v3_esa0height.npz', bilinear_2D_interpolator,
                 flip_ud=False)

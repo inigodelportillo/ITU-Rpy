@@ -1,0 +1,26 @@
+
+Recommendation ITU-R P.1623
+---------------------------
+
+This Recommendation provides prediction methods of fade dynamics on Earth-space paths.
+
+.. include:: itu1623_table.rst
+
+Introduction
+************
+In the design of a variety of telecommunication systems, the dynamic characteristics of fading due to atmospheric propagation are of concern to optimize system capacity and meet quality and reliability criteria. Examples are fixed networks that include a space segment and systems that apply fade mitigation or resource sharing techniques.
+
+Several temporal scales can be defined, and it is useful to have information on fade slope, fade duration and interfade duration statistics for a given attenuation level.
+Fade duration is defined as the time interval between two crossings above the same attenuation threshold whereas interfade duration is defined as the time interval between two crossings below the same attenuation threshold. Fade slope is defined as the rate of change of attenuation with time.
+
+Of particular interest in the context of availability criteria is the distinction between fades of shorter and longer duration than 10 s. Knowledge of the distribution of fade duration as a function of fade depth is also a prerequisite for the application of risk concepts in the provision of telecommunication services.
+
+In addition, information about the expected fade slope is essential to assess the required minimum tracking rate of a fade mitigation system.
+
+Module description
+******************
+
+.. automodule:: itur.models.itu1623
+    :members:
+    :undoc-members:
+    :show-inheritance:

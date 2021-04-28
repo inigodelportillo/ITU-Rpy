@@ -35,6 +35,7 @@ def suite():
     suite.addTest(TestFunctionsRecommendation840('test_840'))
     suite.addTest(TestFunctionsRecommendation1510('test_1510'))
     suite.addTest(TestFunctionsRecommendation1511('test_1511'))
+    suite.addTest(TestFunctionsRecommendation1623('test_1623'))
     suite.addTest(TestFunctionsRecommendation1853('test_1853'))
 
     # Basic import module functionality
@@ -43,6 +44,7 @@ def suite():
     suite.addTest(TestImportModules('test_import_itur_plotting'))
     suite.addTest(TestImportModules('test_import_itur_models'))
     suite.addTest(TestImportModules('test_import_itur_models_1853'))
+    suite.addTest(TestImportModules('test_import_itur_models_1623'))
     suite.addTest(TestImportModules('test_import_itur_models_1511'))
     suite.addTest(TestImportModules('test_import_itur_models_1510'))
     suite.addTest(TestImportModules('test_import_itur_models_453'))
@@ -63,10 +65,14 @@ def suite():
     suite.addTest(TestIturMainFunctions('test_slant_path_attenuation'))
     suite.addTest(TestIturMainFunctions('test_slant_path_attenuation_p_below'))
     suite.addTest(TestIturMainFunctions('test_slant_path_attenuation_p_above'))
-    suite.addTest(TestIturMainFunctions('test_slant_path_attenuation_without_rain'))
-    suite.addTest(TestIturMainFunctions('test_slant_path_attenuation_without_gas'))
-    suite.addTest(TestIturMainFunctions('test_slant_path_attenuation_without_clouds'))
-    suite.addTest(TestIturMainFunctions('test_slant_path_attenuation_without_scintillation'))
+    suite.addTest(TestIturMainFunctions(
+        'test_slant_path_attenuation_without_rain'))
+    suite.addTest(TestIturMainFunctions(
+        'test_slant_path_attenuation_without_gas'))
+    suite.addTest(TestIturMainFunctions(
+        'test_slant_path_attenuation_without_clouds'))
+    suite.addTest(TestIturMainFunctions(
+        'test_slant_path_attenuation_without_scintillation'))
 
     # Test utils library
     suite.addTest(TestIturUtils('test_read_file_npz'))
@@ -165,6 +171,10 @@ class TestImportModules(test.TestCase):
         import itur.models.itu1511
 
     @staticmethod
+    def test_import_itur_models_1623():
+        import itur.models.itu1853
+
+    @staticmethod
     def test_import_itur_models_1853():
         import itur.models.itu1853
 
@@ -250,8 +260,8 @@ class TestIturMainFunctions(test.TestCase):
 
     def test_slant_path_attenuation_without_gas(self):
         itur.atmospheric_attenuation_slant_path(
-                lat=self.lat, lon=self.lon, f=self.f, el=self.el, p=self.p,
-                D=self.D, include_gas=False)
+            lat=self.lat, lon=self.lon, f=self.f, el=self.el, p=self.p,
+            D=self.D, include_gas=False)
 
     def test_slant_path_attenuation_without_scintillation(self):
         itur.atmospheric_attenuation_slant_path(
@@ -316,7 +326,7 @@ class TestIturUtils(test.TestCase):
 
     def test_prepare_quantity(self):
         # Test temperature conversion
-        val = itur.utils.prepare_quantity((273.15, 373.15)*itur.u.K,
+        val = itur.utils.prepare_quantity((273.15, 373.15) * itur.u.K,
                                           units=itur.u.Celsius)
         np.testing.assert_array_equal(val, np.array([0, 100]))
 
@@ -334,14 +344,14 @@ class TestIturUtils(test.TestCase):
         val = itur.utils.prepare_quantity((1, 2), units=itur.u.m)
         np.testing.assert_array_equal(val, np.array([1, 2]))
 
-        val = itur.utils.prepare_quantity((1, 2)*itur.u.km, units=itur.u.m)
+        val = itur.utils.prepare_quantity((1, 2) * itur.u.km, units=itur.u.m)
         np.testing.assert_array_equal(val, np.array([1000, 2000]))
 
         # Test numpy arrays
         val = itur.utils.prepare_quantity(np.array([1, 2]), units=itur.u.m)
         np.testing.assert_array_equal(val, np.array([1, 2]))
 
-        val = itur.utils.prepare_quantity(np.array([1, 2])*itur.u.km,
+        val = itur.utils.prepare_quantity(np.array([1, 2]) * itur.u.km,
                                           units=itur.u.m)
         np.testing.assert_array_equal(val, np.array([1000, 2000]))
 
@@ -349,7 +359,7 @@ class TestIturUtils(test.TestCase):
         val = itur.utils.prepare_quantity([1, 2], units=itur.u.m)
         np.testing.assert_array_equal(val, np.array([1, 2]))
 
-        val = itur.utils.prepare_quantity([1, 2]*itur.u.km, units=itur.u.m)
+        val = itur.utils.prepare_quantity([1, 2] * itur.u.km, units=itur.u.m)
         np.testing.assert_array_equal(val, np.array([1000, 2000]))
 
         # Check that invalid formats raise an exception
@@ -460,7 +470,7 @@ class TestFunctionsRecommendation453(test.TestCase):
 
         models.itu453.map_wet_term_radio_refractivity(lat, lon, p).value
         models.itu453.map_wet_term_radio_refractivity(
-                [lat, lat], [lon, lon], [p, p])
+            [lat, lat], [lon, lon], [p, p])
         models.itu453.map_wet_term_radio_refractivity(lat, lon, [p, p])
 
         models.itu453.DN65(lat, lon, p_exact)
@@ -477,7 +487,6 @@ class TestFunctionsRecommendation453(test.TestCase):
             models.itu453.change_version(version)
             self.test_all_functions_453()
             self.assertEqual(models.itu453.get_version(), version)
-
 
 
 class TestFunctionsRecommendation530(test.TestCase):
@@ -506,7 +515,8 @@ class TestFunctionsRecommendation530(test.TestCase):
         models.itu530.inverse_rain_attenuation(lat, lon, d, f, el, Ap)
 
         models.itu530.rain_event_count(lat, lon, d, f, el, A)
-        models.itu530.XPD_outage_clear_air(lat, lon, h_e, h_r, d, f, XPD_g, C0_I)
+        models.itu530.XPD_outage_clear_air(
+            lat, lon, h_e, h_r, d, f, XPD_g, C0_I)
         models.itu530.XPD_outage_precipitation(lat, lon, d, f, el, C0_I)
 
     def test_530(self):
@@ -787,27 +797,27 @@ class TestFunctionsRecommendation836(test.TestCase):
 
         models.itu836.surface_water_vapour_density(lat, lon, p)
         models.itu836.surface_water_vapour_density(
-                [lat, lat], [lon, lon], p)
+            [lat, lat], [lon, lon], p)
         models.itu836.surface_water_vapour_density(
-                [lat, lat], [lon, lon], [p, p])
+            [lat, lat], [lon, lon], [p, p])
 
         models.itu836.surface_water_vapour_density(lat, lon, p, alt)
         models.itu836.surface_water_vapour_density(
-                [lat, lat], [lon, lon], p, [alt, alt])
+            [lat, lat], [lon, lon], p, [alt, alt])
         models.itu836.surface_water_vapour_density(
-                [lat, lat], [lon, lon], [p, p], [alt, alt])
+            [lat, lat], [lon, lon], [p, p], [alt, alt])
 
         models.itu836.total_water_vapour_content(lat, lon, p)
         models.itu836.total_water_vapour_content(
-                [lat, lat], [lon, lon], p)
+            [lat, lat], [lon, lon], p)
         models.itu836.total_water_vapour_content(
-                [lat, lat], [lon, lon], [p, p])
+            [lat, lat], [lon, lon], [p, p])
 
         models.itu836.total_water_vapour_content(lat, lon, p, alt)
         models.itu836.total_water_vapour_content(
-                [lat, lat], [lon, lon], p, [alt, alt])
+            [lat, lat], [lon, lon], p, [alt, alt])
         models.itu836.total_water_vapour_content(
-                [lat, lat], [lon, lon], [p, p], [alt, alt])
+            [lat, lat], [lon, lon], [p, p], [alt, alt])
 
     def test_836(self):
 
@@ -859,16 +869,16 @@ class TestFunctionsRecommendation838(test.TestCase):
 
         models.itu838.rain_specific_attenuation_coefficients(f, el, tau)
         models.itu838.rain_specific_attenuation_coefficients(
-                [f, f], [el, el], [tau, tau])
+            [f, f], [el, el], [tau, tau])
         models.itu838.rain_specific_attenuation_coefficients(
-                f, [el, el], [tau, tau])
+            f, [el, el], [tau, tau])
 
         models.itu838.rain_specific_attenuation(R, f, el, tau)
         models.itu838.rain_specific_attenuation(R, [f, f], el, [tau, tau])
         models.itu838.rain_specific_attenuation(
-                R, [f, f], [el, el], [tau, tau])
+            R, [f, f], [el, el], [tau, tau])
         models.itu838.rain_specific_attenuation(
-                [R, R], [f, f], [el, el], [tau, tau])
+            [R, R], [f, f], [el, el], [tau, tau])
 
     def test_838(self):
         for version in self.versions:
@@ -920,21 +930,21 @@ class TestFunctionsRecommendation840(test.TestCase):
 
         models.itu840.columnar_content_reduced_liquid(lat, lon, p)
         models.itu840.columnar_content_reduced_liquid(
-                [lat, lat], [lon, lon], p)
+            [lat, lat], [lon, lon], p)
         models.itu840.columnar_content_reduced_liquid(
-                [lat, lat], [lon, lon], [p, p])
+            [lat, lat], [lon, lon], [p, p])
 
         models.itu840.cloud_attenuation(lat, lon, el, f, p)
         models.itu840.cloud_attenuation(
-                [lat, lat], [lon, lon], [el, el], [f, f], [p, p])
+            [lat, lat], [lon, lon], [el, el], [f, f], [p, p])
         models.itu840.cloud_attenuation(
-                [lat, lat], [lon, lon], el, [f, f], [p, p])
+            [lat, lat], [lon, lon], el, [f, f], [p, p])
         models.itu840.cloud_attenuation(
-                [lat, lat], [lon, lon], el, f, [p, p])
+            [lat, lat], [lon, lon], el, f, [p, p])
 
         models.itu840.lognormal_approximation_coefficient(lat, lon)
         models.itu840.lognormal_approximation_coefficient(
-                [lat, lat], [lon, lon])
+            [lat, lat], [lon, lon])
 
     def test_840(self):
 
@@ -960,9 +970,9 @@ class TestFunctionsRecommendation1510(test.TestCase):
             for m in range(1, 13):
                 models.itu1510.surface_month_mean_temperature(lat, lon, m)
                 models.itu1510.surface_month_mean_temperature(
-                        [lat, lat], [lon, lon], m)
+                    [lat, lat], [lon, lon], m)
                 models.itu1510.surface_month_mean_temperature(
-                        [lat, lat], [lon, lon], [m, m])
+                    [lat, lat], [lon, lon], [m, m])
 
     def test_1510(self):
         for version in self.versions:
@@ -989,6 +999,41 @@ class TestFunctionsRecommendation1511(test.TestCase):
             models.itu1511.change_version(version)
             self.test_all_functions_1511()
             self.assertEqual(models.itu1511.get_version(), version)
+
+
+class TestFunctionsRecommendation1623(test.TestCase):
+    def setUp(self):
+        self.versions = [0, 1]
+
+    @staticmethod
+    def test_all_functions_1623():
+        T_tot = 0.224 * 365.25 * 24 * 3600
+        D = np.array([1, 10, 30, 60, 120, 180, 300, 600, 900, 1200, 1500,
+                      1800, 2400, 3600])
+
+        z = np.linspace(-2, 2, 100)
+        A = 10
+        f_B = 0.02
+        delta_t = 1
+        N_target = 25
+        D_target = 60
+        PofA = np.array([50, 30, 20, 10, 5, 3, 2, 1, .5, .3, .2, .1, .05, .03,
+                         .02, .01, .005, .003, .002, .001])
+        A_arr = np.array([0.4, 0.6, 0.8, 1.8, 2.70, 3.5, 4.20, 5.7, 7.4, 9,
+                          10.60, 14, 18.3, 22.3, 25.8, 32.6, 40.1, 46.1, 50.8,
+                          58.8])
+        el = 38.5
+        f = 28
+
+        models.itu1623.fade_duration(D, A, el, f, T_tot)
+        models.itu1623.fade_slope(z, A, f_B, delta_t)
+        models.itu1623.fade_depth(N_target, D_target, A_arr, PofA, el, f)
+
+    def test_1623(self):
+        for version in self.versions:
+            models.itu1623.change_version(version)
+            self.test_all_functions_1623()
+            self.assertEqual(models.itu1623.get_version(), version)
 
 
 class TestFunctionsRecommendation1853(test.TestCase):

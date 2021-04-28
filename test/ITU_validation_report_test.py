@@ -3,7 +3,7 @@ import sys
 import numpy as np
 import pandas as pd
 import os.path as path
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 import unittest as test
 
@@ -18,7 +18,7 @@ html_path = path.join(basepath, '../docs/validation')
 
 
 desc_validation =\
-"""This page contains the validation examples for Recommendation {0}: {1}.
+    """This page contains the validation examples for Recommendation {0}: {1}.
 
 All test cases were extracted from the
 `ITU Validation examples file (rev 5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`_.
@@ -29,7 +29,7 @@ All test cases were extracted from the
 """
 
 desc_test_case =\
-"""The table below contains the results of testing function ``{0}``.
+    """The table below contains the results of testing function ``{0}``.
 The test cases were extracted from spreadsheet ``{1}`` from the
 `ITU Validation examples file (rev 5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`_.
 In addition to the input-arguments, expected result (``ITU Validation``), and
@@ -50,7 +50,7 @@ first row of the results in the table:
 html_header = """
        <html>
          <head>
-             <title>Validation results for {0}</title>
+             <title>Validation results {0}</title>
              <style>
                    table {{
                        border-collapse: collapse;
@@ -86,6 +86,7 @@ html_footer = """
         </html>
         """
 
+
 def create_ITU_suite():
     """ A test suite for the ITU-P Recommendations. Recommendations tested:
     * ITU-P R-676-11
@@ -101,14 +102,15 @@ def create_ITU_suite():
     suite = ITU_Suite()
 
     # ITU-R P.453 tests (Gaseous attenuation)
-    suite.addTest(ITUR453_14TestCase('test_wet_term_radio_refractivity'))
+    suite.add_test(ITUR453_14TestCase('test_wet_term_radio_refractivity'))
 
     # ITU-R P.618
     suite.add_test(ITUR618_13TestCase('test_rain_attenuation'))
     suite.add_test(ITUR618_13TestCase('test_rain_probability'))
     suite.add_test(ITUR618_13TestCase('test_scintillation_attenuation'))
     suite.add_test(ITUR618_13TestCase('test_total_attenuation'))
-    suite.add_test(ITUR618_13TestCase('test_cross_polarization_discrimination'))
+    suite.add_test(ITUR618_13TestCase(
+        'test_cross_polarization_discrimination'))
 
     # ITU-R P.676
     suite.add_test(ITUR676_12TestCase('test_gamma0'))
@@ -118,7 +120,8 @@ def create_ITU_suite():
     suite.add_test(ITUR676_12TestCase('test_attenuation_gas'))
 
     # ITU-R P.836
-    suite.add_test(ITUR836_6TestCase('test_surface_water_vapour_density_annual'))
+    suite.add_test(ITUR836_6TestCase(
+        'test_surface_water_vapour_density_annual'))
     suite.add_test(ITUR836_6TestCase('test_total_water_vapour_content_annual'))
 
     # ITU-R P.837
@@ -144,10 +147,18 @@ def create_ITU_suite():
     suite.add_test(ITUR1511_1TestCase('test_topographic_altitude'))
     suite.add_test(ITUR1511_2TestCase('test_topographic_altitude'))
 
+    # ITU-R P.1623
+    suite.add_test(ITUR1623_1TestCase(
+        'test_fade_duration_cummulative_probability'))
+    suite.add_test(ITUR1623_1TestCase('test_fade_duration_number_fades'))
+    suite.add_test(ITUR1623_1TestCase('test_fade_duration_probability'))
+    suite.add_test(ITUR1623_1TestCase(
+        'test_fade_duration_total_exceedance_time'))
+
     return suite
 
-# Format HTML code
 
+# Format HTML code
 def formatter_fcn(s):
     return '\t\t\t<td style="text-align:left">' + str(s)
 
@@ -218,7 +229,7 @@ class ITU_Suite(test.TestSuite):
 
     def __init__(self):
         test.TestSuite.__init__(self)
-        self.test_cases = {}
+        self.test_cases = OrderedDict({})
 
     def add_test(self, test_case):
         self.test_cases[test_case.__class__.__name__] = test_case
@@ -229,8 +240,8 @@ class ITU_Suite(test.TestSuite):
             ret = test_case.produce_rst_report()
             if path_report:
                 fpath = path.join(
-                  path_report,
-                  test_name.lower().replace('testcase', '') + '.rst')
+                    path_report,
+                    test_name.lower().replace('testcase', '') + '.rst')
                 with open(fpath, 'w', encoding='utf-8') as fd:
                     fd.write(ret)
 
@@ -278,7 +289,7 @@ class ITU_TestCase(test.TestCase):
                 line['error_rel'] = 0
             else:
                 line['error_rel'] = round(
-                      (res_val - res_fcn.value) / res_val * 100, 3)
+                    (res_val - res_fcn.value) / res_val * 100, 3)
 
             res.append(line)
 
@@ -296,7 +307,7 @@ class ITU_TestCase(test.TestCase):
             'attributes': attributes,
             'n_places': n_places,
             'report_html': df[order]
-          }
+        }
 
         # Do the assert equal for all the tests
         for ret in res:
@@ -337,14 +348,14 @@ class ITU_TestCase(test.TestCase):
         ret.extend([
             "", "    # Make call to test-function {0}".format(test_fcn_name),
             '    itur_val = itur.{0}({1})'.format(
-              test_fcn, ", ".join([att + '=' + att for att in attributes]))])
+                test_fcn, ", ".join([att + '=' + att for att in attributes]))])
 
         # Compute errors
         ret.extend([
             "",
             "    # Compute error with respect to value in ITU example file",
             '    ITU_example_val = {0}  # {1}'.format(
-                        row_1['res_val'], units['res_val']),
+                row_1['res_val'], units['res_val']),
             '    error = ITU_example_val - itur_val.value',
             '    error_rel = error / ITU_example_val * 100  # (%)'])
 
@@ -353,7 +364,7 @@ class ITU_TestCase(test.TestCase):
     def produce_rst_report(self):
 
         ret = []
-        title = "Validation results for {0}".format(self.itu_name)
+        title = "Validation results {0}".format(self.itu_name)
         ret.append(title)
         ret.append('=' * len(title))
         ret.append('')
@@ -375,8 +386,8 @@ class ITU_TestCase(test.TestCase):
             ret.append("-" * len(test_case_name))
             ret.append("")
             ret.append(desc_test_case.format(
-                    test_fcn_name, path.basename(report['path_csv']),
-                    self.generate_code_example(report)))
+                test_fcn_name, path.basename(report['path_csv']),
+                self.generate_code_example(report)))
 
             ret.extend(['.. raw:: html',
                         '    :file: {0}'.format(test_name + '_table.html'),
@@ -479,7 +490,7 @@ class ITUR618_13TestCase(ITU_TestCase):
         models.itu618.change_version(13)
 
         # Read the test data
-        df = self.read_csv(path.join(test_data, '618/ITURP618-13_A_rain.csv'),
+        df = self.read_csv(path.join(test_data, '618/ITURP618-13_A_sci.csv'),
                            columns=['lat', 'lon', 'f', 'el', 'p', 'D', 'eta',
                                     'A_scin'])
 
@@ -867,6 +878,76 @@ class ITUR1511_2TestCase(ITU_TestCase):
                      test_fcn='models.itu1511.topographic_altitude',
                      df=df, attributes=['lat', 'lon'],
                      result_value='hs',
+                     n_places=5)
+
+
+class ITUR1623_1TestCase(ITU_TestCase):
+
+    itu_name = 'ITU-R P.1623-1'
+    itu_description = 'Prediction method of fade dynamics on Earth-space paths'
+
+    def test_fade_duration_probability(self):
+        # Set the version to the
+        models.itu1623.change_version(1)
+
+        path_file = '1623/ITURP1623-1_fade_duration_params.csv'
+        # Read the test data
+        df = self.read_csv(path.join(test_data, path_file),
+                           columns=['D', 'A', 'el', 'f', 'P'])
+
+        # Run test and generate the report
+        self.__run__('test_fade_duration_probability',
+                     test_fcn='models.itu1623.fade_duration_probability',
+                     df=df, attributes=['D', 'A', 'el', 'f'],
+                     result_value='P',
+                     n_places=5)
+
+    def test_fade_duration_cummulative_probability(self):
+        # Set the version to the
+        models.itu1623.change_version(1)
+
+        path_file = '1623/ITURP1623-1_fade_duration_params.csv'
+        # Read the test data
+        df = self.read_csv(path.join(test_data, path_file),
+                           columns=['D', 'A', 'el', 'f', 'F'])
+
+        # Run test and generate the report
+        self.__run__('test_fade_duration_cummulative_probability',
+                     test_fcn='models.itu1623.fade_duration_cummulative_probability',
+                     df=df, attributes=['D', 'A', 'el', 'f'],
+                     result_value='F',
+                     n_places=5)
+
+    def test_fade_duration_total_exceedance_time(self):
+        # Set the version to the
+        models.itu1623.change_version(1)
+
+        path_file = '1623/ITURP1623-1_fade_duration_params.csv'
+        # Read the test data
+        df = self.read_csv(path.join(test_data, path_file),
+                           columns=['D', 'A', 'el', 'f', 'T_tot', 'T'])
+
+        # Run test and generate the report
+        self.__run__('test_fade_duration_total_exceedance_time',
+                     test_fcn='models.itu1623.fade_duration_total_exceedance_time',
+                     df=df, attributes=['D', 'A', 'el', 'f', 'T_tot'],
+                     result_value='T',
+                     n_places=5)
+
+    def test_fade_duration_number_fades(self):
+        # Set the version to the
+        models.itu1623.change_version(1)
+
+        path_file = '1623/ITURP1623-1_number_of_fades.csv'
+        # Read the test data
+        df = self.read_csv(path.join(test_data, path_file),
+                           columns=['D', 'A', 'el', 'f', 'T_tot', 'N'])
+
+        # Run test and generate the report
+        self.__run__('test_fade_duration_number_fades',
+                     test_fcn='models.itu1623.fade_duration_number_fades',
+                     df=df, attributes=['D', 'A', 'el', 'f', 'T_tot'],
+                     result_value='N',
                      n_places=5)
 
 

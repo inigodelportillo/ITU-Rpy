@@ -1,5 +1,5 @@
-Validation results for ITU-R P.1510-1
-=====================================
+Validation results ITU-R P.1510-1
+=================================
 
 This page contains the validation examples for Recommendation ITU-R P.1510-1: Mean surface temperature.
 

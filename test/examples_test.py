@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 import matplotlib
 matplotlib.use('agg')
-import matplotlib.pyplot as plt
 
-import sys
-import numpy as np
-import unittest as test
-
-import itur
-import itur.models.itu676 as itu676
 import itur.models.itu835 as itu835
+import itur.models.itu676 as itu676
+import itur
+import unittest as test
+import numpy as np
+import sys
+import matplotlib.pyplot as plt
 
 
 def suite():
@@ -23,7 +22,7 @@ def suite():
     suite.addTest(TestSingleLocation('test_single_location'))
     suite.addTest(TestSingleLocationVsFrequency('test_single_location_vs_f'))
     suite.addTest(TestSingleLocationVsUnavailability(
-            'test_single_location_vs_p'))
+        'test_single_location_vs_p'))
 
     return suite
 
@@ -64,8 +63,8 @@ class TestMapAfrica(test.TestCase):
         # Plot the results
         try:
             m = itur.plotting.plot_in_map(Att, lat, lon,
-                                       cbar_text='Atmospheric attenuation [dB]',
-                                       cmap='magma')
+                                          cbar_text='Atmospheric attenuation [dB]',
+                                          cmap='magma')
 
             # Plot the satellite location
             m.scatter(lon_sat, lat_sat, c='white', s=20)
@@ -151,7 +150,7 @@ class TestSingleLocation(test.TestCase):
         f = 22.5 * itur.u.GHz  # Frequency equal to 22.5 GHz
         D = 1 * itur.u.m       # Receiver antenna diameter of 1 m
         p = 0.1                # We compute values exceeded during 0.1 % of
-                               # the average year
+        # the average year
 
         # Compute atmospheric parameters
         hs = itur.topographic_altitude(lat, lon)
@@ -164,15 +163,15 @@ class TestSingleLocation(test.TestCase):
 
         # Compute rain and cloud-related parameters
         itur.models.itu618.rain_attenuation_probability(
-                lat, lon, el, hs)
+            lat, lon, el, hs)
         itur.models.itu837.rainfall_probability(lat, lon)
         itur.models.itu837.rainfall_rate(lat, lon, p)
         itur.models.itu839.isoterm_0(lat, lon)
         itur.models.itu839.rain_height(lat, lon)
         itur.models.itu840.columnar_content_reduced_liquid(
-                lat, lon, p)
+            lat, lon, p)
         itur.models.itu676.zenit_water_vapour_attenuation(
-                lat, lon, p, f, h=hs)
+            lat, lon, p, f, h=hs)
 
         # Compute attenuation values
         itur.gaseous_attenuation_slant_path(f, el, rho_p, P, T)
@@ -278,7 +277,7 @@ class TestSingleLocationVsUnavailability(test.TestCase):
 
         A_g, A_c, A_r, A_s, A_t = \
             itur.atmospheric_attenuation_slant_path(
-                    lat_GS, lon_GS, f, el, p, D, return_contributions=True)
+                lat_GS, lon_GS, f, el, p, D, return_contributions=True)
 
         # Plot the results using matplotlib
         f, ax = plt.subplots(1, 1)
