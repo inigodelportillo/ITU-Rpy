@@ -30,6 +30,7 @@ jobs:
         pip3 install --upgrade cython numpy pyshp six
         pip3 install shapely --no-binary shapely
         pip install matplotlib cartopy
+        pip install basemap
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
