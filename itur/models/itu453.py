@@ -155,7 +155,7 @@ class _ITU453_13_():
 
     @classmethod
     def radio_refractive_index(self, P, e, T):
-        N = 77.6 * P / T - 5.6 * e / T + 3.75e5 * e / T**2   # Eq. 6 [N-units]
+        N = 77.6 * P / T - 72 * e / T + 3.75e5 * e / T**2   # Eq. 2 [N-units]
         n = 1 + N * 1e-6   # Eq. 1
         return n
 
@@ -423,7 +423,7 @@ def radio_refractive_index(P, e, T):
     Parameters
     ----------
     P : number or Quantity
-        Total atmospheric pressure (hPa)
+        Dry atmospheric pressure (hPa)
     e : number or Quantity
         Water vapour pressure  (hPa)
     T : number or Quantity
