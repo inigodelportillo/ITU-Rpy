@@ -1,5 +1,5 @@
 codecov:
-  require_ci_to_pass: yes
+  require_ci_to_pass: no
 
 coverage:
   precision: 2
@@ -7,3 +7,6 @@ coverage:
   range: "80...100"
   status:
     patch: off  # off for now as it yells about everything
+    project:
+      default:
+        target: 90
