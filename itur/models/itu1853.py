@@ -104,8 +104,8 @@ class _ITU1853_1():
         # the probability the attenuation Ai (dB) is exceeded where Pi < P_K
         p_i = np.array([0.01, 0.02, 0.03, 0.05,
                         0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10])
-        Pi = np.array([p for p in p_i if p < P_rain * 100], dtype=np.float)
-        Ai = np.array([0 for p in p_i if p < P_rain * 100], dtype=np.float)
+        Pi = np.array([p for p in p_i if p < P_rain * 100], dtype=float)
+        Ai = np.array([0 for p in p_i if p < P_rain * 100], dtype=float)
 
         for i, p in enumerate(Pi):
             Ai[i] = rain_attenuation(lat, lon, f, el, hs, p, tau=tau).value
