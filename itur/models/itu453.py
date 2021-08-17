@@ -417,12 +417,12 @@ def dry_term_radio_refractivity(Pd, T):
     return val * u.dimensionless_unscaled
 
 
-def radio_refractive_index(P, e, T):
+def radio_refractive_index(Pd, e, T):
     """Compute the radio refractive index.
 
     Parameters
     ----------
-    P : number or Quantity
+    Pd : number or Quantity
         Dry atmospheric pressure (hPa)
     e : number or Quantity
         Water vapour pressure  (hPa)
@@ -443,7 +443,7 @@ def radio_refractive_index(P, e, T):
     https://www.itu.int/rec/R-REC-P.453/en
 
     """
-    P = prepare_quantity(P, u.hPa, 'Total atmospheric pressure')
+    P = prepare_quantity(P, u.hPa, 'Dry atmospheric pressure')
     e = prepare_quantity(e, u.hPa, 'Water vapour pressure ')
     T = prepare_quantity(T, u.K, 'Absolute temperature')
     val = __model.radio_refractive_index(P, e, T)
