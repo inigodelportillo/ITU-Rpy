@@ -301,7 +301,7 @@ class _ITU676_12_():
                 RuntimeWarning(
                     'The approximated method to compute '
                     'the gaseous attenuation in recommendation ITU-P 676-11 '
-                    'is only recommended for elevation angles between'
+                    'is only recommended for elevation angles between '
                     '5 and 90 degrees'))
 
         # Water vapour attenuation (gammaw) computation as in Section 1 of
@@ -626,7 +626,7 @@ class _ITU676_11_():
                 RuntimeWarning(
                     'The approximated method to compute '
                     'the gaseous attenuation in recommendation ITU-P 676-11 '
-                    'is only recommended for elevation angles between'
+                    'is only recommended for elevation angles between '
                     '5 and 90 degrees'))
 
         # Water vapour attenuation (gammaw) computation as in Section 1 of
@@ -972,7 +972,7 @@ class _ITU676_10_():
                 RuntimeWarning(
                     'The approximated method to compute '
                     'the gaseous attenuation in recommendation ITU-P 676-11 '
-                    'is only recommended for elevation angles between'
+                    'is only recommended for elevation angles between '
                     '5 and 90 degrees'))
 
         # Water vapour attenuation (gammaw) computation as in Section 1 of
