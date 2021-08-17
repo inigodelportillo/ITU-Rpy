@@ -42,6 +42,9 @@ import astropy.units as u
 
 from .__version__ import __version__
 
+# Ignore divide by zero errors
+np.seterr(divide='ignore')
+
 AUTHORS = "Inigo del Portillo"
 
 

@@ -193,13 +193,15 @@ class __ITU676__():
         # Abstract method to compute the specific attenuation due to water
         # vapour
         fcn = np.vectorize(self.instance.gammaw_approx)
-        return fcn(f, p, rho, t)
+        with np.errstate(invalid='ignore'):
+            return fcn(f, p, rho, t)
 
     def gamma0_approx(self, f, p, rho, t):
         # Abstract method to compute the specific attenuation due to dry
         # atmoshere
         fcn = np.vectorize(self.instance.gamma0_approx)
-        return fcn(f, p, rho, t)
+        with np.errstate(invalid='ignore'):
+            return fcn(f, p, rho, t)
 
 
 class _ITU676_12_():
@@ -299,7 +301,7 @@ class _ITU676_12_():
                 RuntimeWarning(
                     'The approximated method to compute '
                     'the gaseous attenuation in recommendation ITU-P 676-11 '
-                    'is only recommended for elevation angles between'
+                    'is only recommended for elevation angles between '
                     '5 and 90 degrees'))
 
         # Water vapour attenuation (gammaw) computation as in Section 1 of
@@ -624,7 +626,7 @@ class _ITU676_11_():
                 RuntimeWarning(
                     'The approximated method to compute '
                     'the gaseous attenuation in recommendation ITU-P 676-11 '
-                    'is only recommended for elevation angles between'
+                    'is only recommended for elevation angles between '
                     '5 and 90 degrees'))
 
         # Water vapour attenuation (gammaw) computation as in Section 1 of
@@ -870,8 +872,8 @@ class _ITU676_10_():
         rp = P / 1013.0
         rt = 288.0 / (T)
 
-        def phi(rp, rt, a, b, c, d): return np.power(
-            rp, a) * np.power(rt, b) * np.exp(c * (1 - rp) + d * (1 - rt))
+        def phi(rp, rt, a, b, c, d): return (
+            rp**a * np.power(rt, b) * np.exp(c * (1 - rp) + d * (1 - rt)))
 
         # Dry air attenuation (gamma0) computation as in Section 1 of Annex 2
         # of [1]
@@ -923,19 +925,20 @@ class _ITU676_10_():
                                           2.91 * rp**2 * rt**1.6)) *
                     f**2 * rp**2 * rt**3.5 * 1e-3 + delta)
 
-        gamma0 = \
-            np.where(
-                f <= 54, fcn_le_54(),
+        with np.errstate(invalid='ignore'):
+            gamma0 = \
                 np.where(
-                    np.logical_and(54 < f, f <= 60), fcn_le_60(),
+                    f <= 54, fcn_le_54(),
                     np.where(
-                        np.logical_and(60 < f, f <= 62), fcn_le_62(),
+                        np.logical_and(54 < f, f <= 60), fcn_le_60(),
                         np.where(
-                            np.logical_and(62 < f, f <= 66), fcn_le_66(),
+                            np.logical_and(60 < f, f <= 62), fcn_le_62(),
                             np.where(
-                                np.logical_and(66 < f, f <= 120),
-                                fcn_le_120(),
-                                fcn_rest())))))
+                                np.logical_and(62 < f, f <= 66), fcn_le_66(),
+                                np.where(
+                                    np.logical_and(66 < f, f <= 120),
+                                    fcn_le_120(),
+                                    fcn_rest())))))
 
         return gamma0
 
@@ -969,7 +972,7 @@ class _ITU676_10_():
                 RuntimeWarning(
                     'The approximated method to compute '
                     'the gaseous attenuation in recommendation ITU-P 676-11 '
-                    'is only recommended for elevation angles between'
+                    'is only recommended for elevation angles between '
                     '5 and 90 degrees'))
 
         # Water vapour attenuation (gammaw) computation as in Section 1 of
