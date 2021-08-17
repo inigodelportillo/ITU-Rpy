@@ -55,8 +55,8 @@ lat, lon = itur.utils.regular_lat_lon_grid()
 
 # Comute the atmospheric attenuation
 Att = itur.atmospheric_attenuation_slant_path(lat, lon, f, el, p, D) 
-itur.utils.plot_in_map(Att.value, lat, lon, 
-                       cbar_text='Atmospheric attenuation [dB]')
+itur.plotting.plot_in_map(Att.value, lat, lon, 
+                          cbar_text='Atmospheric attenuation [dB]')
 ```
 which produces:
 ![Attenuation worldmap](https://raw.githubusercontent.com/inigodelportillo/ITU-Rpy/master/docs/images/att_world.png)
