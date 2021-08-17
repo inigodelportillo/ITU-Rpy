@@ -86,24 +86,25 @@ class _ITU835_6():
 
         """
         h_p = 6356.766 * h / (6356.766 + h)
-        T = np.where(h_p <= 11, 288.15 - 6.5 * h_p,
-            np.where(np.logical_and(11 < h_p, h_p <= 20),
-                     216.65,
-            np.where(np.logical_and(20 < h_p, h_p <= 32),
-                     216.65 + (h_p - 20),
-            np.where(np.logical_and(32 < h_p, h_p <= 47),
-                     228.65 + 2.8 * (h_p - 32),
-            np.where(np.logical_and(47 < h_p, h_p <= 51),
-                     270.65,
-            np.where(np.logical_and(51 < h_p, h_p <= 71),
-                     270.65 - 2.8 * (h_p - 51),
-            np.where(np.logical_and(71 < h_p, h_p <= 84.852),
-                     214.65 - 2.0 * (h_p - 71),
-            np.where(np.logical_and(86 <= h, h <= 91),
-                     186.8673,
-            np.where(np.logical_and(91 < h, h <= 100),
-                     263.1905 - 76.3232 * np.sqrt((1 - ((h - 91)/19.9429)**2)),
-                     195.08134433524688)))))))))
+        with np.errstate(invalid='ignore'):
+            T = np.where(h_p <= 11, 288.15 - 6.5 * h_p,
+                np.where(np.logical_and(11 < h_p, h_p <= 20),
+                         216.65,
+                np.where(np.logical_and(20 < h_p, h_p <= 32),
+                         216.65 + (h_p - 20),
+                np.where(np.logical_and(32 < h_p, h_p <= 47),
+                         228.65 + 2.8 * (h_p - 32),
+                np.where(np.logical_and(47 < h_p, h_p <= 51),
+                         270.65,
+                np.where(np.logical_and(51 < h_p, h_p <= 71),
+                         270.65 - 2.8 * (h_p - 51),
+                np.where(np.logical_and(71 < h_p, h_p <= 84.852),
+                         214.65 - 2.0 * (h_p - 71),
+                np.where(np.logical_and(86 <= h, h <= 91),
+                         186.8673,
+                np.where(np.logical_and(91 < h, h <= 100),
+                         263.1905 - 76.3232 * np.sqrt((1 - ((h - 91)/19.9429)**2)),
+                         195.08134)))))))))
 
         return T
 
@@ -127,8 +128,7 @@ class _ITU835_6():
             np.where(np.logical_and(51 < h_p, h_p <= 71),
                      0.6694167 * (270.65 / (270.65 - 2.8 * (h_p - 51)))**(-34.1632 / 2.8),
             np.where(np.logical_and(71 < h_p, h_p <= 84.852),
-                     0.03956649 * np.power((214.65 / (214.65 - 2.0 * (h_p - 71))),
-                     (-34.1632 / 2.0)),
+                     0.03956649 *(214.65 / (214.65 - 2.0 * (h_p - 71)))**(-34.1632 / 2.0),
             np.where(np.logical_and(86 <= h, h <= 100),
                      np.exp(95.571899 -4.011801 * h + 6.424731e-2 * h**2 -
                             4.789660e-4 * h**3 + 1.340543e-6 * h**4),
