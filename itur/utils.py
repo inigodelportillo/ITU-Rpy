@@ -23,12 +23,6 @@ from astropy import units as u
 dir_path = os.path.dirname(os.path.realpath(__file__))
 dataset_dir = os.path.join(dir_path, 'data/')
 
-
-# Define numeric types including numpy types
-__NUMERIC_TYPES__ = [numbers.Number, int, float, complex,
-                     np.float, np.float16, np.float32, np.float64,
-                     np.int, np.int8, np.int16, np.int32, np.int64]
-
 # Define the geodetic system using the WSG-84 ellipsoid
 __wgs84_geod__ = Geod(ellps='WGS84')
 
@@ -178,10 +172,10 @@ def prepare_output_array(output_array, type_input=None):
     type_output = get_input_type(output_array)
     # First, cast the output_array to the same type of the input
     # Check if the output array is a 0-D number and cast it to a float
-    if (type_input in __NUMERIC_TYPES__ and
-        (type_output in __NUMERIC_TYPES__) or
+    if (type_input in numbers.Number and
+        (type_output in numbers.Number) or
         ((isinstance(output_array, np.ndarray) and output_array.size == 1) or
-         (not type_output not in __NUMERIC_TYPES__ and
+         (not type_output not in numbers.Number and
           len(output_array) == 1))):
         value = float(value)
 
