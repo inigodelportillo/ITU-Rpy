@@ -325,7 +325,7 @@ We conclude the quickstart with a summary of other functions included in *ITU-Rp
 
 	# Compute rain and cloud-related parameters
 	R_prob = itur.models.itu618.rain_attenuation_probability(lat, lon, el, hs)
-	R_pct_prob = itur.models.itu837.rain_percentage_probability(lat, lon)
+	R_pct_prob = itur.models.itu837.rainfall_probability(lat, lon)
 	R001 = itur.models.itu837.rainfall_rate(lat, lon, p)
 	h_0 = itur.models.itu839.isoterm_0(lat, lon)
 	h_rain = itur.models.itu839.rain_height(lat, lon)
