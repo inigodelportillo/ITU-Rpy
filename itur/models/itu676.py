@@ -193,13 +193,15 @@ class __ITU676__():
         # Abstract method to compute the specific attenuation due to water
         # vapour
         fcn = np.vectorize(self.instance.gammaw_approx)
-        return fcn(f, p, rho, t)
+        with np.errstate(invalid='ignore'):
+            return fcn(f, p, rho, t)
 
     def gamma0_approx(self, f, p, rho, t):
         # Abstract method to compute the specific attenuation due to dry
         # atmoshere
         fcn = np.vectorize(self.instance.gamma0_approx)
-        return fcn(f, p, rho, t)
+        with np.errstate(invalid='ignore'):
+            return fcn(f, p, rho, t)
 
 
 class _ITU676_12_():
