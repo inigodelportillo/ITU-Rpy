@@ -54,8 +54,8 @@ class __ITU453__():
     def dry_term_radio_refractivity(self, Pd, T):
         return self.instance.dry_term_radio_refractivity(Pd, T)
 
-    def radio_refractive_index(self, P, e, T):
-        return self.instance.radio_refractive_index(P, e, T)
+    def radio_refractive_index(self, Pd, e, T):
+        return self.instance.radio_refractive_index(Pd, e, T)
 
     def water_vapour_pressure(self, T, P, H, type_hydrometeor='water'):
         return self.instance.water_vapour_pressure(
@@ -154,8 +154,8 @@ class _ITU453_13_():
         return N_dry
 
     @classmethod
-    def radio_refractive_index(self, P, e, T):
-        N = 77.6 * P / T - 5.6 * e / T + 3.75e5 * e / T**2   # Eq. 6 [N-units]
+    def radio_refractive_index(self, Pd, e, T):
+        N = 77.6 * Pd / T + 72 * e / T + 3.75e5 * e / T**2   # Eq. 2 [N-units]
         n = 1 + N * 1e-6   # Eq. 1
         return n
 
@@ -307,8 +307,8 @@ class _ITU453_12_():
         return _ITU453_13_.dry_term_radio_refractivity(Pd, T)
 
     @staticmethod
-    def radio_refractive_index(P, e, T):
-        return _ITU453_13_.radio_refractive_index(P, e, T)
+    def radio_refractive_index(Pd, e, T):
+        return _ITU453_13_.radio_refractive_index(Pd, e, T)
 
     @staticmethod
     def water_vapour_pressure(T, P, H, type_hydrometeor='water'):
@@ -417,13 +417,13 @@ def dry_term_radio_refractivity(Pd, T):
     return val * u.dimensionless_unscaled
 
 
-def radio_refractive_index(P, e, T):
+def radio_refractive_index(Pd, e, T):
     """Compute the radio refractive index.
 
     Parameters
     ----------
-    P : number or Quantity
-        Total atmospheric pressure (hPa)
+    Pd : number or Quantity
+        Dry atmospheric pressure (hPa)
     e : number or Quantity
         Water vapour pressure  (hPa)
     T : number or Quantity
@@ -443,10 +443,10 @@ def radio_refractive_index(P, e, T):
     https://www.itu.int/rec/R-REC-P.453/en
 
     """
-    P = prepare_quantity(P, u.hPa, 'Total atmospheric pressure')
+    Pd = prepare_quantity(Pd, u.hPa, 'Dry atmospheric pressure')
     e = prepare_quantity(e, u.hPa, 'Water vapour pressure ')
     T = prepare_quantity(T, u.K, 'Absolute temperature')
-    val = __model.radio_refractive_index(P, e, T)
+    val = __model.radio_refractive_index(Pd, e, T)
     return val * u.dimensionless_unscaled
 
 
