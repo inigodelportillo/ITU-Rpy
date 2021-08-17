@@ -251,7 +251,7 @@ class ITU_TestCase(test.TestCase):
 
     def read_csv(self, path_name, columns):
         self.path_name = path_name
-        df = pd.read_csv(path_name, sep=',', skiprows=range(1, 2))
+        df = pd.read_csv(path_name, sep=',', skiprows=range(1, 2), encoding='cp1252')
         units = pd.read_csv(path_name, sep=',', nrows=2, encoding='cp1252')
         self.units = dict(units[columns].iloc[0])
         return df[columns]
