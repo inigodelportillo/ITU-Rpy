@@ -86,6 +86,7 @@ class _ITU835_6():
 
         """
         h_p = 6356.766 * h / (6356.766 + h)
+        # Warnings because of sqrt are expected
         with np.errstate(invalid='ignore'):
             T = np.where(h_p <= 11, 288.15 - 6.5 * h_p,
                 np.where(np.logical_and(11 < h_p, h_p <= 20),
