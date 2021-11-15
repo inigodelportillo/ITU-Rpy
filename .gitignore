@@ -142,3 +142,4 @@ write_test_cases.py
 .idea/misc.xml
 .idea/vcs.xml
 *.yaml
+.vscode/*
