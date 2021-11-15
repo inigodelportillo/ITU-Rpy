@@ -16,7 +16,7 @@ from itur.models.itu838 import rain_specific_attenuation
 from itur.models.itu839 import rain_height
 from itur.models.itu1511 import topographic_altitude
 from itur.utils import prepare_input_array, prepare_output_array,\
-    prepare_quantity, compute_distance_earth_to_earth, get_input_type
+    prepare_quantity, compute_distance_earth_to_earth, get_input_type, EPSILON
 
 import warnings
 
@@ -192,7 +192,7 @@ class _ITU618_13():
         # Obtain the raingall rate, exceeded for 0.01% of an average year,
         # if not provided, as described in ITU-R P.837.
         if R001 is None:
-            R001 = rainfall_rate(lat, lon, 0.01).to(u.mm / u.hr).value
+            R001 = rainfall_rate(lat, lon, 0.01).to(u.mm / u.hr).value + EPSILON
 
         # Step 5: Obtain the specific attenuation gammar using the frequency
         # dependent coefficients as given in ITU-R P.838
@@ -210,8 +210,10 @@ class _ITU618_13():
         # for 0.01% of the time:
         eta = np.rad2deg(np.arctan2(hr - hs, Lg * r001))
 
+        Delta_h = (hr - hs)
+        Delta_h[Delta_h <= 0] = EPSILON
         Lr = np.where(eta > el, Lg * r001 / np.cos(np.deg2rad(el)),
-                      (hr - hs) / np.sin(np.deg2rad(el)))
+                      Delta_h / np.sin(np.deg2rad(el)))
 
         xi = np.where(np.abs(lat) < 36, 36 - np.abs(lat), 0)
 
@@ -231,7 +233,7 @@ class _ITU618_13():
         if p >= 1:
             beta = np.zeros_like(A001)
         else:
-            beta = np.where(np.abs(lat) > 36,
+            beta = np.where(np.abs(lat) >= 36,
                             np.zeros_like(A001),
                             np.where((np.abs(lat) < 36) & (el > 25),
                                      -0.005 * (np.abs(lat) - 36),
@@ -532,7 +534,7 @@ class _ITU618_12():
         # Obtain the raingall rate, exceeded for 0.01% of an average year,
         # if not provided, as described in ITU-R P.837.
         if R001 is None:
-            R001 = rainfall_rate(lat, lon, 0.01).to(u.mm / u.hr).value
+            R001 = rainfall_rate(lat, lon, 0.01).to(u.mm / u.hr).value + EPSILON
 
         # Step 5: Obtain the specific attenuation gammar using the frequency
         # dependent coefficients as given in ITU-R P.838
@@ -549,8 +551,10 @@ class _ITU618_12():
         # for 0.01% of the time:
         eta = np.rad2deg(np.arctan2(hr - hs, Lg * r001))
 
+        Delta_h= (hr - hs)
+        Delta_h[Delta_h <= 0] = EPSILON
         Lr = np.where(eta > el, Lg * r001 / np.cos(np.deg2rad(el)),
-                      (hr - hs) / np.sin(np.deg2rad(el)))
+                      Delta_h / np.sin(np.deg2rad(el)))
 
         xi = np.where(np.abs(lat) < 36, 36 - np.abs(lat), 0)
 
@@ -570,7 +574,7 @@ class _ITU618_12():
         if p >= 1:
             beta = np.zeros_like(A001)
         else:
-            beta = np.where(np.abs(lat) > 36,
+            beta = np.where(np.abs(lat) >= 36,
                             np.zeros_like(A001),
                             np.where((np.abs(lat) < 36) & (el > 25),
                                      -0.005 * (np.abs(lat) - 36),
