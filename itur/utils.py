@@ -32,6 +32,9 @@ __NUMERIC_TYPES__ = [numbers.Number, int, float, complex,
 # Define the geodetic system using the WSG-84 ellipsoid
 __wgs84_geod__ = Geod(ellps='WGS84')
 
+# A very small quantity used to avoid log(0) errors.
+EPSILON = 1e-9
+
 
 def load_data_interpolator(path_lat, path_lon, path_data, interp_fcn,
                            flip_ud=True):
@@ -230,7 +233,9 @@ def prepare_quantity(value, units=None, name_val=None):
 
     # If the units of the value are a temperature
     if isinstance(value, u.Quantity):
-        if units in [u.K, u.deg_C, u.Kelvin, u.Celsius, u.imperial.deg_F]:
+        if value.unit == units:
+            return value.value
+        elif units in [u.K, u.deg_C, u.Kelvin, u.Celsius, u.imperial.deg_F]:
             return value.to(units, equivalencies=u.temperature()).value
         else:
             return value.to(units).value
