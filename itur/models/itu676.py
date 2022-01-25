@@ -17,8 +17,10 @@ from itur.models.itu836 import total_water_vapour_content
 from itur.models.itu1511 import topographic_altitude
 from itur.utils import (prepare_quantity, prepare_output_array, get_input_type,
                         prepare_input_array, load_data, dataset_dir)
+from functools import lru_cache
 
 
+@lru_cache(maxsize=1000)
 def __gamma0_exact__(self, f, p, rho, T):
     # T in Kelvin
     # e : water vapour partial pressure in hPa (total barometric pressure
@@ -56,6 +58,7 @@ def __gamma0_exact__(self, f, p, rho, T):
     return gamma
 
 
+@lru_cache(maxsize=1000)
 def __gammaw_exact__(self, f, p, rho, T):
     # T in Kelvin
     # e : water vapour partial pressure in hPa (total barometric pressure
@@ -1370,6 +1373,11 @@ def gaseous_attenuation_slant_path(f, el, rho, P, T, V_t=None, h=None,
     h = prepare_quantity(h, u.km, 'Altitude')
     val = __model.gaseous_attenuation_slant_path(
         f, el, rho, P, T, V_t, h, mode)
+    
+    # The values of attenuation cannot be negative. The ITU models end up
+    # giving out negative values for certain inputs
+    val[val < 0] = 0
+
     return prepare_output_array(val, type_output) * u.dB
 
 
