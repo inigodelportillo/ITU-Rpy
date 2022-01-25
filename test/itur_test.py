@@ -290,7 +290,7 @@ class TestIturUtils(test.TestCase):
     def test_distance_haversine(self):
         val = itur.utils.compute_distance_earth_to_earth_haversine(
             lat_p=0, lon_p=0, lat_grid=10, lon_grid=10)
-        self.assertEqual(val, 1568.5205567985759)
+        np.testing.assert_allclose(val, 1568.5205567985759)
 
         val = itur.utils.compute_distance_earth_to_earth_haversine(
             lat_p=0, lon_p=0, lat_grid=np.array([10, 20]),

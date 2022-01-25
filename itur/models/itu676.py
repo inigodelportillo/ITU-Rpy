@@ -1370,6 +1370,11 @@ def gaseous_attenuation_slant_path(f, el, rho, P, T, V_t=None, h=None,
     h = prepare_quantity(h, u.km, 'Altitude')
     val = __model.gaseous_attenuation_slant_path(
         f, el, rho, P, T, V_t, h, mode)
+    
+    # The values of attenuation cannot be negative. The ITU models end up
+    # giving out negative values for certain inputs
+    val[val < 0] = 0
+
     return prepare_output_array(val, type_output) * u.dB
 
 

@@ -17,42 +17,61 @@ frequency, geographic location and elevation angle. ITU-Rpy allows for fast,
 vectorial computation of the different contributions to the atmospheric
 attenuation.
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function
 
-__all__ = ['utils', 'plotting']
-import itur.utils
+__all__ = ["utils", "plotting"]
+import warnings
+
+import astropy.units as u
+import numpy as np
+
 import itur.plotting
+import itur.utils
 
+from .__version__ import __version__
 from .models.itu618 import rain_attenuation, scintillation_attenuation
-from .models.itu676 import gaseous_attenuation_slant_path, \
-    gaseous_attenuation_inclined_path, \
-    gaseous_attenuation_terrestrial_path
+from .models.itu676 import (
+    gaseous_attenuation_inclined_path,
+    gaseous_attenuation_slant_path,
+    gaseous_attenuation_terrestrial_path,
+)
 from .models.itu835 import standard_pressure
-from .models.itu836 import surface_water_vapour_density, \
-    total_water_vapour_content
+from .models.itu836 import surface_water_vapour_density, total_water_vapour_content
 from .models.itu840 import cloud_attenuation
 from .models.itu1510 import surface_mean_temperature
 from .models.itu1511 import topographic_altitude
 
-import numpy as np
-import warnings
-import astropy.units as u
-
-from .__version__ import __version__
-
 # Ignore divide by zero errors
-np.seterr(divide='ignore')
+np.seterr(divide="ignore")
 
 AUTHORS = "Inigo del Portillo"
 
 
 def atmospheric_attenuation_slant_path(
-        lat, lon, f, el, p, D, hs=None, rho=None, R001=None, eta=0.5, T=None,
-        H=None, P=None, hL=1e3, Ls=None, tau=45, V_t=None, mode='approx',
-        return_contributions=False, include_rain=True, include_gas=True,
-        include_scintillation=True, include_clouds=True):
+    lat,
+    lon,
+    f,
+    el,
+    p,
+    D,
+    hs=None,
+    rho=None,
+    R001=None,
+    eta=0.5,
+    T=None,
+    H=None,
+    P=None,
+    hL=1e3,
+    Ls=None,
+    tau=45,
+    V_t=None,
+    mode="approx",
+    return_contributions=False,
+    include_rain=True,
+    include_gas=True,
+    include_scintillation=True,
+    include_clouds=True,
+):
     """
     Calculate long-term atmospheric attenuation statistics for slant paths.
 
@@ -168,10 +187,12 @@ def atmospheric_attenuation_slant_path(
     if np.logical_or(p < 0.001, p > 50).any():
         warnings.warn(
             RuntimeWarning(
-                'The method to compute the total '
-                'atmospheric attenuation in recommendation ITU-P 618-13 '
-                'is only recommended for unavailabilities (p) between '
-                '0.001 % and 50 %'))
+                "The method to compute the total "
+                "atmospheric attenuation in recommendation ITU-P 618-13 "
+                "is only recommended for unavailabilities (p) between "
+                "0.001% and 50 %"
+            )
+        )
 
     # This takes account of the fact that a large part of the cloud attenuation
     # and gaseous attenuation is already included in the rain attenuation
@@ -216,8 +237,7 @@ def atmospheric_attenuation_slant_path(
         Ac = 0 * u.dB
 
     if include_scintillation:
-        As = scintillation_attenuation(lat, lon, f, el, p, D, eta,
-                                       T, H, P, hL)
+        As = scintillation_attenuation(lat, lon, f, el, p, D, eta, T, H, P, hL)
     else:
         As = 0 * u.dB
 

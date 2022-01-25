@@ -686,6 +686,11 @@ def cloud_attenuation(lat, lon, el, f, p, Lred=None):
         Lred, u.kg / u.m**2,
         'Total columnar contents of reduced cloud liquid water.')
     val = __model.cloud_attenuation(lat, lon, el, f, p, Lred)
+    
+    # The values of attenuation cannot be negative. The ITU models end up
+    # giving out negative values for certain inputs
+    val[val < 0] = 0
+
     return prepare_output_array(val, type_output) * u.dB
 
 

@@ -440,7 +440,7 @@ class _ITU618_13():
         return XPD_p
 
     @classmethod
-    def scintillation_attenuation_sigma(self, lat, lon, f, el, p, D, eta=0.5,
+    def scintillation_attenuation_sigma(cls, lat, lon, f, el, p, D, eta=0.5,
                                         T=None, H=None, P=None, hL=1000):
         # Step 1: For the value of t, calculate the saturation water vapour
         # pressure, es, (hPa), as specified in Recommendation ITU-R P.453.
@@ -478,11 +478,11 @@ class _ITU618_13():
         return sigma
 
     @classmethod
-    def scintillation_attenuation(self, lat, lon, f, el, p, D, eta=0.5, T=None,
+    def scintillation_attenuation(cls, lat, lon, f, el, p, D, eta=0.5, T=None,
                                   H=None, P=None, hL=1000):
         # Step 1 - 7: Calculate the standard deviation of the signal for the
         # applicable period and propagation path:
-        sigma = self.scintillation_attenuation_sigma(lat, lon, f, el, p,
+        sigma = cls.scintillation_attenuation_sigma(lat, lon, f, el, p,
                                                      D, eta, T, H, P, hL)
         # Step 8: Calculate the time percentage factor, a(p), for the time
         # percentage, p, in the range between 0.01% < p < 50%:
@@ -508,7 +508,7 @@ class _ITU618_12():
             warnings.warn(
                 RuntimeWarning('The method to compute the rain attenuation in '
                                'recommendation ITU-P 618-12 is only valid for '
-                               'unavailability values between 0.001 and 5'))
+                               'unavailability values between 0.001% and 5%'))
 
         Re = 8500   # Efective radius of the Earth (8500 km)
 
@@ -718,6 +718,11 @@ def rain_attenuation(lat, lon, f, el, hs=None, p=0.01, R001=None,
 
     val = __model.rain_attenuation(lat, lon, f, el, hs=hs, p=p,
                                    R001=R001, tau=tau, Ls=Ls)
+    
+    # The values of attenuation cannot be negative. The ITU models end up
+    # giving out negative values for certain inputs
+    val[val < 0] = 0
+    
     return prepare_output_array(val, type_output) * u.dB
 
 
@@ -931,6 +936,10 @@ def scintillation_attenuation(lat, lon, f, el, p, D, eta=0.5, T=None,
 
     val = __model.scintillation_attenuation(
         lat, lon, f, el, p, D, eta=eta, T=T, H=H, P=P, hL=hL)
+    
+    # The values of attenuation cannot be negative. The ITU models end up
+    # giving out negative values for certain inputs
+    val[val < 0] = 0
 
     return prepare_output_array(val, type_output) * u.dB
 
