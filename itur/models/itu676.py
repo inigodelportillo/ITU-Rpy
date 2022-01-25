@@ -17,10 +17,8 @@ from itur.models.itu836 import total_water_vapour_content
 from itur.models.itu1511 import topographic_altitude
 from itur.utils import (prepare_quantity, prepare_output_array, get_input_type,
                         prepare_input_array, load_data, dataset_dir)
-from functools import lru_cache
 
 
-@lru_cache(maxsize=1000)
 def __gamma0_exact__(self, f, p, rho, T):
     # T in Kelvin
     # e : water vapour partial pressure in hPa (total barometric pressure
@@ -58,7 +56,6 @@ def __gamma0_exact__(self, f, p, rho, T):
     return gamma
 
 
-@lru_cache(maxsize=1000)
 def __gammaw_exact__(self, f, p, rho, T):
     # T in Kelvin
     # e : water vapour partial pressure in hPa (total barometric pressure
