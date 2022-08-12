@@ -158,10 +158,10 @@ class __ITU676__():
         fcn = np.vectorize(self.instance.gaseous_attenuation_slant_path)
         return fcn(f, el, rho, P, T, V_t, h, mode)
 
-    def slant_inclined_path_equivalent_height(self, f, p, rho, T):
+    def slant_inclined_path_equivalent_height(self, f, P, rho, T):
         fcn = np.vectorize(self.instance.slant_inclined_path_equivalent_height,
                            excluded=[0], otypes=[np.ndarray])
-        return np.array(fcn(f, p, rho, T).tolist())
+        return np.array(fcn(f, P, rho, T).tolist())
 
     def zenit_water_vapour_attenuation(
             self, lat, lon, p, f, V_t=None, h=None):
@@ -637,10 +637,10 @@ class _ITU676_11_():
         return gamma0, gammaw
 
     @classmethod
-    def slant_inclined_path_equivalent_height(self, f, p, rho=None, T=None):
+    def slant_inclined_path_equivalent_height(self, f, P, rho=None, T=None):
         """
         """
-        rp = p / 1013.25
+        rp = P / 1013.25
         t1 = 4.64 / (1 + 0.066 * rp**-2.3) * \
             np.exp(- ((f - 59.7) / (2.87 + 12.4 * np.exp(-7.9 * rp)))**2)
         t2 = (0.14 * np.exp(2.12 * rp)) / \
@@ -983,10 +983,10 @@ class _ITU676_10_():
         return gamma0, gammaw
 
     @classmethod
-    def slant_inclined_path_equivalent_height(self, f, p, rho=None, T=None):
+    def slant_inclined_path_equivalent_height(self, f, P, rho=None, T=None):
         """
         """
-        rp = p / 1013.0
+        rp = P / 1013.0
         t1 = (4.64) / (1 + 0.066 * rp**-2.3) * \
             np.exp(- ((f - 59.7) / (2.87 + 12.4 * np.exp(-7.9 * rp)))**2)
         t2 = (0.14 * np.exp(2.21 * rp)) / \
@@ -1435,7 +1435,7 @@ def gaseous_attenuation_inclined_path(f, el, rho, P, T, h1, h2, mode='approx'):
     return prepare_output_array(val, type_output) * u.dB
 
 
-def slant_inclined_path_equivalent_height(f, p, rho=7.5, T=298.15):
+def slant_inclined_path_equivalent_height(f, P, rho=7.5, T=298.15):
     """ Computes the equivalent height to be used for oxygen and water vapour
     gaseous attenuation computations.
 
@@ -1443,12 +1443,10 @@ def slant_inclined_path_equivalent_height(f, p, rho=7.5, T=298.15):
     ----------
     f : number or Quantity
         Frequency (GHz)
-    p : number
-        Percentage of the time the gaseous attenuation value is exceeded.
-    rho : number or Quantity
-        Water vapor density (g/m3)
     P : number or Quantity
         Atmospheric pressure (hPa)
+    rho : number or Quantity
+        Water vapor density (g/m3)
     T : number or Quantity
         Absolute temperature (K)
 
@@ -1465,10 +1463,11 @@ def slant_inclined_path_equivalent_height(f, p, rho=7.5, T=298.15):
     """
     type_output = get_input_type(f)
     f = prepare_quantity(f, u.GHz, 'Frequency')
+    P = prepare_quantity(P, u.hPa, 'Atmospheric pressure ')
     rho = prepare_quantity(rho, u.g / u.m**3, 'Water vapor density')
     T = prepare_quantity(T, u.K, 'Temperature')
 
-    val = __model.slant_inclined_path_equivalent_height(f, p, rho, T)
+    val = __model.slant_inclined_path_equivalent_height(f, P, rho, T)
     return prepare_output_array(val, type_output) * u.m
 
 
