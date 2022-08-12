@@ -436,7 +436,7 @@ def elevation_angle(h, lat_s, lon_s, lat_grid, lon_grid):
 
     References
     ----------
-    [1] http://www.propagation.gatech.edu/ECE6390/notes/ASD5.pdf - Slides 3, 4
+    [1] https://propagation.ece.gatech.edu/ECE6390/notes/ASD5.pdf - Slides 3, 4
     """
     h = prepare_quantity(h, u.km, name_val='Orbital altitude of the satellite')
 
