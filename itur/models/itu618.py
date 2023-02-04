@@ -107,8 +107,9 @@ class _ITU618():
 #        elif version == 1:
 #            self.instance = _ITU618_1()
         else:
-            raise ValueError(('Version {0} is not implemented'
-                              ' for the ITU-R P.618 model.').format(version))
+            raise ValueError(
+                f"Version {version} is not implemented" " for the ITU-R P.618 model."
+            )
 
     @property
     def __version__(self):

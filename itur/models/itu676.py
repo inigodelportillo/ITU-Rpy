@@ -134,8 +134,8 @@ class __ITU676__():
 #            self.instance = _ITU676_1()
         else:
             raise ValueError(
-                'Version {0} is not implemented for the ITU-R P.676 model.'
-                .format(version))
+                f"Version {version} is not implemented for the ITU-R P.676 model."
+            )
 
     @property
     def __version__(self):

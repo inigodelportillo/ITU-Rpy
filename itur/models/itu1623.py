@@ -57,8 +57,8 @@ class __ITU1623__:
             self.instance = _ITU1623_0_()
         else:
             raise ValueError(
-                "Version {0} is not implemented for the ITU-R P.1623 model."
-                .format(version))
+                f"Version {version} is not implemented for the ITU-R P.1623 model."
+            )
 
         self._zero_isoterm_data = {}
 

@@ -40,8 +40,8 @@ class __ITU839__():
 #            self.instance = _ITU839_0()
         else:
             raise ValueError(
-                'Version {0} is not implemented for the ITU-R P.839 model.'
-                .format(version))
+                f"Version {version} is not implemented for the ITU-R P.839 model."
+            )
 
         self._zero_isoterm_data = {}
 

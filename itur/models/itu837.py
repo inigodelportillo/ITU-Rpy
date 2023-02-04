@@ -50,8 +50,8 @@ class __ITU837():
 #            self.instance = _ITU837_1()
         else:
             raise ValueError(
-                'Version {0} is not implemented for the ITU-R P.837 model.'
-                .format(version))
+                f"Version {version} is not implemented for the ITU-R P.837 model."
+            )
 
         self._Pr6 = {}
         self._Mt = {}
@@ -89,9 +89,11 @@ class _ITU837_7():
         if not self._Mt:
             for _m in self.months:
                 self._Mt[_m] = load_data_interpolator(
-                    '837/v7_lat_mt.npz', '837/v7_lon_mt.npz',
-                    '837/v7_mt_month{0:02d}.npz'.format(_m),
-                    bilinear_2D_interpolator)
+                    "837/v7_lat_mt.npz",
+                    "837/v7_lon_mt.npz",
+                    f"837/v7_mt_month{_m:02d}.npz",
+                    bilinear_2D_interpolator,
+                )
 
         # In this recommendation the longitude is encoded with format -180 to
         # 180 whereas we always use 0 - 360 encoding
