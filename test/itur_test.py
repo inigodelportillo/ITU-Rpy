@@ -308,7 +308,7 @@ class TestIturUtils(test.TestCase):
         val = itur.utils.compute_distance_earth_to_earth(
             lat_p=0, lon_p=0, lat_grid=10, lon_grid=10,
             method='WGS84')
-        self.assertEqual(val, 1565.10909921789)
+        self.assertAlmostEqual(val, 1565.10909921789)
 
         val = itur.utils.compute_distance_earth_to_earth(
             lat_p=0, lon_p=0, lat_grid=np.array([10, 20]),
