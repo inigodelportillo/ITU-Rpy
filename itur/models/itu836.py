@@ -131,9 +131,7 @@ class __ITU836:
             self.instance = _ITU836_4()
         else:
             raise ValueError(
-                "Version {0} is not implemented for the ITU-R P.836 model.".format(
-                    version
-                )
+                f"Version {version} is not implemented for the ITU-R P.836 model."
             )
 
         self._V = {}

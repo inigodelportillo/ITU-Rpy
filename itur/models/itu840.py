@@ -100,9 +100,7 @@ class __ITU840__:
             self.instance = _ITU840_4_()
         else:
             raise ValueError(
-                "Version {0}  is not implemented for the ITU-R P.840 model.".format(
-                    version
-                )
+                f"Version {version}  is not implemented for the ITU-R P.840 model."
             )
 
     @property

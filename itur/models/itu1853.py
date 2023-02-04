@@ -43,9 +43,7 @@ class __ITU1853:
             self.instance = _ITU1853_0()
         else:
             raise ValueError(
-                "Version {0} is not implemented for the ITU-R P.1853 model.".format(
-                    version
-                )
+                f"Version {version} is not implemented for the ITU-R P.1853 model."
             )
 
     @staticmethod

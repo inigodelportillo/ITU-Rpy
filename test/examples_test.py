@@ -341,7 +341,7 @@ class TestGaseousAttenuation(test.TestCase):
             P = itu835.standard_pressure(h)
             T = itu835.standard_temperature(h)
             atts = itu676.gamma_exact(fs * itur.u.GHz, P, rho, T)
-            plt.plot(fs, atts.value, label="Altitude {0} km".format(h.value))
+            plt.plot(fs, atts.value, label=f"Altitude {h.value} km")
 
         plt.xlabel("Frequency [GHz]")
         plt.ylabel("Specific attenuation [dB/km]")

@@ -47,9 +47,7 @@ class __ITU453__:
             self.instance = _ITU453_12_()
         else:
             raise ValueError(
-                "Version {0} is not implemented for the ITU-R P.453 model.".format(
-                    version
-                )
+                f"Version {version} is not implemented for the ITU-R P.453 model."
             )
 
     @property

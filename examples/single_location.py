@@ -33,90 +33,37 @@ T_sa = itur.models.itu835.temperature(lat, hs)
 V = itur.models.itu836.total_water_vapour_content(lat, lon, p, hs)
 
 print(
-    (
-        "The ITU recommendations predict the following values for the point "
-        "located at coordinates ({0}, {1})"
-    ).format(lat, lon)
+    f"The ITU recommendations predict the following values for the point located at coordinates ({lat}, {lon})"
 )
 
 print(
-    "  - Height above the sea level                  [ITU-R P.1511]  {0:.1f}".format(
-        hs.to(itur.u.m)
-    )
+    f"  - Height above the sea level                  [ITU-R P.1511]  {hs.to(itur.u.m):.1f}"
 )
-print(
-    "  - Surface mean temperature                    [ITU-R P.1510]  {0:.1f}".format(
-        T.to(itur.u.Celsius, equivalencies=itur.u.temperature())
-    )
-)
-print(
-    "  - Surface pressure                            [ITU-R P.835]   {0:.1f}".format(P)
-)
-print(
-    "  - Standard surface temperature                [ITU-R P.835]   {0:.1f}".format(
-        T_sa.to(itur.u.Celsius, equivalencies=itur.u.temperature())
-    )
-)
-print(
-    "  - Standard water vapour density               [ITU-R P.835]   {0:.1f}".format(
-        rho_sa
-    )
-)
-print(
-    "  - Water vapor density (p={0}%)                [ITU-R P.836]   {1:.1f}".format(
-        p, rho_p
-    )
-)
-print(
-    "  - Total water vapour content (p={0}%)         [ITU-R P.836]   {1:.1f}".format(
-        p, V
-    )
-)
+T_C = T.to(itur.u.Celsius, equivalencies=itur.u.temperature())
+print(f"  - Surface mean temperature                    [ITU-R P.1510]  {T_C:.1f}")
+print(f"  - Surface pressure                            [ITU-R P.835]   {P:.1f}")
+T_sa_C = T_sa.to(itur.u.Celsius, equivalencies=itur.u.temperature())
+print(f"  - Standard surface temperature                [ITU-R P.835]   {T_sa_C:.1f}")
+print(f"  - Standard water vapour density               [ITU-R P.835]   {rho_sa:.1f}")
+print(f"  - Water vapor density (p={p}%)                [ITU-R P.836]   {rho_p:.1f}")
+print(f"  - Total water vapour content (p={p}%)         [ITU-R P.836]   {V:.1f}")
 
 # Compute rain and cloud-related parameters
 R_prob = itur.models.itu618.rain_attenuation_probability(lat, lon, el, hs)
-R_pct_prob = itur.models.itu837.rainfall_probability(lat, lon)
+R_pct = itur.models.itu837.rainfall_probability(lat, lon)
 R001 = itur.models.itu837.rainfall_rate(lat, lon, p)
 h_0 = itur.models.itu839.isoterm_0(lat, lon)
 h_rain = itur.models.itu839.rain_height(lat, lon)
 L_red = itur.models.itu840.columnar_content_reduced_liquid(lat, lon, p)
 A_w = itur.models.itu676.zenit_water_vapour_attenuation(lat, lon, p, f, h=hs)
 
-print(
-    "  - Rain attenuation probability                [ITU-R P.618]   {0:.1f}".format(
-        R_prob
-    )
-)
-print(
-    "  - Rain percentage probability                 [ITU-R P.837]   {0:.1f}".format(
-        R_pct_prob
-    )
-)
-print(
-    "  - Rainfall rate exceeded for p={0}%           [ITU-R P.837]   {1:.1f}".format(
-        p, R001
-    )
-)
-print(
-    "  - 0 degree C isotherm height                  [ITU-R P.839]   {0:.1f}".format(
-        h_0
-    )
-)
-print(
-    "  - Rain height                                 [ITU-R P.839]   {0:.1f}".format(
-        h_rain
-    )
-)
-print(
-    "  - Columnar content of reduced liquid (p={0}%) [ITU-R P.840]   {1:.1f}".format(
-        p, L_red
-    )
-)
-print(
-    "  - Zenit water vapour attenuation (p={0}%)     [ITU-R P.676]   {1:.1f}".format(
-        p, A_w
-    )
-)
+print(f"  - Rain attenuation probability                [ITU-R P.618]   {R_prob:.1f}")
+print(f"  - Rain percentage probability                 [ITU-R P.837]   {R_pct:.1f}")
+print(f"  - Rainfall rate exceeded for p={p}%           [ITU-R P.837]   {R001:.1f}")
+print(f"  - 0 degree C isotherm height                  [ITU-R P.839]   {h_0:.1f}")
+print(f"  - Rain height                                 [ITU-R P.839]   {h_rain:.1f}")
+print(f"  - Columnar content of reduced liquid (p={p}%) [ITU-R P.840]   {L_red:.1f}")
+print(f"  - Zenit water vapour attenuation (p={p}%)     [ITU-R P.676]   {A_w:.1f}")
 
 # Compute attenuation values
 A_g = itur.gaseous_attenuation_slant_path(f, el, rho_p, P, T)
@@ -126,35 +73,13 @@ A_s = itur.scintillation_attenuation(lat, lon, f, el, p, D)
 A_t = itur.atmospheric_attenuation_slant_path(lat, lon, f, el, p, D)
 
 print(
-    (
-        "\n\nAttenuation values exceeded for p={0}% of the average year "
-        "for a link with el={1} deg, f={2}, \nD={3} and "
-        "receiver ground station located at coordinates ({4}, {5})"
-    ).format(p, el, f, D, lat, lon)
+    f"\n\nAttenuation values exceeded for p={p}% of the average year "
+    f"for a link with el={el} deg, f={f}, \nD={D} and "
+    f"receiver ground station located at coordinates ({lat}, {lon})"
 )
 
-print(
-    "  - Rain attenuation                            [ITU-R P.618]   {0:.1f}".format(
-        A_r
-    )
-)
-print(
-    "  - Gaseous attenuation                         [ITU-R P.676]   {0:.1f}".format(
-        A_g
-    )
-)
-print(
-    "  - Clouds attenuation                          [ITU-R P.840]   {0:.1f}".format(
-        A_c
-    )
-)
-print(
-    "  - Scintillation attenuation                   [ITU-R P.618]   {0:.1f}".format(
-        A_s
-    )
-)
-print(
-    "  - Total atmospheric attenuation               [ITU-R P.618]   {0:.1f}".format(
-        A_t
-    )
-)
+print(f"  - Rain attenuation                            [ITU-R P.618]   {A_r:.1f}")
+print(f"  - Gaseous attenuation                         [ITU-R P.676]   {A_g:.1f}")
+print(f"  - Clouds attenuation                          [ITU-R P.840]   {A_c:.1f}")
+print(f"  - Scintillation attenuation                   [ITU-R P.618]   {A_s:.1f}")
+print(f"  - Total atmospheric attenuation               [ITU-R P.618]   {A_t:.1f}")
