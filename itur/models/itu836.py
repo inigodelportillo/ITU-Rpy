@@ -10,27 +10,33 @@ import numpy as np
 from astropy import units as u
 
 from itur.models.itu1511 import topographic_altitude
-from itur.models.itu1144 import (bilinear_2D_interpolator,
-                                 bicubic_2D_interpolator)
-from itur.utils import (prepare_input_array, prepare_output_array,
-                        dataset_dir, prepare_quantity, get_input_type,
-                        load_data_interpolator)
+from itur.models.itu1144 import bilinear_2D_interpolator, bicubic_2D_interpolator
+from itur.utils import (
+    prepare_input_array,
+    prepare_output_array,
+    dataset_dir,
+    prepare_quantity,
+    get_input_type,
+    load_data_interpolator,
+)
 
 
-def __interpolator_836__(self, data, lat, lon, p, alt=None,
-                         alt_res_fcn=topographic_altitude):
+def __interpolator_836__(
+    self, data, lat, lon, p, alt=None, alt_res_fcn=topographic_altitude
+):
     lat_f = lat.flatten()
     lon_f = lon.flatten()
 
-    available_p = np.array([0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10,
-                            20, 30, 50, 60, 70, 80, 90, 95, 99])
+    available_p = np.array(
+        [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30, 50, 60, 70, 80, 90, 95, 99]
+    )
 
     if p in available_p:
         p_below = p_above = p
         pExact = True
     else:
         pExact = False
-        idx = available_p.searchsorted(p, side='right') - 1
+        idx = available_p.searchsorted(p, side="right") - 1
         idx = np.clip(idx, 0, len(available_p) - 1)
 
         p_below = available_p[idx]
@@ -40,13 +46,15 @@ def __interpolator_836__(self, data, lat, lon, p, alt=None,
     R = -(lat_f - 90) // 1.125
     C = lon_f // 1.125
 
-    lats = np.array([90 - R * 1.125, 90 - (R + 1) * 1.125,
-                     90 - R * 1.125, 90 - (R + 1) * 1.125])
+    lats = np.array(
+        [90 - R * 1.125, 90 - (R + 1) * 1.125, 90 - R * 1.125, 90 - (R + 1) * 1.125]
+    )
 
-    lons = np.mod(np.array([C * 1.125, C * 1.125,
-                            (C + 1) * 1.125, (C + 1) * 1.125]), 360)
+    lons = np.mod(
+        np.array([C * 1.125, C * 1.125, (C + 1) * 1.125, (C + 1) * 1.125]), 360
+    )
 
-    r = - (lat_f - 90) / 1.125
+    r = -(lat_f - 90) / 1.125
     c = lon_f / 1.125
 
     data_a = data(lats, lons, p_above)
@@ -63,33 +71,38 @@ def __interpolator_836__(self, data, lat, lon, p, alt=None,
     else:
         alt = alt.flatten()
 
-    data_a = data_a * np.exp(- (alt - altitude_res) * 1.0 / (VSCH_a))
+    data_a = data_a * np.exp(-(alt - altitude_res) * 1.0 / (VSCH_a))
 
-    data_a = (data_a[0, :] * ((R + 1 - r) * (C + 1 - c)) +
-              data_a[1, :] * ((r - R) * (C + 1 - c)) +
-              data_a[2, :] * ((R + 1 - r) * (c - C)) +
-              data_a[3, :] * ((r - R) * (c - C)))
+    data_a = (
+        data_a[0, :] * ((R + 1 - r) * (C + 1 - c))
+        + data_a[1, :] * ((r - R) * (C + 1 - c))
+        + data_a[2, :] * ((R + 1 - r) * (c - C))
+        + data_a[3, :] * ((r - R) * (c - C))
+    )
 
     if not pExact:
         data_b = data(lats, lons, p_below)
         VSCH_b = self.VSCH(lats, lons, p_below)
-        data_b = data_b * np.exp(- (alt - altitude_res) / (VSCH_b))
+        data_b = data_b * np.exp(-(alt - altitude_res) / (VSCH_b))
 
-        data_b = (data_b[0, :] * ((R + 1 - r) * (C + 1 - c)) +
-                  data_b[1, :] * ((r - R) * (C + 1 - c)) +
-                  data_b[2, :] * ((R + 1 - r) * (c - C)) +
-                  data_b[3, :] * ((r - R) * (c - C)))
+        data_b = (
+            data_b[0, :] * ((R + 1 - r) * (C + 1 - c))
+            + data_b[1, :] * ((r - R) * (C + 1 - c))
+            + data_b[2, :] * ((R + 1 - r) * (c - C))
+            + data_b[3, :] * ((r - R) * (c - C))
+        )
 
     # Compute the values of Lred_a
     if not pExact:
-        rho = data_b + (data_a - data_b) * (np.log(p) - np.log(p_below)) / \
-            (np.log(p_above) - np.log(p_below))
+        rho = data_b + (data_a - data_b) * (np.log(p) - np.log(p_below)) / (
+            np.log(p_above) - np.log(p_below)
+        )
         return rho.reshape(lat.shape)
     else:
         return data_a.reshape(lat.shape)
 
 
-class __ITU836():
+class __ITU836:
     """Private class to model the ITU-R P.836 recommendations.
 
     Water vapour: surface density and total columnar content
@@ -118,8 +131,10 @@ class __ITU836():
             self.instance = _ITU836_4()
         else:
             raise ValueError(
-                'Version {0} is not implemented for the ITU-R P.836 model.'
-                .format(version))
+                "Version {0} is not implemented for the ITU-R P.836 model.".format(
+                    version
+                )
+            )
 
         self._V = {}
         self._VSCH = {}
@@ -131,23 +146,28 @@ class __ITU836():
         return self.instance.__version__
 
     def surface_water_vapour_density(self, lat, lon, p, alt):
-        fcn = np.vectorize(self.instance.surface_water_vapour_density,
-                           excluded=[0, 1, 3], otypes=[np.ndarray])
+        fcn = np.vectorize(
+            self.instance.surface_water_vapour_density,
+            excluded=[0, 1, 3],
+            otypes=[np.ndarray],
+        )
         return np.array(fcn(lat, lon, p, alt).tolist())
 
     def total_water_vapour_content(self, lat, lon, p, alt):
-        fcn = np.vectorize(self.instance.total_water_vapour_content,
-                           excluded=[0, 1, 3], otypes=[np.ndarray])
+        fcn = np.vectorize(
+            self.instance.total_water_vapour_content,
+            excluded=[0, 1, 3],
+            otypes=[np.ndarray],
+        )
         return np.array(fcn(lat, lon, p, alt).tolist())
 
 
-class _ITU836_6():
-
+class _ITU836_6:
     def __init__(self):
         self.__version__ = 6
         self.year = 2017
         self.month = 12
-        self.link = 'https://www.itu.int/rec/R-REC-P.836-6-201712-I/en'
+        self.link = "https://www.itu.int/rec/R-REC-P.836-6-201712-I/en"
 
         self._V = {}
         self._VSCH = {}
@@ -156,73 +176,146 @@ class _ITU836_6():
 
     def V(self, lat, lon, p):
         if not self._V:
-            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
-                  50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '836/v6_v_%s.npz')
+            ps = [
+                0.1,
+                0.2,
+                0.3,
+                0.5,
+                1,
+                2,
+                3,
+                5,
+                10,
+                20,
+                30,
+                50,
+                60,
+                70,
+                80,
+                90,
+                95,
+                99,
+            ]
+            d_dir = os.path.join(dataset_dir, "836/v6_v_%s.npz")
             for p_loads in ps:
                 self._V[float(p_loads)] = load_data_interpolator(
-                    '836/v6_lat.npz', '836/v6_lon.npz',
-                    d_dir % (str(p_loads).replace('.', '')),
-                    bilinear_2D_interpolator, flip_ud=False)
+                    "836/v6_lat.npz",
+                    "836/v6_lon.npz",
+                    d_dir % (str(p_loads).replace(".", "")),
+                    bilinear_2D_interpolator,
+                    flip_ud=False,
+                )
 
-        return self._V[float(p)](
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._V[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(
+            lat.shape
+        )
 
     def VSCH(self, lat, lon, p):
         if not self._VSCH:
-            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
-                  50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '836/v6_vsch_%s.npz')
+            ps = [
+                0.1,
+                0.2,
+                0.3,
+                0.5,
+                1,
+                2,
+                3,
+                5,
+                10,
+                20,
+                30,
+                50,
+                60,
+                70,
+                80,
+                90,
+                95,
+                99,
+            ]
+            d_dir = os.path.join(dataset_dir, "836/v6_vsch_%s.npz")
             for p_loads in ps:
                 self._VSCH[float(p_loads)] = load_data_interpolator(
-                    '836/v6_lat.npz', '836/v6_lon.npz',
-                    d_dir % (str(p_loads).replace('.', '')),
-                    bilinear_2D_interpolator, flip_ud=False)
+                    "836/v6_lat.npz",
+                    "836/v6_lon.npz",
+                    d_dir % (str(p_loads).replace(".", "")),
+                    bilinear_2D_interpolator,
+                    flip_ud=False,
+                )
 
-        return self._VSCH[float(p)](
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._VSCH[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(
+            lat.shape
+        )
 
     def rho(self, lat, lon, p):
         if not self._rho:
-            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
-                  50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '836/v6_rho_%s.npz')
+            ps = [
+                0.1,
+                0.2,
+                0.3,
+                0.5,
+                1,
+                2,
+                3,
+                5,
+                10,
+                20,
+                30,
+                50,
+                60,
+                70,
+                80,
+                90,
+                95,
+                99,
+            ]
+            d_dir = os.path.join(dataset_dir, "836/v6_rho_%s.npz")
             for p_loads in ps:
                 self._rho[float(p_loads)] = load_data_interpolator(
-                    '836/v6_lat.npz', '836/v6_lon.npz',
-                    d_dir % (str(p_loads).replace('.', '')),
-                    bilinear_2D_interpolator, flip_ud=False)
+                    "836/v6_lat.npz",
+                    "836/v6_lon.npz",
+                    d_dir % (str(p_loads).replace(".", "")),
+                    bilinear_2D_interpolator,
+                    flip_ud=False,
+                )
 
-        return self._rho[float(p)](
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._rho[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(
+            lat.shape
+        )
 
     def topo_alt(self, lat, lon):
         if self._topo_alt is None:
             self._topo_alt = load_data_interpolator(
-                '836/v6_topolat.npz', '836/v6_topolon.npz',
-                '836/v6_topo_0dot5.npz', bicubic_2D_interpolator)
+                "836/v6_topolat.npz",
+                "836/v6_topolon.npz",
+                "836/v6_topo_0dot5.npz",
+                bicubic_2D_interpolator,
+            )
 
-        return self._topo_alt(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._topo_alt(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def surface_water_vapour_density(self, lat, lon, p, alt=None):
         return __interpolator_836__(
-            self, data=self.rho, lat=lat, lon=lon, p=p, alt=alt,
-            alt_res_fcn=self.topo_alt)
+            self,
+            data=self.rho,
+            lat=lat,
+            lon=lon,
+            p=p,
+            alt=alt,
+            alt_res_fcn=self.topo_alt,
+        )
 
     def total_water_vapour_content(self, lat, lon, p, alt=None):
         return __interpolator_836__(
-            self, data=self.V, lat=lat, lon=lon, p=p, alt=alt,
-            alt_res_fcn=self.topo_alt)
+            self, data=self.V, lat=lat, lon=lon, p=p, alt=alt, alt_res_fcn=self.topo_alt
+        )
 
 
-class _ITU836_5():
-
+class _ITU836_5:
     def __init__(self):
         self.__version__ = 5
         self.year = 2013
         self.month = 9
-        self.link = 'https://www.itu.int/rec/R-REC-P.836-5-201309-I/en'
+        self.link = "https://www.itu.int/rec/R-REC-P.836-5-201309-I/en"
 
         self._V = {}
         self._VSCH = {}
@@ -230,64 +323,141 @@ class _ITU836_5():
 
     def V(self, lat, lon, p):
         if not self._V:
-            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
-                  50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '836/v5_v_%s.npz')
+            ps = [
+                0.1,
+                0.2,
+                0.3,
+                0.5,
+                1,
+                2,
+                3,
+                5,
+                10,
+                20,
+                30,
+                50,
+                60,
+                70,
+                80,
+                90,
+                95,
+                99,
+            ]
+            d_dir = os.path.join(dataset_dir, "836/v5_v_%s.npz")
             for p_loads in ps:
                 self._V[float(p_loads)] = load_data_interpolator(
-                    '836/v5_lat.npz', '836/v5_lon.npz',
-                    d_dir % (str(p_loads).replace('.', '')),
-                    bilinear_2D_interpolator, flip_ud=False)
+                    "836/v5_lat.npz",
+                    "836/v5_lon.npz",
+                    d_dir % (str(p_loads).replace(".", "")),
+                    bilinear_2D_interpolator,
+                    flip_ud=False,
+                )
 
-        return self._V[float(p)](
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._V[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(
+            lat.shape
+        )
 
     def VSCH(self, lat, lon, p):
         if not self._VSCH:
-            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
-                  50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '836/v5_vsch_%s.npz')
+            ps = [
+                0.1,
+                0.2,
+                0.3,
+                0.5,
+                1,
+                2,
+                3,
+                5,
+                10,
+                20,
+                30,
+                50,
+                60,
+                70,
+                80,
+                90,
+                95,
+                99,
+            ]
+            d_dir = os.path.join(dataset_dir, "836/v5_vsch_%s.npz")
             for p_loads in ps:
                 self._VSCH[float(p_loads)] = load_data_interpolator(
-                    '836/v5_lat.npz', '836/v5_lon.npz',
-                    d_dir % (str(p_loads).replace('.', '')),
-                    bilinear_2D_interpolator, flip_ud=False)
+                    "836/v5_lat.npz",
+                    "836/v5_lon.npz",
+                    d_dir % (str(p_loads).replace(".", "")),
+                    bilinear_2D_interpolator,
+                    flip_ud=False,
+                )
 
-        return self._VSCH[float(p)](
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._VSCH[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(
+            lat.shape
+        )
 
     def rho(self, lat, lon, p):
         if not self._rho:
-            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
-                  50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '836/v5_rho_%s.npz')
+            ps = [
+                0.1,
+                0.2,
+                0.3,
+                0.5,
+                1,
+                2,
+                3,
+                5,
+                10,
+                20,
+                30,
+                50,
+                60,
+                70,
+                80,
+                90,
+                95,
+                99,
+            ]
+            d_dir = os.path.join(dataset_dir, "836/v5_rho_%s.npz")
             for p_loads in ps:
                 self._rho[float(p_loads)] = load_data_interpolator(
-                    '836/v5_lat.npz', '836/v5_lon.npz',
-                    d_dir % (str(p_loads).replace('.', '')),
-                    bilinear_2D_interpolator, flip_ud=False)
+                    "836/v5_lat.npz",
+                    "836/v5_lon.npz",
+                    d_dir % (str(p_loads).replace(".", "")),
+                    bilinear_2D_interpolator,
+                    flip_ud=False,
+                )
 
-        return self._rho[float(p)](
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._rho[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(
+            lat.shape
+        )
 
     def surface_water_vapour_density(self, lat, lon, p, alt=None):
         return __interpolator_836__(
-            self, data=self.rho, lat=lat, lon=lon, p=p, alt=alt,
-            alt_res_fcn=topographic_altitude)
+            self,
+            data=self.rho,
+            lat=lat,
+            lon=lon,
+            p=p,
+            alt=alt,
+            alt_res_fcn=topographic_altitude,
+        )
 
     def total_water_vapour_content(self, lat, lon, p, alt=None):
         return __interpolator_836__(
-            self, data=self.V, lat=lat, lon=lon, p=p, alt=alt,
-            alt_res_fcn=topographic_altitude)
+            self,
+            data=self.V,
+            lat=lat,
+            lon=lon,
+            p=p,
+            alt=alt,
+            alt_res_fcn=topographic_altitude,
+        )
 
 
-class _ITU836_4():
-
+class _ITU836_4:
     def __init__(self):
         self.__version__ = 4
         self.year = 2009
         self.month = 10
-        self.link = 'https://www.itu.int/rec/R-REC-P.836-4-200910-S/en'
+        self.link = "https://www.itu.int/rec/R-REC-P.836-4-200910-S/en"
 
         self._V = {}
         self._VSCH = {}
@@ -295,58 +465,136 @@ class _ITU836_4():
 
     def V(self, lat, lon, p):
         if not self._V:
-            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
-                  50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '836/v4_v_%s.npz')
+            ps = [
+                0.1,
+                0.2,
+                0.3,
+                0.5,
+                1,
+                2,
+                3,
+                5,
+                10,
+                20,
+                30,
+                50,
+                60,
+                70,
+                80,
+                90,
+                95,
+                99,
+            ]
+            d_dir = os.path.join(dataset_dir, "836/v4_v_%s.npz")
             for p_loads in ps:
                 self._V[float(p_loads)] = load_data_interpolator(
-                    '836/v4_lat.npz', '836/v4_lon.npz',
-                    d_dir % (str(p_loads).replace('.', '')),
-                    bilinear_2D_interpolator, flip_ud=False)
+                    "836/v4_lat.npz",
+                    "836/v4_lon.npz",
+                    d_dir % (str(p_loads).replace(".", "")),
+                    bilinear_2D_interpolator,
+                    flip_ud=False,
+                )
 
-        return self._V[float(p)](
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._V[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(
+            lat.shape
+        )
 
     def VSCH(self, lat, lon, p):
         if not self._VSCH:
-            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
-                  50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '836/v4_vsch_%s.npz')
+            ps = [
+                0.1,
+                0.2,
+                0.3,
+                0.5,
+                1,
+                2,
+                3,
+                5,
+                10,
+                20,
+                30,
+                50,
+                60,
+                70,
+                80,
+                90,
+                95,
+                99,
+            ]
+            d_dir = os.path.join(dataset_dir, "836/v4_vsch_%s.npz")
             for p_loads in ps:
                 self._VSCH[float(p_loads)] = load_data_interpolator(
-                    '836/v4_lat.npz', '836/v4_lon.npz',
-                    d_dir % (str(p_loads).replace('.', '')),
-                    bilinear_2D_interpolator, flip_ud=False)
+                    "836/v4_lat.npz",
+                    "836/v4_lon.npz",
+                    d_dir % (str(p_loads).replace(".", "")),
+                    bilinear_2D_interpolator,
+                    flip_ud=False,
+                )
 
-        return self._VSCH[float(p)](
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._VSCH[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(
+            lat.shape
+        )
 
     def rho(self, lat, lon, p):
         if not self._rho:
-            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
-                  50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '836/v4_rho_%s.npz')
+            ps = [
+                0.1,
+                0.2,
+                0.3,
+                0.5,
+                1,
+                2,
+                3,
+                5,
+                10,
+                20,
+                30,
+                50,
+                60,
+                70,
+                80,
+                90,
+                95,
+                99,
+            ]
+            d_dir = os.path.join(dataset_dir, "836/v4_rho_%s.npz")
             for p_loads in ps:
                 self._rho[float(p_loads)] = load_data_interpolator(
-                    '836/v4_lat.npz', '836/v4_lon.npz',
-                    d_dir % (str(p_loads).replace('.', '')),
-                    bilinear_2D_interpolator, flip_ud=False)
+                    "836/v4_lat.npz",
+                    "836/v4_lon.npz",
+                    d_dir % (str(p_loads).replace(".", "")),
+                    bilinear_2D_interpolator,
+                    flip_ud=False,
+                )
 
-        return self._rho[float(p)](
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._rho[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(
+            lat.shape
+        )
 
     # The procedure to compute the surface water vapour density and the
     # total water vapour content is similar to the ones in recommendation
     # ITU-P R.836-5.
     def surface_water_vapour_density(self, lat, lon, p, alt=None):
         return __interpolator_836__(
-            self, data=self.rho, lat=lat, lon=lon, p=p, alt=alt,
-            alt_res_fcn=topographic_altitude)
+            self,
+            data=self.rho,
+            lat=lat,
+            lon=lon,
+            p=p,
+            alt=alt,
+            alt_res_fcn=topographic_altitude,
+        )
 
     def total_water_vapour_content(self, lat, lon, p, alt=None):
         return __interpolator_836__(
-            self, data=self.V, lat=lat, lon=lon, p=p, alt=alt,
-            alt_res_fcn=topographic_altitude)
+            self,
+            data=self.V,
+            lat=lat,
+            lon=lon,
+            p=p,
+            alt=alt,
+            alt_res_fcn=topographic_altitude,
+        )
 
 
 __model = __ITU836()
@@ -421,7 +669,7 @@ def surface_water_vapour_density(lat, lon, p, alt=None):
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
     alt = prepare_input_array(alt)
-    alt = prepare_quantity(alt, u.km, 'Altitude of the receivers')
+    alt = prepare_quantity(alt, u.km, "Altitude of the receivers")
     val = __model.surface_water_vapour_density(lat, lon, p, alt)
     return prepare_output_array(val, type_output) * u.g / u.m**3
 
@@ -462,6 +710,6 @@ def total_water_vapour_content(lat, lon, p, alt=None):
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
     alt = prepare_input_array(alt)
-    alt = prepare_quantity(alt, u.km, 'Altitude of the receivers')
+    alt = prepare_quantity(alt, u.km, "Altitude of the receivers")
     val = __model.total_water_vapour_content(lat, lon, p, alt)
     return prepare_output_array(val, type_output) * u.kg / u.m**2

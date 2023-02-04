@@ -15,12 +15,9 @@ import itur
 
 # Generate a regular grid of latitude and longitudes with 0.1 degree resolution
 # for the region of interest.
-lat, lon = itur.utils.regular_lat_lon_grid(lat_max=60,
-                                           lat_min=-60,
-                                           lon_max=65,
-                                           lon_min=-35,
-                                           resolution_lon=1,
-                                           resolution_lat=1)
+lat, lon = itur.utils.regular_lat_lon_grid(
+    lat_max=60, lat_min=-60, lon_max=65, lon_min=-35, resolution_lon=1, resolution_lat=1
+)
 
 # Satellite coordinates (GEO, 4 E)
 lat_sat = 0
@@ -31,24 +28,25 @@ h_sat = 35786 * itur.u.km
 el = itur.utils.elevation_angle(h_sat, lat_sat, lon_sat, lat, lon)
 
 # Set the link parameters
-f = 22.5 * itur.u.GHz    # Link frequency
-D = 1.2 * itur.u.m       # Antenna diameters
-p = 0.1                  # Unavailability (Values exceeded 0.1% of time)
+f = 22.5 * itur.u.GHz  # Link frequency
+D = 1.2 * itur.u.m  # Antenna diameters
+p = 0.1  # Unavailability (Values exceeded 0.1% of time)
 
 # Compute the atmospheric attenuation
 Att = itur.atmospheric_attenuation_slant_path(lat, lon, f, el, p, D)
 
 # Plot the results
-m = itur.plotting.plot_in_map(Att, lat, lon,
-                              cbar_text='Atmospheric attenuation [dB]',
-                              cmap='magma')
+m = itur.plotting.plot_in_map(
+    Att, lat, lon, cbar_text="Atmospheric attenuation [dB]", cmap="magma"
+)
 
 # Plot the satellite location
-m.scatter(lon_sat, lat_sat, c='white', s=20)
+m.scatter(lon_sat, lat_sat, c="white", s=20)
 
 # Now we show the surface mean temperature distribution
-T = itur.surface_mean_temperature(lat, lon)\
-    .to(itur.u.Celsius, equivalencies=itur.u.temperature())
-m = itur.plotting.plot_in_map(T, lat, lon,
-                              cbar_text='Surface mean temperature [C]',
-                              cmap='RdBu_r')
+T = itur.surface_mean_temperature(lat, lon).to(
+    itur.u.Celsius, equivalencies=itur.u.temperature()
+)
+m = itur.plotting.plot_in_map(
+    T, lat, lon, cbar_text="Surface mean temperature [C]", cmap="RdBu_r"
+)

@@ -10,7 +10,12 @@ from astropy import units as u
 from scipy.optimize import fsolve
 from scipy.special import erf as erf
 
-from itur.utils import get_input_type, prepare_quantity, prepare_output_array, prepare_input_array
+from itur.utils import (
+    get_input_type,
+    prepare_quantity,
+    prepare_output_array,
+    prepare_input_array,
+)
 
 
 def Qfunc(z):
@@ -57,8 +62,10 @@ class __ITU1623__:
             self.instance = _ITU1623_0_()
         else:
             raise ValueError(
-                "Version {0} is not implemented for the ITU-R P.1623 model."
-                .format(version))
+                "Version {0} is not implemented for the ITU-R P.1623 model.".format(
+                    version
+                )
+            )
 
         self._zero_isoterm_data = {}
 
@@ -91,16 +98,20 @@ class _ITU1623_1_:
         if np.any(f < 10) or np.any(f > 50):
             warnings.warn(
                 RuntimeWarning(
-                    'The method to compute fade duration parameters '
-                    'in recommendation ITU-P 1623-11 is only '
-                    'recommended for frequencies in the 10-50GHz range'))
+                    "The method to compute fade duration parameters "
+                    "in recommendation ITU-P 1623-11 is only "
+                    "recommended for frequencies in the 10-50GHz range"
+                )
+            )
 
         if np.any(el < 5) or np.any(el > 60):
             warnings.warn(
                 RuntimeWarning(
-                    'The method to compute fade duration parameters '
-                    'in recommendation ITU-P 1623-11 is only '
-                    'recommended for elevation angles in the 5-60deg range'))
+                    "The method to compute fade duration parameters "
+                    "in recommendation ITU-P 1623-11 is only "
+                    "recommended for elevation angles in the 5-60deg range"
+                )
+            )
 
         # Step 1: Calculate the mean duration D0 of the log-normal
         # distribution of the fraction of fading time due to fades of long
@@ -114,42 +125,43 @@ class _ITU1623_1_:
 
         # Step 3: Calculate the exponent γ of the power-law distribution of
         # the fraction of fading time due to fades of short duration:
-        gamma = 0.055 * (f ** 0.65) * (A ** (-0.003))
+        gamma = 0.055 * (f**0.65) * (A ** (-0.003))
 
         # Step 4: Calculate the boundary between short and long fade
         # durations, Dt:
         p_1 = (0.885 * gamma) - 0.814
-        p_2 = (-1.05 * (gamma ** 2)) + (2.23 * gamma) - 1.61
-        D_t = D_0 * np.exp(p_1 * sigma ** 2 + p_2 * sigma - 0.39)
+        p_2 = (-1.05 * (gamma**2)) + (2.23 * gamma) - 1.61
+        D_t = D_0 * np.exp(p_1 * sigma**2 + p_2 * sigma - 0.39)
 
         # Step 5: Calculate the mean duration D2 of the log-normal distribution
         # of the probability of occurrence of fading events of long duration:
-        D_2 = D_0 * np.exp(-(sigma ** 2))
+        D_2 = D_0 * np.exp(-(sigma**2))
 
         # Step 6: Calculate the fraction of time k due to fades of duration
         # less than Dt:
         Q_1 = Qfunc((np.log(D_t) - np.log(D_0)) / sigma)
         Q_2 = Qfunc((np.log(D_t) - np.log(D_2)) / sigma)
-        k = 1. / (1 + ((np.sqrt(D_0 * D_2) *
-                        (1 - gamma) * Q_1) / (D_t * gamma * Q_2)))
+        k = 1.0 / (1 + ((np.sqrt(D_0 * D_2) * (1 - gamma) * Q_1) / (D_t * gamma * Q_2)))
 
         # Step 7: Calculate the probability of occurrence of fade events
         # duration d longer than D given that attenuation a is greater than A:
         p = np.zeros_like(D_arr)  # initializes p for indexing ops.
-        Q_ratio_p = (Qfunc(np.log(D_arr / D_2) / sigma) /
-                     Qfunc(np.log(D_t / D_2) / sigma))
+        Q_ratio_p = Qfunc(np.log(D_arr / D_2) / sigma) / Qfunc(
+            np.log(D_t / D_2) / sigma
+        )
 
         p = np.where(
             np.logical_and(D_arr >= 1, D_arr <= D_t),
-            D_arr ** -gamma,
-            (D_t ** -gamma) * Q_ratio_p,
+            D_arr**-gamma,
+            (D_t**-gamma) * Q_ratio_p,
         )
 
         # Step 8: Calculate the cumulative probability of exceedance, i.e. the
         # total fraction of fade time due to fades of duration d longer than D:
         F = np.zeros_like(D_arr)
-        Q_ratio_F = (Qfunc(np.log(D_arr / D_0) / sigma) /
-                     Qfunc(np.log(D_t / D_0) / sigma))  # or divide by Q_2
+        Q_ratio_F = Qfunc(np.log(D_arr / D_0) / sigma) / Qfunc(
+            np.log(D_t / D_0) / sigma
+        )  # or divide by Q_2
 
         F = np.where(
             np.logical_and(D_arr >= 1, D_arr <= D_t),
@@ -177,8 +189,8 @@ class _ITU1623_1_:
         # Step 1:   Calculate F
         b = 2.3
         F = np.sqrt(
-            (2 * np.pi) ** 2 / ((1 / f_B ** b) + (2 * delta_t) ** b) ** (1 / b)
-        )   # eq. 18
+            (2 * np.pi) ** 2 / ((1 / f_B**b) + (2 * delta_t) ** b) ** (1 / b)
+        )  # eq. 18
 
         # Step 2:   Calculate STD of the conditional fade slope
         # s is a parameter which depends on climate and elevation angle; an
@@ -197,7 +209,7 @@ class _ITU1623_1_:
         abs_z_over_sigmaz = np.abs(z) / sigma_z
         P = (
             0.5
-            - z_over_sigmaz / (np.pi * (1 + z_over_sigmaz ** 2))
+            - z_over_sigmaz / (np.pi * (1 + z_over_sigmaz**2))
             - (np.arctan(z_over_sigmaz) / np.pi)
         )
 
@@ -206,7 +218,7 @@ class _ITU1623_1_:
         # attenuation value, A:
         P2 = (
             1
-            - 2 * abs_z_over_sigmaz / (np.pi * (1 + abs_z_over_sigmaz ** 2))
+            - 2 * abs_z_over_sigmaz / (np.pi * (1 + abs_z_over_sigmaz**2))
             - (2 * np.arctan(abs_z_over_sigmaz) / np.pi)
         )
 
@@ -318,9 +330,9 @@ def fade_duration_probability(D, A, el, f):
     """
     type_output = get_input_type(D)
 
-    A = prepare_quantity(A, u.dB / u.s, 'Attenuation threshold')
-    el = prepare_quantity(el, u.deg, 'Elevation angle')
-    f = prepare_quantity(f, u.GHz, 'Frequency')
+    A = prepare_quantity(A, u.dB / u.s, "Attenuation threshold")
+    el = prepare_quantity(el, u.deg, "Elevation angle")
+    f = prepare_quantity(f, u.GHz, "Frequency")
 
     val = __model.fade_duration(D, A, el, f, 1)[0]
     return prepare_output_array(val, type_output) * u.dimensionless_unscaled
@@ -360,9 +372,9 @@ def fade_duration_cummulative_probability(D, A, el, f):
     """
     type_output = get_input_type(D)
 
-    A = prepare_quantity(A, u.dB / u.s, 'Attenuation threshold')
-    el = prepare_quantity(el, u.deg, 'Elevation angle')
-    f = prepare_quantity(f, u.GHz, 'Frequency')
+    A = prepare_quantity(A, u.dB / u.s, "Attenuation threshold")
+    el = prepare_quantity(el, u.deg, "Elevation angle")
+    f = prepare_quantity(f, u.GHz, "Frequency")
 
     val = __model.fade_duration(D, A, el, f, 1)[1]
     return prepare_output_array(val, type_output) * u.dimensionless_unscaled
@@ -412,9 +424,9 @@ def fade_duration_number_fades(D, A, el, f, T_tot):
     """
     type_output = get_input_type(D)
     D = prepare_input_array(D)
-    A = prepare_quantity(A, u.dB / u.s, 'Attenuation threshold')
-    el = prepare_quantity(el, u.deg, 'Elevation angle')
-    f = prepare_quantity(f, u.GHz, 'Frequency')
+    A = prepare_quantity(A, u.dB / u.s, "Attenuation threshold")
+    el = prepare_quantity(el, u.deg, "Elevation angle")
+    f = prepare_quantity(f, u.GHz, "Frequency")
 
     val = __model.fade_duration(D, A, el, f, T_tot)[2]
     return prepare_output_array(val, type_output) * u.dimensionless_unscaled
@@ -463,9 +475,9 @@ def fade_duration_total_exceedance_time(D, A, el, f, T_tot):
     """
     type_output = get_input_type(D)
 
-    A = prepare_quantity(A, u.dB / u.s, 'Attenuation threshold')
-    el = prepare_quantity(el, u.deg, 'Elevation angle')
-    f = prepare_quantity(f, u.GHz, 'Frequency')
+    A = prepare_quantity(A, u.dB / u.s, "Attenuation threshold")
+    el = prepare_quantity(el, u.deg, "Elevation angle")
+    f = prepare_quantity(f, u.GHz, "Frequency")
 
     val = __model.fade_duration(D, A, el, f, T_tot)[3]
     return prepare_output_array(val, type_output) * u.s
@@ -525,9 +537,9 @@ def fade_duration(D, A, el, f, T_tot):
     """
     get_input_type(D)
 
-    A = prepare_quantity(A, u.dB / u.s, 'Attenuation threshold')
-    el = prepare_quantity(el, u.deg, 'Elevation angle')
-    f = prepare_quantity(f, u.GHz, 'Frequency')
+    A = prepare_quantity(A, u.dB / u.s, "Attenuation threshold")
+    el = prepare_quantity(el, u.deg, "Elevation angle")
+    f = prepare_quantity(f, u.GHz, "Frequency")
 
     val = __model.fade_duration(D, A, el, f, T_tot)
     return val
@@ -596,10 +608,10 @@ def fade_slope(z, A, f_B, delta_t):
     https://www.itu.int/rec/R-REC-P.1623/en
     """
     get_input_type(z)
-    z = prepare_quantity(z, u.dB / u.s, 'Fade slope values')
-    A = prepare_quantity(A, u.dB / u.s, 'Attenuation threshold')
-    delta_t = prepare_quantity(delta_t, u.s, 'Time interval')
-    f_B = prepare_quantity(f_B, u.GHz, 'Cut-off Frequency')
+    z = prepare_quantity(z, u.dB / u.s, "Fade slope values")
+    A = prepare_quantity(A, u.dB / u.s, "Attenuation threshold")
+    delta_t = prepare_quantity(delta_t, u.s, "Time interval")
+    f_B = prepare_quantity(f_B, u.GHz, "Cut-off Frequency")
 
     val = __model.fade_slope(z, A, f_B, delta_t)
     return val
@@ -661,8 +673,8 @@ def fade_depth(N_target, D_target, A, PofA, el, f):
     https://www.itu.int/rec/R-REC-P.1623/en
     """
     get_input_type(A)
-    el = prepare_quantity(el, u.deg, 'Elevation angle')
-    f = prepare_quantity(f, u.GHz, 'Frequency')
+    el = prepare_quantity(el, u.deg, "Elevation angle")
+    f = prepare_quantity(f, u.GHz, "Frequency")
 
     val = __model.fade_depth(N_target, D_target, A, PofA, el, f)
     return val

@@ -33,29 +33,29 @@ h_sat = 35786 * itur.u.km
 # Compute the elevation angle between satellite and ground station
 el = itur.utils.elevation_angle(h_sat, lat_sat, lon_sat, lat_GS, lon_GS)
 
-f = 22.5 * itur.u.GHz    # Link frequency
-D = 1.2 * itur.u.m       # Antenna diameters
+f = 22.5 * itur.u.GHz  # Link frequency
+D = 1.2 * itur.u.m  # Antenna diameters
 p = 1
 
 f = np.logspace(-0.2, 2, 100) * itur.u.GHz
 
-Ag, Ac, Ar, As, A =\
-    itur.atmospheric_attenuation_slant_path(lat_GS, lon_GS, f, el, p, D,
-                                            return_contributions=True)
+Ag, Ac, Ar, As, A = itur.atmospheric_attenuation_slant_path(
+    lat_GS, lon_GS, f, el, p, D, return_contributions=True
+)
 
 # Plot the results
 fig, ax = plt.subplots(1, 1)
-ax.loglog(f, Ag, label='Gaseous attenuation')
-ax.loglog(f, Ac, label='Cloud attenuation')
-ax.loglog(f, Ar, label='Rain attenuation')
-ax.loglog(f, As, label='Scintillation attenuation')
-ax.loglog(f, A, label='Total atmospheric attenuation')
+ax.loglog(f, Ag, label="Gaseous attenuation")
+ax.loglog(f, Ac, label="Cloud attenuation")
+ax.loglog(f, Ar, label="Rain attenuation")
+ax.loglog(f, As, label="Scintillation attenuation")
+ax.loglog(f, A, label="Total atmospheric attenuation")
 
 ax.xaxis.set_major_formatter(ScalarFormatter())
 ax.yaxis.set_major_formatter(ScalarFormatter())
-ax.set_xlabel('Frequency [GHz]')
-ax.set_ylabel('Atmospheric attenuation [dB]')
-ax.grid(which='both', linestyle=':')
+ax.set_xlabel("Frequency [GHz]")
+ax.set_ylabel("Atmospheric attenuation [dB]")
+ax.grid(which="both", linestyle=":")
 plt.legend()
 
 
@@ -66,21 +66,21 @@ plt.legend()
 f = 22.5 * itur.u.GHz
 el = np.linspace(5, 90, 100)
 
-Ag, Ac, Ar, As, A =\
-    itur.atmospheric_attenuation_slant_path(lat_GS, lon_GS, f, el, p, D,
-                                            return_contributions=True)
+Ag, Ac, Ar, As, A = itur.atmospheric_attenuation_slant_path(
+    lat_GS, lon_GS, f, el, p, D, return_contributions=True
+)
 
 # Plot the results
 fig, ax = plt.subplots(1, 1)
-ax.plot(el, Ag, label='Gaseous attenuation')
-ax.plot(el, Ac, label='Cloud attenuation')
-ax.plot(el, Ar, label='Rain attenuation')
-ax.plot(el, As, label='Scintillation attenuation')
-ax.plot(el, A, label='Total atmospheric attenuation')
+ax.plot(el, Ag, label="Gaseous attenuation")
+ax.plot(el, Ac, label="Cloud attenuation")
+ax.plot(el, Ar, label="Rain attenuation")
+ax.plot(el, As, label="Scintillation attenuation")
+ax.plot(el, A, label="Total atmospheric attenuation")
 
 ax.xaxis.set_major_formatter(ScalarFormatter())
 ax.yaxis.set_major_formatter(ScalarFormatter())
-ax.set_xlabel('Elevation angle [deg]')
-ax.set_ylabel('Atmospheric attenuation [dB]')
-ax.grid(which='both', linestyle=':')
+ax.set_xlabel("Elevation angle [deg]")
+ax.set_ylabel("Atmospheric attenuation [dB]")
+ax.grid(which="both", linestyle=":")
 plt.legend()

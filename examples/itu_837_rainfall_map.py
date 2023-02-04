@@ -13,8 +13,7 @@ itur.models.itu837.change_version(7)
 
 # Generate a regular grid of latitude and longitudes with 0.1 degree resolution
 # for the region of interest.
-lat, lon = itur.utils.regular_lat_lon_grid(resolution_lat=0.1,
-                                           resolution_lon=0.1)
+lat, lon = itur.utils.regular_lat_lon_grid(resolution_lat=0.1, resolution_lon=0.1)
 
 # Compute the rainfall rate exceeded for 0.01 % of the time.
 p = 0.01
@@ -24,5 +23,12 @@ R001 = itur.models.itu837.rainfall_rate(lat, lon, p)
 fig = plt.figure(figsize=(16, 8))
 ax = fig.add_subplot(1, 1, 1)
 m = itur.plotting.plot_in_map(
-    R001, lat, lon, cmap='jet', vmin=0, vmax=90, ax=ax,
-    cbar_text='Rainfall rate exceeded for 0.01% of an average year [mm/hr]')
+    R001,
+    lat,
+    lon,
+    cmap="jet",
+    vmin=0,
+    vmax=90,
+    ax=ax,
+    cbar_text="Rainfall rate exceeded for 0.01% of an average year [mm/hr]",
+)

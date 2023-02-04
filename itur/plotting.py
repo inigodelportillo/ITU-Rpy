@@ -39,14 +39,25 @@ import numpy as np
 try:
     import cartopy.crs as ccrs
     import cartopy.feature as cpf
+
     plotting_installed = True
 except BaseException:
     plotting_installed = False
 
 
-def plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
-                lon_min=None, lon_max=None, cbar_text='', ax=None,
-                figsize=(6, 4), **kwargs):
+def plot_in_map(
+    data,
+    lat=None,
+    lon=None,
+    lat_min=None,
+    lat_max=None,
+    lon_min=None,
+    lon_max=None,
+    cbar_text="",
+    ax=None,
+    figsize=(6, 4),
+    **kwargs
+):
     """Plot the values in `data` in a map using ``cartopy``.
 
     The map uses an PlateCarree projection. Either
@@ -87,21 +98,24 @@ def plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
     import matplotlib.pyplot as plt
 
     if not plotting_installed:
-        raise RuntimeError('Neither cartopy nor matplotlib are installed. '
-                           'Therefore plot_in_map cannot be used. '
-                           'To use this function you need to install '
-                           'the cartopy and matplotlib libraries')
+        raise RuntimeError(
+            "Neither cartopy nor matplotlib are installed. "
+            "Therefore plot_in_map cannot be used. "
+            "To use this function you need to install "
+            "the cartopy and matplotlib libraries"
+        )
 
-    if all([el is None for el in [lat, lon, lat_min, lon_min,
-                                  lat_max, lon_max]]):
-        raise ValueError('Either {{lat, lon}} or {{lat_min, lon_min, lat_max,'
-                         'lon_max}} need to be provided')
+    if all([el is None for el in [lat, lon, lat_min, lon_min, lat_max, lon_max]]):
+        raise ValueError(
+            "Either {{lat, lon}} or {{lat_min, lon_min, lat_max,"
+            "lon_max}} need to be provided"
+        )
 
     elif lat is not None and lon is not None:
-        if not(np.shape(lat) == np.shape(lon) and
-               np.shape(lat) == np.shape(data)):
-            raise RuntimeError('Shape of latitude grid is not equal to shape'
-                               'of longitude grid')
+        if not (np.shape(lat) == np.shape(lon) and np.shape(lat) == np.shape(data)):
+            raise RuntimeError(
+                "Shape of latitude grid is not equal to shape" "of longitude grid"
+            )
         lat_max = np.max(lat)
         lat_min = np.min(lat)
         lon_max = np.max(lon)
@@ -112,29 +126,43 @@ def plot_in_map(data, lat=None, lon=None, lat_min=None, lat_max=None,
         proj = ccrs.PlateCarree(central_longitude=0.0)
         ax = fig.add_subplot(111, projection=proj)
 
-    ax.set_extent([lon_min, lon_max, lat_min, lat_max],
-                  crs=ccrs.PlateCarree())
-    ax.coastlines(color='grey', linewidth=0.8)
-    ax.add_feature(cpf.BORDERS, edgecolor='grey')
+    ax.set_extent([lon_min, lon_max, lat_min, lat_max], crs=ccrs.PlateCarree())
+    ax.coastlines(color="grey", linewidth=0.8)
+    ax.add_feature(cpf.BORDERS, edgecolor="grey")
 
     parallels = np.arange(-80, 81, 20)
-    meridians = np.arange(-180., 181., 30.)
+    meridians = np.arange(-180.0, 181.0, 30.0)
 
-    ax.gridlines(xlocs=meridians, ylocs=parallels, draw_labels=True,
-                 color='white', linestyle=':', linewidth=0.2)
+    ax.gridlines(
+        xlocs=meridians,
+        ylocs=parallels,
+        draw_labels=True,
+        color="white",
+        linestyle=":",
+        linewidth=0.2,
+    )
 
-    im = ax.contourf(lon, lat, data, 100, transform=ccrs.PlateCarree(),
-                     **kwargs)
+    im = ax.contourf(lon, lat, data, 100, transform=ccrs.PlateCarree(), **kwargs)
 
-    cbar = fig.colorbar(im, orientation='horizontal', fraction=0.046, pad=0.04)
+    cbar = fig.colorbar(im, orientation="horizontal", fraction=0.046, pad=0.04)
     cbar.set_label(cbar_text)
     fig.show()
     return ax
 
 
-def plot_in_map_basemap(data, lat=None, lon=None, lat_min=None,
-                        lat_max=None, lon_min=None, lon_max=None,
-                        cbar_text='', ax=None, figsize=(6, 4), **kwargs):
+def plot_in_map_basemap(
+    data,
+    lat=None,
+    lon=None,
+    lat_min=None,
+    lat_max=None,
+    lon_min=None,
+    lon_max=None,
+    cbar_text="",
+    ax=None,
+    figsize=(6, 4),
+    **kwargs
+):
     """Plot the values in `data` in a map using ``basemap``.
 
     The map uses an equidistant cylindrical projection. Either
@@ -176,20 +204,23 @@ def plot_in_map_basemap(data, lat=None, lon=None, lat_min=None,
         import matplotlib.pyplot as plt
         from mpl_toolkits.basemap import Basemap
     except BaseException:
-        raise RuntimeError('Basemap is not installed and therefore '
-                           'plot_in_map_basemap cannot be used. To use this '
-                           'function you need to install the basemap library')
+        raise RuntimeError(
+            "Basemap is not installed and therefore "
+            "plot_in_map_basemap cannot be used. To use this "
+            "function you need to install the basemap library"
+        )
 
-    if all([el is None for el in [lat, lon, lat_min, lon_min,
-                                  lat_max, lon_max]]):
-        raise ValueError('Either {{lat, lon}} or {{lat_min, lon_min, lat_max,'
-                         'lon_max}} need to be provided')
+    if all([el is None for el in [lat, lon, lat_min, lon_min, lat_max, lon_max]]):
+        raise ValueError(
+            "Either {{lat, lon}} or {{lat_min, lon_min, lat_max,"
+            "lon_max}} need to be provided"
+        )
 
     elif lat is not None and lon is not None:
-        if not(np.shape(lat) == np.shape(lon) and
-               np.shape(lat) == np.shape(data)):
-            raise RuntimeError('Shape of latitude grid is not equal to shape'
-                               'of longitude grid')
+        if not (np.shape(lat) == np.shape(lon) and np.shape(lat) == np.shape(data)):
+            raise RuntimeError(
+                "Shape of latitude grid is not equal to shape" "of longitude grid"
+            )
         lat_max = np.max(lat)
         lat_min = np.min(lat)
         lon_max = np.max(lon)
@@ -199,20 +230,28 @@ def plot_in_map_basemap(data, lat=None, lon=None, lat_min=None,
         fig = plt.figure(figsize=figsize)
         ax = fig.add_subplot(111)
 
-    m = Basemap(ax=ax, projection='cyl', llcrnrlat=lat_min,
-                urcrnrlat=lat_max, llcrnrlon=lon_min, urcrnrlon=lon_max,
-                resolution='l')
+    m = Basemap(
+        ax=ax,
+        projection="cyl",
+        llcrnrlat=lat_min,
+        urcrnrlat=lat_max,
+        llcrnrlon=lon_min,
+        urcrnrlon=lon_max,
+        resolution="l",
+    )
 
-    m.drawcoastlines(color='grey', linewidth=0.8)
-    m.drawcountries(color='grey', linewidth=0.8)
+    m.drawcoastlines(color="grey", linewidth=0.8)
+    m.drawcountries(color="grey", linewidth=0.8)
     parallels = np.arange(-80, 81, 20)
-    m.drawparallels(parallels, labels=[1, 0, 0, 1], dashes=[2, 1],
-                    linewidth=0.2, color='white')
-    meridians = np.arange(0., 360., 30.)
-    m.drawmeridians(meridians, labels=[1, 0, 0, 1], dashes=[2, 1],
-                    linewidth=0.2, color='white')
+    m.drawparallels(
+        parallels, labels=[1, 0, 0, 1], dashes=[2, 1], linewidth=0.2, color="white"
+    )
+    meridians = np.arange(0.0, 360.0, 30.0)
+    m.drawmeridians(
+        meridians, labels=[1, 0, 0, 1], dashes=[2, 1], linewidth=0.2, color="white"
+    )
 
     im = m.imshow(np.flipud(data), **kwargs)
-    cbar = m.colorbar(im, location='bottom', pad="8%")
+    cbar = m.colorbar(im, location="bottom", pad="8%")
     cbar.set_label(cbar_text)
     return m

@@ -11,12 +11,16 @@ import scipy.stats as stats
 
 from itur.models.itu1510 import surface_month_mean_temperature
 from itur.models.itu1144 import bilinear_2D_interpolator
-from itur.utils import (prepare_input_array, prepare_output_array,
-                        load_data_interpolator, prepare_quantity,
-                        get_input_type)
+from itur.utils import (
+    prepare_input_array,
+    prepare_output_array,
+    load_data_interpolator,
+    prepare_quantity,
+    get_input_type,
+)
 
 
-class __ITU837():
+class __ITU837:
     """Characteristics of precipitation for propagation modelling
 
     Available versions include:
@@ -30,6 +34,7 @@ class __ITU837():
     * P.837-5 (08/07) (Superseded)
 
     """
+
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.837 recommendation.
 
@@ -38,20 +43,22 @@ class __ITU837():
             self.instance = _ITU837_7()
         elif version == 6:
             self.instance = _ITU837_6()
-#        elif version == 5:
-#            self.instance = _ITU837_5()
-#        elif version == 4:
-#            self.instance = _ITU837_4()
-#        elif version == 3:
-#            self.instance = _ITU837_3()
-#        elif version == 2:
-#            self.instance = _ITU837_2()
-#        elif version == 1:
-#            self.instance = _ITU837_1()
+        #        elif version == 5:
+        #            self.instance = _ITU837_5()
+        #        elif version == 4:
+        #            self.instance = _ITU837_4()
+        #        elif version == 3:
+        #            self.instance = _ITU837_3()
+        #        elif version == 2:
+        #            self.instance = _ITU837_2()
+        #        elif version == 1:
+        #            self.instance = _ITU837_1()
         else:
             raise ValueError(
-                'Version {0} is not implemented for the ITU-R P.837 model.'
-                .format(version))
+                "Version {0} is not implemented for the ITU-R P.837 model.".format(
+                    version
+                )
+            )
 
         self._Pr6 = {}
         self._Mt = {}
@@ -68,18 +75,18 @@ class __ITU837():
 
     def rainfall_rate(self, lat, lon, p):
         # Abstract method to compute the zero isoterm height
-        fcn = np.vectorize(self.instance.rainfall_rate, excluded=[0, 1],
-                           otypes=[np.ndarray])
+        fcn = np.vectorize(
+            self.instance.rainfall_rate, excluded=[0, 1], otypes=[np.ndarray]
+        )
         return np.array(fcn(lat, lon, p).tolist())
 
 
-class _ITU837_7():
-
+class _ITU837_7:
     def __init__(self):
         self.__version__ = 7
         self.year = 2017
         self.month = 6
-        self.link = 'https://www.itu.int/rec/R-REC-P.837-7-201706-I/en'
+        self.link = "https://www.itu.int/rec/R-REC-P.837-7-201706-I/en"
 
         self.months = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
         self._Mt = {}
@@ -89,34 +96,35 @@ class _ITU837_7():
         if not self._Mt:
             for _m in self.months:
                 self._Mt[_m] = load_data_interpolator(
-                    '837/v7_lat_mt.npz', '837/v7_lon_mt.npz',
-                    '837/v7_mt_month{0:02d}.npz'.format(_m),
-                    bilinear_2D_interpolator)
+                    "837/v7_lat_mt.npz",
+                    "837/v7_lon_mt.npz",
+                    "837/v7_mt_month{0:02d}.npz".format(_m),
+                    bilinear_2D_interpolator,
+                )
 
         # In this recommendation the longitude is encoded with format -180 to
         # 180 whereas we always use 0 - 360 encoding
         lon = np.array(lon)
         lon[lon > 180] = lon[lon > 180] - 360
-        return self._Mt[m](
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._Mt[m](np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def R001(self, lat, lon):
         if not self._R001:
             self._R001 = load_data_interpolator(
-                '837/v7_lat_r001.npz', '837/v7_lon_r001.npz',
-                '837/v7_r001.npz', bilinear_2D_interpolator)
+                "837/v7_lat_r001.npz",
+                "837/v7_lon_r001.npz",
+                "837/v7_r001.npz",
+                bilinear_2D_interpolator,
+            )
 
         # In this recommendation the longitude is encoded with format -180 to
         # 180 whereas we always use 0 - 360 encoding
         lon = np.array(lon)
         lon[lon > 180] = lon[lon > 180] - 360
-        return self._R001(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._R001(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def rainfall_probability(self, lat_d, lon_d):
-        """
-
-        """
+        """ """
         lat_f = lat_d.flatten()
         lon_f = lon_d.flatten()
 
@@ -139,7 +147,7 @@ class _ITU837_7():
         P0ii = 100 * MTii / (24 * Nii * rii)  # Eq. 2
 
         # Step 7b:
-        rii = np.where(P0ii > 70, 100 / 70. * MTii / (24 * Nii), rii)
+        rii = np.where(P0ii > 70, 100 / 70.0 * MTii / (24 * Nii), rii)
         P0ii = np.where(P0ii > 70, 70, P0ii)
 
         # Step 7: Calculate the annual probability of rain, P0anual
@@ -148,8 +156,7 @@ class _ITU837_7():
         return P0anual.reshape(lat_d.shape)
 
     def rainfall_rate(self, lat_d, lon_d, p):
-        """
-        """
+        """ """
         if p == 0.01:
             return self.R001(lat_d, lon_d)
 
@@ -175,7 +182,7 @@ class _ITU837_7():
         P0ii = 100 * MTii / (24 * Nii * rii)
 
         # Step 7b:
-        rii = np.where(P0ii > 70, 100 / 70. * MTii / (24 * Nii), rii)
+        rii = np.where(P0ii > 70, 100 / 70.0 * MTii / (24 * Nii), rii)
         P0ii = np.where(P0ii > 70, 70, P0ii)
 
         # Step 7: Calculate the annual probability of rain, P0anual
@@ -189,7 +196,8 @@ class _ITU837_7():
                 # Use a bisection method to determine
                 def f_Rp(Rref):
                     P_r_ge_Rii = P0ii * stats.norm.sf(
-                        (np.log(Rref) + 0.7938 - np.log(rii)) / 1.26)
+                        (np.log(Rref) + 0.7938 - np.log(rii)) / 1.26
+                    )
                     P_r_ge_R = np.sum(Nii * P_r_ge_Rii) / 365.25
                     return 100 * (P_r_ge_R / p - 1)
 
@@ -199,13 +207,12 @@ class _ITU837_7():
         return fcn(P0anual).reshape(lat_d.shape)
 
 
-class _ITU837_6():
-
+class _ITU837_6:
     def __init__(self):
         self.__version__ = 6
         self.year = 2012
         self.month = 2
-        self.link = 'https://www.itu.int/rec/R-REC-P.837-6-201202-I/en'
+        self.link = "https://www.itu.int/rec/R-REC-P.837-6-201202-I/en"
 
         self._Pr6 = {}
         self._Mt = {}
@@ -214,37 +221,41 @@ class _ITU837_6():
     def Pr6(self, lat, lon):
         if not self._Pr6:
             self._Pr6 = load_data_interpolator(
-                '837/esarain_lat_v5.npz', '837/esarain_lon_v5.npz',
-                '837/esarain_pr6_v5.npz', bilinear_2D_interpolator,
-                flip_ud=False)
+                "837/esarain_lat_v5.npz",
+                "837/esarain_lon_v5.npz",
+                "837/esarain_pr6_v5.npz",
+                bilinear_2D_interpolator,
+                flip_ud=False,
+            )
 
-        return self._Pr6(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._Pr6(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def Mt(self, lat, lon):
         if not self._Mt:
             self._Mt = load_data_interpolator(
-                '837/esarain_lat_v5.npz', '837/esarain_lon_v5.npz',
-                '837/esarain_mt_v5.npz', bilinear_2D_interpolator,
-                flip_ud=False)
+                "837/esarain_lat_v5.npz",
+                "837/esarain_lon_v5.npz",
+                "837/esarain_mt_v5.npz",
+                bilinear_2D_interpolator,
+                flip_ud=False,
+            )
 
-        return self._Mt(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._Mt(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def Beta(self, lat, lon):
         if not self._Beta:
             self._Beta = load_data_interpolator(
-                '837/esarain_lat_v5.npz', '837/esarain_lon_v5.npz',
-                '837/esarain_beta_v5.npz', bilinear_2D_interpolator,
-                flip_ud=False)
+                "837/esarain_lat_v5.npz",
+                "837/esarain_lon_v5.npz",
+                "837/esarain_beta_v5.npz",
+                bilinear_2D_interpolator,
+                flip_ud=False,
+            )
 
-        return self._Beta(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._Beta(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def rainfall_probability(self, lat_d, lon_d):
-        """
-
-        """
+        """ """
         Pr6 = self.Pr6(lat_d, lon_d)
         Mt = self.Mt(lat_d, lon_d)
         Beta = self.Beta(lat_d, lon_d)
@@ -259,8 +270,7 @@ class _ITU837_6():
         return P0
 
     def rainfall_rate(self, lat_d, lon_d, p):
-        """
-        """
+        """ """
         Pr6 = self.Pr6(lat_d, lon_d)
         Mt = self.Mt(lat_d, lon_d)
         Beta = self.Beta(lat_d, lon_d)
@@ -271,20 +281,18 @@ class _ITU837_6():
 
         # Step 4: Derive the percentage propability of rain in an average year,
         # P0:
-        P0 = np.where(Pr6 > 0,
-                      Pr6 * (1 - np.exp(-0.0079 * (Ms / Pr6))),
-                      0)  # Eq. 1
+        P0 = np.where(Pr6 > 0, Pr6 * (1 - np.exp(-0.0079 * (Ms / Pr6))), 0)  # Eq. 1
 
         # Step 5: Derive the rainfall rate, Rp, exceeded for p% of the average
         # year, where p <= P0, from:
         def computeRp(P0, Mc, Ms):
-            a = 1.09                        # Eq. 2d
-            b = (Mc + Ms) / (21797 * P0)    # Eq. 2e
-            c = 26.02 * b                   # Eq. 2f
+            a = 1.09  # Eq. 2d
+            b = (Mc + Ms) / (21797 * P0)  # Eq. 2e
+            c = 26.02 * b  # Eq. 2f
 
-            A = a * b                       # Eq. 2a
-            B = a + c * np.log(p / P0)      # Eq. 2b
-            C = np.log(p / P0)              # Eq. 2c
+            A = a * b  # Eq. 2a
+            B = a + c * np.log(p / P0)  # Eq. 2b
+            C = np.log(p / P0)  # Eq. 2c
 
             Rp = (-B + np.sqrt(B**2 - 4 * A * C)) / (2 * A)  # Eq. 2
 
@@ -432,11 +440,11 @@ def unavailability_from_rainfall_rate(lat, lon, R):
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
-    R = prepare_quantity(R, u.mm / u.hr, 'Rain rate')
+    R = prepare_quantity(R, u.mm / u.hr, "Rain rate")
 
     # TODO: Cehck for bound on R (between 0 and 200 mm/hr?)
 
     def fcn(x):
-        return (rainfall_rate(lat, lon, x).value - R - 1e-6)
+        return rainfall_rate(lat, lon, x).value - R - 1e-6
 
     return bisect(fcn, 1e-5, 100, maxiter=50)

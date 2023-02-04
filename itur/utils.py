@@ -21,23 +21,32 @@ from astropy import units as u
 
 # Set the basepath for the module and the basepath for the data
 dir_path = os.path.dirname(os.path.realpath(__file__))
-dataset_dir = os.path.join(dir_path, 'data/')
+dataset_dir = os.path.join(dir_path, "data/")
 
 
 # Define numeric types including numpy types
-__NUMERIC_TYPES__ = [numbers.Number, int, float, complex,
-                     np.float16, np.float32, np.float64, 
-                     np.int8, np.int16, np.int32, np.int64]
+__NUMERIC_TYPES__ = [
+    numbers.Number,
+    int,
+    float,
+    complex,
+    np.float16,
+    np.float32,
+    np.float64,
+    np.int8,
+    np.int16,
+    np.int32,
+    np.int64,
+]
 
 # Define the geodetic system using the WSG-84 ellipsoid
-__wgs84_geod__ = Geod(ellps='WGS84')
+__wgs84_geod__ = Geod(ellps="WGS84")
 
 # A very small quantity used to avoid log(0) errors.
 EPSILON = 1e-9
 
 
-def load_data_interpolator(path_lat, path_lon, path_data, interp_fcn,
-                           flip_ud=True):
+def load_data_interpolator(path_lat, path_lon, path_data, interp_fcn, flip_ud=True):
     """Load a lat-lon tabulated dataset and build an interpolator.
 
     Parameters
@@ -93,20 +102,19 @@ def load_data(path, is_text=False, **kwargs):
     """
     # TODO: Change method to allow for h5df data too
     if not os.path.isfile(path):
-        raise RuntimeError('The path provided is not a file - {0}'
-                           .format(path))
+        raise RuntimeError("The path provided is not a file - {0}".format(path))
 
     _, file_extension = os.path.splitext(path)
 
-    if file_extension == '.npz':
-        data = np.load(path)['arr_0']
-    elif file_extension == '.npy':
+    if file_extension == ".npz":
+        data = np.load(path)["arr_0"]
+    elif file_extension == ".npy":
         data = np.load(path)
-    elif file_extension == '.txt':
+    elif file_extension == ".txt":
         if is_text:
-            data = np.loadtxt(path, dtype=np.string_, delimiter=',', **kwargs)
+            data = np.loadtxt(path, dtype=np.string_, delimiter=",", **kwargs)
         else:
-            data = np.genfromtxt(path, dtype=float, delimiter=',', **kwargs)
+            data = np.genfromtxt(path, dtype=float, delimiter=",", **kwargs)
 
     return data
 
@@ -181,11 +189,14 @@ def prepare_output_array(output_array, type_input=None):
     type_output = get_input_type(output_array)
     # First, cast the output_array to the same type of the input
     # Check if the output array is a 0-D number and cast it to a float
-    if (type_input in __NUMERIC_TYPES__ and
-        (type_output in __NUMERIC_TYPES__) or
-        ((isinstance(output_array, np.ndarray) and output_array.size == 1) or
-         (not type_output not in __NUMERIC_TYPES__ and
-          len(output_array) == 1))):
+    if (
+        type_input in __NUMERIC_TYPES__
+        and (type_output in __NUMERIC_TYPES__)
+        or (
+            (isinstance(output_array, np.ndarray) and output_array.size == 1)
+            or (not type_output not in __NUMERIC_TYPES__ and len(output_array) == 1)
+        )
+    ):
         value = float(value)
 
     # Check if the input array was a list and conver appropriately
@@ -250,13 +261,13 @@ def prepare_quantity(value, units=None, name_val=None):
     elif isinstance(value, tuple) and units is not None:
         return np.array([prepare_quantity(v, units, name_val) for v in value])
     else:
-        raise ValueError('%s has not the correct format. It must be a value,'
-                         'sequence, array, or a Quantity with %s units' %
-                         (name_val, str(units)))
+        raise ValueError(
+            "%s has not the correct format. It must be a value,"
+            "sequence, array, or a Quantity with %s units" % (name_val, str(units))
+        )
 
 
-def compute_distance_earth_to_earth(lat_p, lon_p, lat_grid, lon_grid,
-                                    method=None):
+def compute_distance_earth_to_earth(lat_p, lon_p, lat_grid, lon_grid, method=None):
     """
     Compute the distance between a point and a matrix of (lat, lons).
 
@@ -281,16 +292,18 @@ def compute_distance_earth_to_earth(lat_p, lon_p, lat_grid, lon_grid,
         (km)
 
     """
-    if ((method == 'WGS84' and not(method is not None)) or
-        (type(lat_p) in __NUMERIC_TYPES__) or
-        (type(lat_grid) in __NUMERIC_TYPES__) or
-        (len(lat_grid) < 10000) or
-            (isinstance(lat_grid, np.ndarray) and lat_grid.size < 1e5)):
-        return compute_distance_earth_to_earth_wgs84(
-            lat_p, lon_p, lat_grid, lon_grid)
+    if (
+        (method == "WGS84" and not (method is not None))
+        or (type(lat_p) in __NUMERIC_TYPES__)
+        or (type(lat_grid) in __NUMERIC_TYPES__)
+        or (len(lat_grid) < 10000)
+        or (isinstance(lat_grid, np.ndarray) and lat_grid.size < 1e5)
+    ):
+        return compute_distance_earth_to_earth_wgs84(lat_p, lon_p, lat_grid, lon_grid)
     else:
         return compute_distance_earth_to_earth_haversine(
-            lat_p, lon_p, lat_grid, lon_grid)
+            lat_p, lon_p, lat_grid, lon_grid
+        )
 
 
 def compute_distance_earth_to_earth_wgs84(lat_p, lon_p, lat_grid, lon_grid):
@@ -324,8 +337,7 @@ def compute_distance_earth_to_earth_wgs84(lat_p, lon_p, lat_grid, lon_grid):
     return d / 1e3
 
 
-def compute_distance_earth_to_earth_haversine(lat_p, lon_p,
-                                              lat_grid, lon_grid):
+def compute_distance_earth_to_earth_haversine(lat_p, lon_p, lat_grid, lon_grid):
     """Compute the distance between points using the Haversine formula.
 
     Compute the distance between a point (P) in (`lat_s`, `lon_s`) and a matrix
@@ -364,15 +376,26 @@ def compute_distance_earth_to_earth_haversine(lat_p, lon_p,
     dlon = lon2 - lon1
 
     # Compute the distance
-    a = np.clip((np.sin(dlat / 2.0))**2 + np.cos(lat1) * np.cos(lat2) *
-                (np.sin(dlon / 2))**2, -1, 1)
+    a = np.clip(
+        (np.sin(dlat / 2.0)) ** 2
+        + np.cos(lat1) * np.cos(lat2) * (np.sin(dlon / 2)) ** 2,
+        -1,
+        1,
+    )
     c = 2 * np.arcsin(np.sqrt(a))
     d = RE * c
     return d
 
 
-def regular_lat_lon_grid(resolution_lat=1, resolution_lon=1, lon_start_0=False,
-                         lat_min=-90, lat_max=90, lon_min=-180, lon_max=180):
+def regular_lat_lon_grid(
+    resolution_lat=1,
+    resolution_lon=1,
+    lon_start_0=False,
+    lat_min=-90,
+    lat_max=90,
+    lon_min=-180,
+    lon_max=180,
+):
     """
     Build regular latitude and longitude matrices.
 
@@ -397,12 +420,15 @@ def regular_lat_lon_grid(resolution_lat=1, resolution_lon=1, lon_start_0=False,
         Grid of coordinates of the longitude point
     """
     if lon_start_0:
-        lon, lat = np.meshgrid(np.arange(lon_min + 180.0, lon_max + 180.0,
-                                         resolution_lon),
-                               np.arange(lat_max, lat_min, - resolution_lat))
+        lon, lat = np.meshgrid(
+            np.arange(lon_min + 180.0, lon_max + 180.0, resolution_lon),
+            np.arange(lat_max, lat_min, -resolution_lat),
+        )
     else:
-        lon, lat = np.meshgrid(np.arange(lon_min, lon_max, resolution_lon),
-                               np.arange(lat_max, lat_min, - resolution_lat))
+        lon, lat = np.meshgrid(
+            np.arange(lon_min, lon_max, resolution_lon),
+            np.arange(lat_max, lat_min, -resolution_lat),
+        )
 
     return lat, lon
 
@@ -438,9 +464,9 @@ def elevation_angle(h, lat_s, lon_s, lat_grid, lon_grid):
     ----------
     [1] http://www.propagation.gatech.edu/ECE6390/notes/ASD5.pdf - Slides 3, 4
     """
-    h = prepare_quantity(h, u.km, name_val='Orbital altitude of the satellite')
+    h = prepare_quantity(h, u.km, name_val="Orbital altitude of the satellite")
 
-    RE = 6371.0     # Radius of the Earth (km)
+    RE = 6371.0  # Radius of the Earth (km)
     rs = RE + h
 
     # Transform latitude_longitude values to radians
@@ -451,10 +477,15 @@ def elevation_angle(h, lat_s, lon_s, lat_grid, lon_grid):
 
     # Compute the elevation angle as described in
     gamma = np.arccos(
-        np.clip(np.sin(lat2) * np.sin(lat1) +
-                np.cos(lat1) * np.cos(lat2) * np.cos(lon2 - lon1), -1, 1))
-    elevation = np.arccos(np.sin(gamma) /
-                          np.sqrt(1 + (RE / rs)**2 -
-                                  2 * (RE / rs) * np.cos(gamma)))  # In radians
+        np.clip(
+            np.sin(lat2) * np.sin(lat1)
+            + np.cos(lat1) * np.cos(lat2) * np.cos(lon2 - lon1),
+            -1,
+            1,
+        )
+    )
+    elevation = np.arccos(
+        np.sin(gamma) / np.sqrt(1 + (RE / rs) ** 2 - 2 * (RE / rs) * np.cos(gamma))
+    )  # In radians
 
     return np.rad2deg(elevation)

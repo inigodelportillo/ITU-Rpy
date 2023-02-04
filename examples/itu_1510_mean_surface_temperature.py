@@ -12,13 +12,18 @@ itur.models.itu1510.change_version(1)
 
 # Generate a regular grid of latitude and longitudes with 0.1 degree resolution
 # for the region of interest.
-lat, lon = itur.utils.regular_lat_lon_grid(resolution_lat=0.1,
-                                           resolution_lon=0.1)
+lat, lon = itur.utils.regular_lat_lon_grid(resolution_lat=0.1, resolution_lon=0.1)
 
 # Compute the surface mean temperature
 T = itur.models.itu1510.surface_mean_temperature(lat, lon)
 
 # Display the results in a map
 ax = itur.plotting.plot_in_map(
-        T, lat, lon, cmap='jet', vmin=230, vmax=310,
-        cbar_text='Annual mean surface temperature [K]')
+    T,
+    lat,
+    lon,
+    cmap="jet",
+    vmin=230,
+    vmax=310,
+    cbar_text="Annual mean surface temperature [K]",
+)

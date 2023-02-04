@@ -9,22 +9,46 @@ import numpy as np
 from astropy import units as u
 
 from itur.models.itu1144 import bilinear_2D_interpolator
-from itur.utils import (dataset_dir, prepare_input_array, prepare_output_array,
-                        prepare_quantity, load_data_interpolator,
-                        get_input_type)
+from itur.utils import (
+    dataset_dir,
+    prepare_input_array,
+    prepare_output_array,
+    prepare_quantity,
+    load_data_interpolator,
+    get_input_type,
+)
 
 
 def __fcn_columnar_content_reduced_liquid__(Lred, lat, lon, p):
     available_p = np.array(
-        [0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0, 30.0, 50.0,
-         60.0, 70.0, 80.0, 90.0, 95.0, 99.0])
+        [
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1.0,
+            2.0,
+            3.0,
+            5.0,
+            10.0,
+            20.0,
+            30.0,
+            50.0,
+            60.0,
+            70.0,
+            80.0,
+            90.0,
+            95.0,
+            99.0,
+        ]
+    )
 
     if p in available_p:
         p_below = p_above = p
         pExact = True
     else:
         pExact = False
-        idx = available_p.searchsorted(p, side='right') - 1
+        idx = available_p.searchsorted(p, side="right") - 1
         idx = np.clip(idx, 0, len(available_p))
 
         p_below = available_p[idx]
@@ -34,14 +58,15 @@ def __fcn_columnar_content_reduced_liquid__(Lred, lat, lon, p):
     Lred_a = Lred(lat, lon, p_above)
     if not pExact:
         Lred_b = Lred(lat, lon, p_below)
-        Lred = Lred_b + (Lred_a - Lred_b) * (np.log(p) - np.log(p_below)) \
-            / (np.log(p_above) - np.log(p_below))
+        Lred = Lred_b + (Lred_a - Lred_b) * (np.log(p) - np.log(p_below)) / (
+            np.log(p_above) - np.log(p_below)
+        )
         return Lred
     else:
         return Lred_a
 
 
-class __ITU840__():
+class __ITU840__:
     """Attenuation due to clouds and fog: This Recommendation provides methods
     to predict the attenuation due to clouds and fog on Earth-space paths.
 
@@ -58,6 +83,7 @@ class __ITU840__():
     * P.840-3 (10/99) (Superseded) - Tentative similar to P.840-4
 
     """
+
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.840 recommendation.
 
@@ -74,8 +100,10 @@ class __ITU840__():
             self.instance = _ITU840_4_()
         else:
             raise ValueError(
-                'Version {0}  is not implemented for the ITU-R P.840 model.'
-                .format(version))
+                "Version {0}  is not implemented for the ITU-R P.840 model.".format(
+                    version
+                )
+            )
 
     @property
     def __version__(self):
@@ -88,8 +116,11 @@ class __ITU840__():
 
     def columnar_content_reduced_liquid(self, lat, lon, p):
         # Abstract method to compute the columnar content of reduced liquid
-        fcn = np.vectorize(__fcn_columnar_content_reduced_liquid__,
-                           excluded=[0, 1, 2], otypes=[np.ndarray])
+        fcn = np.vectorize(
+            __fcn_columnar_content_reduced_liquid__,
+            excluded=[0, 1, 2],
+            otypes=[np.ndarray],
+        )
         return np.array(fcn(self.instance.Lred, lat, lon, p).tolist())
 
     def cloud_attenuation(self, lat, lon, el, f, p, Lred=None):
@@ -106,13 +137,12 @@ class __ITU840__():
         return self.instance.lognormal_approximation_coefficient(lat, lon)
 
 
-class _ITU840_8_():
-
+class _ITU840_8_:
     def __init__(self):
         self.__version__ = 8
         self.year = 2019
         self.month = 8
-        self.link = 'https://www.itu.int/rec/R-REC-P.840-8-201908-I/en'
+        self.link = "https://www.itu.int/rec/R-REC-P.840-8-201908-I/en"
 
         self._Lred = {}
         self._M = None
@@ -125,49 +155,79 @@ class _ITU840_8_():
 
     def Lred(self, lat, lon, p):
         if not self._Lred:
-            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
-                  50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '840/v7_lred_%s.npz')
+            ps = [
+                0.1,
+                0.2,
+                0.3,
+                0.5,
+                1,
+                2,
+                3,
+                5,
+                10,
+                20,
+                30,
+                50,
+                60,
+                70,
+                80,
+                90,
+                95,
+                99,
+            ]
+            d_dir = os.path.join(dataset_dir, "840/v7_lred_%s.npz")
             for p_load in ps:
                 self._Lred[float(p_load)] = load_data_interpolator(
-                    '840/v7_lat.npz', '840/v7_lon.npz',
-                    d_dir % (str(p_load).replace('.', '')),
-                    bilinear_2D_interpolator, flip_ud=False)
+                    "840/v7_lat.npz",
+                    "840/v7_lon.npz",
+                    d_dir % (str(p_load).replace(".", "")),
+                    bilinear_2D_interpolator,
+                    flip_ud=False,
+                )
 
-        return self._Lred[float(p)](
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._Lred[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(
+            lat.shape
+        )
 
     def M(self, lat, lon):
         if not self._M:
             self._M = load_data_interpolator(
-                '840/v7_lat.npz', '840/v7_lon.npz',
-                '840/v7_m.npz', bilinear_2D_interpolator, flip_ud=False)
+                "840/v7_lat.npz",
+                "840/v7_lon.npz",
+                "840/v7_m.npz",
+                bilinear_2D_interpolator,
+                flip_ud=False,
+            )
 
-        return self._M(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._M(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def sigma(self, lat, lon):
         if not self._sigma:
             self._sigma = load_data_interpolator(
-                '840/v7_lat.npz', '840/v7_lon.npz',
-                '840/v7_sigma.npz', bilinear_2D_interpolator, flip_ud=False)
+                "840/v7_lat.npz",
+                "840/v7_lon.npz",
+                "840/v7_sigma.npz",
+                bilinear_2D_interpolator,
+                flip_ud=False,
+            )
 
-        return self._sigma(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._sigma(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def Pclw(self, lat, lon):
         if not self._Pclw:
             self._Pclw = load_data_interpolator(
-                '840/v7_lat.npz', '840/v7_lon.npz',
-                '840/v7_pclw.npz', bilinear_2D_interpolator, flip_ud=False)
+                "840/v7_lat.npz",
+                "840/v7_lon.npz",
+                "840/v7_pclw.npz",
+                bilinear_2D_interpolator,
+                flip_ud=False,
+            )
 
-        return self._Pclw(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._Pclw(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     @staticmethod
     def specific_attenuation_coefficients(f, T):
-        """
-        """
+        """ """
         return _ITU840_6_.specific_attenuation_coefficients(f, T)
 
     def lognormal_approximation_coefficient(self, lat, lon):
@@ -178,13 +238,12 @@ class _ITU840_8_():
         return m, sigma, Pclw
 
 
-class _ITU840_7_():
-
+class _ITU840_7_:
     def __init__(self):
         self.__version__ = 7
         self.year = 2017
         self.month = 12
-        self.link = 'https://www.itu.int/rec/R-REC-P.840-7-201712-I/en'
+        self.link = "https://www.itu.int/rec/R-REC-P.840-7-201712-I/en"
 
         self._Lred = {}
         self._M = {}
@@ -193,49 +252,79 @@ class _ITU840_7_():
 
     def Lred(self, lat, lon, p):
         if not self._Lred:
-            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
-                  50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '840/v7_lred_%s.npz')
+            ps = [
+                0.1,
+                0.2,
+                0.3,
+                0.5,
+                1,
+                2,
+                3,
+                5,
+                10,
+                20,
+                30,
+                50,
+                60,
+                70,
+                80,
+                90,
+                95,
+                99,
+            ]
+            d_dir = os.path.join(dataset_dir, "840/v7_lred_%s.npz")
             for p_load in ps:
                 self._Lred[float(p_load)] = load_data_interpolator(
-                    '840/v7_lat.npz', '840/v7_lon.npz',
-                    d_dir % (str(p_load).replace('.', '')),
-                    bilinear_2D_interpolator, flip_ud=False)
+                    "840/v7_lat.npz",
+                    "840/v7_lon.npz",
+                    d_dir % (str(p_load).replace(".", "")),
+                    bilinear_2D_interpolator,
+                    flip_ud=False,
+                )
 
-        return self._Lred[float(p)](
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._Lred[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(
+            lat.shape
+        )
 
     def M(self, lat, lon):
         if not self._M:
             self._M = load_data_interpolator(
-                '840/v7_lat.npz', '840/v7_lon.npz',
-                '840/v7_m.npz', bilinear_2D_interpolator, flip_ud=False)
+                "840/v7_lat.npz",
+                "840/v7_lon.npz",
+                "840/v7_m.npz",
+                bilinear_2D_interpolator,
+                flip_ud=False,
+            )
 
-        return self._M(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._M(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def sigma(self, lat, lon):
         if not self._sigma:
             self._sigma = load_data_interpolator(
-                '840/v7_lat.npz', '840/v7_lon.npz',
-                '840/v7_sigma.npz', bilinear_2D_interpolator, flip_ud=False)
+                "840/v7_lat.npz",
+                "840/v7_lon.npz",
+                "840/v7_sigma.npz",
+                bilinear_2D_interpolator,
+                flip_ud=False,
+            )
 
-        return self._sigma(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._sigma(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def Pclw(self, lat, lon):
         if not self._Pclw:
             self._Pclw = load_data_interpolator(
-                '840/v7_lat.npz', '840/v7_lon.npz',
-                '840/v7_pclw.npz', bilinear_2D_interpolator, flip_ud=False)
+                "840/v7_lat.npz",
+                "840/v7_lon.npz",
+                "840/v7_pclw.npz",
+                bilinear_2D_interpolator,
+                flip_ud=False,
+            )
 
-        return self._Pclw(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._Pclw(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     @staticmethod
     def specific_attenuation_coefficients(f, T):
-        """
-        """
+        """ """
         return _ITU840_6_.specific_attenuation_coefficients(f, T)
 
     def lognormal_approximation_coefficient(self, lat, lon):
@@ -247,13 +336,12 @@ class _ITU840_7_():
         return m, sigma, Pclw
 
 
-class _ITU840_6_():
-
+class _ITU840_6_:
     def __init__(self):
         self.__version__ = 6
         self.year = 2013
         self.month = 9
-        self.link = 'https://www.itu.int/rec/R-REC-P.840-6-201202-I/en'
+        self.link = "https://www.itu.int/rec/R-REC-P.840-6-201202-I/en"
 
         self._Lred = {}
         self._M = {}
@@ -262,76 +350,114 @@ class _ITU840_6_():
 
     def Lred(self, lat, lon, p):
         if not self._Lred:
-            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
-                  50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '840/v6_lred_%s.npz')
+            ps = [
+                0.1,
+                0.2,
+                0.3,
+                0.5,
+                1,
+                2,
+                3,
+                5,
+                10,
+                20,
+                30,
+                50,
+                60,
+                70,
+                80,
+                90,
+                95,
+                99,
+            ]
+            d_dir = os.path.join(dataset_dir, "840/v6_lred_%s.npz")
             for p_load in ps:
                 self._Lred[float(p_load)] = load_data_interpolator(
-                    '840/v6_lat.npz', '840/v6_lon.npz',
-                    d_dir % (str(p_load).replace('.', '')),
-                    bilinear_2D_interpolator, flip_ud=False)
+                    "840/v6_lat.npz",
+                    "840/v6_lon.npz",
+                    d_dir % (str(p_load).replace(".", "")),
+                    bilinear_2D_interpolator,
+                    flip_ud=False,
+                )
 
-        return self._Lred[float(p)](
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._Lred[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(
+            lat.shape
+        )
 
     def M(self, lat, lon):
         if not self._M:
             self._M = load_data_interpolator(
-                '840/v6_lat.npz', '840/v6_lon.npz',
-                '840/v6_m.npz', bilinear_2D_interpolator, flip_ud=False)
+                "840/v6_lat.npz",
+                "840/v6_lon.npz",
+                "840/v6_m.npz",
+                bilinear_2D_interpolator,
+                flip_ud=False,
+            )
 
-        return self._M(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._M(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def sigma(self, lat, lon):
         if not self._sigma:
             self._sigma = load_data_interpolator(
-                '840/v6_lat.npz', '840/v6_lon.npz',
-                '840/v6_sigma.npz', bilinear_2D_interpolator, flip_ud=False)
+                "840/v6_lat.npz",
+                "840/v6_lon.npz",
+                "840/v6_sigma.npz",
+                bilinear_2D_interpolator,
+                flip_ud=False,
+            )
 
-        return self._sigma(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._sigma(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def Pclw(self, lat, lon):
         if not self._Pclw:
             self._Pclw = load_data_interpolator(
-                '840/v6_lat.npz', '840/v6_lon.npz',
-                '840/v6_pclw.npz', bilinear_2D_interpolator, flip_ud=False)
+                "840/v6_lat.npz",
+                "840/v6_lon.npz",
+                "840/v6_pclw.npz",
+                bilinear_2D_interpolator,
+                flip_ud=False,
+            )
 
-        return self._Pclw(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._Pclw(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     @staticmethod
     def specific_attenuation_coefficients(f, T):
-        """
-        """
+        """ """
         if np.any(f > 1000):
-            raise ValueError('Frequency must be introduced in GHz and the '
-                             'maximum range is 1000 GHz')
+            raise ValueError(
+                "Frequency must be introduced in GHz and the "
+                "maximum range is 1000 GHz"
+            )
 
         T_kelvin = T + 273.15
-        theta = 300.0 / T_kelvin                # Eq. 9
+        theta = 300.0 / T_kelvin  # Eq. 9
 
         # Compute the values of the epsilons
         epsilon0 = 77.66 + 103.3 * (theta - 1)  # Eq. 6
-        epsilon1 = 0.0671 * epsilon0            # Eq. 7
-        epsilon2 = 3.52                         # Eq. 8
+        epsilon1 = 0.0671 * epsilon0  # Eq. 7
+        epsilon2 = 3.52  # Eq. 8
 
         # Compute the principal and secondary relacation frequencies
-        fp = 20.20 - 146 * (theta - 1) + 316.0 * (theta - 1)**2     # Eq. 10
-        fs = 39.8 * fp                                              # Eq. 11
+        fp = 20.20 - 146 * (theta - 1) + 316.0 * (theta - 1) ** 2  # Eq. 10
+        fs = 39.8 * fp  # Eq. 11
 
         # Compute the dielectric permitivity of water
-        epsilonp = (epsilon0 - epsilon1) / (1 + (f / fp) ** 2) + \
-            (epsilon1 - epsilon2) / (1 + (f / fs) ** 2) + epsilon2  # Eq. 5
+        epsilonp = (
+            (epsilon0 - epsilon1) / (1 + (f / fp) ** 2)
+            + (epsilon1 - epsilon2) / (1 + (f / fs) ** 2)
+            + epsilon2
+        )  # Eq. 5
 
-        epsilonpp = f * (epsilon0 - epsilon1) / (fp * (1 + (f / fp)**2)) + \
-            f * (epsilon1 - epsilon2) / (fs * (1 + (f / fs)**2))       # Eq. 4
+        epsilonpp = f * (epsilon0 - epsilon1) / (fp * (1 + (f / fp) ** 2)) + f * (
+            epsilon1 - epsilon2
+        ) / (
+            fs * (1 + (f / fs) ** 2)
+        )  # Eq. 4
 
-        eta = (2 + epsilonp) / epsilonpp                    # Eq. 3
-        Kl = (0.819 * f) / (epsilonpp * (1 + eta**2))       # Eq. 2
+        eta = (2 + epsilonp) / epsilonpp  # Eq. 3
+        Kl = (0.819 * f) / (epsilonpp * (1 + eta**2))  # Eq. 2
 
-        return Kl       # Specific attenuation coefficient  (dB/km)/(g/m3)
+        return Kl  # Specific attenuation coefficient  (dB/km)/(g/m3)
 
     def lognormal_approximation_coefficient(self, lat, lon):
         m = self.M(lat, lon)
@@ -341,13 +467,12 @@ class _ITU840_6_():
         return m, sigma, Pclw
 
 
-class _ITU840_5_():
-
+class _ITU840_5_:
     def __init__(self):
         self.__version__ = 5
         self.year = 2012
         self.month = 2
-        self.link = 'https://www.itu.int/rec/R-REC-P.840-5-201202-S/en'
+        self.link = "https://www.itu.int/rec/R-REC-P.840-5-201202-S/en"
 
         self._Lred = {}
         self._M = {}
@@ -356,52 +481,79 @@ class _ITU840_5_():
 
     def Lred(self, lat, lon, p):
         if not self._Lred:
-            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
-                  50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '840/v4_esawred_%s.npz')
+            ps = [
+                0.1,
+                0.2,
+                0.3,
+                0.5,
+                1,
+                2,
+                3,
+                5,
+                10,
+                20,
+                30,
+                50,
+                60,
+                70,
+                80,
+                90,
+                95,
+                99,
+            ]
+            d_dir = os.path.join(dataset_dir, "840/v4_esawred_%s.npz")
             for p_load in ps:
                 self._Lred[float(p_load)] = load_data_interpolator(
-                    '840/v4_lat.npz', '840/v4_lon.npz',
-                    d_dir % (str(p_load).replace('.', '')),
-                    bilinear_2D_interpolator, flip_ud=False)
+                    "840/v4_lat.npz",
+                    "840/v4_lon.npz",
+                    d_dir % (str(p_load).replace(".", "")),
+                    bilinear_2D_interpolator,
+                    flip_ud=False,
+                )
 
-        return self._Lred[float(p)](
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._Lred[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(
+            lat.shape
+        )
 
     def M(self, lat, lon):
         if not self._M:
             self._M = load_data_interpolator(
-                '840/v6_lat.npz', '840/v6_lon.npz',
-                '840/v4_wred_lognormal_mean.npz', bilinear_2D_interpolator,
-                flip_ud=False)
+                "840/v6_lat.npz",
+                "840/v6_lon.npz",
+                "840/v4_wred_lognormal_mean.npz",
+                bilinear_2D_interpolator,
+                flip_ud=False,
+            )
 
-        return self._M(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._M(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def sigma(self, lat, lon):
         if not self._sigma:
             self._sigma = load_data_interpolator(
-                '840/v6_lat.npz', '840/v6_lon.npz',
-                '840/v4_wred_lognormal_stdev.npz', bilinear_2D_interpolator,
-                flip_ud=False)
+                "840/v6_lat.npz",
+                "840/v6_lon.npz",
+                "840/v4_wred_lognormal_stdev.npz",
+                bilinear_2D_interpolator,
+                flip_ud=False,
+            )
 
-        return self._sigma(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._sigma(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def Pclw(self, lat, lon):
         if not self._Pclw:
             self._Pclw = load_data_interpolator(
-                '840/v6_lat.npz', '840/v6_lon.npz',
-                '840/v4_wred_lognormal_pclw.npz', bilinear_2D_interpolator,
-                flip_ud=False)
+                "840/v6_lat.npz",
+                "840/v6_lon.npz",
+                "840/v4_wred_lognormal_pclw.npz",
+                bilinear_2D_interpolator,
+                flip_ud=False,
+            )
 
-        return self._Pclw(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._Pclw(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     @staticmethod
     def specific_attenuation_coefficients(f, T):
-        """
-        """
+        """ """
         return _ITU840_4_.specific_attenuation_coefficients(f, T)
 
     def lognormal_approximation_coefficient(self, lat, lon):
@@ -412,13 +564,12 @@ class _ITU840_5_():
         return m, sigma, Pclw
 
 
-class _ITU840_4_():
-
+class _ITU840_4_:
     def __init__(self):
         self.__version__ = 4
         self.year = 2013
         self.month = 9
-        self.link = 'https://www.itu.int/rec/R-REC-P.840-6-201202-I/en'
+        self.link = "https://www.itu.int/rec/R-REC-P.840-6-201202-I/en"
 
         self._Lred = {}
         self._M = {}
@@ -427,80 +578,114 @@ class _ITU840_4_():
 
     def Lred(self, lat, lon, p):
         if not self._Lred:
-            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30,
-                  50, 60, 70, 80, 90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '840/v4_esawred_%s.npz')
+            ps = [
+                0.1,
+                0.2,
+                0.3,
+                0.5,
+                1,
+                2,
+                3,
+                5,
+                10,
+                20,
+                30,
+                50,
+                60,
+                70,
+                80,
+                90,
+                95,
+                99,
+            ]
+            d_dir = os.path.join(dataset_dir, "840/v4_esawred_%s.npz")
             for p_load in ps:
                 self._Lred[float(p_load)] = load_data_interpolator(
-                    '840/v4_lat.npz', '840/v4_lon.npz',
-                    d_dir % (str(p_load).replace('.', '')),
-                    bilinear_2D_interpolator, flip_ud=False)
+                    "840/v4_lat.npz",
+                    "840/v4_lon.npz",
+                    d_dir % (str(p_load).replace(".", "")),
+                    bilinear_2D_interpolator,
+                    flip_ud=False,
+                )
 
-        return self._Lred[float(p)](
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._Lred[float(p)](np.array([lat.ravel(), lon.ravel()]).T).reshape(
+            lat.shape
+        )
 
     def M(self, lat, lon):
         if not self._M:
             self._M = load_data_interpolator(
-                '840/v6_lat.npz', '840/v6_lon.npz',
-                '840/v4_wred_lognormal_mean.npz', bilinear_2D_interpolator,
-                flip_ud=False)
+                "840/v6_lat.npz",
+                "840/v6_lon.npz",
+                "840/v4_wred_lognormal_mean.npz",
+                bilinear_2D_interpolator,
+                flip_ud=False,
+            )
 
-        return self._M(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._M(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def sigma(self, lat, lon):
         if not self._sigma:
             self._sigma = load_data_interpolator(
-                '840/v6_lat.npz', '840/v6_lon.npz',
-                '840/v4_wred_lognormal_stdev.npz', bilinear_2D_interpolator,
-                flip_ud=False)
+                "840/v6_lat.npz",
+                "840/v6_lon.npz",
+                "840/v4_wred_lognormal_stdev.npz",
+                bilinear_2D_interpolator,
+                flip_ud=False,
+            )
 
-        return self._sigma(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._sigma(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def Pclw(self, lat, lon):
         if not self._Pclw:
             self._Pclw = load_data_interpolator(
-                '840/v6_lat.npz', '840/v6_lon.npz',
-                '840/v4_wred_lognormal_pclw.npz', bilinear_2D_interpolator,
-                flip_ud=False)
+                "840/v6_lat.npz",
+                "840/v6_lon.npz",
+                "840/v4_wred_lognormal_pclw.npz",
+                bilinear_2D_interpolator,
+                flip_ud=False,
+            )
 
-        return self._Pclw(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._Pclw(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     @staticmethod
     def specific_attenuation_coefficients(f, T):
-        """
-        """
+        """ """
         if np.any(f > 1000):
             raise ValueError(
-                'Frequency must be introduced in GHz and the maximum range'
-                ' is 1000 GHz')
+                "Frequency must be introduced in GHz and the maximum range"
+                " is 1000 GHz"
+            )
 
         T_kelvin = T + 273.15
-        theta = 300.0 / T_kelvin                # Eq. 9
+        theta = 300.0 / T_kelvin  # Eq. 9
 
         # Compute the values of the epsilons
         epsilon0 = 77.66 + 103.3 * (theta - 1)  # Eq. 6
-        epsilon1 = 5.48                         # Eq. 7
-        epsilon2 = 3.51                         # Eq. 8
+        epsilon1 = 5.48  # Eq. 7
+        epsilon2 = 3.51  # Eq. 8
 
         # Compute the principal and secondary relacation frequencies
-        fp = 20.09 - 142 * (theta - 1) + 294.0 * (theta - 1)**2     # Eq. 10
-        fs = 590 - 1500 * (theta - 1)                               # Eq. 11
+        fp = 20.09 - 142 * (theta - 1) + 294.0 * (theta - 1) ** 2  # Eq. 10
+        fs = 590 - 1500 * (theta - 1)  # Eq. 11
 
         # Compute the dielectric permitivity of water
-        epsilonp = (epsilon0 - epsilon1) / (1 + (f / fp) ** 2) + \
-            (epsilon1 - epsilon2) / (1 + (f / fs) ** 2) + epsilon2  # Eq. 5
+        epsilonp = (
+            (epsilon0 - epsilon1) / (1 + (f / fp) ** 2)
+            + (epsilon1 - epsilon2) / (1 + (f / fs) ** 2)
+            + epsilon2
+        )  # Eq. 5
 
-        epsilonpp = f * (epsilon0 - epsilon1) / (fp * (1 + (f / fp)**2)) + \
-            f * (epsilon1 - epsilon2) / (fs * (1 + (f / fs)**2))       # Eq. 4
+        epsilonpp = f * (epsilon0 - epsilon1) / (fp * (1 + (f / fp) ** 2)) + f * (
+            epsilon1 - epsilon2
+        ) / (
+            fs * (1 + (f / fs) ** 2)
+        )  # Eq. 4
 
-        eta = (2 + epsilonp) / epsilonpp                    # Eq. 3
-        Kl = (0.819 * f) / (epsilonpp * (1 + eta**2))       # Eq. 2
+        eta = (2 + epsilonp) / epsilonpp  # Eq. 3
+        Kl = (0.819 * f) / (epsilonpp * (1 + eta**2))  # Eq. 2
 
-        return Kl       # Specific attenuation coefficient  (dB/km)/(g/m3)
+        return Kl  # Specific attenuation coefficient  (dB/km)/(g/m3)
 
     def lognormal_approximation_coefficient(self, lat, lon):
         m = self.M(lat, lon)
@@ -576,8 +761,8 @@ def specific_attenuation_coefficients(f, T):
     [1] Attenuation due to clouds and fog:
     https://www.itu.int/rec/R-REC-P.840/en
     """
-    f = prepare_quantity(f, u.GHz, 'Frequency')
-    T = prepare_quantity(T, u.deg_C, 'Temperature')
+    f = prepare_quantity(f, u.GHz, "Frequency")
+    T = prepare_quantity(T, u.deg_C, "Temperature")
     return __model.specific_attenuation_coefficients(f, T)
 
 
@@ -680,11 +865,11 @@ def cloud_attenuation(lat, lon, el, f, p, Lred=None):
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
-    el = prepare_quantity(el, u.deg, 'Elevation angle')
-    f = prepare_quantity(f, u.GHz, 'Frequency')
+    el = prepare_quantity(el, u.deg, "Elevation angle")
+    f = prepare_quantity(f, u.GHz, "Frequency")
     Lred = prepare_quantity(
-        Lred, u.kg / u.m**2,
-        'Total columnar contents of reduced cloud liquid water.')
+        Lred, u.kg / u.m**2, "Total columnar contents of reduced cloud liquid water."
+    )
     val = __model.cloud_attenuation(lat, lon, el, f, p, Lred)
     return prepare_output_array(val, type_output) * u.dB
 
@@ -731,6 +916,8 @@ def lognormal_approximation_coefficient(lat, lon):
     lon = np.mod(lon, 360)
     val = __model.lognormal_approximation_coefficient(lat, lon)
     u_adim = u.dimensionless_unscaled
-    return (prepare_output_array(val[0], type_output) * u_adim,
-            prepare_output_array(val[1], type_output) * u_adim,
-            prepare_output_array(val[2], type_output) * u_adim)
+    return (
+        prepare_output_array(val[0], type_output) * u_adim,
+        prepare_output_array(val[1], type_output) * u_adim,
+        prepare_output_array(val[2], type_output) * u_adim,
+    )

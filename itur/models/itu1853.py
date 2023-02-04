@@ -8,10 +8,11 @@ import scipy.stats as stats
 from scipy.signal import lfilter
 
 from itur.models.itu618 import rain_attenuation, scintillation_attenuation_sigma
-from itur.models.itu676 import gamma0_exact, \
-    slant_inclined_path_equivalent_height
-from itur.models.itu840 import lognormal_approximation_coefficient, \
-    specific_attenuation_coefficients
+from itur.models.itu676 import gamma0_exact, slant_inclined_path_equivalent_height
+from itur.models.itu840 import (
+    lognormal_approximation_coefficient,
+    specific_attenuation_coefficients,
+)
 from itur.models.itu835 import standard_pressure, standard_water_vapour_density
 from itur.models.itu836 import total_water_vapour_content
 from itur.models.itu837 import rainfall_probability
@@ -23,7 +24,7 @@ from itur.utils import prepare_quantity
 from astropy import units as u
 
 
-class __ITU1853():
+class __ITU1853:
 
     """Tropospheric attenuation time series synthesis
 
@@ -31,6 +32,7 @@ class __ITU1853():
     * P.1853-0 (10/09) (Superseded)
     * P.1853-1 (02/12) (Current version)
     """
+
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.1853 recommendation.
 
@@ -41,8 +43,10 @@ class __ITU1853():
             self.instance = _ITU1853_0()
         else:
             raise ValueError(
-                'Version {0} is not implemented for the ITU-R P.1853 model.'
-                .format(version))
+                "Version {0} is not implemented for the ITU-R P.1853 model.".format(
+                    version
+                )
+            )
 
     @staticmethod
     def set_seed(seed):
@@ -52,43 +56,68 @@ class __ITU1853():
     def __version__(self):
         return self.instance.__version__
 
-    def rain_attenuation_synthesis(self, lat, lon, f, el, hs, Ns,
-                                   Ts=1, tau=45, n=None):
+    def rain_attenuation_synthesis(self, lat, lon, f, el, hs, Ns, Ts=1, tau=45, n=None):
         return self.instance.rain_attenuation_synthesis(
-            lat, lon, f, el, hs, Ns, Ts=Ts, tau=tau, n=n)
+            lat, lon, f, el, hs, Ns, Ts=Ts, tau=tau, n=n
+        )
 
-    def total_attenuation_synthesis(self, lat, lon, f, el, p, D, Ns, Ts=1,
-                                    tau=45, hs=None, eta=0.65, rho=None,
-                                    H=None, P=None, hL=1000,
-                                    return_contributions=False):
+    def total_attenuation_synthesis(
+        self,
+        lat,
+        lon,
+        f,
+        el,
+        p,
+        D,
+        Ns,
+        Ts=1,
+        tau=45,
+        hs=None,
+        eta=0.65,
+        rho=None,
+        H=None,
+        P=None,
+        hL=1000,
+        return_contributions=False,
+    ):
         return self.instance.total_attenuation_synthesis(
-            lat, lon, f, el, p, D, Ns, Ts=Ts, tau=tau, hs=hs, eta=eta, rho=rho,
-            H=H, P=P, hL=hL, return_contributions=return_contributions)
+            lat,
+            lon,
+            f,
+            el,
+            p,
+            D,
+            Ns,
+            Ts=Ts,
+            tau=tau,
+            hs=hs,
+            eta=eta,
+            rho=rho,
+            H=H,
+            P=P,
+            hL=hL,
+            return_contributions=return_contributions,
+        )
 
     def scintillation_attenuation_synthesis(self, Ns, f_c=0.1, Ts=1):
-        return self.instance.scintillation_attenuation_synthesis(
-            Ns, f_c=f_c, Ts=Ts)
+        return self.instance.scintillation_attenuation_synthesis(Ns, f_c=f_c, Ts=Ts)
 
     def cloud_liquid_water_synthesis(self, lat, lon, Ns, Ts=1, n=None):
-        return self.instance.cloud_liquid_water_synthesis(
-            lat, lon, Ns, Ts=Ts, n=n)
+        return self.instance.cloud_liquid_water_synthesis(lat, lon, Ns, Ts=Ts, n=n)
 
     def integrated_water_vapour_synthesis(self, lat, lon, Ns, Ts=1, n=None):
-        return self.instance.integrated_water_vapour_synthesis(
-            lat, lon, Ns, Ts=Ts, n=n)
+        return self.instance.integrated_water_vapour_synthesis(lat, lon, Ns, Ts=Ts, n=n)
 
 
-class _ITU1853_1():
-
+class _ITU1853_1:
     def __init__(self):
         self.__version__ = 1
         self.year = 2012
         self.month = 2
-        self.link = 'https://www.itu.int/rec/R-REC-P.1853-1-201202-I/en'
+        self.link = "https://www.itu.int/rec/R-REC-P.1853-1-201202-I/en"
 
     @staticmethod
-    def rain_attenuation_synthesis(
-            lat, lon, f, el, hs, Ns, tau=45, Ts=1, n=None):
+    def rain_attenuation_synthesis(lat, lon, f, el, hs, Ns, tau=45, Ts=1, n=None):
         """
         For Earth-space paths, the time series synthesis method is valid for
         frequencies between 4 GHz and 55 GHz and elevation angles between
@@ -97,13 +126,11 @@ class _ITU1853_1():
 
         # Step A1: Determine Prain (% of time), the probability of rain on the
         # path. Prain can be well approximated as P0(lat, lon)
-        P_rain = rainfall_probability(lat, lon).\
-            to(u.dimensionless_unscaled).value
+        P_rain = rainfall_probability(lat, lon).to(u.dimensionless_unscaled).value
 
         # Step A2: Construct the set of pairs [Pi, Ai] where Pi (% of time) is
         # the probability the attenuation Ai (dB) is exceeded where Pi < P_K
-        p_i = np.array([0.01, 0.02, 0.03, 0.05,
-                        0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10])
+        p_i = np.array([0.01, 0.02, 0.03, 0.05, 0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10])
         Pi = np.array([p for p in p_i if p < P_rain * 100], dtype=np.float32)
         Ai = np.array([0 for p in p_i if p < P_rain * 100], dtype=np.float32)
 
@@ -117,8 +144,9 @@ class _ITU1853_1():
 
         # Step A4: Determine the variables sigma_lna, m_lna by performing a
         # least-squares fit to lnAi = sigma_lna Q^{-1}(Pi/P_k) + m_lna
-        m, sigma = np.linalg.lstsq(np.vstack([np.ones(len(Q)), Q]).T,
-                                   lnA, rcond=None)[0]
+        m, sigma = np.linalg.lstsq(np.vstack([np.ones(len(Q)), Q]).T, lnA, rcond=None)[
+            0
+        ]
 
         # Step B: Set the low-pass filter parameter
         beta = 2e-4
@@ -143,18 +171,18 @@ class _ITU1853_1():
 
         # D6: Discard the first 200 000 samples from the synthesized
         if discard_samples:
-            A_rain = A_rain[np.ceil(200000 / Ts).astype(int):]
+            A_rain = A_rain[np.ceil(200000 / Ts).astype(int) :]
 
         return A_rain.flatten()
 
     @classmethod
     def fftnoise(cls, f):
-        f = np.array(f, dtype='complex')
+        f = np.array(f, dtype="complex")
         Np = (len(f) - 1) // 2
         phases = np.random.rand(Np) * 2 * np.pi
         phases = np.cos(phases) + 1j * np.sin(phases)
-        f[1:Np + 1] *= phases
-        f[-1:-1 - Np:-1] = np.conj(f[1:Np + 1])
+        f[1 : Np + 1] *= phases
+        f[-1 : -1 - Np : -1] = np.conj(f[1 : Np + 1])
         return np.fft.ifft(f).real
 
     @staticmethod
@@ -165,16 +193,16 @@ class _ITU1853_1():
         5 deg and 90 deg.
         """
         freqs = np.abs(np.fft.fftfreq(2 * int(Ns + 2e5), 1 / Ts))
-        H_f = np.where(freqs <= f_c, 1, 10 **
-                       ((np.log10(freqs) - np.log10(f_c)) * (-8 / 3)))
-        H_f = H_f[0:int(Ns + 2e5)]
+        H_f = np.where(
+            freqs <= f_c, 1, 10 ** ((np.log10(freqs) - np.log10(f_c)) * (-8 / 3))
+        )
+        H_f = H_f[0 : int(Ns + 2e5)]
         sci = _ITU1853_1.fftnoise(np.fft.fftshift(H_f))
         return sci[200000:].flatten()
 
     @staticmethod
     def cloud_liquid_water_synthesis(lat, lon, Ns, Ts=1, n=None):
-        """
-        """
+        """ """
 
         # Step A: Estimation of m, sigma and Pcwl
         m, sigma, Pcwl = lognormal_approximation_coefficient(lat, lon)
@@ -208,12 +236,15 @@ class _ITU1853_1():
         # Step D4: Compute Gc(kTs),
         G_c = gamma_1 * X_1 + gamma_2 * X_2
         # Step D5: Compute L(kTs) (dB)
-        L = np.where(G_c > alpha, np.exp(m + sigma * stats.norm.ppf(
-            1 - 1 / Pcwl * stats.norm.sf(G_c))), 0)
+        L = np.where(
+            G_c > alpha,
+            np.exp(m + sigma * stats.norm.ppf(1 - 1 / Pcwl * stats.norm.sf(G_c))),
+            0,
+        )
 
         # D6: Discard the first 500 000 samples from the synthesized
         if discard_samples:
-            L = L[np.ceil(500000 / Ts).astype(int):]
+            L = L[np.ceil(500000 / Ts).astype(int) :]
 
         return L.flatten()
 
@@ -221,14 +252,14 @@ class _ITU1853_1():
     def integrated_water_vapour_coefficients(lat, lon):
         # A Estimation of κ and λ
         ps = np.array([0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30, 50])
-        Vi = np.array([total_water_vapour_content(lat, lon, p_i).value
-                       for p_i in ps])
+        Vi = np.array([total_water_vapour_content(lat, lon, p_i).value for p_i in ps])
 
-        ln_lnPi = np.log(- np.log(ps / 100))
+        ln_lnPi = np.log(-np.log(ps / 100))
         ln_Vi = np.log(Vi)
 
-        a, b = np.linalg.lstsq(np.vstack([ln_Vi, np.ones(len(ln_Vi))]).T,
-                               ln_lnPi, rcond=None)[0]
+        a, b = np.linalg.lstsq(
+            np.vstack([ln_Vi, np.ones(len(ln_Vi))]).T, ln_lnPi, rcond=None
+        )[0]
         kappa = a
         lambd = np.exp(-b / a)
         return kappa, lambd
@@ -253,17 +284,32 @@ class _ITU1853_1():
         rho = np.exp(-beta_V * Ts)
         G_v = lfilter([np.sqrt(1 - rho**2)], [1, -rho], n, 0)
         # Step C4: Compute Compute V(kTs),
-        V = lambd * (- np.log10(stats.norm.sf(G_v)))**(1 / kappa)
+        V = lambd * (-np.log10(stats.norm.sf(G_v))) ** (1 / kappa)
         # Step C5: Discard the first 5 000 000 samples from the synthesized
         if discard_samples:
-            V = V[np.ceil(5000000 / Ts).astype(int):]
+            V = V[np.ceil(5000000 / Ts).astype(int) :]
 
         return V.flatten()
 
-    def total_attenuation_synthesis(self, lat, lon, f, el, p, D, Ns, Ts=1,
-                                    hs=None, tau=45, eta=0.65, rho=None,
-                                    H=None, P=None, hL=1000,
-                                    return_contributions=False):
+    def total_attenuation_synthesis(
+        self,
+        lat,
+        lon,
+        f,
+        el,
+        p,
+        D,
+        Ns,
+        Ts=1,
+        hs=None,
+        tau=45,
+        eta=0.65,
+        rho=None,
+        H=None,
+        P=None,
+        hL=1000,
+        return_contributions=False,
+    ):
         t_disc = int(5e6)
         # Step A Correlation coefficients:
         C_RC = 1
@@ -271,12 +317,20 @@ class _ITU1853_1():
 
         # Step B Scintillation polynomials
         def a_Fade(p):
-            return -0.061 * np.log10(p)**3 + 0.072 * \
-                np.log10(p)**2 - 1.71 * np.log10(p) + 3
+            return (
+                -0.061 * np.log10(p) ** 3
+                + 0.072 * np.log10(p) ** 2
+                - 1.71 * np.log10(p)
+                + 3
+            )
 
         def a_Enhanc(p):
-            return -0.0597 * np.log10(p)**3 - 0.0835 * \
-                np.log10(p)**2 - 1.258 * np.log10(p) + 2.672
+            return (
+                -0.0597 * np.log10(p) ** 3
+                - 0.0835 * np.log10(p) ** 2
+                - 1.258 * np.log10(p)
+                + 2.672
+            )
 
         # Step C1-C3:
         n_R = np.random.normal(0, 1, int((Ns * Ts + t_disc)))
@@ -291,21 +345,20 @@ class _ITU1853_1():
         if hs is None:
             hs = topographic_altitude(lat, lon)
         Ar = self.rain_attenuation_synthesis(
-            lat, lon, f, el, hs, Ns, Ts=1, tau=tau, n=n_R)
+            lat, lon, f, el, hs, Ns, Ts=1, tau=tau, n=n_R
+        )
         Ar = Ar[t_disc:]
 
         # Step C7: Compute the cloud integrated liquid water content time
         # series
         L = self.cloud_liquid_water_synthesis(lat, lon, Ns, Ts=1, n=n_L)
         L = L[t_disc:]
-        Ac = L * \
-            specific_attenuation_coefficients(f, T=0) / np.sin(np.deg2rad(el))
+        Ac = L * specific_attenuation_coefficients(f, T=0) / np.sin(np.deg2rad(el))
         Ac = Ac.flatten()
 
         # Step C9: Identify time stamps where A_R > 0 L > 1
         idx = np.where(np.logical_and(Ar > 0, L > 1))[0]
-        idx_no = np.where(np.logical_not(
-            np.logical_and(Ar > 0, L > 1)))[0]
+        idx_no = np.where(np.logical_not(np.logical_and(Ar > 0, L > 1)))[0]
 
         # Step C10: Discard the previous values of Ac and re-compute them by
         # linear interpolation vs. time starting from the non-discarded cloud
@@ -349,16 +402,18 @@ class _ITU1853_1():
         # Step C17: Transform the integrated water vapour content time series
         # V(kTs) into the Gamma distributed time series Z(kTs) as follows:
         kappa, lambd = self.integrated_water_vapour_coefficients(lat, lon)
-        Z = stats.gamma.ppf(1 - np.exp(-(V / lambd)**kappa), 10, 0.1)
+        Z = stats.gamma.ppf(1 - np.exp(-((V / lambd) ** kappa)), 10, 0.1)
 
         # Step C18: Compute the scintillation standard deviation σ following
         # the method recommended in Recommendation ITU-R P.618.
-        sigma = scintillation_attenuation_sigma(lat, lon, f, el, p, D, eta, Tm,
-                                                H, P, hL).value
+        sigma = scintillation_attenuation_sigma(
+            lat, lon, f, el, p, D, eta, Tm, H, P, hL
+        ).value
 
         # Step C19: Compute the scintillation time series sci:
-        As = np.where(Ar > 1, sigma * sci_0 * C_x * Z * Ar ** (5 / 12),
-                      sigma * sci_0 * C_x * Z)
+        As = np.where(
+            Ar > 1, sigma * sci_0 * C_x * Z * Ar ** (5 / 12), sigma * sci_0 * C_x * Z
+        )
 
         # Step C20: Compute total tropospheric attenuation time series A(kTs)
         # as follows:
@@ -370,13 +425,12 @@ class _ITU1853_1():
             return A[::Ts]
 
 
-class _ITU1853_0():
-
+class _ITU1853_0:
     def __init__(self):
         self.__version__ = 0
         self.year = 2009
         self.month = 10
-        self.link = 'https://www.itu.int/rec/R-REC-P.1853-0-200910-I/en'
+        self.link = "https://www.itu.int/rec/R-REC-P.1853-0-200910-I/en"
 
     @staticmethod
     def rain_attenuation_synthesis(*args, **kwargs):
@@ -390,19 +444,22 @@ class _ITU1853_0():
     def cloud_liquid_water_synthesis(*args, **kwargs):
         raise NotImplementedError(
             "Recommendation ITU-R P.1853 does not specify a method to compute "
-            "time series for the cloud liquid water content.")
+            "time series for the cloud liquid water content."
+        )
 
     @staticmethod
     def integrated_water_vapour_synthesis(*args, **kwargs):
         raise NotImplementedError(
             "Recommendation ITU-R P.1853 does not specify a method to compute "
-            "time series for the water vapour content.")
+            "time series for the water vapour content."
+        )
 
     @staticmethod
     def total_attenuation_synthesis(*args, **kwargs):
         raise NotImplementedError(
             "Recommendation ITU-R P.1853 does not specify a method to compute "
-            "time series for the total atmospheric attenuation.")
+            "time series for the total atmospheric attenuation."
+        )
 
 
 __model = __ITU1853()
@@ -496,13 +553,13 @@ def rain_attenuation_synthesis(lat, lon, f, el, hs, Ns, Ts=1, tau=45, n=None):
     global __model
 
     lon = np.mod(lon, 360)
-    f = prepare_quantity(f, u.GHz, 'Frequency')
-    el = prepare_quantity(el, u.deg, 'Elevation angle')
-    hs = prepare_quantity(
-        hs, u.km, 'Heigh above mean sea level of the earth station')
-    Ts = prepare_quantity(Ts, u.second, 'Time step between samples')
-    val = __model.rain_attenuation_synthesis(lat, lon, f, el, hs, Ns,
-                                             Ts=Ts, tau=tau, n=n)
+    f = prepare_quantity(f, u.GHz, "Frequency")
+    el = prepare_quantity(el, u.deg, "Elevation angle")
+    hs = prepare_quantity(hs, u.km, "Heigh above mean sea level of the earth station")
+    Ts = prepare_quantity(Ts, u.second, "Time step between samples")
+    val = __model.rain_attenuation_synthesis(
+        lat, lon, f, el, hs, Ns, Ts=Ts, tau=tau, n=n
+    )
     return val * u.dB
 
 
@@ -539,7 +596,7 @@ def scintillation_attenuation_synthesis(Ns, f_c=0.1, Ts=1):
 
 
 def integrated_water_vapour_synthesis(lat, lon, Ns, Ts=1, n=None):
-    """ The time series synthesis method generates a time series that
+    """The time series synthesis method generates a time series that
     reproduces the spectral characteristics and the distribution of water
     vapour content.
 
@@ -576,7 +633,7 @@ def integrated_water_vapour_synthesis(lat, lon, Ns, Ts=1, n=None):
 
 
 def cloud_liquid_water_synthesis(lat, lon, Ns, Ts=1, n=None):
-    """ The time series synthesis method generates a time series that
+    """The time series synthesis method generates a time series that
     reproduces the spectral characteristics, rate of change and duration
     statistics of cloud liquid content events.
 
@@ -611,10 +668,25 @@ def cloud_liquid_water_synthesis(lat, lon, Ns, Ts=1, n=None):
     return val * u.mm
 
 
-def total_attenuation_synthesis(lat, lon, f, el, p, D, Ns, Ts=1, hs=None,
-                                tau=45, eta=0.65, rho=None, H=None, P=None,
-                                hL=1000, return_contributions=False):
-    """ The time series synthesis method generates a time series that
+def total_attenuation_synthesis(
+    lat,
+    lon,
+    f,
+    el,
+    p,
+    D,
+    Ns,
+    Ts=1,
+    hs=None,
+    tau=45,
+    eta=0.65,
+    rho=None,
+    H=None,
+    P=None,
+    hL=1000,
+    return_contributions=False,
+):
+    """The time series synthesis method generates a time series that
     reproduces the spectral characteristics, rate of change and duration
     statistics of the total atmospheric attenuation events.
 
@@ -683,20 +755,34 @@ def total_attenuation_synthesis(lat, lon, f, el, p, D, Ns, Ts=1, hs=None,
     """
     global __model
 
-    f = prepare_quantity(f, u.GHz, 'Frequency')
-    el = prepare_quantity(el, u.deg, 'Elevation angle')
-    D = prepare_quantity(D, u.m, 'Antenna diameter')
-    hs = prepare_quantity(
-        hs, u.km, 'Heigh above mean sea level of the earth station')
-    eta = prepare_quantity(eta, u.one, 'Antenna efficiency')
-    rho = prepare_quantity(rho, u.g / u.m**3, 'Water vapor density')
-    H = prepare_quantity(H, u.percent, 'Average surface relative humidity')
-    P = prepare_quantity(P, u.hPa, 'Average surface pressure')
-    hL = prepare_quantity(hL, u.m, 'Height of the turbulent layer')
+    f = prepare_quantity(f, u.GHz, "Frequency")
+    el = prepare_quantity(el, u.deg, "Elevation angle")
+    D = prepare_quantity(D, u.m, "Antenna diameter")
+    hs = prepare_quantity(hs, u.km, "Heigh above mean sea level of the earth station")
+    eta = prepare_quantity(eta, u.one, "Antenna efficiency")
+    rho = prepare_quantity(rho, u.g / u.m**3, "Water vapor density")
+    H = prepare_quantity(H, u.percent, "Average surface relative humidity")
+    P = prepare_quantity(P, u.hPa, "Average surface pressure")
+    hL = prepare_quantity(hL, u.m, "Height of the turbulent layer")
 
     val = __model.total_attenuation_synthesis(
-        lat, lon, f, el, p, D, Ns, Ts=Ts, tau=tau, hs=hs, eta=eta, rho=rho,
-        H=H, P=P, hL=hL, return_contributions=return_contributions)
+        lat,
+        lon,
+        f,
+        el,
+        p,
+        D,
+        Ns,
+        Ts=Ts,
+        tau=tau,
+        hs=hs,
+        eta=eta,
+        rho=rho,
+        H=H,
+        P=P,
+        hL=hL,
+        return_contributions=return_contributions,
+    )
     if return_contributions:
         return tuple([v * u.dB for v in val])
     else:

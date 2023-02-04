@@ -8,11 +8,15 @@ import numpy as np
 from astropy import units as u
 
 from itur.models.itu1144 import bicubic_2D_interpolator
-from itur.utils import (prepare_input_array, prepare_output_array,
-                        load_data_interpolator, get_input_type)
+from itur.utils import (
+    prepare_input_array,
+    prepare_output_array,
+    load_data_interpolator,
+    get_input_type,
+)
 
 
-class __ITU1511():
+class __ITU1511:
     """Topography for Earth-to-space propagation modelling. This model shall be
     used to obtain the height above mean sea level when no local data are
     available or when no data with a better spatial resolution is available.
@@ -22,6 +26,7 @@ class __ITU1511():
     * P.1511-1 (07/15) (Superseded)
     * P.1511-2 (08/19) (Current version)
     """
+
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.1511 recommendation.
 
@@ -33,8 +38,10 @@ class __ITU1511():
         elif version == 0:
             self.instance = _ITU1511_0_()
         else:
-            raise ValueError('Version ' + str(version) + ' is not implemented'
-                             ' for the ITU-R P.1511 model.')
+            raise ValueError(
+                "Version " + str(version) + " is not implemented"
+                " for the ITU-R P.1511 model."
+            )
 
     @property
     def __version__(self):
@@ -48,7 +55,7 @@ class __ITU1511():
         return self.instance.topographic_altitude(lat, lon)
 
 
-class _ITU1511_2_():
+class _ITU1511_2_:
     """
     The values of topographical height (km) above mean sea level of the surface
     of the Earth are  provided on a 0.5° grid in both latitude and longitude.
@@ -61,8 +68,10 @@ class _ITU1511_2_():
         self.__version__ = 2
         self.year = 2019
         self.month = 8
-        self.link = 'https://www.itu.int/rec/R-REC-P.1511/' +\
-                    'recommendation.asp?lang=en&parent=R-REC-P.1511-2-201908-I'
+        self.link = (
+            "https://www.itu.int/rec/R-REC-P.1511/"
+            + "recommendation.asp?lang=en&parent=R-REC-P.1511-2-201908-I"
+        )
 
         self._altitude = None
         self._wgs4_altitude = None
@@ -70,20 +79,26 @@ class _ITU1511_2_():
     def altitude(self, lat, lon):
         if not self._altitude:
             self._altitude = load_data_interpolator(
-                '1511/v2_lat.npz', '1511/v2_lon.npz',
-                '1511/v2_topo.npz', bicubic_2D_interpolator)
+                "1511/v2_lat.npz",
+                "1511/v2_lon.npz",
+                "1511/v2_topo.npz",
+                bicubic_2D_interpolator,
+            )
 
-        return self._altitude(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._altitude(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def wgs4_altitude(self, lat, lon):
         if not self._wgs4_altitude:
             self._wgs4_altitude = load_data_interpolator(
-                '1511/v2_lat.npz', '1511/v2_lon.npz',
-                '1511/v2_egm2008.npz', bicubic_2D_interpolator)
+                "1511/v2_lat.npz",
+                "1511/v2_lon.npz",
+                "1511/v2_egm2008.npz",
+                bicubic_2D_interpolator,
+            )
 
-        return self._wgs4_altitude(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._wgs4_altitude(np.array([lat.ravel(), lon.ravel()]).T).reshape(
+            lat.shape
+        )
 
     def topographic_altitude(self, lat_d, lon_d):
         """
@@ -97,7 +112,7 @@ class _ITU1511_2_():
         return self.altitude(lat_d, lon_d) / 1000
 
 
-class _ITU1511_1_():
+class _ITU1511_1_:
     """
     The values of topographical height (km) above mean sea level of the surface
     of the Earth are  provided on a 0.5° grid in both latitude and longitude.
@@ -110,19 +125,23 @@ class _ITU1511_1_():
         self.__version__ = 1
         self.year = 2015
         self.month = 7
-        self.link = 'https://www.itu.int/rec/R-REC-P.1511/' +\
-                    'recommendation.asp?lang=en&parent=R-REC-P.1511-1-201507-I'
+        self.link = (
+            "https://www.itu.int/rec/R-REC-P.1511/"
+            + "recommendation.asp?lang=en&parent=R-REC-P.1511-1-201507-I"
+        )
 
         self._altitude = None
 
     def altitude(self, lat, lon):
         if not self._altitude:
             self._altitude = load_data_interpolator(
-                '1511/v1_lat.npz', '1511/v1_lon.npz',
-                '1511/v1_topo_0dot5.npz', bicubic_2D_interpolator)
+                "1511/v1_lat.npz",
+                "1511/v1_lon.npz",
+                "1511/v1_topo_0dot5.npz",
+                bicubic_2D_interpolator,
+            )
 
-        return self._altitude(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._altitude(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def topographic_altitude(self, lat_d, lon_d):
         """
@@ -132,7 +151,7 @@ class _ITU1511_1_():
         return self.altitude(lat_d, lon_d)
 
 
-class _ITU1511_0_():
+class _ITU1511_0_:
     """
     The values of topographical height (km) above mean sea level of the surface
     of the Earth are  provided on a 0.5° grid in both latitude and longitude.
@@ -145,19 +164,23 @@ class _ITU1511_0_():
         self.__version__ = 0
         self.year = 2001
         self.month = 2
-        self.link = 'https://www.itu.int/rec/R-REC-P.1511/' +\
-                    'recommendation.asp?lang=en&parent=R-REC-P.1511-0-200102-I'
+        self.link = (
+            "https://www.itu.int/rec/R-REC-P.1511/"
+            + "recommendation.asp?lang=en&parent=R-REC-P.1511-0-200102-I"
+        )
 
         self._altitude = None
 
     def altitude(self, lat, lon):
         if not self._altitude:
             self._altitude = load_data_interpolator(
-                '1511/v1_lat.npz', '1511/v1_lon.npz',
-                '1511/v1_topo_0dot5.npz', bicubic_2D_interpolator)
+                "1511/v1_lat.npz",
+                "1511/v1_lon.npz",
+                "1511/v1_topo_0dot5.npz",
+                bicubic_2D_interpolator,
+            )
 
-        return self._altitude(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+        return self._altitude(np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def topographic_altitude(self, lat_d, lon_d):
         """
