@@ -10,6 +10,44 @@ All test cases were extracted from the
     :depth: 2
 
 
+Function fade_duration_cummulative_probability
+----------------------------------------------
+
+The table below contains the results of testing function ``fade_duration_cummulative_probability``.
+The test cases were extracted from spreadsheet ``ITURP1623-1_fade_duration_params.csv`` from the
+`ITU Validation examples file (rev 5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`_.
+In addition to the input-arguments, expected result (``ITU Validation``), and
+ITU-Rpy computed result (``ITUR-py Result``), the absolute and relative errors
+are shown. Each test case is color-coded depending on the magnitude of the
+errors (green = pass, errors are negligible, red = fail, relative error is
+above 0.01%).
+
+In addition, the code snippet below shows an example of how to generate the
+first row of the results in the table:
+
+.. code-block:: python
+
+    import itur
+
+    # Define input attributes
+    D = 30.0  # (s)
+    A = 12.51  # (dB)
+    el = 20.33  # (°)
+    f = 30.0  # (GHz)
+
+    # Make call to test-function fade_duration_cummulative_probability
+    itur_val = itur.models.itu1623.fade_duration_cummulative_probability(D=D, A=A, el=el, f=f)
+
+    # Compute error with respect to value in ITU example file
+    ITU_example_val = 0.923603873  #  
+    error = ITU_example_val - itur_val.value
+    error_rel = error / ITU_example_val * 100  # (%)
+
+
+.. raw:: html
+    :file: test_fade_duration_cummulative_probability_table.html
+
+
 Function fade_duration_number_fades
 -----------------------------------
 
@@ -49,6 +87,44 @@ first row of the results in the table:
     :file: test_fade_duration_number_fades_table.html
 
 
+Function fade_duration_probability
+----------------------------------
+
+The table below contains the results of testing function ``fade_duration_probability``.
+The test cases were extracted from spreadsheet ``ITURP1623-1_fade_duration_params.csv`` from the
+`ITU Validation examples file (rev 5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`_.
+In addition to the input-arguments, expected result (``ITU Validation``), and
+ITU-Rpy computed result (``ITUR-py Result``), the absolute and relative errors
+are shown. Each test case is color-coded depending on the magnitude of the
+errors (green = pass, errors are negligible, red = fail, relative error is
+above 0.01%).
+
+In addition, the code snippet below shows an example of how to generate the
+first row of the results in the table:
+
+.. code-block:: python
+
+    import itur
+
+    # Define input attributes
+    D = 30.0  # (s)
+    A = 12.51  # (dB)
+    el = 20.33  # (°)
+    f = 30.0  # (GHz)
+
+    # Make call to test-function fade_duration_probability
+    itur_val = itur.models.itu1623.fade_duration_probability(D=D, A=A, el=el, f=f)
+
+    # Compute error with respect to value in ITU example file
+    ITU_example_val = 0.183841589  #  
+    error = ITU_example_val - itur_val.value
+    error_rel = error / ITU_example_val * 100  # (%)
+
+
+.. raw:: html
+    :file: test_fade_duration_probability_table.html
+
+
 Function fade_duration_total_exceedance_time
 --------------------------------------------
 
@@ -86,80 +162,4 @@ first row of the results in the table:
 
 .. raw:: html
     :file: test_fade_duration_total_exceedance_time_table.html
-
-
-Function fade_duration_probability
-----------------------------------
-
-The table below contains the results of testing function ``fade_duration_probability``.
-The test cases were extracted from spreadsheet ``ITURP1623-1_fade_duration_params.csv`` from the
-`ITU Validation examples file (rev 5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`_.
-In addition to the input-arguments, expected result (``ITU Validation``), and
-ITU-Rpy computed result (``ITUR-py Result``), the absolute and relative errors
-are shown. Each test case is color-coded depending on the magnitude of the
-errors (green = pass, errors are negligible, red = fail, relative error is
-above 0.01%).
-
-In addition, the code snippet below shows an example of how to generate the
-first row of the results in the table:
-
-.. code-block:: python
-
-    import itur
-
-    # Define input attributes
-    D = 30.0  # (s)
-    A = 12.51  # (dB)
-    el = 20.33  # (°)
-    f = 30.0  # (GHz)
-
-    # Make call to test-function fade_duration_probability
-    itur_val = itur.models.itu1623.fade_duration_probability(D=D, A=A, el=el, f=f)
-
-    # Compute error with respect to value in ITU example file
-    ITU_example_val = 0.18384158899999997  #  
-    error = ITU_example_val - itur_val.value
-    error_rel = error / ITU_example_val * 100  # (%)
-
-
-.. raw:: html
-    :file: test_fade_duration_probability_table.html
-
-
-Function fade_duration_cummulative_probability
-----------------------------------------------
-
-The table below contains the results of testing function ``fade_duration_cummulative_probability``.
-The test cases were extracted from spreadsheet ``ITURP1623-1_fade_duration_params.csv`` from the
-`ITU Validation examples file (rev 5.1) <https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx>`_.
-In addition to the input-arguments, expected result (``ITU Validation``), and
-ITU-Rpy computed result (``ITUR-py Result``), the absolute and relative errors
-are shown. Each test case is color-coded depending on the magnitude of the
-errors (green = pass, errors are negligible, red = fail, relative error is
-above 0.01%).
-
-In addition, the code snippet below shows an example of how to generate the
-first row of the results in the table:
-
-.. code-block:: python
-
-    import itur
-
-    # Define input attributes
-    D = 30.0  # (s)
-    A = 12.51  # (dB)
-    el = 20.33  # (°)
-    f = 30.0  # (GHz)
-
-    # Make call to test-function fade_duration_cummulative_probability
-    itur_val = itur.models.itu1623.fade_duration_cummulative_probability(D=D, A=A, el=el, f=f)
-
-    # Compute error with respect to value in ITU example file
-    ITU_example_val = 0.923603873  #  
-    error = ITU_example_val - itur_val.value
-    error_rel = error / ITU_example_val * 100  # (%)
-
-
-.. raw:: html
-    :file: test_fade_duration_cummulative_probability_table.html
 
