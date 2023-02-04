@@ -211,7 +211,7 @@ class _ITU618_13():
         eta = np.rad2deg(np.arctan2(hr - hs, Lg * r001))
 
         Delta_h = (hr - hs)
-        Delta_h[Delta_h <= 0] = EPSILON
+        Delta_h = np.where(Delta_h <= 0,  EPSILON, Delta_h)
         Lr = np.where(eta > el, Lg * r001 / np.cos(np.deg2rad(el)),
                       Delta_h / np.sin(np.deg2rad(el)))
 
@@ -295,8 +295,8 @@ class _ITU618_13():
         # the probability the attenuation Ai (dB) is exceeded where Pi < P_K
         p_i = np.array([0.01, 0.02, 0.03, 0.05,
                         0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10])
-        Pi = np.array([p for p in p_i if p < P_k], dtype=np.float)
-        Ai = np.array([0 for p in p_i if p < P_k], dtype=np.float)
+        Pi = np.array([p for p in p_i if p < P_k], dtype=np.float32)
+        Ai = np.array([0 for p in p_i if p < P_k], dtype=np.float32)
 
         for i, p in enumerate(Pi):
             Ai[i] = self.rain_attenuation(lat, lon, f, el, hs, p, tau=tau)
@@ -552,7 +552,7 @@ class _ITU618_12():
         eta = np.rad2deg(np.arctan2(hr - hs, Lg * r001))
 
         Delta_h= (hr - hs)
-        Delta_h[Delta_h <= 0] = EPSILON
+        Delta_h = np.where(Delta_h <= 0,  EPSILON, Delta_h)
         Lr = np.where(eta > el, Lg * r001 / np.cos(np.deg2rad(el)),
                       Delta_h / np.sin(np.deg2rad(el)))
 

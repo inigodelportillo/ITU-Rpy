@@ -41,9 +41,13 @@ def is_regular_grid(lats_o, lons_o):
     Delta_lons = np.unique(np.diff(lons_o, axis=1))
     Delta_lats = np.unique(np.diff(lats_o, axis=0))
 
-    return (np.allclose(Delta_lons, Delta_lons[0], rtol=1e-5) and
-            np.allclose(Delta_lats, Delta_lats[0], rtol=1e-5) and
-            (Delta_lons != 0).all() and (Delta_lats != 0).all())
+    return (
+        np.allclose(Delta_lons, Delta_lons[0], rtol=1e-5)
+        and np.allclose(Delta_lats, Delta_lats[0], rtol=1e-5)
+        and (Delta_lons != 0).all()
+        and (Delta_lats != 0).all()
+    )
+
 
 ###############################################################################
 #                       Nearest Neighbour Interpolation                       #
@@ -88,20 +92,28 @@ def nearest_2D_interpolator(lats_o, lons_o, values):
 
 
 def _nearest_2D_interpolator_reg(lats_o, lons_o, values):
-    f = RegularGridInterpolator((np.flipud(lats_o[:, 0]), lons_o[0, :]),
-                                np.flipud(values), method='nearest',
-                                bounds_error=False)
+    f = RegularGridInterpolator(
+        (
+            np.ascontiguousarray(np.flipud(lats_o[:, 0])),
+            np.ascontiguousarray(lons_o[0, :]),
+        ),
+        np.ascontiguousarray(np.flipud(values)),
+        method="nearest",
+        bounds_error=False,
+    )
     return f
 
 
 def _nearest_2D_interpolator_arb(lats_o, lons_o, values):
-    return lambda x: griddata((lats_o.ravel(), lons_o.ravel()), values.ravel(),
-                              (x[:, 0], x[:, 1]), 'nearest')
+    return lambda x: griddata(
+        (lats_o.ravel(), lons_o.ravel()), values.ravel(), (x[:, 0], x[:, 1]), "nearest"
+    )
 
 
 ###############################################################################
 #                            Bilinear Interpolation                           #
 ###############################################################################
+
 
 def bilinear_2D_interpolator(lats_o, lons_o, values):
     """
@@ -140,20 +152,28 @@ def bilinear_2D_interpolator(lats_o, lons_o, values):
 
 
 def _bilinear_2D_interpolator_reg(lats_o, lons_o, values):
-    f = RegularGridInterpolator((np.flipud(lats_o[:, 0]), lons_o[0, :]),
-                                np.flipud(values), method='linear',
-                                bounds_error=False)
+    f = RegularGridInterpolator(
+        (
+            np.ascontiguousarray(np.flipud(lats_o[:, 0])),
+            np.ascontiguousarray(lons_o[0, :]),
+        ),
+        np.ascontiguousarray(np.flipud(values)),
+        method="linear",
+        bounds_error=False,
+    )
     return f
 
 
 def _bilinear_2D_interpolator_arb(lats_o, lons_o, values):
-    return lambda x: griddata((lats_o.ravel(), lons_o.ravel()), values.ravel(),
-                              (x[:, 0], x[:, 1]), 'linear')
+    return lambda x: griddata(
+        (lats_o.ravel(), lons_o.ravel()), values.ravel(), (x[:, 0], x[:, 1]), "linear"
+    )
 
 
 ###############################################################################
 #                            Bicubic Interpolation                            #
 ###############################################################################
+
 
 def bicubic_2D_interpolator(lats_o, lons_o, values):
     """
@@ -190,8 +210,9 @@ def bicubic_2D_interpolator(lats_o, lons_o, values):
 
 
 def _bicubic_2D_interpolator_arb(lats_o, lons_o, values):
-    return lambda x: griddata((lats_o.ravel(), lons_o.ravel()),
-                              values.ravel(), (x[:, 0], x[:, 1]), 'cubic')
+    return lambda x: griddata(
+        (lats_o.ravel(), lons_o.ravel()), values.ravel(), (x[:, 0], x[:, 1]), "cubic"
+    )
 
 
 def _bicubic_2D_interpolator_reg(lats_o, lons_o, values):
@@ -201,20 +222,29 @@ def _bicubic_2D_interpolator_reg(lats_o, lons_o, values):
 
     def K(d):
         d = np.abs(d)
-        return np.where(np.logical_and(d >= 0, d <= 1),
-                        1.5 * d**3 - 2.5 * d**2 + 1,
-                        np.where(np.logical_and(d >= 1, d <= 2),
-                                 -0.5 * d**3 + 2.5 * d**2 - 4 * d + 2, 0))
+        return np.where(
+            np.logical_and(d >= 0, d <= 1),
+            1.5 * d**3 - 2.5 * d**2 + 1,
+            np.where(
+                np.logical_and(d >= 1, d <= 2),
+                -0.5 * d**3 + 2.5 * d**2 - 4 * d + 2,
+                0,
+            ),
+        )
 
     def interpolator(vect):
         lat = vect[:, 0]
         lon = vect[:, 1]
 
         # Make sure that we do not hit the limit cases
-        R = ((np.searchsorted(lat_row, lat, 'right') - 1) +
-             (np.searchsorted(lat_row, lat, 'left') - 1)) // 2
-        C = ((np.searchsorted(lon_row, lon, 'right') - 1) +
-             (np.searchsorted(lon_row, lon, 'right') - 1)) // 2
+        R = (
+            (np.searchsorted(lat_row, lat, "right") - 1)
+            + (np.searchsorted(lat_row, lat, "left") - 1)
+        ) // 2
+        C = (
+            (np.searchsorted(lon_row, lon, "right") - 1)
+            + (np.searchsorted(lon_row, lon, "right") - 1)
+        ) // 2
 
         diff_lats = np.diff(lat_row)[0]
         diff_lons = np.diff(lon_row)[0]
@@ -222,16 +252,36 @@ def _bicubic_2D_interpolator_reg(lats_o, lons_o, values):
         r = (lat - lat_row[0]) / diff_lats + 1
         c = (lon - lon_row[0]) / diff_lons + 1
 
-        RI_Rc = I[R, C] * K(c - C) + I[R, C + 1] * K(c - (C + 1)) + \
-            I[R, C + 2] * K(c - (C + 2)) + I[R, C + 3] * K(c - (C + 3))
-        RI_R1c = I[R + 1, C] * K(c - C) + I[R + 1, C + 1] * K(c - (C + 1)) + \
-            I[R + 1, C + 2] * K(c - (C + 2)) + I[R + 1, C + 3] * K(c - (C + 3))
-        RI_R2_c = I[R + 2, C] * K(c - C) + I[R + 2, C + 1] * K(c - (C + 1)) +\
-            I[R + 2, C + 2] * K(c - (C + 2)) + I[R + 2, C + 3] * K(c - (C + 3))
-        RI_R3_c = I[R + 3, C] * K(c - C) + I[R + 3, C + 1] * K(c - (C + 1)) +\
-            I[R + 3, C + 2] * K(c - (C + 2)) + I[R + 3, C + 3] * K(c - (C + 3))
+        RI_Rc = (
+            I[R, C] * K(c - C)
+            + I[R, C + 1] * K(c - (C + 1))
+            + I[R, C + 2] * K(c - (C + 2))
+            + I[R, C + 3] * K(c - (C + 3))
+        )
+        RI_R1c = (
+            I[R + 1, C] * K(c - C)
+            + I[R + 1, C + 1] * K(c - (C + 1))
+            + I[R + 1, C + 2] * K(c - (C + 2))
+            + I[R + 1, C + 3] * K(c - (C + 3))
+        )
+        RI_R2_c = (
+            I[R + 2, C] * K(c - C)
+            + I[R + 2, C + 1] * K(c - (C + 1))
+            + I[R + 2, C + 2] * K(c - (C + 2))
+            + I[R + 2, C + 3] * K(c - (C + 3))
+        )
+        RI_R3_c = (
+            I[R + 3, C] * K(c - C)
+            + I[R + 3, C + 1] * K(c - (C + 1))
+            + I[R + 3, C + 2] * K(c - (C + 2))
+            + I[R + 3, C + 3] * K(c - (C + 3))
+        )
 
-        return (RI_Rc * K(r - R) + RI_R1c * K(r - (R + 1)) +
-                RI_R2_c * K(r - (R + 2)) + RI_R3_c * K(r - (R + 3)))
+        return (
+            RI_Rc * K(r - R)
+            + RI_R1c * K(r - (R + 1))
+            + RI_R2_c * K(r - (R + 2))
+            + RI_R3_c * K(r - (R + 3))
+        )
 
     return interpolator

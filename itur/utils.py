@@ -26,8 +26,8 @@ dataset_dir = os.path.join(dir_path, 'data/')
 
 # Define numeric types including numpy types
 __NUMERIC_TYPES__ = [numbers.Number, int, float, complex,
-                     np.float, np.float16, np.float32, np.float64,
-                     np.int, np.int8, np.int16, np.int32, np.int64]
+                     np.float16, np.float32, np.float64, 
+                     np.int8, np.int16, np.int32, np.int64]
 
 # Define the geodetic system using the WSG-84 ellipsoid
 __wgs84_geod__ = Geod(ellps='WGS84')
