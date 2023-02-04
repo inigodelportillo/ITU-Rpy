@@ -46,6 +46,7 @@ np.seterr(divide="ignore")
 
 AUTHORS = "Inigo del Portillo"
 
+__all__ = ["atmospheric_attenuation_slant_path"]
 
 def atmospheric_attenuation_slant_path(
     lat,
