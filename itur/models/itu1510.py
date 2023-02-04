@@ -78,9 +78,11 @@ class _ITU1510_1_():
         if not self._month_temperature:
             for _m in self.__months:
                 self._month_temperature[_m] = load_data_interpolator(
-                    '1510/v1_lat.npz', '1510/v1_lon.npz',
-                    '1510/v1_t_month{0:02d}.npz'.format(_m),
-                    bilinear_2D_interpolator)
+                    "1510/v1_lat.npz",
+                    "1510/v1_lon.npz",
+                    f"1510/v1_t_month{_m:02d}.npz",
+                    bilinear_2D_interpolator,
+                )
 
         lon[lon > 180] = lon[lon > 180] - 360
         return self._month_temperature[m](
@@ -118,9 +120,9 @@ class _ITU1510_0_():
             np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
 
     def surface_month_mean_temperature(self, lat, lon, m):
-        raise NotImplementedError('The monthly mean temperature is not'
-                                  'implemented in recomendation ITU-R P.1510'
-                                  '-{0}'.format(self.__version__))
+        raise NotImplementedError(
+            f"The monthly mean temperature is notimplemented in recomendation ITU-R P.1510-{self.__version__}"
+        )
 
 
 __model = __ITU1510__()

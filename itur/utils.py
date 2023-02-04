@@ -93,8 +93,7 @@ def load_data(path, is_text=False, **kwargs):
     """
     # TODO: Change method to allow for h5df data too
     if not os.path.isfile(path):
-        raise RuntimeError('The path provided is not a file - {0}'
-                           .format(path))
+        raise RuntimeError(f"The path provided is not a file - {path}")
 
     _, file_extension = os.path.splitext(path)
 
