@@ -65,14 +65,14 @@ class TestMapAfrica(test.TestCase):
         # Plot the results
         try:
             m = itur.plotting.plot_in_map(
-                Att, lat, lon, cbar_text="Atmospheric attenuation [dB]", cmap="magma"
+                Att.value, lat, lon, cbar_text="Atmospheric attenuation [dB]", cmap="magma"
             )
 
             # Plot the satellite location
             m.scatter(lon_sat, lat_sat, c="white", s=20)
 
             m = itur.plotting.plot_in_map(
-                T, lat, lon, cbar_text="Surface mean temperature [C]", cmap="RdBu_r"
+                T.value, lat, lon, cbar_text="Surface mean temperature [C]", cmap="RdBu_r"
             )
         except RuntimeError as e:
             print(e)
