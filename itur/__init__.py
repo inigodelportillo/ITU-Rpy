@@ -44,6 +44,7 @@ from .__version__ import __version__
 
 AUTHORS = "Inigo del Portillo"
 
+__all__ = ["atmospheric_attenuation_slant_path"]
 
 def atmospheric_attenuation_slant_path(
         lat, lon, f, el, p, D, hs=None, rho=None, R001=None, eta=0.5, T=None,
