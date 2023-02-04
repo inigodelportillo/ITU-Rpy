@@ -362,7 +362,7 @@ class ITU_TestCase(test.TestCase):
     def produce_rst_report(self):
 
         ret = []
-        title = f"Validation results {itu_name}"
+        title = f"Validation results {self.itu_name}"
         ret.append(title)
         ret.append("=" * len(title))
         ret.append("")
