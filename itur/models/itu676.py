@@ -161,7 +161,7 @@ class __ITU676__():
     def slant_inclined_path_equivalent_height(self, f, P, rho, T):
         fcn = np.vectorize(self.instance.slant_inclined_path_equivalent_height,
                            excluded=[0], otypes=[np.ndarray])
-        return np.array(fcn(f, p, rho, T).tolist())
+        return np.array(fcn(f, P, rho, T).tolist())
 
     def zenit_water_vapour_attenuation(
             self, lat, lon, p, f, V_t=None, h=None):
