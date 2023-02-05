@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-""" ``itur.utils`` is a utilities library for ITU-Rpy.
+""" 
+``itur.utils`` is a utilities library for ITU-Rpy.
 
 This utility library for ITU-Rpy contains methods to:
 * Load data and build an interpolator object.
 * Prepare the input and output arrays, and handle unit transformations.
-* Compute distances and elevation angles between two points on Earth and
-  or space.
+* Compute distances and elevation angles between two points on Earth and or space.
+
 """
 from __future__ import absolute_import
 from __future__ import division
