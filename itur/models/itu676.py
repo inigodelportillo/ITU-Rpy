@@ -1455,7 +1455,7 @@ def slant_inclined_path_equivalent_height(f, p, rho=7.5, T=298.15):
     Returns
     -------
     ho, hw : Quantity
-        Equivalent height for oxygen and water vapour (m)
+        Equivalent height for oxygen and water vapour (km)
 
     References
     --------
@@ -1469,7 +1469,7 @@ def slant_inclined_path_equivalent_height(f, p, rho=7.5, T=298.15):
     T = prepare_quantity(T, u.K, 'Temperature')
 
     val = __model.slant_inclined_path_equivalent_height(f, p, rho, T)
-    return prepare_output_array(val, type_output) * u.m
+    return prepare_output_array(val, type_output) * u.km
 
 
 def zenit_water_vapour_attenuation(lat, lon, p, f, V_t=None, h=None):
