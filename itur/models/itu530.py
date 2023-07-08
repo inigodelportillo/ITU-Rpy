@@ -372,7 +372,7 @@ class _ITU530_17_():
                                  U0=15, XPIF=0):
         """
         Estimate the probability of outage due to cross-polar discrimination
-        reduction due to clear-air effects, assuming that a target C0_I is
+        reduction due to precipitation effects, assuming that a target C0_I is
         required.
 
         Implementation of 'XPD_outage_precipitation' method for recommendation
@@ -952,9 +952,8 @@ def XPD_outage_precipitation(lat, lon, d, f, el, C0_I, tau=45,
     """Estimate the probability of outage due to cross-polar discrimination.
 
     Estimate the probability of outage due to cross-polar discrimination
-    reduction due to clear-air effects, assuming that a target C0_I is
+    reduction due to precipitation effects, assuming that a target C0_I is
     required.
-
 
     Parameters
     ----------
@@ -988,7 +987,7 @@ def XPD_outage_precipitation(lat, lon, d, f, el, C0_I, tau=45,
     Returns
     -------
     p_XP: Quantity
-        Probability of outage due to clear-air cross-polarization
+        Probability of outage due to precipitation cross-polarization
 
 
     References
