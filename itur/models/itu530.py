@@ -309,8 +309,11 @@ class _ITU530_17_():
 
         def func_bisect(p):
             return A001 * C1 * p ** (- (C2 + C3 * np.log10(p))) - Ap
+        
+        if np.sign(func_bisect(1e-9)) == np.sign(func_bisect(100)): 
+            return 0
 
-        return bisect(func_bisect, 0.000001, 100)
+        return bisect(func_bisect, 1e-9, 100)
 
     @classmethod
     def rain_event_count(self, lat, lon, d, f, el, A, tau=45, R001=None):
