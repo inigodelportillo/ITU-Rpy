@@ -10,11 +10,7 @@ import unittest as test
 import itur.models as models
 from itur import atmospheric_attenuation_slant_path
 
-
-if sys.version[:3] <= '3.5':
-    pd.set_option("display.max_colwidth", -1)
-else:
-    pd.set_option('display.max_colwidth', None)
+pd.set_option('display.max_colwidth', None)
 
 basepath = path.dirname(path.realpath(__file__))
 test_data = path.join(basepath, "test_data")
