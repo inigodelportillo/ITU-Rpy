@@ -9,6 +9,7 @@ import warnings
 
 import numpy as np
 from astropy import units as u
+from scipy import integrate
 
 from itur.models.itu453 import radio_refractive_index
 from itur.models.itu835 import (standard_pressure, standard_temperature,
@@ -385,35 +386,31 @@ class _ITU676_12_():
             return (A0 + Aw) / np.sin(np.deg2rad(el))
 
         else:
-            delta_h = 0.0001 * \
-                np.exp((np.arange(0, 922)) / 100)             # Eq. 14
-            h_n = 0.0001 * ((np.exp(np.arange(0, 922) / 100.0) -
-                             1.0) / (np.exp(1.0 / 100.0) - 1.0))             # Eq. 15
-            T_n = standard_temperature(h_n).to(u.K).value
-            press_n = standard_pressure(h_n).value
-            rho_n = standard_water_vapour_density(h_n, rho_0=rho).value
+            h1 = 0 if h is None else h
 
-            e_n = rho_n * T_n / 216.7
-            n_n = radio_refractive_index(press_n, e_n, T_n).value
-            n_ratio = n_n / np.pad(n_n[1:], (0, 1), mode='edge')
-            r_n = 6371 + h_n
+            temp_h1 = standard_temperature(h1).to(u.K).value
+            press_h1 = standard_pressure(h1).value
+            rho_h1 = standard_water_vapour_density(h1, rho_0=rho).value
+            e_h1 = rho_h1 * temp_h1 / 216.7
+            n_h1 = radio_refractive_index(press_h1, e_h1, temp_h1).value
 
-            b = np.pi / 2 - np.deg2rad(el)
-            Agas = 0
-            for t, press, rho, r, delta, n_r in zip(
-                    T_n, press_n, rho_n, r_n, delta_h, n_ratio):
-                a = - r * np.cos(b) + 0.5 * np.sqrt(
-                    4 * r**2 * np.cos(b)**2 + 8 * r * delta + 4 * delta**2)  # Eq. 17
-                a_cos_arg = np.clip((-a**2 - 2 * r * delta - delta**2) /
-                                    (2 * a * r + 2 * a * delta), -1, 1)
-                # Eq. 18a
-                alpha = np.pi - np.arccos(a_cos_arg)
-                gamma = self.gamma_exact(f, press, rho, t)
-                Agas += a * gamma                                            # Eq. 13
-                b = np.arcsin(np.sin(alpha) *
-                              n_r)                           # Eq. 19a
+            def eqn11(h_):
+                temp_ = standard_temperature(h_).to(u.K).value
+                press_ = standard_pressure(h_).value
+                rho_ = standard_water_vapour_density(h_, rho_0=rho).value
+                e_ = rho_ * temp_ / 216.7
+                gamma_ = self.gamma_exact(f, press_, rho_, temp_)
 
-            return Agas
+                n_ = radio_refractive_index(press_, e_, temp_).value
+
+                Re = 6371
+                cos_phi_h = ((Re + h1) * n_h1)/((Re + h_) * n_) * \
+                    np.cos(np.deg2rad(el))
+                return gamma_/np.sqrt(1 - (cos_phi_h**2))
+
+            Agas = integrate.quad(eqn11, h1, 100)
+
+            return Agas[0]
 
     @classmethod
     def gaseous_attenuation_inclined_path(
