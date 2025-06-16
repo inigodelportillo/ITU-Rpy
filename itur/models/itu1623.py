@@ -248,6 +248,7 @@ class _ITU1623_0_:
         return _ITU1623_1_.fade_depth(*args, **kwargs)
 
 
+global __model  # noqa: F824
 __model = __ITU1623__()
 
 

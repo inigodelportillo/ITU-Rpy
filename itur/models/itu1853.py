@@ -476,7 +476,7 @@ def change_version(new_version):
           * 1:  Activates recommendation ITU-R P.1853-1 (02/12) (Current version)
           * 0:  Activates recommendation ITU-R P.1853-0 (10/09) (Superseded)
     """
-    global __model
+    global __model  # noqa: F824
     __model = __ITU1853(new_version)
 
 
@@ -490,7 +490,7 @@ def get_version():
         Version currently being used.
 
     """
-    global __model
+    global __model  # noqa: F824
     return __model.__version__
 
 
@@ -548,7 +548,7 @@ def rain_attenuation_synthesis(lat, lon, f, el, hs, Ns, Ts=1, tau=45, n=None):
     [1] Characteristics of precipitation for propagation modelling
     https://www.itu.int/rec/R-REC-P.1853/en
     """
-    global __model
+    global __model  # noqa: F824
 
     lon = np.mod(lon, 360)
     f = prepare_quantity(f, u.GHz, "Frequency")
@@ -587,7 +587,7 @@ def scintillation_attenuation_synthesis(Ns, f_c=0.1, Ts=1):
     [1] Characteristics of precipitation for propagation modelling
     https://www.itu.int/rec/R-REC-P.1853/en
     """
-    global __model
+    global __model  # noqa: F824
 
     val = __model.scintillation_attenuation_synthesis(Ns, f_c, Ts)
     return val * u.dB
@@ -623,7 +623,7 @@ def integrated_water_vapour_synthesis(lat, lon, Ns, Ts=1, n=None):
     [1] Characteristics of precipitation for propagation modelling
     https://www.itu.int/rec/R-REC-P.1853/en
     """
-    global __model
+    global __model  # noqa: F824
 
     lon = np.mod(lon, 360)
     val = __model.integrated_water_vapour_synthesis(lat, lon, Ns, Ts, n)
@@ -659,7 +659,7 @@ def cloud_liquid_water_synthesis(lat, lon, Ns, Ts=1, n=None):
     [1] Characteristics of precipitation for propagation modelling
     https://www.itu.int/rec/R-REC-P.1853/en
     """
-    global __model
+    global __model  # noqa: F824
 
     lon = np.mod(lon, 360)
     val = __model.cloud_liquid_water_synthesis(lat, lon, Ns, Ts, n)
@@ -751,7 +751,7 @@ def total_attenuation_synthesis(
     [1] Characteristics of precipitation for propagation modelling
     https://www.itu.int/rec/R-REC-P.1853/en
     """
-    global __model
+    global __model  # noqa: F824
 
     f = prepare_quantity(f, u.GHz, "Frequency")
     el = prepare_quantity(el, u.deg, "Elevation angle")

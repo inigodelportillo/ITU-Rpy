@@ -263,7 +263,7 @@ def change_version(new_version):
           *  0: Activates recommendation ITU-R P.838-0 (03/92) (Superseded)
 
     """
-    global __model
+    global __model  # noqa: F824
     __model = __ITU838__(new_version)
 
 

@@ -183,7 +183,7 @@ def change_version(new_version):
 
 
     """
-    global __model
+    global __model  # noqa: F824
     __model = __ITU839__(new_version)
 
 

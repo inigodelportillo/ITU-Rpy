@@ -184,7 +184,7 @@ def change_version(new_version):
           * 0:  Activates recommendation ITU-R P.1511-0 (02/01) (Superseded)
 
     """
-    global __model
+    global __model  # noqa: F824
     __model = __ITU1511(new_version)
 
 

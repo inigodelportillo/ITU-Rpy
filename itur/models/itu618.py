@@ -609,6 +609,7 @@ class _ITU618_12():
         return _ITU618_13.scintillation_attenuation(*args, **kwargs)
 
 
+global __model  # noqa: F824
 __model = _ITU618()
 
 

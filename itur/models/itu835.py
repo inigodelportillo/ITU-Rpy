@@ -659,7 +659,7 @@ def change_version(new_version):
           *  6: Activates recommendation ITU-R P.835-6 (12/17) (Current version)
           *  5: Activates recommendation ITU-R P.835-5 (02/12) (Superseded)
     """
-    global __model
+    global __model  # noqa: F824
     __model = __ITU835__(new_version)
 
 
@@ -673,7 +673,7 @@ def get_version():
     version: int
        The version of the ITU-R P.835 recommendation being used.
     """
-    global __model
+    global __model  # noqa: F824
     return __model.__version__
 
 
@@ -708,7 +708,7 @@ def temperature(lat, h, season='summer'):
     https://www.itu.int/rec/R-REC-P.835/en
 
     """
-    global __model
+    global __model  # noqa: F824
     type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     h = prepare_quantity(h, u.km, 'Height')
@@ -745,7 +745,7 @@ def pressure(lat, h, season='summer'):
     [1] Reference Standard Atmospheres
     https://www.itu.int/rec/R-REC-P.835/en
     """
-    global __model
+    global __model  # noqa: F824
     type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     h = prepare_quantity(h, u.km, 'Height')
@@ -784,7 +784,7 @@ def water_vapour_density(lat, h, season='summer'):
     [1] Reference Standard Atmospheres
     https://www.itu.int/rec/R-REC-P.835/en
     """
-    global __model
+    global __model  # noqa: F824
     type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     h = prepare_quantity(h, u.km, 'Height')
@@ -820,7 +820,7 @@ def standard_temperature(h, T_0=288.15):
     [1] Reference Standard Atmospheres
     https://www.itu.int/rec/R-REC-P.835/en
     """
-    global __model
+    global __model  # noqa: F824
 
     h = prepare_quantity(h, u.km, 'Height')
     T_0 = prepare_quantity(T_0, u.Kelvin, 'Surface temperature')
@@ -859,7 +859,7 @@ def standard_pressure(h, T_0=288.15, P_0=1013.25):
     [1] Reference Standard Atmospheres
     https://www.itu.int/rec/R-REC-P.835/en
     """
-    global __model
+    global __model  # noqa: F824
 
     type_output = get_input_type(h)
     h = prepare_quantity(h, u.km, 'Height')
@@ -899,7 +899,7 @@ def standard_water_vapour_density(h, h_0=2, rho_0=7.5):
     [1] Reference Standard Atmospheres
     https://www.itu.int/rec/R-REC-P.835/en
     """
-    global __model
+    global __model  # noqa: F824
 
     h = prepare_quantity(h, u.km, 'Height')
     h_0 = prepare_quantity(h_0, u.km, 'Scale height')
@@ -939,7 +939,7 @@ def standard_water_vapour_pressure(h, h_0=2, rho_0=7.5):
     [1] Reference Standard Atmospheres
     https://www.itu.int/rec/R-REC-P.835/en
     """
-    global __model
+    global __model  # noqa: F824
 
     h = prepare_quantity(h, u.km, 'Height')
     h_0 = prepare_quantity(h_0, u.km, 'Scale height')

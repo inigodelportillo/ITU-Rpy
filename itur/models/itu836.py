@@ -349,6 +349,7 @@ class _ITU836_4():
             alt_res_fcn=topographic_altitude)
 
 
+global __model  # noqa: F824
 __model = __ITU836()
 
 

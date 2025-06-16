@@ -322,6 +322,7 @@ class _ITU453_12_():
         return self.N_wet(lat, lon)
 
 
+global __model  # noqa: F824
 __model = __ITU453__()
 
 

@@ -480,7 +480,7 @@ def change_version(new_version):
         Valid values are:
           * 16: Activates recommendation ITU-R P.530-16 (07/15) (Current version)
     """
-    global __model
+    global __model  # noqa: F824
     __model = __ITU530__(new_version)
 
 

@@ -297,6 +297,7 @@ class _ITU837_6():
         return Rp
 
 
+global __model  # noqa: F824
 __model = __ITU837()
 
 
