@@ -33,8 +33,10 @@ class __ITU1511():
         elif version == 0:
             self.instance = _ITU1511_0_()
         else:
-            raise ValueError('Version ' + str(version) + ' is not implemented'
-                             ' for the ITU-R P.1511 model.')
+            raise ValueError(
+                'Version ' + str(version) + ' is not implemented'
+                ' for the ITU-R P.1511 model.'
+            )
 
     @property
     def __version__(self):

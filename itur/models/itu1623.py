@@ -57,7 +57,8 @@ class __ITU1623__:
             self.instance = _ITU1623_0_()
         else:
             raise ValueError(
-                f"Version {version} is not implemented for the ITU-R P.1623 model."
+                f"Version {version} is not implemented for the "
+                f"ITU-R P.1623 model."
             )
 
         self._zero_isoterm_data = {}
@@ -93,14 +94,18 @@ class _ITU1623_1_:
                 RuntimeWarning(
                     'The method to compute fade duration parameters '
                     'in recommendation ITU-P 1623-11 is only '
-                    'recommended for frequencies in the 10-50GHz range'))
+                    'recommended for frequencies in the 10-50GHz range'
+                )
+            )
 
         if np.any(el < 5) or np.any(el > 60):
             warnings.warn(
                 RuntimeWarning(
                     'The method to compute fade duration parameters '
                     'in recommendation ITU-P 1623-11 is only '
-                    'recommended for elevation angles in the 5-60deg range'))
+                    'recommended for elevation angles in the 5-60deg range'
+                )
+            )
 
         # Step 1: Calculate the mean duration D0 of the log-normal
         # distribution of the fraction of fading time due to fades of long

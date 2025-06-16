@@ -95,57 +95,93 @@ class _ITU453_13_():
 
     def DN65(self, lat, lon, p):
         if not self._DN65:
-            ps = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80,
-                  90, 95, 98, 99, 99.5, 99.8, 99.9]
-            d_dir = os.path.join(dataset_dir, '453/v12_dn65m_%02dd%02d_v1.npz')
-            lats = load_data(os.path.join(dataset_dir, '453/v12_lat0d75.npz'))
-            lons = load_data(os.path.join(dataset_dir, '453/v12_lon0d75.npz'))
+            ps = [
+                0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80,
+                90, 95, 98, 99, 99.5, 99.8, 99.9
+            ]
+            d_dir = os.path.join(
+                dataset_dir,
+                '453/v12_dn65m_%02dd%02d_v1.npz'
+            )
+            lats = load_data(
+                os.path.join(dataset_dir, '453/v12_lat0d75.npz')
+            )
+            lons = load_data(
+                os.path.join(dataset_dir, '453/v12_lon0d75.npz')
+            )
             for p_loads in ps:
                 int_p = p_loads // 1
                 frac_p = round((p_loads % 1.0) * 100)
                 vals = load_data(d_dir % (int_p, frac_p))
                 self._DN65[float(p_loads)] = bilinear_2D_interpolator(
-                    lats, lons, vals)
+                    lats, lons, vals
+                )
 
         return self._DN65[float(p)](
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+            np.array([lat.ravel(), lon.ravel()]).T
+        ).reshape(lat.shape)
 
     def DN1(self, lat, lon, p):
         if not self._DN1:
-            ps = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80,
-                  90, 95, 98, 99, 99.5, 99.8, 99.9]
-            d_dir = os.path.join(dataset_dir, '453/v12_dn_%02dd%02d_v1.npz')
-            lats = load_data(os.path.join(dataset_dir, '453/v12_lat0d75.npz'))
-            lons = load_data(os.path.join(dataset_dir, '453/v12_lon0d75.npz'))
+            ps = [
+                0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80,
+                90, 95, 98, 99, 99.5, 99.8, 99.9
+            ]
+            d_dir = os.path.join(
+                dataset_dir,
+                '453/v12_dn_%02dd%02d_v1.npz'
+            )
+            lats = load_data(
+                os.path.join(dataset_dir, '453/v12_lat0d75.npz')
+            )
+            lons = load_data(
+                os.path.join(dataset_dir, '453/v12_lon0d75.npz')
+            )
             for p_loads in ps:
                 int_p = p_loads // 1
                 frac_p = round((p_loads % 1.0) * 100)
                 vals = load_data(d_dir % (int_p, frac_p))
                 self._DN1[float(p_loads)] = bilinear_2D_interpolator(
-                    lats, lons, vals)
+                    lats, lons, vals
+                )
 
         return self._DN1[float(p)](
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+            np.array([lat.ravel(), lon.ravel()]).T
+        ).reshape(lat.shape)
 
     def N_wet(self, lat, lon, p):
         if not self._N_wet:
-            ps = [0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30, 50, 60, 70, 80,
-                  90, 95, 99]
-            d_dir = os.path.join(dataset_dir, '453/v13_nwet_annual_%s.npz')
-            lats = load_data(os.path.join(dataset_dir, '453/v13_lat_n.npz'))
-            lons = load_data(os.path.join(dataset_dir, '453/v13_lon_n.npz'))
+            ps = [
+                0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30, 50, 60, 70, 80,
+                90, 95, 99
+            ]
+            d_dir = os.path.join(
+                dataset_dir,
+                '453/v13_nwet_annual_%s.npz'
+            )
+            lats = load_data(
+                os.path.join(dataset_dir, '453/v13_lat_n.npz')
+            )
+            lons = load_data(
+                os.path.join(dataset_dir, '453/v13_lon_n.npz')
+            )
             for p_loads in ps:
                 vals = load_data(d_dir % (str(p_loads).replace('.', '')))
                 self._N_wet[float(p_loads)] = bilinear_2D_interpolator(
-                    np.flipud(lats), lons, np.flipud(vals))
+                    np.flipud(lats), lons, np.flipud(vals)
+                )
 
         lon[lon > 180] = lon[lon > 180] - 360
         return self._N_wet[float(p)](
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+            np.array([lat.ravel(), lon.ravel()]).T
+        ).reshape(lat.shape)
 
     @classmethod
     def wet_term_radio_refractivity(self, e, T):
-        N_wet = (72 * e / (T + 273.15) + 3.75e5 * e / (T + 273.15)**2) * 1e-6
+        N_wet = (
+            72 * e / (T + 273.15) +
+            3.75e5 * e / (T + 273.15)**2
+        ) * 1e-6
         return N_wet
 
     @classmethod
@@ -155,33 +191,48 @@ class _ITU453_13_():
 
     @classmethod
     def radio_refractive_index(self, Pd, e, T):
-        N = 77.6 * Pd / T + 72 * e / T + 3.75e5 * e / T**2   # Eq. 2 [N-units]
+        N = (
+            77.6 * Pd / T +
+            72 * e / T +
+            3.75e5 * e / T**2
+        )   # Eq. 2 [N-units]
         n = 1 + N * 1e-6   # Eq. 1
         return n
 
     @classmethod
-    def water_vapour_pressure(self, T, P, H, type_hydrometeor='water'):
-        e_s = self.saturation_vapour_pressure(T, P, type_hydrometeor)
+    def water_vapour_pressure(
+        self, T, P, H, type_hydrometeor='water'
+    ):
+        e_s = self.saturation_vapour_pressure(
+            T, P, type_hydrometeor
+        )
         return H * e_s / 100   # Eq. 8
 
     @classmethod
-    def saturation_vapour_pressure(self, T, P, type_hydrometeor='water'):
-
+    def saturation_vapour_pressure(
+        self, T, P, type_hydrometeor='water'
+    ):
         if type_hydrometeor == 'water':
-            EF = 1 + 1e-4 * (7.2 + P * (0.0320 + 5.9e-6 * T**2))
+            EF = 1 + 1e-4 * (
+                7.2 + P * (0.0320 + 5.9e-6 * T**2)
+            )
             a = 6.1121
             b = 18.678
             c = 257.14
             d = 234.5
 
         elif type_hydrometeor == 'ice':
-            EF = 1 + 1e-4 * (2.2 + P * (0.0383 + 6.4e-6 * T**2))
+            EF = 1 + 1e-4 * (
+                2.2 + P * (0.0383 + 6.4e-6 * T**2)
+            )
             a = 6.1115
             b = 23.036
             c = 279.82
             d = 333.7
 
-        e_s = EF * a * np.exp((b - T / d) * T / (T + c))
+        e_s = EF * a * np.exp(
+            (b - T / d) * T / (T + c)
+        )
         return e_s
 
     def map_wet_term_radio_refractivity(self, lat, lon, p):

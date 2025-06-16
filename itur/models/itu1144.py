@@ -106,7 +106,10 @@ def _nearest_2D_interpolator_reg(lats_o, lons_o, values):
 
 def _nearest_2D_interpolator_arb(lats_o, lons_o, values):
     return lambda x: griddata(
-        (np.ascontiguousarray(lats_o.ravel()), np.ascontiguousarray(lons_o.ravel())),
+        (
+            np.ascontiguousarray(lats_o.ravel()),
+            np.ascontiguousarray(lons_o.ravel())
+        ),
         np.ascontiguousarray(values.ravel()),
         (x[:, 0], x[:, 1]),
         "nearest",
@@ -169,7 +172,10 @@ def _bilinear_2D_interpolator_reg(lats_o, lons_o, values):
 
 def _bilinear_2D_interpolator_arb(lats_o, lons_o, values):
     return lambda x: griddata(
-        (np.ascontiguousarray(lats_o.ravel()), np.ascontiguousarray(lons_o.ravel())),
+        (
+            np.ascontiguousarray(lats_o.ravel()),
+            np.ascontiguousarray(lons_o.ravel())
+        ),
         np.ascontiguousarray(values.ravel()),
         (x[:, 0], x[:, 1]),
         "linear",
@@ -217,7 +223,10 @@ def bicubic_2D_interpolator(lats_o, lons_o, values):
 
 def _bicubic_2D_interpolator_arb(lats_o, lons_o, values):
     return lambda x: griddata(
-        (np.ascontiguousarray(lats_o.ravel()), np.ascontiguousarray(lons_o.ravel())),
+        (
+            np.ascontiguousarray(lats_o.ravel()),
+            np.ascontiguousarray(lons_o.ravel())
+        ),
         np.ascontiguousarray(values.ravel()),
         (x[:, 0], x[:, 1]),
         "cubic",
