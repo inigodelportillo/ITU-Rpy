@@ -181,7 +181,7 @@ class _ITU453_13_():
         N_wet = (
             72 * e / (T + 273.15) +
             3.75e5 * e / (T + 273.15)**2
-        ) * 1e-6
+        )
         return N_wet
 
     @classmethod
