@@ -145,8 +145,8 @@ class _ITU1853_1:
             Ai[i] = rain_attenuation(lat, lon, f, el, hs, p, tau=tau).value
 
         # Step A3: Transform the set of pairs [Pi, Ai] to [Q^{-1}(Pi/P_k),
-        # ln(Ai)]
-        Q = stats.norm.ppf((Pi / 100))
+        # ln(Ai)]. Q^{-1}(p) = -Phi^{-1}(p) = -stats.norm.ppf(p)
+        Q = -stats.norm.ppf((Pi / 100))
         lnA = np.log(Ai)
 
         # Step A4: Determine the variables sigma_lna, m_lna by performing a
@@ -158,7 +158,7 @@ class _ITU1853_1:
         # Step B: Set the low-pass filter parameter
         beta = 2e-4
         # Step C: compute the attenuation offset
-        A_offset = np.exp(m + sigma * stats.norm.ppf(P_rain))
+        A_offset = np.exp(m + sigma * (-stats.norm.ppf(P_rain)))
         # Step D: Time series synthesis
         # D1: Synthesize a white Gaussian noise time series
         if n is None:
