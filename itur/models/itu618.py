@@ -314,8 +314,8 @@ class _ITU618_13():
         return sigma_lna, m_lna
 
     @classmethod
-    def site_diversity_rain_outage_probability(self, lat1, lon1, a1, lat2,
-                                               lon2, a2, f, el1, el2, tau=45,
+    def site_diversity_rain_outage_probability(self, lat1, lon1, a1, el1,
+                                               lat2, lon2, a2, el2, f, tau=45,
                                                hs1=None, hs2=None):
         # The diversity prediction method assumes a log-normal distribution of
         # rain intensity and rain attenuation. This method predicts
@@ -868,7 +868,7 @@ def site_diversity_rain_outage_probability(lat1, lon1, a1, el1, lat2,
         hs2, u.km, 'Altitude over the sea level for ground station 2')
 
     val = __model.site_diversity_rain_outage_probability(
-        lat1, lon1, a1, lat2, lon2, a2, f, el1, el2, tau=tau, hs1=hs1, hs2=hs2)
+        lat1, lon1, a1, el1, lat2, lon2, a2, el2, f, tau=tau, hs1=hs1, hs2=hs2)
 
     return prepare_output_array(val, type_output) * u.pct
 
