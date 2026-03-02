@@ -43,7 +43,8 @@ class __ITU1853:
             self.instance = _ITU1853_0()
         else:
             raise ValueError(
-                f"Version {version} is not implemented for the ITU-R P.1853 model."
+                f"Version {version} is not implemented for the "
+                f"ITU-R P.1853 model."
             )
 
     @staticmethod
@@ -54,7 +55,9 @@ class __ITU1853:
     def __version__(self):
         return self.instance.__version__
 
-    def rain_attenuation_synthesis(self, lat, lon, f, el, hs, Ns, Ts=1, tau=45, n=None):
+    def rain_attenuation_synthesis(
+        self, lat, lon, f, el, hs, Ns, Ts=1, tau=45, n=None
+    ):
         return self.instance.rain_attenuation_synthesis(
             lat, lon, f, el, hs, Ns, Ts=Ts, tau=tau, n=n
         )
@@ -98,13 +101,19 @@ class __ITU1853:
         )
 
     def scintillation_attenuation_synthesis(self, Ns, f_c=0.1, Ts=1):
-        return self.instance.scintillation_attenuation_synthesis(Ns, f_c=f_c, Ts=Ts)
+        return self.instance.scintillation_attenuation_synthesis(
+            Ns, f_c=f_c, Ts=Ts
+        )
 
     def cloud_liquid_water_synthesis(self, lat, lon, Ns, Ts=1, n=None):
-        return self.instance.cloud_liquid_water_synthesis(lat, lon, Ns, Ts=Ts, n=n)
+        return self.instance.cloud_liquid_water_synthesis(
+            lat, lon, Ns, Ts=Ts, n=n
+        )
 
     def integrated_water_vapour_synthesis(self, lat, lon, Ns, Ts=1, n=None):
-        return self.instance.integrated_water_vapour_synthesis(lat, lon, Ns, Ts=Ts, n=n)
+        return self.instance.integrated_water_vapour_synthesis(
+            lat, lon, Ns, Ts=Ts, n=n
+        )
 
 
 class _ITU1853_1:
@@ -476,7 +485,7 @@ def change_version(new_version):
           * 1:  Activates recommendation ITU-R P.1853-1 (02/12) (Current version)
           * 0:  Activates recommendation ITU-R P.1853-0 (10/09) (Superseded)
     """
-    global __model
+    global __model  # noqa: F824
     __model = __ITU1853(new_version)
 
 
@@ -490,7 +499,7 @@ def get_version():
         Version currently being used.
 
     """
-    global __model
+    global __model  # noqa: F824
     return __model.__version__
 
 
@@ -548,7 +557,7 @@ def rain_attenuation_synthesis(lat, lon, f, el, hs, Ns, Ts=1, tau=45, n=None):
     [1] Characteristics of precipitation for propagation modelling
     https://www.itu.int/rec/R-REC-P.1853/en
     """
-    global __model
+    global __model  # noqa: F824
 
     lon = np.mod(lon, 360)
     f = prepare_quantity(f, u.GHz, "Frequency")
@@ -587,7 +596,7 @@ def scintillation_attenuation_synthesis(Ns, f_c=0.1, Ts=1):
     [1] Characteristics of precipitation for propagation modelling
     https://www.itu.int/rec/R-REC-P.1853/en
     """
-    global __model
+    global __model  # noqa: F824
 
     val = __model.scintillation_attenuation_synthesis(Ns, f_c, Ts)
     return val * u.dB
@@ -623,7 +632,7 @@ def integrated_water_vapour_synthesis(lat, lon, Ns, Ts=1, n=None):
     [1] Characteristics of precipitation for propagation modelling
     https://www.itu.int/rec/R-REC-P.1853/en
     """
-    global __model
+    global __model  # noqa: F824
 
     lon = np.mod(lon, 360)
     val = __model.integrated_water_vapour_synthesis(lat, lon, Ns, Ts, n)
@@ -659,7 +668,7 @@ def cloud_liquid_water_synthesis(lat, lon, Ns, Ts=1, n=None):
     [1] Characteristics of precipitation for propagation modelling
     https://www.itu.int/rec/R-REC-P.1853/en
     """
-    global __model
+    global __model  # noqa: F824
 
     lon = np.mod(lon, 360)
     val = __model.cloud_liquid_water_synthesis(lat, lon, Ns, Ts, n)
@@ -751,7 +760,7 @@ def total_attenuation_synthesis(
     [1] Characteristics of precipitation for propagation modelling
     https://www.itu.int/rec/R-REC-P.1853/en
     """
-    global __model
+    global __model  # noqa: F824
 
     f = prepare_quantity(f, u.GHz, "Frequency")
     el = prepare_quantity(el, u.deg, "Elevation angle")

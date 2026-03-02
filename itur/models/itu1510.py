@@ -121,7 +121,8 @@ class _ITU1510_0_():
 
     def surface_month_mean_temperature(self, lat, lon, m):
         raise NotImplementedError(
-            f"The monthly mean temperature is notimplemented in recomendation ITU-R P.1510-{self.__version__}"
+            f"The monthly mean temperature is notimplemented in "
+            f"recomendation ITU-R P.1510-{self.__version__}"
         )
 
 
@@ -145,7 +146,7 @@ def change_version(new_version):
         * 1: Activates recommendation ITU-R P.1510-1 (06/17) (Current version)
         * 0: Activates recommendation ITU-R P.1510-0 (02/01) (Current version)
     """
-    global __model
+    global __model  # noqa: F824
     __model = __ITU1510__(new_version)
 
 

@@ -68,8 +68,11 @@ class __ITU837():
 
     def rainfall_rate(self, lat, lon, p):
         # Abstract method to compute the zero isoterm height
-        fcn = np.vectorize(self.instance.rainfall_rate, excluded=[0, 1],
-                           otypes=[np.ndarray])
+        fcn = np.vectorize(
+            self.instance.rainfall_rate,
+            excluded=[0, 1],
+            otypes=[np.ndarray]
+        )
         return np.array(fcn(lat, lon, p).tolist())
 
 
@@ -81,7 +84,9 @@ class _ITU837_7():
         self.month = 6
         self.link = 'https://www.itu.int/rec/R-REC-P.837-7-201706-I/en'
 
-        self.months = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+        self.months = np.array([
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+        ])
         self._Mt = {}
         self._R001 = {}
 
@@ -100,20 +105,25 @@ class _ITU837_7():
         lon = np.array(lon)
         lon[lon > 180] = lon[lon > 180] - 360
         return self._Mt[m](
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+            np.array([lat.ravel(), lon.ravel()]).T
+        ).reshape(lat.shape)
 
     def R001(self, lat, lon):
         if not self._R001:
             self._R001 = load_data_interpolator(
-                '837/v7_lat_r001.npz', '837/v7_lon_r001.npz',
-                '837/v7_r001.npz', bilinear_2D_interpolator)
+                '837/v7_lat_r001.npz',
+                '837/v7_lon_r001.npz',
+                '837/v7_r001.npz',
+                bilinear_2D_interpolator
+            )
 
         # In this recommendation the longitude is encoded with format -180 to
         # 180 whereas we always use 0 - 360 encoding
         lon = np.array(lon)
         lon[lon > 180] = lon[lon > 180] - 360
         return self._R001(
-            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+            np.array([lat.ravel(), lon.ravel()]).T
+        ).reshape(lat.shape)
 
     def rainfall_probability(self, lat_d, lon_d):
         """
@@ -122,26 +132,40 @@ class _ITU837_7():
         lat_f = lat_d.flatten()
         lon_f = lon_d.flatten()
 
-        Nii = np.array([[31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]])
+        Nii = np.array([[
+            31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+        ]])
 
         # Step 2: For each month, determine the monthly mean surface
         # temperature
-        Tii = surface_month_mean_temperature(lat_f, lon_f, self.months).value.T
+        Tii = surface_month_mean_temperature(
+            lat_f, lon_f, self.months
+        ).value.T
 
         # Step 3: For each month, determine the monthly mean total rainfall
-        MTii = np.array([self.Mt(lat_f, lon_f, m) for m in self.months]).T
+        MTii = np.array([
+            self.Mt(lat_f, lon_f, m) for m in self.months
+        ]).T
 
         # Step 4: For each month, determine the monthly mean total rainfall
         tii = Tii - 273.15
 
         # Step 5: For each month number, calculate rii
-        rii = np.where(tii >= 0, 0.5874 * np.exp(0.0883 * tii), 0.5874)  # Eq.1
+        rii = np.where(
+            tii >= 0,
+            0.5874 * np.exp(0.0883 * tii),
+            0.5874
+        )  # Eq.1
 
         # Step 6a For each month number, calculate the probability of rain:
         P0ii = 100 * MTii / (24 * Nii * rii)  # Eq. 2
 
         # Step 7b:
-        rii = np.where(P0ii > 70, 100 / 70. * MTii / (24 * Nii), rii)
+        rii = np.where(
+            P0ii > 70,
+            100 / 70. * MTii / (24 * Nii),
+            rii
+        )
         P0ii = np.where(P0ii > 70, 70, P0ii)
 
         # Step 7: Calculate the annual probability of rain, P0anual
@@ -158,26 +182,40 @@ class _ITU837_7():
         lat_f = lat_d.flatten()
         lon_f = lon_d.flatten()
 
-        Nii = np.array([[31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]])
+        Nii = np.array([[
+            31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+        ]])
 
         # Step 2: For each month, determine the monthly mean surface
         # temperature
-        Tii = surface_month_mean_temperature(lat_f, lon_f, self.months).value.T
+        Tii = surface_month_mean_temperature(
+            lat_f, lon_f, self.months
+        ).value.T
 
         # Step 3: For each month, determine the monthly mean total rainfall
-        MTii = np.array([self.Mt(lat_f, lon_f, m) for m in self.months]).T
+        MTii = np.array([
+            self.Mt(lat_f, lon_f, m) for m in self.months
+        ]).T
 
         # Step 4: For each month, determine the monthly mean total rainfall
         tii = Tii - 273.15
 
         # Step 5: For each month number, calculate rii
-        rii = np.where(tii >= 0, 0.5874 * np.exp(0.0883 * tii), 0.5874)
+        rii = np.where(
+            tii >= 0,
+            0.5874 * np.exp(0.0883 * tii),
+            0.5874
+        )
 
         # Step 6a For each month number, calculate the probability of rain:
         P0ii = 100 * MTii / (24 * Nii * rii)
 
         # Step 7b:
-        rii = np.where(P0ii > 70, 100 / 70. * MTii / (24 * Nii), rii)
+        rii = np.where(
+            P0ii > 70,
+            100 / 70. * MTii / (24 * Nii),
+            rii
+        )
         P0ii = np.where(P0ii > 70, 70, P0ii)
 
         # Step 7: Calculate the annual probability of rain, P0anual
@@ -191,7 +229,8 @@ class _ITU837_7():
                 # Use a bisection method to determine
                 def f_Rp(Rref):
                     P_r_ge_Rii = P0ii * stats.norm.sf(
-                        (np.log(Rref) + 0.7938 - np.log(rii)) / 1.26)
+                        (np.log(Rref) + 0.7938 - np.log(rii)) / 1.26
+                    )
                     P_r_ge_R = np.sum(Nii * P_r_ge_Rii) / 365.25
                     return 100 * (P_r_ge_R / p - 1)
 
@@ -297,6 +336,7 @@ class _ITU837_6():
         return Rp
 
 
+global __model  # noqa: F824
 __model = __ITU837()
 
 

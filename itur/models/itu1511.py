@@ -33,8 +33,10 @@ class __ITU1511():
         elif version == 0:
             self.instance = _ITU1511_0_()
         else:
-            raise ValueError('Version ' + str(version) + ' is not implemented'
-                             ' for the ITU-R P.1511 model.')
+            raise ValueError(
+                'Version ' + str(version) + ' is not implemented'
+                ' for the ITU-R P.1511 model.'
+            )
 
     @property
     def __version__(self):
@@ -184,7 +186,7 @@ def change_version(new_version):
           * 0:  Activates recommendation ITU-R P.1511-0 (02/01) (Superseded)
 
     """
-    global __model
+    global __model  # noqa: F824
     __model = __ITU1511(new_version)
 
 

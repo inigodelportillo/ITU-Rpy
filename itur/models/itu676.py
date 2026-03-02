@@ -1217,7 +1217,7 @@ class _ITU676_9_():
                 self.gammaw_exact(f, p, rho, T))
 
 
-__model = __ITU676__()
+global __model  # noqa: F824
 
 
 def change_version(new_version):

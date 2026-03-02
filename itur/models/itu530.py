@@ -107,7 +107,7 @@ class _ITU530_17_():
         Standard deviation of terrain heights.
 
         Computes the Standard deviation of terrain heights (m) within a
-        110 km × 110 km area with a 30 s resolution (e.g. the Globe “gtopo30”
+        110 km × 110 km area with a 30 s resolution (e.g. the Globe "gtopo30"
         data).
 
         The value for the mid-path may be obtained from an area roughness
@@ -213,7 +213,7 @@ class _ITU530_17_():
                    (1 + 0.3 * 10 ** (-At / 20) * 10 ** (-0.016 * At)) -
                    4.3 * (10**(-At / 20) + At / 800))
             q_a = 2 + (1 + 0.3 * 10**(-A / 20)) * (10**(-0.016 * A)) *\
-                (q_t + 4.3 * (10**(-A / 20 + A / 800)))
+                (q_t + 4.3 * (10**(-A / 20) + A / 800))
             p_W = 100 * (1 - np.exp(-10 ** (-q_a * A / 20)))
             return p_W
 
@@ -480,7 +480,7 @@ def change_version(new_version):
         Valid values are:
           * 16: Activates recommendation ITU-R P.530-16 (07/15) (Current version)
     """
-    global __model
+    global __model  # noqa: F824
     __model = __ITU530__(new_version)
 
 

@@ -529,7 +529,7 @@ def change_version(new_version):
           * 5: Activates recommendation ITU-R P.840-5 (02/12) (Superseded)
           * 4: Activates recommendation ITU-R P.840-4 (10/09) (Superseded)
     """
-    global __model
+    global __model  # noqa: F824
     __model = __ITU840__(new_version)
 
 
