@@ -148,6 +148,11 @@ class ITUR453_12TestCase(test.TestCase):
         self.assertAlmostEqual(
             models.itu453.map_wet_term_radio_refractivity(9.05, 38.7).value,
             50.162000, places=5)
+        # Regression test for issue #89: wet_term_radio_refractivity must
+        # return values in N-units (ppm), not as a dimensionless ratio
+        self.assertAlmostEqual(
+            models.itu453.wet_term_radio_refractivity(10, 20).value,
+            46.092737, places=5)
 
 
 class ITUR453_13TestCase(test.TestCase):
@@ -187,6 +192,11 @@ class ITUR453_13TestCase(test.TestCase):
             models.itu453.map_wet_term_radio_refractivity(
                 51.5, -0.14, 50).value,
             50.38926222, places=5)
+        # Regression test for issue #89: wet_term_radio_refractivity must
+        # return values in N-units (ppm), not as a dimensionless ratio
+        self.assertAlmostEqual(
+            models.itu453.wet_term_radio_refractivity(10, 20).value,
+            46.092737, places=5)
 
 
 class ITUR676_9TestCase(test.TestCase):
