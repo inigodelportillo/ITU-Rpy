@@ -181,7 +181,7 @@ def atmospheric_attenuation_slant_path(
     ----------
     [1] Propagation data and prediction methods required for the design of
     Earth-space telecommunication systems:
-    https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
+    https://www.itu.int/rec/R-REC-P.618-12-201507-S/en
 
 
     """
