@@ -55,6 +55,7 @@ def suite():
 
     suite.addTest(ITUR618_13TestCase('test_rain_attenuation'))
     suite.addTest(ITUR618_13TestCase('test_probability_of_rain_attenuation'))
+    suite.addTest(ITUR618_13TestCase('test_site_diversity_regression'))
 #    suite.addTest(ITUR618_13TestCase('test_site_diversity'))
     suite.addTest(ITUR618_13TestCase('test_scintillation_attenuation'))
     suite.addTest(ITUR618_13TestCase(
@@ -6197,6 +6198,52 @@ class ITUR618_13TestCase(test.TestCase):
 #                    25.796, -80.287, 3, 52.33141826,
 #                    25.889, -80.278, 9, 52.25682688, 29, tau=0).value,
 #            0.39740505, places=5)
+
+    def test_site_diversity_regression(self):
+        # Regression tests for issue #86: parameter order mismatch in
+        # site_diversity_rain_outage_probability. These expected values were
+        # computed with the corrected implementation and guard against future
+        # regressions where el1/el2 and f are passed in the wrong order.
+
+        # Symmetric attenuation thresholds (a1 == a2)
+        self.assertAlmostEqual(
+            models.itu618.site_diversity_rain_outage_probability(
+                25.768, -80.205, 9, 52.40999326,
+                25.463, -80.486, 9, 52.48526958, 14.5, tau=0).value,
+            0.00099352, places=5)
+        self.assertAlmostEqual(
+            models.itu618.site_diversity_rain_outage_probability(
+                25.768, -80.205, 9, 52.40999326,
+                25.463, -80.486, 9, 52.48526958, 29.0, tau=0).value,
+            0.09301376, places=5)
+        self.assertAlmostEqual(
+            models.itu618.site_diversity_rain_outage_probability(
+                25.796, -80.287, 9, 52.33141826,
+                25.889, -80.278, 9, 52.25682688, 29.0, tau=0).value,
+            0.29296748, places=5)
+
+        # Asymmetric attenuation thresholds (a1 != a2): verifies that el1
+        # is correctly associated with a1/lat1/lon1 and el2 with a2/lat2/lon2,
+        # i.e. the parameter ordering bug is not reintroduced.
+        self.assertAlmostEqual(
+            models.itu618.site_diversity_rain_outage_probability(
+                25.768, -80.205, 9, 52.40999326,
+                25.463, -80.486, 3, 52.48526958, 14.5, tau=0).value,
+            0.00548506, places=5)
+        self.assertAlmostEqual(
+            models.itu618.site_diversity_rain_outage_probability(
+                25.768, -80.205, 3, 52.40999326,
+                25.463, -80.486, 9, 52.48526958, 14.5, tau=0).value,
+            0.00559827, places=5)
+        # Swapping (a1, el1) <-> (a2, el2) must yield a different result
+        # when a1 != a2, confirming correct parameter binding.
+        r_fwd = models.itu618.site_diversity_rain_outage_probability(
+            25.768, -80.205, 9, 52.40999326,
+            25.463, -80.486, 3, 52.48526958, 14.5, tau=0).value
+        r_swp = models.itu618.site_diversity_rain_outage_probability(
+            25.463, -80.486, 3, 52.48526958,
+            25.768, -80.205, 9, 52.40999326, 14.5, tau=0).value
+        self.assertAlmostEqual(r_fwd, r_swp, places=5)
 
     def test_scintillation_attenuation(self):
         self.assertAlmostEqual(
