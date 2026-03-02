@@ -143,3 +143,6 @@ write_test_cases.py
 .idea/vcs.xml
 *.yaml
 .vscode/*
+
+# Local Claude Code project guide (not for version control)
+CLAUDE.md
