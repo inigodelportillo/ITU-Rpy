@@ -197,7 +197,7 @@ class _ITU618_13():
 
         # Step 5: Obtain the specific attenuation gammar using the frequency
         # dependent coefficients as given in ITU-R P.838
-        # https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.838-3-200503-I!!PDF-E.pdf
+        # https://www.itu.int/rec/R-REC-P.838-3-200503-I/en
         gammar = rain_specific_attenuation(
             R001, f, el, tau).to(
             u.dB / u.km).value
@@ -702,7 +702,7 @@ def rain_attenuation(lat, lon, f, el, hs=None, p=0.01, R001=None,
     --------
     [1] Propagation data and prediction methods required for the design of
     Earth-space telecommunication systems:
-    https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
+    https://www.itu.int/rec/R-REC-P.618-12-201507-S/en
     """
     type_output = get_input_type(lat)
 
@@ -766,7 +766,7 @@ def rain_attenuation_probability(lat, lon, el, hs=None, Ls=None, P0=None):
     ----------
     [1] Propagation data and prediction methods required for the design of
     Earth-space telecommunication systems:
-    https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
+    https://www.itu.int/rec/R-REC-P.618-12-201507-S/en
     """
     type_output = get_input_type(lat)
 
@@ -845,7 +845,7 @@ def site_diversity_rain_outage_probability(lat1, lon1, a1, el1, lat2,
     ----------
     [1] Propagation data and prediction methods required for the design of
     Earth-space telecommunication systems:
-    https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
+    https://www.itu.int/rec/R-REC-P.618-12-201507-S/en
     """
     type_output = get_input_type(lat1)
     lon1 = np.mod(lon1, 360)
@@ -919,7 +919,7 @@ def scintillation_attenuation(lat, lon, f, el, p, D, eta=0.5, T=None,
     ----------
     [1] Propagation data and prediction methods required for the design of
     Earth-space telecommunication systems:
-    https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
+    https://www.itu.int/rec/R-REC-P.618-12-201507-S/en
     """
     type_output = get_input_type(lat)
 
@@ -993,7 +993,7 @@ def scintillation_attenuation_sigma(lat, lon, f, el, p, D, eta=0.5, T=None,
     ----------
     [1] Propagation data and prediction methods required for the design of
     Earth-space telecommunication systems:
-    https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
+    https://www.itu.int/rec/R-REC-P.618-12-201507-S/en
     """
     type_output = get_input_type(lat)
 
@@ -1051,7 +1051,7 @@ def rain_cross_polarization_discrimination(Ap, f, el, p, tau=45):
     ----------
     [1] Propagation data and prediction methods required for the design of
     Earth-space telecommunication systems:
-    https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
+    https://www.itu.int/rec/R-REC-P.618-12-201507-S/en
     """
     type_output = get_input_type(Ap)
     Ap = prepare_input_array(Ap)
@@ -1100,7 +1100,7 @@ def fit_rain_attenuation_to_lognormal(lat, lon, f, el, hs, P_k, tau):
     ----------
     [1] Propagation data and prediction methods required for the design of
     Earth-space telecommunication systems:
-    https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.618-12-201507-I!!PDF-E.pdf
+    https://www.itu.int/rec/R-REC-P.618-12-201507-S/en
 
     """
     lat = prepare_input_array(lat)

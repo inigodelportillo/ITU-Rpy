@@ -457,7 +457,7 @@ class _ITU835_5():
         self.__version__ = 5
         self.year = 2012
         self.month = 2
-        self.link = 'https://www.itu.int/rec/R-REC-P.835-5-201202-I/en'
+        self.link = 'https://www.itu.int/rec/R-REC-P.835-5-201202-S/en'
 
     @staticmethod
     def standard_temperature(h, T_0=288.15):
