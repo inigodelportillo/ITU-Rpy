@@ -178,7 +178,7 @@ class _ITU1853_1:
 
         # D6: Discard the first 200 000 samples from the synthesized
         if discard_samples:
-            A_rain = A_rain[np.ceil(200000 / Ts).astype(int) :]
+            A_rain = A_rain[np.ceil(200000 / Ts).astype(int):]
 
         return A_rain.flatten()
 
@@ -188,8 +188,8 @@ class _ITU1853_1:
         Np = (len(f) - 1) // 2
         phases = np.random.rand(Np) * 2 * np.pi
         phases = np.cos(phases) + 1j * np.sin(phases)
-        f[1 : Np + 1] *= phases
-        f[-1 : -1 - Np : -1] = np.conj(f[1 : Np + 1])
+        f[1:Np + 1] *= phases
+        f[-1:-1 - Np:-1] = np.conj(f[1:Np + 1])
         return np.fft.ifft(f).real
 
     @staticmethod
@@ -203,7 +203,7 @@ class _ITU1853_1:
         H_f = np.where(
             freqs <= f_c, 1, 10 ** ((np.log10(freqs) - np.log10(f_c)) * (-8 / 3))
         )
-        H_f = H_f[0 : int(Ns + 2e5)]
+        H_f = H_f[0:int(Ns + 2e5)]
         sci = _ITU1853_1.fftnoise(np.fft.fftshift(H_f))
         return sci[200000:].flatten()
 
@@ -251,7 +251,7 @@ class _ITU1853_1:
 
         # D6: Discard the first 500 000 samples from the synthesized
         if discard_samples:
-            L = L[np.ceil(500000 / Ts).astype(int) :]
+            L = L[np.ceil(500000 / Ts).astype(int):]
 
         return L.flatten()
 
@@ -294,7 +294,7 @@ class _ITU1853_1:
         V = lambd * (-np.log10(stats.norm.sf(G_v))) ** (1 / kappa)
         # Step C5: Discard the first 5 000 000 samples from the synthesized
         if discard_samples:
-            V = V[np.ceil(5000000 / Ts).astype(int) :]
+            V = V[np.ceil(5000000 / Ts).astype(int):]
 
         return V.flatten()
 

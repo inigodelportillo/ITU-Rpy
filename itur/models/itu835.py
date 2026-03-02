@@ -16,7 +16,7 @@ class __ITU835__():
     """Class to model the ITU-R P.835 recommendation.
 
     The procedures to compute the reference standard atmosphere parameters
-    pressented in these versions are identical to those included in version
+    presented in these versions are identical to those included in version
     ITU_T P.835.
 
     Available versions:
