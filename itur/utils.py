@@ -104,7 +104,7 @@ def load_data(path, is_text=False, **kwargs):
         data = np.load(path)
     elif file_extension == '.txt':
         if is_text:
-            data = np.loadtxt(path, dtype=np.string_, delimiter=',', **kwargs)
+            data = np.loadtxt(path, dtype=np.bytes_, delimiter=',', **kwargs)
         else:
             data = np.genfromtxt(path, dtype=float, delimiter=',', **kwargs)
 
