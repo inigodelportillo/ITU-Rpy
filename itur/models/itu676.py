@@ -1218,6 +1218,7 @@ class _ITU676_9_():
 
 
 global __model  # noqa: F824
+__model = __ITU676__()
 
 
 def change_version(new_version):
