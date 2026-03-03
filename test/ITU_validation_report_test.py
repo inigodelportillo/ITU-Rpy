@@ -696,7 +696,7 @@ class ITUR676_13TestCase(ITU_TestCase):
         )
 
         self.__run__(
-            "test_gamma0",
+            "itur676_13_gamma0",
             test_fcn="models.itu676.gamma0_exact",
             df=df,
             attributes=["f", "P", "rho", "T"],
@@ -713,7 +713,7 @@ class ITUR676_13TestCase(ITU_TestCase):
         )
 
         self.__run__(
-            "test_gammaw",
+            "itur676_13_gammaw",
             test_fcn="models.itu676.gammaw_exact",
             df=df,
             attributes=["f", "P", "rho", "T"],
@@ -730,7 +730,7 @@ class ITUR676_13TestCase(ITU_TestCase):
         )
 
         self.__run__(
-            "test_gamma",
+            "itur676_13_gamma",
             test_fcn="models.itu676.gamma_exact",
             df=df,
             attributes=["f", "P", "rho", "T"],
@@ -748,7 +748,7 @@ class ITUR676_13TestCase(ITU_TestCase):
         )
 
         self.__run__(
-            "test_attenuation_gas",
+            "itur676_13_attenuation_gas",
             test_fcn="models.itu676.gaseous_attenuation_slant_path",
             df=df,
             attributes=["f", "el", "rho", "P", "T"],
