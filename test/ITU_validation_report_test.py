@@ -115,6 +115,10 @@ def create_ITU_suite():
     suite.add_test(ITUR676_12TestCase("test_gamma"))
     suite.add_test(ITUR676_12TestCase("test_zenith_attenuation"))
     suite.add_test(ITUR676_12TestCase("test_attenuation_gas"))
+    suite.add_test(ITUR676_13TestCase("test_gamma0"))
+    suite.add_test(ITUR676_13TestCase("test_gammaw"))
+    suite.add_test(ITUR676_13TestCase("test_gamma"))
+    suite.add_test(ITUR676_13TestCase("test_attenuation_gas"))
 
     # ITU-R P.836
     suite.add_test(ITUR836_6TestCase("test_surface_water_vapour_density_annual"))
@@ -674,6 +678,81 @@ class ITUR676_12TestCase(ITU_TestCase):
             df=df,
             attributes=["lat", "lon", "p", "f", "h", "V_t"],
             result_value="Aw",
+            n_places=5,
+        )
+
+
+class ITUR676_13TestCase(ITU_TestCase):
+
+    itu_name = "ITU-R P.676-13"
+    itu_description = "Attenuation by atmospheric gases and related effects"
+
+    def test_gamma0(self):
+        models.itu676.change_version(13)
+
+        path_file = "676/ITURP676-13_gamma.csv"
+        df = self.read_csv(
+            path.join(test_data, path_file), columns=["f", "P", "rho", "T", "gamma0"]
+        )
+
+        self.__run__(
+            "test_gamma0",
+            test_fcn="models.itu676.gamma0_exact",
+            df=df,
+            attributes=["f", "P", "rho", "T"],
+            result_value="gamma0",
+            n_places=5,
+        )
+
+    def test_gammaw(self):
+        models.itu676.change_version(13)
+
+        path_file = "676/ITURP676-13_gamma.csv"
+        df = self.read_csv(
+            path.join(test_data, path_file), columns=["f", "P", "rho", "T", "gammaw"]
+        )
+
+        self.__run__(
+            "test_gammaw",
+            test_fcn="models.itu676.gammaw_exact",
+            df=df,
+            attributes=["f", "P", "rho", "T"],
+            result_value="gammaw",
+            n_places=5,
+        )
+
+    def test_gamma(self):
+        models.itu676.change_version(13)
+
+        path_file = "676/ITURP676-13_gamma.csv"
+        df = self.read_csv(
+            path.join(test_data, path_file), columns=["f", "P", "rho", "T", "gamma"]
+        )
+
+        self.__run__(
+            "test_gamma",
+            test_fcn="models.itu676.gamma_exact",
+            df=df,
+            attributes=["f", "P", "rho", "T"],
+            result_value="gamma",
+            n_places=5,
+        )
+
+    def test_attenuation_gas(self):
+        models.itu676.change_version(13)
+
+        path_file = "676/ITURP676-13_A_gas.csv"
+        df = self.read_csv(
+            path.join(test_data, path_file),
+            columns=["f", "el", "rho", "P", "T", "A_gas"],
+        )
+
+        self.__run__(
+            "test_attenuation_gas",
+            test_fcn="models.itu676.gaseous_attenuation_slant_path",
+            df=df,
+            attributes=["f", "el", "rho", "P", "T"],
+            result_value="A_gas",
             n_places=5,
         )
 
