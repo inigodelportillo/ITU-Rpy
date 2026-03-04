@@ -139,6 +139,9 @@ def create_ITU_suite():
     # ITU-R P.840
     suite.add_test(ITUR840_8TestCase("test_columnar_content_reduced_liquid"))
     suite.add_test(ITUR840_8TestCase("test_cloud_attenuation"))
+    suite.add_test(ITUR840_9TestCase("test_columnar_content_reduced_liquid"))
+    suite.add_test(ITUR840_9TestCase("test_cloud_attenuation"))
+    suite.add_test(ITUR840_9TestCase("test_cloud_attenuation_lognormal"))
 
     # ITU-R P.1510
     suite.add_test(ITUR1510_1TestCase("test_surface_mean_temperature"))
@@ -981,6 +984,65 @@ class ITUR840_8TestCase(ITU_TestCase):
         self.__run__(
             "test_cloud_attenuation",
             test_fcn="models.itu840.cloud_attenuation",
+            df=df,
+            attributes=["lat", "lon", "f", "el", "p"],
+            result_value="Ac",
+            n_places=5,
+        )
+
+
+class ITUR840_9TestCase(ITU_TestCase):
+
+    itu_name = "ITU-R P.840-9"
+    itu_description = "Attenuation due to clouds and fog"
+
+    def test_columnar_content_reduced_liquid(self):
+        models.itu840.change_version(9)
+
+        path_file = "840/ITURP840-9_columnar_content_reduced_liquid.csv"
+        df = self.read_csv(
+            path.join(test_data, path_file), columns=["lat", "lon", "p", "Lred"]
+        )
+
+        self.__run__(
+            "itur840_9_columnar_content_reduced_liquid",
+            test_fcn="models.itu840.columnar_content_reduced_liquid",
+            df=df,
+            attributes=["lat", "lon", "p"],
+            result_value="Lred",
+            n_places=5,
+        )
+
+    def test_cloud_attenuation(self):
+        models.itu840.change_version(9)
+
+        path_file = "840/ITURP840-9_cloud_attenuation.csv"
+        df = self.read_csv(
+            path.join(test_data, path_file),
+            columns=["lat", "lon", "f", "el", "p", "Ac"],
+        )
+
+        self.__run__(
+            "itur840_9_cloud_attenuation",
+            test_fcn="models.itu840.cloud_attenuation",
+            df=df,
+            attributes=["lat", "lon", "f", "el", "p"],
+            result_value="Ac",
+            n_places=5,
+        )
+
+    def test_cloud_attenuation_lognormal(self):
+        models.itu840.change_version(9)
+
+        path_file = "840/ITURP840-9_cloud_attenuation_lognormal.csv"
+        df = self.read_csv(
+            path.join(test_data, path_file),
+            columns=["lat", "lon", "f", "el", "p", "Ac"],
+        )
+
+        self.__run__(
+            "itur840_9_cloud_attenuation_lognormal",
+            test_fcn="models.itu840.cloud_attenuation_lognormal",
             df=df,
             attributes=["lat", "lon", "f", "el", "p"],
             result_value="Ac",
