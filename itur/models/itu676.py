@@ -91,7 +91,8 @@ class __ITU676__():
        * P.676-9 (02/12) (Superseded)
        * P.676-10 (09/13) (Superseded)
        * P.676-11 (09/16) (Superseded)
-       * P.676-11 (08/19) (Current version)
+       * P.676-12 (08/19) (Superseded)
+       * P.676-13 (08/22) (Current version)
 
     Not available versions:
        * P.676-1 (03/92) (Superseded)
@@ -107,8 +108,10 @@ class __ITU676__():
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.676 recommendation.
 
-    def __init__(self, version=12):
-        if version == 12:
+    def __init__(self, version=13):
+        if version == 13:
+            self.instance = _ITU676_13_()
+        elif version == 12:
             self.instance = _ITU676_12_()
         elif version == 11:
             self.instance = _ITU676_11_()
@@ -436,6 +439,272 @@ class _ITU676_12_():
 
         e = rho * T / 216.7
         h0, hw = self.slant_inclined_path_equivalent_height(f, P + e, rho, T)
+
+        if 5 < el and el < 90:
+            h0_p = h0 * (np.exp(-h1 / h0) - np.exp(-h2 / h0))
+            hw_p = hw * (np.exp(-h1 / hw) - np.exp(-h2 / hw))
+            return (gamma0 * h0_p + gammaw * hw_p) / np.sin(np.deg2rad(el))
+        else:
+            def F(x):
+                return 1 / (0.661 * x + 0.339 * np.sqrt(x**2 + 5.51))
+
+            el1 = el
+            Re = 8500  # TODO: change to ITU-R P 834
+            el2 = np.rad2deg(
+                np.arccos(((Re + h1) / (Re + h2)) * np.cos(np.deg2rad(el1))))
+
+            def xi(eli, hi):
+                return np.tan(np.deg2rad(eli)) * np.sqrt((Re + hi) / h0)
+
+            def xi_p(eli, hi):
+                return np.tan(np.deg2rad(eli)) * np.sqrt((Re + hi) / hw)
+
+            def eq_33(h_num, h_den, el, x):
+                return np.sqrt(Re + h_num) * F(x) * \
+                    np.exp(-h_num / h_den) / np.cos(np.deg2rad(el))
+
+            A = gamma0 * np.sqrt(h0) * (eq_33(h1, h0, el1, xi(el1, h1)) -
+                                        eq_33(h2, h0, el2, xi(el2, h2))) +\
+                gammaw * np.sqrt(hw) * (eq_33(h1, hw, el1, xi_p(el1, h1)) -
+                                        eq_33(h2, hw, el2, xi_p(el2, h2)))
+            return A
+
+    @classmethod
+    def zenit_water_vapour_attenuation(
+            self, lat, lon, p, f, V_t=None, h=None):
+        f_ref = 20.6        # [GHz]
+        p_ref = 845         # [hPa]
+
+        if h is None:
+            h = topographic_altitude(lat, lon).value
+
+        if V_t is None:
+            V_t = total_water_vapour_content(lat, lon, p, h).value
+
+        rho_ref = V_t / 2.38
+        t_ref = 14 * np.log(0.22 * V_t / 2.38) + 3    # [Celsius]
+
+        a = (0.2048 * np.exp(- ((f - 22.43) / 3.097)**2) +
+             0.2326 * np.exp(- ((f - 183.5) / 4.096)**2) +
+             0.2073 * np.exp(- ((f - 325) / 3.651)**2) - 0.1113)
+
+        b = 8.741e4 * np.exp(-0.587 * f) + 312.2 * f**(-2.38) + 0.723
+        h = np.clip(h, 0, 4)
+
+        gammaw_approx_vect = np.vectorize(self.gammaw_exact)
+
+        Aw_term1 = (0.0176 * V_t *
+                    gammaw_approx_vect(f, p_ref, rho_ref, t_ref + 273.15) /
+                    gammaw_approx_vect(f_ref, p_ref, rho_ref, t_ref + 273.15))
+
+        return np.where(f < 20, Aw_term1, Aw_term1 * (a * h ** b + 1))
+
+
+class _ITU676_13_():
+
+    tmp = load_data(os.path.join(dataset_dir, '676/v13_lines_oxygen.txt'),
+                    skip_header=1)
+    f_ox = tmp[:, 0]
+    a1 = tmp[:, 1]
+    a2 = tmp[:, 2]
+    a3 = tmp[:, 3]
+    a4 = tmp[:, 4]
+    a5 = tmp[:, 5]
+    a6 = tmp[:, 6]
+
+    tmp = load_data(os.path.join(dataset_dir, '676/v13_lines_water_vapour.txt'),
+                    skip_header=1)
+    f_wv = tmp[:, 0]
+    b1 = tmp[:, 1]
+    b2 = tmp[:, 2]
+    b3 = tmp[:, 3]
+    b4 = tmp[:, 4]
+    b5 = tmp[:, 5]
+    b6 = tmp[:, 6]
+
+    # Part 1 coefficient data for oxygen equivalent height (Annex 2, Eq. 31)
+    tmp_h0 = load_data(os.path.join(dataset_dir,
+                                    '676/v13_h0_coefficients.txt'),
+                       skip_header=1)
+    _h0_freq = tmp_h0[:, 0]   # frequencies [GHz]
+    _h0_a0 = tmp_h0[:, 1]     # a0 coefficients [km]
+    _h0_b0 = tmp_h0[:, 2]     # b0 coefficients [km/K]
+    _h0_c0 = tmp_h0[:, 3]     # c0 coefficients [km/hPa]
+    _h0_d0 = tmp_h0[:, 4]     # d0 coefficients [km/(g/m^3)]
+
+    # Table 4 coefficients for hw (Annex 2, Eq. 37)
+    _hw_A = 5.6585e-5          # [km/GHz]
+    _hw_B = 1.8348             # [km]
+    _hw_line_coeffs = [
+        (22.235080,  2.6846, 2.7649),
+        (183.310087, 5.8905, 4.9219),
+        (325.152888, 2.9810, 3.0748),
+    ]
+
+    def __init__(self):
+        self.__version__ = 13
+        self.year = 2022
+        self.month = 8
+        self.link = 'https://www.itu.int/rec/R-REC-P.676-13-202208-I/en'
+
+    def gammaw_approx(self, f, p, rho, T):
+        warnings.warn(
+            RuntimeWarning(
+                'Recommendation ITU-R P.676-13 does not have an explicit '
+                'method to approximate gamma_w. The exact method shall be '
+                'used instead.'))
+        return self.gamma_exact(f, p, rho, T)
+
+    def gamma0_approx(self, f, p, rho, T):
+        warnings.warn(
+            RuntimeWarning(
+                'Recommendation ITU-R P.676-13 does not have an explicit '
+                'method to approximate gamma_0. The exact method shall be '
+                'used instead.'))
+        return self.gamma_exact(f, p, rho, T)
+
+    @classmethod
+    def gamma0_exact(self, f, p, rho, T):
+        return __gamma0_exact__(self, f, p, rho, T)
+
+    @classmethod
+    def gammaw_exact(self, f, p, rho, T):
+        return __gammaw_exact__(self, f, p, rho, T)
+
+    @classmethod
+    def gamma_exact(self, f, p, rho, T):
+        return (self.gamma0_exact(f, p, rho, T) +
+                self.gammaw_exact(f, p, rho, T))
+
+    @classmethod
+    def gaseous_attenuation_approximation(self, f, el, rho, P, T):
+        if np.any(f > 350):
+            warnings.warn(
+                RuntimeWarning(
+                    'The approximated method to compute '
+                    'the gaseous attenuation in recommendation ITU-P 676-13 '
+                    'is only recommended for frequencies below 350GHz'))
+
+        if np.any(5 > el) or np.any(np.mod(el, 90) < 5):
+            warnings.warn(
+                RuntimeWarning(
+                    'The approximated method to compute '
+                    'the gaseous attenuation in recommendation ITU-P 676-13 '
+                    'is only recommended for elevation angles between '
+                    '5 and 90 degrees'))
+
+        gamma0 = self.gamma0_exact(f, P, rho, T)
+        gammaw = self.gammaw_exact(f, P, rho, T)
+        return gamma0, gammaw
+
+    @classmethod
+    def slant_inclined_path_equivalent_height(self, f, P, rho, T):
+        """
+        Compute oxygen (h0) and water vapour (hw) equivalent heights
+        for P.676-13 Annex 2.
+
+        h0: Eq. 31 — linearly interpolated from Part 1 data file
+            h0 = a0(f) + b0(f)*T + c0(f)*P + d0(f)*rho
+        hw: Eq. 37 — analytical formula using Table 4 coefficients
+            hw(f) = A*f + B + sum_i(ai / ((f - fi)^2 + bi))
+        """
+        # Oxygen equivalent height h0 (Eq. 31)
+        # Eq. 31 uses total surface pressure Ps = P(dry) + e (water vapour)
+        e = rho * T / 216.7
+        Ps = P + e
+        a0 = np.interp(f, self._h0_freq, self._h0_a0)
+        b0 = np.interp(f, self._h0_freq, self._h0_b0)
+        c0 = np.interp(f, self._h0_freq, self._h0_c0)
+        d0 = np.interp(f, self._h0_freq, self._h0_d0)
+        h0 = a0 + b0 * T + c0 * Ps + d0 * rho
+
+        # Water vapour equivalent height hw (Eq. 37)
+        hw = (self._hw_A * f + self._hw_B +
+              sum(ai / ((f - fi) ** 2 + bi)
+                  for fi, ai, bi in self._hw_line_coeffs))
+        return h0, hw
+
+    @classmethod
+    def gaseous_attenuation_terrestrial_path(
+            self, r, f, el, rho, P, T, mode='approx'):
+        if mode == 'approx':
+            gamma0, gammaw = self.gaseous_attenuation_approximation(
+                f, el, rho, P, T)
+            return (gamma0 + gammaw) * r
+        else:
+            gamma = self.gamma_exact(f, P, rho, T)
+            return gamma * r
+
+    @classmethod
+    def gaseous_attenuation_slant_path(self, f, el, rho, P, T, V_t=None,
+                                       h=None, mode='approx'):
+        if mode == 'approx':
+            gamma0, gammaw = self.gaseous_attenuation_approximation(
+                f, el, rho, P, T)
+
+            h0, hw = self.slant_inclined_path_equivalent_height(f, P, rho, T)
+
+            if V_t is not None and h is not None:
+                Aw = self.zenit_water_vapour_attenuation(None, None, None,
+                                                         f, V_t, h)
+            else:
+                Aw = gammaw * hw
+
+            A0 = gamma0 * h0
+            return (A0 + Aw) / np.sin(np.deg2rad(el))
+
+        else:
+            delta_h = 0.0001 * \
+                np.exp((np.arange(0, 922)) / 100)             # Eq. 14
+            h_n = 0.0001 * ((np.exp(np.arange(0, 922) / 100.0) -
+                             1.0) / (np.exp(1.0 / 100.0) - 1.0))             # Eq. 15
+            # Evaluate atmospheric profiles at layer mid-points (Annex 1)
+            h_mid = h_n + delta_h / 2
+            T_n = standard_temperature(h_mid).to(u.K).value
+            press_n = standard_pressure(h_mid).value
+            rho_n = standard_water_vapour_density(h_mid, rho_0=rho).value
+
+            e_n = rho_n * T_n / 216.7
+            n_n = radio_refractive_index(press_n, e_n, T_n).value
+            n_ratio = n_n / np.pad(n_n[1:], (0, 1), mode='edge')
+            r_n = 6371 + h_n
+
+            b = np.pi / 2 - np.deg2rad(el)
+            Agas = 0
+            for t, press, rho, r, delta, n_r in zip(
+                    T_n, press_n, rho_n, r_n, delta_h, n_ratio):
+                a = - r * np.cos(b) + 0.5 * np.sqrt(
+                    4 * r**2 * np.cos(b)**2 + 8 * r * delta + 4 * delta**2)  # Eq. 17
+                # Eq. 18b (replaces deprecated Eq. 18a from P.676-12)
+                alpha = np.arcsin(
+                    np.clip((r / (r + delta)) * np.sin(b), -1, 1))
+                # Use dry air pressure for specific attenuation (p = P_total - e)
+                p_dry = press - rho * t / 216.7
+                gamma = self.gamma_exact(f, p_dry, rho, t)
+                Agas += a * gamma                                            # Eq. 13
+                b = np.arcsin(np.sin(alpha) *
+                              n_r)                           # Eq. 19a
+
+            return Agas
+
+    @classmethod
+    def gaseous_attenuation_inclined_path(
+            self, f, el, rho, P, T, h1, h2, mode='approx'):
+        if h1 > 10 or h2 > 10:
+            raise ValueError(
+                'Both the transmitter and the receiver must be at'
+                'altitude of less than 10 km above the sea level.'
+                'Current altitude Tx: %.2f km, Rx: %.2f km' % (h1, h2))
+
+        if mode == 'approx':
+            rho = rho * np.exp(h1 / 2)
+            gamma0, gammaw = self.gaseous_attenuation_approximation(
+                f, el, rho, P, T)
+        else:
+            gamma0 = self.gamma0_exact(f, P, rho, T)
+            gammaw = 0
+
+        h0, hw = self.slant_inclined_path_equivalent_height(f, P, rho, T)
 
         if 5 < el and el < 90:
             h0_p = h0 * (np.exp(-h1 / h0) - np.exp(-h2 / h0))

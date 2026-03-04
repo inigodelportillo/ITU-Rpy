@@ -46,6 +46,10 @@ def suite():
     suite.addTest(ITUR676_11TestCase('test_gammaw_approx'))
     suite.addTest(ITUR676_11TestCase('test_gamma0_approx'))
     suite.addTest(ITUR676_11TestCase('test_zenit_water_vapour_attenuation'))
+    suite.addTest(ITUR676_13TestCase('test_gamma0_exact'))
+    suite.addTest(ITUR676_13TestCase('test_gammaw_exact'))
+    suite.addTest(ITUR676_13TestCase('test_gaseous_attenuation_slant_path_exact'))
+    suite.addTest(ITUR676_13TestCase('test_gaseous_attenuation_slant_path_approx'))
 
     # ITU-R P.618 tests (Rain attenuation)
     suite.addTest(ITUR618_12TestCase(
@@ -3860,6 +3864,88 @@ class ITUR676_11TestCase(test.TestCase):
             models.itu676.zenit_water_vapour_attenuation(
                 9.05, 38.7, 0.2, 29).value,
             0.19997458, places=5)
+
+
+class ITUR676_13TestCase(test.TestCase):
+    """Validation tests for ITU-R P.676-13 (08/2022).
+
+    Test data sourced from CG-3M3J-13-ValEx-Rev8.3.0.xlsx.
+    Sheets used:
+      - P.676-13 SpAtt          : Specific attenuation (Eqs. 1-9, Annex 1)
+      - P.676-13 A_Gas_A1_2.2.1a: Slant path exact (Annex 1, Eqs. 13-19b)
+      - P.676-13 A_Gas_A2_INST  : Slant path approximate (Annex 2, Eqs. 31-37)
+
+    Pressure convention: P argument = dry air pressure (hPa).
+    """
+
+    def setUp(self):
+        models.itu676.change_version(13)
+
+    def test_gamma0_exact(self):
+        # Standard conditions from SpAtt sheet: p=1013.25 hPa (dry), rho=7.5 g/m3, T=288.15 K
+        self.assertAlmostEqual(
+            models.itu676.gamma0_exact(12, 1013.25, 7.5, 288.15).value,
+            0.00869826406877357, places=5)
+        self.assertAlmostEqual(
+            models.itu676.gamma0_exact(20, 1013.25, 7.5, 288.15).value,
+            0.01188355047780760, places=5)
+        self.assertAlmostEqual(
+            models.itu676.gamma0_exact(60, 1013.25, 7.5, 288.15).value,
+            14.6234747964861, places=4)
+        self.assertAlmostEqual(
+            models.itu676.gamma0_exact(90, 1013.25, 7.5, 288.15).value,
+            0.03886971107242350, places=5)
+        self.assertAlmostEqual(
+            models.itu676.gamma0_exact(130, 1013.25, 7.5, 288.15).value,
+            0.04150908359952280, places=5)
+
+    def test_gammaw_exact(self):
+        # Standard conditions from SpAtt sheet: p=1013.25 hPa (dry), rho=7.5 g/m3, T=288.15 K
+        self.assertAlmostEqual(
+            models.itu676.gammaw_exact(12, 1013.25, 7.5, 288.15).value,
+            0.00953538822024593, places=5)
+        self.assertAlmostEqual(
+            models.itu676.gammaw_exact(20, 1013.25, 7.5, 288.15).value,
+            0.09704730481511170, places=5)
+        self.assertAlmostEqual(
+            models.itu676.gammaw_exact(60, 1013.25, 7.5, 288.15).value,
+            0.15484184100000, places=5)
+        self.assertAlmostEqual(
+            models.itu676.gammaw_exact(90, 1013.25, 7.5, 288.15).value,
+            0.34197339400000, places=5)
+        self.assertAlmostEqual(
+            models.itu676.gammaw_exact(130, 1013.25, 7.5, 288.15).value,
+            0.75184470400000, places=5)
+
+    def test_gaseous_attenuation_slant_path_exact(self):
+        # A_Gas_A1_2.2.1a sheet: f=28 GHz, el=30 deg, rho=7.5, p=1013.25 (dry), T=288.15
+        # Uses P.835-6 standard atmosphere; expected A_gas = 0.47081173472870474 dB
+        self.assertAlmostEqual(
+            models.itu676.gaseous_attenuation_slant_path(
+                28, 30, 7.5, 1013.25, 288.15, mode='exact').value,
+            0.47081173472870474, places=5)
+
+    def test_gaseous_attenuation_slant_path_approx(self):
+        # A_Gas_A2_INST sheet: el=45 deg, Annex 2 method (Eqs. 29-37)
+        # P argument = dry air pressure ps = Ps - es
+        cases = [
+            # (f, ps, T, rho, expected_A_gas)
+            (38.5, 988.3342860812425,  295.15, 13.998103358274586, 0.6724061393008622),
+            (38.5, 988.8194616390798,  294.45, 14.04229126442994,  0.6783244181497916),
+            (38.5, 989.4840337179357,  294.65, 14.205904949340969, 0.6833829361095082),
+            (38.5, 989.4976770016127,  297.15, 14.295215863202152, 0.6721249815284822),
+            (38.5, 990.712469428683,   300.85, 13.172371197621427, 0.6171528309720985),
+            (38.5, 990.6016244371225,  303.25, 12.932952957874935, 0.5981110294418397),
+            (38.5, 989.3537790809332,  304.05, 13.503193794315951, 0.6104970109958014),
+            (38.5, 987.9839758399005,  302.65, 14.83285126546697,  0.6579285461427736),
+            (38.5, 989.3878692172694,  301.35, 14.53449059438436,  0.6566089491834671),
+            (39.5, 988.9020367914704,  297.65, 15.942511766465097, 0.7707708981960036),
+        ]
+        for f, ps, T, rho, expected in cases:
+            self.assertAlmostEqual(
+                models.itu676.gaseous_attenuation_slant_path(
+                    f, 45, rho, ps, T, mode='approx').value,
+                expected, places=5)
 
 
 class ITUR836_6TestCase(test.TestCase):
