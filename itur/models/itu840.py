@@ -14,10 +14,12 @@ from itur.utils import (dataset_dir, prepare_input_array, prepare_output_array,
                         get_input_type)
 
 
-def __fcn_columnar_content_reduced_liquid__(Lred, lat, lon, p):
-    available_p = np.array(
-        [0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0, 30.0, 50.0,
-         60.0, 70.0, 80.0, 90.0, 95.0, 99.0])
+def __fcn_columnar_content_reduced_liquid__(Lred, lat, lon, p,
+                                           available_p=None):
+    if available_p is None:
+        available_p = np.array(
+            [0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0, 30.0,
+             50.0, 60.0, 70.0, 80.0, 90.0, 95.0, 99.0])
 
     if p in available_p:
         p_below = p_above = p
@@ -50,7 +52,8 @@ class __ITU840__():
     * P.840-5 (02/12) (Superseded)
     * P.840-6 (09/13) (Superseded)
     * P.840-7 (12/17) (Superseded)
-    * P.840-8 (08/19) (Current version)
+    * P.840-8 (08/19) (Superseded)
+    * P.840-9 (08/23) (Current version)
 
     Non-available versions include:
     * P.840-1 (08/94) (Superseded) - Tentative similar to P.840-4
@@ -61,8 +64,10 @@ class __ITU840__():
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.840 recommendation.
 
-    def __init__(self, version=7):
-        if version == 8:
+    def __init__(self, version=9):
+        if version == 9:
+            self.instance = _ITU840_9_()
+        elif version == 8:
             self.instance = _ITU840_8_()
         elif version == 7:
             self.instance = _ITU840_7_()
@@ -88,22 +93,150 @@ class __ITU840__():
 
     def columnar_content_reduced_liquid(self, lat, lon, p):
         # Abstract method to compute the columnar content of reduced liquid
+        available_p = getattr(self.instance, 'available_p', None)
         fcn = np.vectorize(__fcn_columnar_content_reduced_liquid__,
-                           excluded=[0, 1, 2], otypes=[np.ndarray])
-        return np.array(fcn(self.instance.Lred, lat, lon, p).tolist())
+                           excluded=[0, 1, 2, 4], otypes=[np.ndarray])
+        return np.array(
+            fcn(self.instance.Lred, lat, lon, p, available_p).tolist())
 
     def cloud_attenuation(self, lat, lon, el, f, p, Lred=None):
         # Abstract method to compute the cloud attenuation
-        Kl = self.specific_attenuation_coefficients(f, T=0)
+        if hasattr(self.instance, 'cloud_liquid_mass_absorption_coefficient'):
+            KL = np.vectorize(
+                self.instance.cloud_liquid_mass_absorption_coefficient)(f)
+        else:
+            KL = self.specific_attenuation_coefficients(f, T=0)
         if Lred is None:
             Lred = self.columnar_content_reduced_liquid(lat, lon, p)
-        A = Lred * Kl / np.sin(np.deg2rad(el))
+        A = Lred * KL / np.sin(np.deg2rad(el))
 
+        return A
+
+    def cloud_attenuation_lognormal(self, lat, lon, el, f, p):
+        # Compute cloud attenuation using the log-normal approximation (Eq. 15)
+        from scipy.stats import norm
+        KL = np.vectorize(
+            self.instance.cloud_liquid_mass_absorption_coefficient)(f)
+        mL, sL, PL = self.lognormal_approximation_coefficient(lat, lon)
+        # Q^{-1}(p/PL): inverse complementary standard normal CDF
+        with np.errstate(invalid='ignore', divide='ignore'):
+            ratio = np.where(PL > 0, p / PL, 1.0)
+            ratio = np.clip(ratio, 1e-12, 1 - 1e-12)
+            Q_inv = norm.ppf(1.0 - ratio)
+            A = KL * np.exp(mL + sL * Q_inv) / np.sin(np.deg2rad(el))
+        # Zero where p >= PL, PL <= 0.02, or mL is NaN
+        A = np.where(
+            (p >= PL) | (PL <= 0.02) | np.isnan(mL) | np.isnan(A), 0.0, A)
         return A
 
     def lognormal_approximation_coefficient(self, lat, lon):
         # Abstract method to compute the lognormal approximation coefficients
         return self.instance.lognormal_approximation_coefficient(lat, lon)
+
+
+class _ITU840_9_():
+
+    def __init__(self):
+        self.__version__ = 9
+        self.year = 2023
+        self.month = 8
+        self.link = 'https://www.itu.int/rec/R-REC-P.840-9-202308-I/en'
+
+        self._Lred = {}
+        self._M = None
+        self._sigma = None
+        self._Pclw = None
+
+        # Available exceedance probabilities (%) for annual L(p) maps
+        self.available_p = np.array(
+            [0.01, 0.02, 0.03, 0.05, 0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 3.0,
+             5.0, 10.0, 20.0, 30.0, 50.0, 60.0, 70.0, 80.0, 90.0, 95.0,
+             99.0, 100.0])
+
+        # Map p value to NPZ filename stem (e.g. 0.01 -> '001')
+        self._p_to_stem = {
+            0.01: '001', 0.02: '002', 0.03: '003', 0.05: '005',
+            0.1: '01', 0.2: '02', 0.3: '03', 0.5: '05',
+            1.0: '1', 2.0: '2', 3.0: '3', 5.0: '5',
+            10.0: '10', 20.0: '20', 30.0: '30', 50.0: '50',
+            60.0: '60', 70.0: '70', 80.0: '80', 90.0: '90',
+            95.0: '95', 99.0: '99', 100.0: '100',
+        }
+
+    def Lred(self, lat, lon, p):
+        if not self._Lred:
+            d_dir = os.path.join(dataset_dir, '840/v9_l_%s.npz')
+            for p_load, stem in self._p_to_stem.items():
+                self._Lred[float(p_load)] = load_data_interpolator(
+                    '840/v9_lat.npz', '840/v9_lon.npz',
+                    d_dir % stem,
+                    bilinear_2D_interpolator, flip_ud=False)
+
+        return self._Lred[float(p)](
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+
+    def M(self, lat, lon):
+        if self._M is None:
+            self._M = load_data_interpolator(
+                '840/v9_lat.npz', '840/v9_lon.npz',
+                '840/v9_ml.npz', bilinear_2D_interpolator, flip_ud=False)
+
+        return self._M(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+
+    def sigma(self, lat, lon):
+        if self._sigma is None:
+            self._sigma = load_data_interpolator(
+                '840/v9_lat.npz', '840/v9_lon.npz',
+                '840/v9_sl.npz', bilinear_2D_interpolator, flip_ud=False)
+
+        return self._sigma(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+
+    def Pclw(self, lat, lon):
+        if self._Pclw is None:
+            self._Pclw = load_data_interpolator(
+                '840/v9_lat.npz', '840/v9_lon.npz',
+                '840/v9_pl.npz', bilinear_2D_interpolator, flip_ud=False)
+
+        return self._Pclw(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+
+    @staticmethod
+    def specific_attenuation_coefficients(f, T):
+        return _ITU840_6_.specific_attenuation_coefficients(f, T)
+
+    @staticmethod
+    def cloud_liquid_mass_absorption_coefficient(f):
+        """Cloud liquid mass absorption coefficient KL(f) per Eq. 12.
+
+        Defined as KL(f) = Kl(f, T=273.75 K) × (A1·exp(...) + A2·exp(...) + A3)
+
+        Parameters
+        ----------
+        f : number
+            Frequency (GHz)
+
+        Returns
+        -------
+        KL : float
+            Cloud liquid mass absorption coefficient (dB/(kg/m²))
+        """
+        T_ref = 273.75 - 273.15    # 0.60 °C → T=273.75 K
+        Kl = _ITU840_6_.specific_attenuation_coefficients(f, T_ref)
+        A1, A2, A3 = 0.1522, 11.51, -10.4912
+        f1, f2 = -23.9589, 219.2096
+        sigma1, sigma2 = 3.2991e3, 2.7595e6
+        correction = (A1 * np.exp(-(f - f1) ** 2 / sigma1) +
+                      A2 * np.exp(-(f - f2) ** 2 / sigma2) + A3)
+        return Kl * correction
+
+    def lognormal_approximation_coefficient(self, lat, lon):
+        m = self.M(lat, lon)
+        sigma = self.sigma(lat, lon)
+        Pclw = self.Pclw(lat, lon)
+
+        return m, sigma, Pclw
 
 
 class _ITU840_8_():
@@ -523,7 +656,8 @@ def change_version(new_version):
     new_version : int
         Number of the version to use.
         Valid values are:
-          * 8: Activates recommendation ITU-R P.840-8 (08/19) (Current version)
+          * 9: Activates recommendation ITU-R P.840-9 (08/23) (Current version)
+          * 8: Activates recommendation ITU-R P.840-8 (08/19) (Superseded)
           * 7: Activates recommendation ITU-R P.840-7 (12/17) (Superseded)
           * 6: Activates recommendation ITU-R P.840-6 (09/13) (Superseded)
           * 5: Activates recommendation ITU-R P.840-5 (02/12) (Superseded)
@@ -691,6 +825,59 @@ def cloud_attenuation(lat, lon, el, f, p, Lred=None):
     # giving out negative values for certain inputs
     val[val < 0] = 0
 
+    return prepare_output_array(val, type_output) * u.dB
+
+
+def cloud_attenuation_lognormal(lat, lon, el, f, p):
+    """
+    Compute cloud attenuation using the log-normal approximation (P.840-9 §3.3).
+
+    Uses the log-normal distribution parameters (mL, sL, PL) from the digital
+    maps to estimate cloud attenuation at a given exceedance probability.
+
+    The value of the cloud attenuation is:
+
+    .. math::
+      A_c(f,p) = \\frac{K_L(f) \\cdot e^{m_L + \\sigma_L Q^{-1}(p/P_L)}}{\\sin(\\theta)}
+      \\quad \\text{for } p < P_L
+
+    and zero otherwise. :math:`Q^{-1}(x)` is the inverse standard normal CCDF
+    as defined in Recommendation ITU-R P.1057.
+
+    .. note::
+        This function requires P.840-9 (version 9). Activate it with
+        ``itur.models.itu840.change_version(9)``.
+
+    Parameters
+    ----------
+    lat : number, sequence, or numpy.ndarray
+        Latitudes of the receiver points
+    lon : number, sequence, or numpy.ndarray
+        Longitudes of the receiver points
+    el : number, sequence, or numpy.ndarray
+        Elevation angle of the receiver points (deg)
+    f : number
+        Frequency (GHz)
+    p : number
+        Exceedance probability (%)
+
+    Returns
+    -------
+    Ac: numpy.ndarray
+        Cloud attenuation, Ac (dB), from the log-normal approximation
+
+    References
+    ----------
+    [1] Attenuation due to clouds and fog:
+    https://www.itu.int/rec/R-REC-P.840/en
+    """
+    type_output = get_input_type(lat)
+    lat = prepare_input_array(lat)
+    lon = prepare_input_array(lon)
+    lon = np.mod(lon, 360)
+    el = prepare_quantity(el, u.deg, 'Elevation angle')
+    f = prepare_quantity(f, u.GHz, 'Frequency')
+    val = __model.cloud_attenuation_lognormal(lat, lon, el, f, p)
     return prepare_output_array(val, type_output) * u.dB
 
 

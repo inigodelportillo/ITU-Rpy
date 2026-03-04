@@ -92,6 +92,9 @@ def suite():
 #    suite.addTest(ITUR840_4TestCase('test_cloud_attenuation'))
     suite.addTest(ITUR840_7TestCase('test_columnar_content_reduced_liquid'))
     suite.addTest(ITUR840_7TestCase('test_cloud_attenuation'))
+    suite.addTest(ITUR840_9TestCase('test_columnar_content_reduced_liquid'))
+    suite.addTest(ITUR840_9TestCase('test_cloud_attenuation'))
+    suite.addTest(ITUR840_9TestCase('test_cloud_attenuation_lognormal'))
 
     # ITU-R P.1511 tests (Topographic altitude)
     suite.addTest(ITUR1511_1TestCase('test_topographic_altitude'))
@@ -7968,6 +7971,243 @@ class ITUR840_7TestCase(test.TestCase):
             models.itu840.cloud_attenuation(
                 9.05, 38.7, 20.14348033, 29, 0.2).value,
             3.00278773, places=5)
+
+
+class ITUR840_9TestCase(test.TestCase):
+
+    def setUp(self):
+        models.itu840.change_version(9)
+
+    def test_columnar_content_reduced_liquid(self):
+        self.assertAlmostEqual(
+            models.itu840.columnar_content_reduced_liquid(0, 0, 0.015).value,
+            0.82359246235649, places=5)
+        self.assertAlmostEqual(
+            models.itu840.columnar_content_reduced_liquid(0, 0, 1.5).value,
+            0.221336837464663, places=5)
+        self.assertAlmostEqual(
+            models.itu840.columnar_content_reduced_liquid(0, 0, 15.5).value,
+            0.0877674171040156, places=5)
+        self.assertAlmostEqual(
+            models.itu840.columnar_content_reduced_liquid(0, 0, 65).value,
+            0.0278460017036198, places=5)
+        self.assertAlmostEqual(
+            models.itu840.columnar_content_reduced_liquid(45, 0, 0.015).value,
+            1.34086314993942, places=5)
+        self.assertAlmostEqual(
+            models.itu840.columnar_content_reduced_liquid(45, 0, 1.5).value,
+            0.618180437395432, places=5)
+        self.assertAlmostEqual(
+            models.itu840.columnar_content_reduced_liquid(45, 0, 15.5).value,
+            0.152463592389544, places=5)
+        self.assertAlmostEqual(
+            models.itu840.columnar_content_reduced_liquid(45, 0, 65).value,
+            0.0, places=5)
+        self.assertAlmostEqual(
+            models.itu840.columnar_content_reduced_liquid(87.5, 0, 0.015).value,
+            0.591827062460336, places=5)
+        self.assertAlmostEqual(
+            models.itu840.columnar_content_reduced_liquid(87.5, 0, 1.5).value,
+            0.202902249956731, places=5)
+        self.assertAlmostEqual(
+            models.itu840.columnar_content_reduced_liquid(87.5, 0, 15.5).value,
+            0.0733996853195151, places=5)
+        self.assertAlmostEqual(
+            models.itu840.columnar_content_reduced_liquid(87.5, 0, 65).value,
+            0.0, places=5)
+        self.assertAlmostEqual(
+            models.itu840.columnar_content_reduced_liquid(-45, 0, 0.015).value,
+            0.8335819499625, places=5)
+        self.assertAlmostEqual(
+            models.itu840.columnar_content_reduced_liquid(-45, 0, 1.5).value,
+            0.502562399953846, places=5)
+        self.assertAlmostEqual(
+            models.itu840.columnar_content_reduced_liquid(-45, 0, 15.5).value,
+            0.209082764510553, places=5)
+        self.assertAlmostEqual(
+            models.itu840.columnar_content_reduced_liquid(-45, 0, 65).value,
+            0.0267305029813346, places=5)
+        self.assertAlmostEqual(
+            models.itu840.columnar_content_reduced_liquid(-87.5, 0, 0.015).value,
+            0.0, places=5)
+
+    def test_cloud_attenuation(self):
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(0, 0, 15, 6, 0.015).value,
+            0.09905224128740467, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(0, 0, 45, 15, 1.5).value,
+            0.0595088161565868, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(0, 0, 75, 30, 15.5).value,
+            0.0643180997169543, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(0, 0, 90, 45, 65).value,
+            0.0401834480600295, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(45, 0, 15, 6, 0.015).value,
+            0.16126361802920472, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(45, 0, 45, 15, 1.5).value,
+            0.16620453432852675, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(45, 0, 75, 30, 15.5).value,
+            0.1117290318216181, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(45, 0, 90, 45, 65).value,
+            0.0, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(87.5, 0, 15, 6, 0.015).value,
+            0.0711781611302106, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(87.5, 0, 45, 15, 1.5).value,
+            0.054552476798448, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(87.5, 0, 75, 30, 15.5).value,
+            0.0537890761212528, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(87.5, 0, 90, 45, 65).value,
+            0.0, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(-45, 0, 15, 6, 0.015).value,
+            0.10025366211374016, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(-45, 0, 45, 15, 1.5).value,
+            0.13511936742495984, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(-45, 0, 75, 30, 15.5).value,
+            0.15322093939427275, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(-45, 0, 90, 45, 65).value,
+            0.03857371660037261, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(-87.5, 0, 15, 6, 0.015).value,
+            0.0, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(45, -90, 15, 6, 0.015).value,
+            0.16037182249062948, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(45, -90, 45, 15, 1.5).value,
+            0.16960835335532312, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(45, -90, 75, 30, 15.5).value,
+            0.08943220814674452, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(45, -90, 90, 45, 65).value,
+            0.0, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(-45, -90, 15, 6, 0.015).value,
+            0.09519569310317853, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(-45, -90, 45, 15, 1.5).value,
+            0.12647013318717665, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(-45, -90, 75, 30, 15.5).value,
+            0.1276903220818493, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(-45, -90, 90, 45, 65).value,
+            0.04515082187650632, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(45, 90, 15, 6, 0.015).value,
+            0.06088498490086637, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(45, 90, 45, 15, 1.5).value,
+            0.03282568820678756, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(45, 90, 75, 30, 15.5).value,
+            0.005659138865712261, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation(45, 90, 90, 45, 65).value,
+            0.0, places=5)
+
+    def test_cloud_attenuation_lognormal(self):
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(0, 0, 15, 6, 0.015).value,
+            0.08674959983796496, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(0, 0, 45, 15, 1.5).value,
+            0.06180612183071958, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(0, 0, 75, 30, 15.5).value,
+            0.06657122827308563, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(0, 0, 90, 45, 65).value,
+            0.03868774708057425, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(45, 0, 15, 6, 0.015).value,
+            0.21897897939595976, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(45, 0, 45, 15, 1.5).value,
+            0.1269517636335897, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(45, 0, 75, 30, 15.5).value,
+            0.10770463945367836, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(45, 0, 90, 45, 65).value,
+            0.0, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(87.5, 0, 15, 6, 0.015).value,
+            0.07819254246186, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(87.5, 0, 45, 15, 1.5).value,
+            0.05444667921583171, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(87.5, 0, 75, 30, 15.5).value,
+            0.052072201180795474, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(87.5, 0, 90, 45, 65).value,
+            0.0, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(-45, 0, 15, 6, 0.015).value,
+            0.14472701916328337, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(-45, 0, 45, 15, 1.5).value,
+            0.10208845034389148, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(-45, 0, 75, 30, 15.5).value,
+            0.10780669506228527, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(-45, 0, 90, 45, 65).value,
+            0.05513171503320124, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(-87.5, 0, 15, 6, 0.015).value,
+            0.0, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(45, -90, 15, 6, 0.015).value,
+            0.21571375177426674, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(45, -90, 45, 15, 1.5).value,
+            0.1240585112881047, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(45, -90, 75, 30, 15.5).value,
+            0.09884714953763293, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(45, -90, 90, 45, 65).value,
+            0.0, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(-45, -90, 15, 6, 0.015).value,
+            0.13598307822713646, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(-45, -90, 45, 15, 1.5).value,
+            0.09471704998020258, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(-45, -90, 75, 30, 15.5).value,
+            0.10008633657035622, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(-45, -90, 90, 45, 65).value,
+            0.056392641038532844, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(45, 90, 15, 6, 0.015).value,
+            0.06669528717975434, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(45, 90, 45, 15, 1.5).value,
+            0.029926704350571116, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(45, 90, 75, 30, 15.5).value,
+            0.0, places=5)
+        self.assertAlmostEqual(
+            models.itu840.cloud_attenuation_lognormal(45, 90, 90, 45, 65).value,
+            0.0, places=5)
 
 
 class ITUR1511_1TestCase(test.TestCase):
