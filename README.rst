@@ -121,8 +121,8 @@ If you use ITU-Rpy in one of your research projects, please cite it as:
 
 .. |GitHub license| image:: https://img.shields.io/badge/license-MIT-lightgrey.svg
    :target: https://raw.githubusercontent.com/Carthage/Carthage/master/LICENSE.md
-.. |Build Status| image:: https://travis-ci.org/inigodelportillo/ITU-Rpy.svg?branch=master
-   :target: https://travis-ci.org/inigodelportillo/ITU-Rpy
+.. |Build Status| image:: https://github.com/inigodelportillo/ITU-Rpy/actions/workflows/build.yml/badge.svg?branch=master
+   :target: https://github.com/inigodelportillo/ITU-Rpy/actions/workflows/build.yml
 .. |PyPI version| image:: https://badge.fury.io/py/itur.svg
    :target: https://badge.fury.io/py/itur
 .. |Coverage Status| image:: https://codecov.io/gh/inigodelportillo/ITU-Rpy/branch/master/graph/badge.svg?token=0FZBWMH271
