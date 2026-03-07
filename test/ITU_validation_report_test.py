@@ -89,6 +89,7 @@ def create_ITU_suite():
     """A test suite for the ITU-P Recommendations. Recommendations tested:
     * ITU-P R-676-11
     * ITU-P R-618-13
+    * ITU-P R-618-14
     * ITU-P R-453-14
     * ITU-P R-837-7
     * ITU-P R-838-3
@@ -108,6 +109,13 @@ def create_ITU_suite():
     suite.add_test(ITUR618_13TestCase("test_scintillation_attenuation"))
     suite.add_test(ITUR618_13TestCase("test_total_attenuation"))
     suite.add_test(ITUR618_13TestCase("test_cross_polarization_discrimination"))
+
+    # ITU-R P.618-14
+    suite.add_test(ITUR618_14TestCase("test_rain_attenuation"))
+    suite.add_test(ITUR618_14TestCase("test_rain_probability"))
+    suite.add_test(ITUR618_14TestCase("test_scintillation_attenuation"))
+    suite.add_test(ITUR618_14TestCase("test_total_attenuation"))
+    suite.add_test(ITUR618_14TestCase("test_cross_polarization_discrimination"))
 
     # ITU-R P.676
     suite.add_test(ITUR676_12TestCase("test_gamma0"))
@@ -569,6 +577,115 @@ class ITUR618_13TestCase(ITU_TestCase):
         # Run test and generate the report
         self.__run__(
             "test_total_attenuation",
+            test_fcn="atmospheric_attenuation_slant_path",
+            df=df,
+            attributes=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs"],
+            result_value="A_total",
+            n_places=4,
+        )
+
+
+class ITUR618_14TestCase(ITU_TestCase):
+
+    itu_name = "ITU-R P.618-14"
+    itu_description = (
+        "Propagation data and prediction methods required for"
+        + " the design of Earth-space telecommunication systems"
+    )
+
+    def test_rain_attenuation(self):
+        # Set the version to the
+        models.itu618.change_version(14)
+
+        # Read the test data
+        df = self.read_csv(
+            path.join(test_data, "618/ITURP618-14_A_rain.csv"),
+            columns=["lat", "lon", "hs", "el", "f", "tau", "p", "R001", "A_rain"],
+        )
+
+        # Run test and generate the report
+        self.__run__(
+            "itur618_14_rain_attenuation",
+            test_fcn="models.itu618.rain_attenuation",
+            df=df,
+            attributes=["lat", "lon", "hs", "el", "f", "tau", "p", "R001"],
+            result_value="A_rain",
+            n_places=5,
+        )
+
+    def test_rain_probability(self):
+        # Set the version to the
+        models.itu618.change_version(14)
+
+        # Read the test data
+        df = self.read_csv(
+            path.join(test_data, "618/ITURP618-14_A_rain.csv"),
+            columns=["lat", "lon", "hs", "el", "Ls", "P0", "P_rain"],
+        )
+
+        # Run test and generate the report
+        self.__run__(
+            "itur618_14_rain_probability",
+            test_fcn="models.itu618.rain_attenuation_probability",
+            df=df,
+            attributes=["lat", "lon", "hs", "el", "Ls", "P0"],
+            result_value="P_rain",
+            n_places=5,
+        )
+
+    def test_scintillation_attenuation(self):
+        # Set the version to the
+        models.itu618.change_version(14)
+
+        # Read the test data
+        df = self.read_csv(
+            path.join(test_data, "618/ITURP618-14_A_sci.csv"),
+            columns=["lat", "lon", "f", "el", "p", "D", "eta", "A_scin"],
+        )
+
+        # Run test and generate the report
+        self.__run__(
+            "itur618_14_scintillation_attenuation",
+            test_fcn="models.itu618.scintillation_attenuation",
+            df=df,
+            attributes=["lat", "lon", "f", "el", "p", "D", "eta"],
+            result_value="A_scin",
+            n_places=5,
+        )
+
+    def test_cross_polarization_discrimination(self):
+        # Set the version to the
+        models.itu618.change_version(14)
+
+        # Read the test data
+        df = self.read_csv(
+            path.join(test_data, "618/ITURP618-14_A_xpd.csv"),
+            columns=["f", "el", "p", "tau", "Ap", "XPD"],
+        )
+
+        # Run test and generate the report
+        self.__run__(
+            "itur618_14_cross_polarization_discrimination",
+            test_fcn="models.itu618.rain_cross_polarization_discrimination",
+            df=df,
+            attributes=["f", "el", "p", "tau", "Ap"],
+            result_value="XPD",
+            n_places=5,
+        )
+
+    def test_total_attenuation(self):
+        # Set the version to the
+        models.itu618.change_version(14)
+
+        # Read the test data
+        df = self.read_csv(
+            path.join(test_data, "618/ITURP618-14_A_total.csv"),
+            columns=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", "A_total"],
+        )
+
+        # Run test and generate the report
+        self.__run__(
+            "itur618_14_total_attenuation",
             test_fcn="atmospheric_attenuation_slant_path",
             df=df,
             attributes=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs"],
