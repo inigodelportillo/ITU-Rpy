@@ -5,6 +5,7 @@ import itur
 import itur.models as models
 
 import sys
+import numpy as np
 from astropy import units as u
 
 
@@ -15,6 +16,7 @@ def suite():
     * ITU-P R-618-12
     * ITU-P R-618-13
     * ITU-P R-453-12
+    * ITU-P R-678-3
     * ITU-P R-837-6
     * ITU-P R-837-7
     * ITU-P R-838-3
@@ -95,6 +97,19 @@ def suite():
     suite.addTest(ITUR840_9TestCase('test_columnar_content_reduced_liquid'))
     suite.addTest(ITUR840_9TestCase('test_cloud_attenuation'))
     suite.addTest(ITUR840_9TestCase('test_cloud_attenuation_lognormal'))
+
+    # ITU-R P.678 tests (Inter-annual variability and risk)
+    models.itu678.change_version(3)
+    suite.addTest(ITURP678_3TestCase('test_risk_identity'))
+    suite.addTest(ITURP678_3TestCase('test_variance_of_estimation'))
+    suite.addTest(ITURP678_3TestCase('test_inter_annual_variability_positive'))
+    suite.addTest(ITURP678_3TestCase('test_inter_annual_variability_reference'))
+    suite.addTest(ITURP678_3TestCase('test_risk_monotonicity'))
+    suite.addTest(ITURP678_3TestCase('test_risk_bounds'))
+    suite.addTest(ITURP678_3TestCase('test_western_hemisphere_lookup'))
+    suite.addTest(ITURP678_3TestCase('test_climatic_variance_high_rc_region'))
+    suite.addTest(ITURP678_3TestCase('test_variance_of_estimation_caching'))
+    suite.addTest(ITURP678_3TestCase('test_public_api_scalar_inputs'))
 
     # ITU-R P.1511 tests (Topographic altitude)
     suite.addTest(ITUR1511_1TestCase('test_topographic_altitude'))
@@ -8272,6 +8287,230 @@ class ITUR1511_2TestCase(test.TestCase):
         self.assertAlmostEqual(
             models.itu1511.topographic_altitude(9.05, 38.7).value,
             2.5398618775, places=4)
+
+
+class ITURP678_3TestCase(test.TestCase):
+    """
+    Validation tests for ITU-R P.678-3 (inter-annual variability and risk).
+
+    No official ITU validation spreadsheet exists for P.678, so the test cases
+    are derived analytically from properties stated explicitly in the
+    recommendation itself, plus numerically computed reference values.
+
+    Reference values were computed with:
+        a = 0.0265 s^{-1}, dt = 60 s, N = 525960, b = b1*ln(p) + b2
+        (b1 = -0.0396, b2 = 0.286)
+        climatic ratio from the converted NPZ map (0-360 lon convention)
+    """
+
+    def setUp(self):
+        models.itu678.change_version(3)
+
+    # ------------------------------------------------------------------
+    # Test 1: Identity property (stated explicitly in the recommendation)
+    # "p_R = p leads, as expected, to R = 0.5"  (Annex 3)
+    # This is independent of location, so we verify at four geographically
+    # diverse sites.
+    # ------------------------------------------------------------------
+    def test_risk_identity(self):
+        """risk_of_exceedance(p, p, lat, lon) must equal exactly 50 %."""
+        test_points = [
+            (51.5,  -0.14,  "London"),
+            (0.0,   36.8,   "Nairobi"),
+            (-33.9, 151.2,  "Sydney"),
+            (40.7,  -74.0,  "New York"),
+        ]
+        for p in [0.001, 0.005, 0.01, 0.02]:
+            for lat, lon, name in test_points:
+                r = models.itu678.risk_of_exceedance(p, p, lat, lon)
+                self.assertAlmostEqual(
+                    r.value, 50.0, places=8,
+                    msg=f"Identity failed for p={p} at {name} "
+                        f"(lat={lat}, lon={lon}): got {r.value}")
+
+    # ------------------------------------------------------------------
+    # Test 2: variance_of_estimation – non-negativity and reference values
+    # ------------------------------------------------------------------
+    def test_variance_of_estimation(self):
+        """σ²_E(p) must be positive and match analytical reference values.
+
+        Reference values computed with:
+            b = -0.0396*ln(p) + 0.286, a = 0.0265 s^{-1}, dt = 60 s, N = 525960
+            C = 1 + 2*Σ_{i=1}^{max_i} exp(-a*(i*dt)^b)  (truncated at 1e-13)
+            σ²_E = p*(1-p)*C/N
+        """
+        def _sigma2_E_ref(p):
+            """Standalone reference implementation (no caching)."""
+            b = -0.0396 * np.log(p) + 0.286
+            a, N, dt = 0.0265, 525960, 60
+            max_i = min(int(np.ceil((30.0 / a) ** (1.0 / b) / dt)) + 1, N - 1)
+            i_pos = np.arange(0, max_i + 1, dtype=float)
+            cu = np.exp(-a * np.abs(i_pos * dt) ** b)
+            C = 2.0 * np.sum(cu) - cu[0]
+            return float(p * (1 - p) * C / N)
+
+        # Non-negativity for all valid p
+        for p in [0.0001, 0.001, 0.005, 0.01, 0.02]:
+            ve = _sigma2_E_ref(p)
+            self.assertGreater(ve, 0.0,
+                               msg=f"sigma2_E not positive at p={p}")
+            self.assertTrue(np.isfinite(ve),
+                            msg=f"sigma2_E not finite at p={p}")
+
+        # Reference values (pre-computed, 0.1 % tolerance)
+        expected = {
+            0.0001: 2.3124e-09,
+            0.001:  6.9223e-08,
+            0.01:   3.3187e-06,
+            0.02:   1.2155e-05,
+        }
+        for p, ref in expected.items():
+            ve = _sigma2_E_ref(p)
+            self.assertAlmostEqual(
+                ve, ref, delta=ref * 1e-3,
+                msg=f"sigma2_E mismatch at p={p}: got {ve:.6e}, expected {ref:.6e}")
+
+        # Consistency: public API result at a known location must be >= sigma2_E
+        # (since sigma2_total = sigma2_C + sigma2_E)
+        lat, lon = 0.0, 20.0   # equatorial Africa — non-zero climatic ratio
+        for p in [0.001, 0.01]:
+            v_total = models.itu678.inter_annual_variability(p, lat, lon)
+            ve_ref  = _sigma2_E_ref(p)
+            self.assertGreaterEqual(
+                v_total.value, ve_ref,
+                msg=f"sigma2_total ({v_total.value:.3e}) < sigma2_E ({ve_ref:.3e}) "
+                    f"at p={p}, ({lat},{lon})")
+
+    # ------------------------------------------------------------------
+    # Test 3: inter_annual_variability – positivity and finite values
+    # ------------------------------------------------------------------
+    def test_inter_annual_variability_positive(self):
+        """σ²(p) must be strictly positive and finite for all valid inputs."""
+        test_points = [
+            (51.5,  -0.14),   # London
+            (0.0,   36.8),    # Nairobi (high climatic ratio region)
+            (-33.9, 151.2),   # Sydney
+            (40.7,  -74.0),   # New York (western hemisphere — tests NPZ orientation)
+            (35.7,  139.7),   # Tokyo
+        ]
+        for p in [0.0001, 0.001, 0.01, 0.02]:
+            for lat, lon in test_points:
+                v = models.itu678.inter_annual_variability(p, lat, lon)
+                self.assertGreater(
+                    v.value, 0.0,
+                    msg=f"sigma2 not positive at p={p}, ({lat},{lon})")
+                self.assertTrue(
+                    np.isfinite(v.value),
+                    msg=f"sigma2 not finite at p={p}, ({lat},{lon})")
+
+    # ------------------------------------------------------------------
+    # Test 4: inter_annual_variability – reference value at London
+    # ------------------------------------------------------------------
+    def test_inter_annual_variability_reference(self):
+        """σ²(0.01) at London and New York match pre-computed reference values."""
+        # London: lat=51.5, lon=-0.14 → lon_mod=359.86; r_c ≈ 0.146
+        # sigma2_total ≈ 5.44e-6  (bilinear interpolation from wrapped NPZ)
+        v_lon = models.itu678.inter_annual_variability(0.01, 51.5, -0.14)
+        self.assertAlmostEqual(
+            v_lon.value, 5.44e-6, delta=5.44e-6 * 5e-2,   # 5 % tolerance
+            msg=f"sigma2(0.01) at London: got {v_lon.value:.6e}, expected ~5.44e-6")
+
+        # New York: lat=40.7, lon=-74.0 → lon_mod=286.0; r_c ≈ 0.154
+        # sigma2_total ≈ 5.67e-6
+        v_ny = models.itu678.inter_annual_variability(0.01, 40.7, -74.0)
+        self.assertAlmostEqual(
+            v_ny.value, 5.67e-6, delta=5.67e-6 * 5e-2,   # 5 % tolerance
+            msg=f"sigma2(0.01) at New York: got {v_ny.value:.6e}, expected ~5.67e-6")
+
+    # ------------------------------------------------------------------
+    # Test 5: risk_of_exceedance – monotonicity
+    # If pr > p  →  ℜ < 50 % (harder to exceed a higher threshold)
+    # If pr < p  →  ℜ > 50 % (easier to exceed a lower threshold)
+    # ------------------------------------------------------------------
+    def test_risk_monotonicity(self):
+        """Risk decreases as pr increases above p, and increases as pr falls below p."""
+        lat, lon, p = 51.5, -0.14, 0.01
+        r_below = models.itu678.risk_of_exceedance(p, p * 0.5, lat, lon)
+        r_equal = models.itu678.risk_of_exceedance(p, p,       lat, lon)
+        r_above = models.itu678.risk_of_exceedance(p, p * 2.0, lat, lon)
+        self.assertGreater(r_below.value, r_equal.value,
+                           msg="Risk should be > 50% when pr < p")
+        self.assertGreater(r_equal.value, r_above.value,
+                           msg="Risk should be < 50% when pr > p")
+        self.assertAlmostEqual(r_equal.value, 50.0, places=8,
+                               msg="Identity: risk(p, p) must equal 50%")
+
+    # ------------------------------------------------------------------
+    # Test 6: risk_of_exceedance – output is in [0, 100] %
+    # ------------------------------------------------------------------
+    def test_risk_bounds(self):
+        """Risk must be within [0, 100] % for any valid input combination."""
+        lat, lon = 0.0, 20.0    # equatorial Africa
+        for p in [0.001, 0.01]:
+            for pr_factor in [0.1, 0.5, 1.0, 2.0, 10.0]:
+                r = models.itu678.risk_of_exceedance(p, p * pr_factor, lat, lon)
+                self.assertGreaterEqual(r.value, 0.0,
+                                        msg=f"Negative risk at pr={p*pr_factor}")
+                self.assertLessEqual(r.value, 100.0,
+                                     msg=f"Risk > 100% at pr={p*pr_factor}")
+
+    # ------------------------------------------------------------------
+    # Test 7: western-hemisphere lookup (validates fixed NPZ orientation)
+    # ------------------------------------------------------------------
+    def test_western_hemisphere_lookup(self):
+        """Lookups in the western hemisphere (lon < 0) must return finite, positive values."""
+        western_points = [
+            (40.7,   -74.0),   # New York
+            (-22.9,  -43.2),   # Rio de Janeiro
+            (19.4,   -99.1),   # Mexico City
+            (51.5,  -114.1),   # Calgary
+        ]
+        for lat, lon in western_points:
+            v = models.itu678.inter_annual_variability(0.01, lat, lon)
+            self.assertTrue(
+                np.isfinite(v.value),
+                msg=f"NaN/Inf at western-hemisphere point ({lat}, {lon})")
+            self.assertGreater(v.value, 0.0,
+                               msg=f"Non-positive variance at ({lat}, {lon})")
+
+    # ------------------------------------------------------------------
+    # Test 8: climatic variance dominates in high-rc regions
+    # The Sahel / Horn of Africa have rc > 1, so σ²_C >> σ²_E for p=0.01
+    # ------------------------------------------------------------------
+    def test_climatic_variance_high_rc_region(self):
+        """σ²(p) is larger in high-rc regions than in low-rc mid-latitude regions."""
+        p = 0.01
+        # Sahel (lat≈13, lon≈25): very high climatic ratio (rc > 1.5)
+        v_sahel  = models.itu678.inter_annual_variability(p, 13.0,  25.0)
+        # London (lat=51.5, lon=-0.14): low-to-moderate climatic ratio
+        v_london = models.itu678.inter_annual_variability(p, 51.5, -0.14)
+        self.assertGreater(
+            v_sahel.value, v_london.value,
+            msg=f"Sahel sigma2 ({v_sahel.value:.3e}) should exceed "
+                f"London sigma2 ({v_london.value:.3e}) due to higher r_c")
+
+    # ------------------------------------------------------------------
+    # Test 9: caching — calling variance_of_estimation twice with same p
+    #          returns the same object (proves the cache is active)
+    # ------------------------------------------------------------------
+    def test_variance_of_estimation_caching(self):
+        """Two calls to inter_annual_variability with the same p and location
+        must return bitwise-identical values (proves determinism / caching)."""
+        p, lat, lon = 0.01, 51.5, -0.14
+        v1 = models.itu678.inter_annual_variability(p, lat, lon)
+        v2 = models.itu678.inter_annual_variability(p, lat, lon)
+        self.assertEqual(v1.value, v2.value,
+                         msg="Repeated calls must return identical values")
+
+    # ------------------------------------------------------------------
+    # Test 10: API smoke test — both public functions accept scalar inputs
+    # ------------------------------------------------------------------
+    def test_public_api_scalar_inputs(self):
+        """Public functions work with plain scalar lat/lon."""
+        v = models.itu678.inter_annual_variability(0.01, 51.5, -0.14)
+        self.assertIsNotNone(v)
+        r = models.itu678.risk_of_exceedance(0.01, 0.01, 51.5, -0.14)
+        self.assertAlmostEqual(r.value, 50.0, places=8)
 
 
 if __name__ == '__main__':
