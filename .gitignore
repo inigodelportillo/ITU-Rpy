@@ -144,5 +144,6 @@ write_test_cases.py
 *.yaml
 .vscode/*
 
-# Local Claude Code project guide (not for version control)
+# Local notes (not for version control)
 CLAUDE.md
+itur/VALIDATION_SUMMARY.md

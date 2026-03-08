@@ -30,6 +30,7 @@ import itur.utils
 
 from .__version__ import __version__
 from .models.itu618 import rain_attenuation, scintillation_attenuation
+from .models.itu678 import inter_annual_variability, risk_of_exceedance
 from .models.itu676 import (
     gaseous_attenuation_inclined_path,
     gaseous_attenuation_slant_path,
