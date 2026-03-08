@@ -44,7 +44,8 @@ class _ITU618():
     Earth-space telecommunication systems.
 
     Available versions include:
-       * P.618-13 (12/17) (Current version)
+       * P.618-14 (08/23) (Current version)
+       * P.618-13 (12/17) (Superseded)
        * P.618-12 (07/15) (Superseded)
 
     Versions that need to be implemented
@@ -79,8 +80,10 @@ class _ITU618():
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.618 recommendation.
 
-    def __init__(self, version=13):
-        if version == 13:
+    def __init__(self, version=14):
+        if version == 14:
+            self.instance = _ITU618_14()
+        elif version == 13:
             self.instance = _ITU618_13()
         elif version == 12:
             self.instance = _ITU618_12()
@@ -155,6 +158,43 @@ class _ITU618():
         return np.array(fcn(lat1, lon1, a1, el1,
                             lat2, lon2, a2, el2,
                             f, tau, hs1, hs2).tolist())
+
+
+class _ITU618_14():
+
+    def __init__(self):
+        self.__version__ = 14
+        self.year = 2023
+        self.month = 8
+        self.link = 'https://www.itu.int/rec/R-REC-P.618-14-202308-I/en'
+
+    @classmethod
+    def rain_attenuation(cls, *args, **kwargs):
+        return _ITU618_13.rain_attenuation(*args, **kwargs)
+
+    @classmethod
+    def rain_attenuation_probability(cls, *args, **kwargs):
+        return _ITU618_13.rain_attenuation_probability(*args, **kwargs)
+
+    @classmethod
+    def fit_rain_attenuation_to_lognormal(cls, *args, **kwargs):
+        return _ITU618_13.fit_rain_attenuation_to_lognormal(*args, **kwargs)
+
+    @classmethod
+    def site_diversity_rain_outage_probability(cls, *args, **kwargs):
+        return _ITU618_13.site_diversity_rain_outage_probability(*args, **kwargs)
+
+    @classmethod
+    def rain_cross_polarization_discrimination(cls, *args, **kwargs):
+        return _ITU618_13.rain_cross_polarization_discrimination(*args, **kwargs)
+
+    @classmethod
+    def scintillation_attenuation(cls, *args, **kwargs):
+        return _ITU618_13.scintillation_attenuation(*args, **kwargs)
+
+    @classmethod
+    def scintillation_attenuation_sigma(cls, *args, **kwargs):
+        return _ITU618_13.scintillation_attenuation_sigma(*args, **kwargs)
 
 
 class _ITU618_13():
@@ -625,7 +665,8 @@ def change_version(new_version):
     new_version : int
         Number of the version to use.
         Valid values are:
-          *  13: Activates recommendation ITU-R P.618-13 (12/17) (Current version)
+          *  14: Activates recommendation ITU-R P.618-14 (08/23) (Current version)
+          *  13: Activates recommendation ITU-R P.618-13 (12/17) (Superseded)
           *  12: Activates recommendation ITU-R P.618-12 (07/15) (Superseded)
     """
     global __model
@@ -877,7 +918,7 @@ def scintillation_attenuation(lat, lon, f, el, p, D, eta=0.5, T=None,
                               H=None, P=None, hL=1000):
     """
     Calculation of monthly and long-term statistics of amplitude scintillations
-    at elevation angles greater than 5° and frequencies up to 20 GHz.
+    at elevation angles greater than 5° and frequencies up to 55 GHz.
 
 
     Parameters
@@ -951,7 +992,7 @@ def scintillation_attenuation_sigma(lat, lon, f, el, p, D, eta=0.5, T=None,
     """
     Calculation of the standard deviation of the amplitude of the
     scintillations attenuation at elevation angles greater than 5° and
-    frequencies up to 20 GHz.
+    frequencies up to 55 GHz.
 
 
     Parameters

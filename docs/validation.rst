@@ -11,6 +11,7 @@ The links below show the validation results for each of the recommendations:
 
     validation/itur453_14
     validation/itur618_13
+    validation/itur618_14
     validation/itur676_12
     validation/itur836_6
     validation/itur837_7
