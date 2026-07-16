@@ -200,7 +200,7 @@ def atmospheric_attenuation_slant_path(
     # and gaseous attenuation is already included in the rain attenuation
     # prediction for time percentages below 1%. Eq. 64 and Eq. 65 in
     # Recommendation ITU 618-12
-    p_c_g = np.maximum(1, p)
+    p_c_g = np.maximum(5, p)
 
     # Estimate the ground station altitude
     if hs is None:
