@@ -165,14 +165,19 @@ class __ITU676__():
         fcn = np.vectorize(self.instance.slant_inclined_path_equivalent_height,
                            excluded=[0], otypes=[np.ndarray])
         return np.array(fcn(f, P, rho, T).tolist())
+    
+    def water_vapour_mass_absorption_coefficient(self, f, P, rho, T):
+        fcn = np.vectorize(self.instance.water_vapour_mass_absorption_coefficient,
+                           excluded=[0], otypes=[np.ndarray])
+        return np.array(fcn(f, P, rho, T))
 
     def zenit_water_vapour_attenuation(
-            self, lat, lon, p, f, V_t=None, h=None):
+            self, lat, lon, p, f, P, rho, T, V_t=None, h=None):
         # Abstract method to compute the water vapour attenuation over the
         # slant path
         fcn = np.vectorize(self.instance.zenit_water_vapour_attenuation,
-                           excluded=[0, 1, 4, 5], otypes=[np.ndarray])
-        return np.array(fcn(lat, lon, p, f, V_t, h).tolist())
+                           excluded=[0, 1, 7, 8], otypes=[np.ndarray])
+        return np.array(fcn(lat, lon, p, f, P, rho, T, V_t, h).tolist())
 
     def gamma_exact(self, f, p, rho, t):
         # Abstract method to compute the specific attenuation using the
@@ -532,6 +537,16 @@ class _ITU676_13_():
     _h0_c0 = tmp_h0[:, 3]     # c0 coefficients [km/hPa]
     _h0_d0 = tmp_h0[:, 4]     # d0 coefficients [km/(g/m^3)]
 
+    # Part 2 coefficient data for water vapor mass absorption coefficient, K_v (Annex 2, Eq. 39/41)
+    tmp_kv = load_data(os.path.join(dataset_dir,
+                                    '676/v13_kv_coefficients.txt'),
+                       skip_header=1)
+    _kv_freq = tmp_kv[:, 0]   # frequencies [GHz]  
+    _kv_av = tmp_kv[:, 1]     # av coefficients 
+    _kv_bv = tmp_kv[:, 2]
+    _kv_cv = tmp_kv[:, 3]
+    _kv_dv = tmp_kv[:, 4]
+
     # Table 4 coefficients for hw (Annex 2, Eq. 37)
     _hw_A = 5.6585e-5          # [km/GHz]
     _hw_B = 1.8348             # [km]
@@ -646,7 +661,7 @@ class _ITU676_13_():
 
             if V_t is not None and h is not None:
                 Aw = self.zenit_water_vapour_attenuation(None, None, None,
-                                                         f, V_t, h)
+                                                         f, P, rho, T, V_t, h)
             else:
                 Aw = gammaw * hw
 
@@ -737,33 +752,41 @@ class _ITU676_13_():
 
     @classmethod
     def zenit_water_vapour_attenuation(
-            self, lat, lon, p, f, V_t=None, h=None):
-        f_ref = 20.6        # [GHz]
-        p_ref = 845         # [hPa]
+            self, lat, lon, p, f, P, rho, T, V_s=None, h=None):
 
         if h is None:
             h = topographic_altitude(lat, lon).value
 
-        if V_t is None:
-            V_t = total_water_vapour_content(lat, lon, p, h).value
+        if V_s is None:
+            V_s = total_water_vapour_content(lat, lon, p, h).value
 
-        rho_ref = V_t / 2.38
-        t_ref = 14 * np.log(0.22 * V_t / 2.38) + 3    # [Celsius]
+        kv = self.water_vapour_mass_absorption_coefficient(f, P, rho, T)
 
-        a = (0.2048 * np.exp(- ((f - 22.43) / 3.097)**2) +
-             0.2326 * np.exp(- ((f - 183.5) / 4.096)**2) +
-             0.2073 * np.exp(- ((f - 325) / 3.651)**2) - 0.1113)
+        return kv * V_s
+    
+    @classmethod
+    def water_vapour_mass_absorption_coefficient(
+            self, f, P, rho, T):
+        """
+        Compute water vapour mass absorption coefficient (kv)
+        p.676-13 Annex 2 eq. 39/41
 
-        b = 8.741e4 * np.exp(-0.587 * f) + 312.2 * f**(-2.38) + 0.723
-        h = np.clip(h, 0, 4)
+        kv: Eq. 39/41 — linearly interpolated from Part 2 data file
+            Kv = av(f) + bv(f)*T + cv(f)*P + dv(f)*rho
+        """
+        # Eq. 31 uses total surface pressure Ps = P(dry) + e (water vapour)
+        e = rho * T / 216.7
+        Ps = P + e
 
-        gammaw_approx_vect = np.vectorize(self.gammaw_exact)
+        av = np.interp(f, self._kv_freq, self._kv_av)
+        bv = np.interp(f, self._kv_freq, self._kv_bv)
+        cv = np.interp(f, self._kv_freq, self._kv_cv)
+        dv = np.interp(f, self._kv_freq, self._kv_dv)
 
-        Aw_term1 = (0.0176 * V_t *
-                    gammaw_approx_vect(f, p_ref, rho_ref, t_ref + 273.15) /
-                    gammaw_approx_vect(f_ref, p_ref, rho_ref, t_ref + 273.15))
+        kv = av + bv*rho + cv*T + dv*Ps
 
-        return np.where(f < 20, Aw_term1, Aw_term1 * (a * h ** b + 1))
+        return kv
+
 
 
 class _ITU676_11_():

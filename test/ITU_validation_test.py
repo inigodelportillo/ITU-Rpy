@@ -5883,15 +5883,15 @@ class ITUR618_13TestCase(test.TestCase):
 
     def setUp(self):
         models.itu453.change_version(13)
-        models.itu618.change_version(13)
-        models.itu676.change_version(11)
+        models.itu618.change_version(14)
+        models.itu676.change_version(12) # 12,13
         models.itu836.change_version(6)
         models.itu837.change_version(7)
         models.itu838.change_version(3)
         models.itu839.change_version(4)
-        models.itu840.change_version(7)
+        models.itu840.change_version(8) #7, 8
         models.itu1510.change_version(1)
-        models.itu1511.change_version(1)
+        models.itu1511.change_version(2) # 1,2
 
     def test_rain_attenuation(self):
         self.assertAlmostEqual(
@@ -6874,14 +6874,14 @@ class ITUR618_13TestCase(test.TestCase):
             21.61918999, places=5)
 
     def total_attenuation_fcn(self, lat, lon, f, el, p, D, eta, tau,
-                              val_g, val_c, val_r, val_s, val_t):
+                              val_g, val_c, val_r, val_s, val_t, hs = None):
 
         # The validation function uses the exact method to compute the rainfall
         # rate exceeded for 0.01% of the time
         R001 = models.itu837.rainfall_rate(lat, lon, 0.01000000001)
         A_g, A_c, A_r, A_s, A = itur.atmospheric_attenuation_slant_path(
             lat, lon, f, el, p, D, eta=eta, tau=tau, R001=R001,
-            return_contributions=True)
+            return_contributions=True, hs = hs)
 
         self.assertAlmostEqual(A_g.value, val_g, places=5)
         self.assertAlmostEqual(A_c.value, val_c, places=5)
@@ -6891,8 +6891,8 @@ class ITUR618_13TestCase(test.TestCase):
 
     def test_total_attenuation(self):
         self.total_attenuation_fcn(
-            51.5, -0.14, 14.25, 31.07694309, 1, 1, 0.65, 0,
-            0.223693782, 0.45517046, 0.48914539, 0.26193234, 1.203663661)
+            51.5, -0.14, 13.75, 31.076991235657, 1, 1, 0.65, 0,
+            0.226874037671152, 0.45516982445228, 0.495316046823163, 0.261931888971004, 1.21279072, hs = 0.031382983999999)
         self.total_attenuation_fcn(
             41.9, 12.49, 14.25, 40.23202374, 1, 1, 0.65, 0,
             0.184499507, 0.26338517, 0.62159459, 0.22405226, 1.097400703)
