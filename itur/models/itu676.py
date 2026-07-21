@@ -17,6 +17,7 @@ from itur.models.itu836 import total_water_vapour_content
 from itur.models.itu1511 import topographic_altitude
 from itur.utils import (prepare_quantity, prepare_output_array, get_input_type,
                         prepare_input_array, load_data, dataset_dir)
+import itur.models.itu2145 as itu2145
 
 
 def __gamma0_exact__(self, f, p, rho, T):
@@ -156,10 +157,12 @@ class __ITU676__():
         fcn = np.vectorize(self.instance.gaseous_attenuation_inclined_path)
         return fcn(f, el, rho, P, T, h1, h2, mode)
 
-    def gaseous_attenuation_slant_path(self, f, el, rho, P, T, V_t, h, mode):
+    def gaseous_attenuation_slant_path(self, f, el, rho, P, T, V_t, 
+                                       rho_mean, P_mean, T_mean, h, mode):
         # Abstract method to compute the gaseous attenuation over a slant path
         fcn = np.vectorize(self.instance.gaseous_attenuation_slant_path)
-        return fcn(f, el, rho, P, T, V_t, h, mode)
+        return fcn(f, el, rho, P, T, V_t, 
+                   rho_mean, P_mean, T_mean, h, mode)
 
     def slant_inclined_path_equivalent_height(self, f, P, rho, T):
         fcn = np.vectorize(self.instance.slant_inclined_path_equivalent_height,
@@ -652,16 +655,24 @@ class _ITU676_13_():
 
     @classmethod
     def gaseous_attenuation_slant_path(self, f, el, rho, P, T, V_t=None,
+                                       rho_mean=None, P_mean=None, T_mean=None,
                                        h=None, mode='approx'):
+        if rho_mean is None:
+            rho_mean = rho
+        if P_mean is None:
+            P_mean = P
+        if T_mean is None:
+            T_mean = T
+
         if mode == 'approx':
             gamma0, gammaw = self.gaseous_attenuation_approximation(
-                f, el, rho, P, T)
+                f, el, rho_mean, P_mean, T_mean)
 
             h0, hw = self.slant_inclined_path_equivalent_height(f, P, rho, T)
 
             if V_t is not None and h is not None:
                 Aw = self.zenit_water_vapour_attenuation(None, None, None,
-                                                         f, P, rho, T, V_t, h)
+                                                         f, P_mean, rho_mean, T_mean, V_t, h)
             else:
                 Aw = gammaw * hw
 
@@ -758,7 +769,7 @@ class _ITU676_13_():
             h = topographic_altitude(lat, lon).value
 
         if V_s is None:
-            V_s = total_water_vapour_content(lat, lon, p, h).value
+            V_s = itu2145.total_water_vapour_content(lat, lon, p, h).value
 
         kv = self.water_vapour_mass_absorption_coefficient(f, P, rho, T)
 
@@ -1601,7 +1612,9 @@ def gaseous_attenuation_terrestrial_path(r, f, el, rho, P, T, mode):
     return prepare_output_array(val, type_output) * u.dB
 
 
-def gaseous_attenuation_slant_path(f, el, rho, P, T, V_t=None, h=None,
+def gaseous_attenuation_slant_path(f, el, rho, P, T, V_t=None, 
+                                   rho_mean=None, P_mean=None,
+                                   T_mean=None, h=None,
                                    mode='approx'):
     """
     Estimate the attenuation of atmospheric gases on slant paths. This function
@@ -1656,13 +1669,17 @@ def gaseous_attenuation_slant_path(f, el, rho, P, T, V_t=None, h=None,
     f = prepare_quantity(f, u.GHz, 'Frequency')
     el = prepare_quantity(prepare_input_array(el), u.deg, 'Elevation angle')
     rho = prepare_quantity(rho, u.g / u.m**3, 'Water vapor density')
-    P = prepare_quantity(P, u.hPa, 'Atospheric pressure')
+    P = prepare_quantity(P, u.hPa, 'Atmospheric pressure (dry air)')
     T = prepare_quantity(T, u.K, 'Temperature')
     V_t = prepare_quantity(V_t, u.kg / u.m**2,
                            'Integrated water vapour content')
+    rho_mean = prepare_quantity(rho_mean, u.g / u.m**3, 'Mean water vapour density')
+    P_mean = prepare_quantity(P_mean, u.hPa, 'Mean Atmospheric Pressure (dry air)')
+    T_mean = prepare_quantity(T_mean, u.Kelvin, 'Mean Temperature')
     h = prepare_quantity(h, u.km, 'Altitude')
     val = __model.gaseous_attenuation_slant_path(
-        f, el, rho, P, T, V_t, h, mode)
+        f, el, rho, P, T, V_t, rho_mean, P_mean, T_mean,
+        h, mode)
     
     # The values of attenuation cannot be negative. The ITU models end up
     # giving out negative values for certain inputs

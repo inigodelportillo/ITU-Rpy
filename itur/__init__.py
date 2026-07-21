@@ -213,19 +213,34 @@ def atmospheric_attenuation_slant_path(
 
     # Surface mean temperature
     if T is None:
-        T = surface_mean_temperature(lat, lon)
+        T_2145_p = surface_temperature(lat, lon, p_c_g, hs)
+        T_2145_mean = surface_temperature(lat, lon, 'mean', hs)
+    else:
+        T_2145_p = T
+        T_2145_mean = T
+
+    # Estimate the surface water vapour density
+    if rho is None:
+        rho_p = surface_water_vapour_density(lat, lon, p_c_g, hs)
+        rho_mean = surface_water_vapour_density(lat, lon, 'mean', hs)
+    else:
+        rho_p = rho
+        rho_mean = rho
 
     # Estimate the surface Pressure
     if P is None:
         P = standard_pressure(hs)
+        P_2145_p = barometric_surface_pressure(lat, lon, p_c_g, hs)
+        P_2145_p_dry = P_2145_p - rho_p*T_2145_p / (216.7*(u.Kelvin*u.g/u.hJ))
+        P_2145_mean = barometric_surface_pressure(lat,lon,'mean', hs)
+        P_2145_mean_dry = P_2145_mean - rho_mean*T_2145_mean / (216.7*(u.Kelvin*u.g/u.hJ))
+    else:
+        P_2145_p_dry = P - rho_p*T_2145_p / (216.7 * (u.Kelvin*u.g/u.hJ))
+        P_2145_mean_dry = P - rho_mean*T_2145_mean / (216.7 * (u.Kelvin*u.g/u.hJ))
 
     # Estimate the surface Pressure
     if V_t is None:
         V_t = total_water_vapour_content(lat, lon, p_c_g, hs)
-
-    # Estimate the surface water vapour density
-    if rho is None:
-        rho = surface_water_vapour_density(lat, lon, p_c_g, hs)
 
     # Compute the attenuation components
     if include_rain:
@@ -234,7 +249,9 @@ def atmospheric_attenuation_slant_path(
         Ar = 0 * u.dB
 
     if include_gas:
-        Ag = gaseous_attenuation_slant_path(f, el, rho, P, T, V_t, hs, mode)
+        Ag = gaseous_attenuation_slant_path(f, el, rho_p, P_2145_p_dry, T_2145_p, V_t,
+                                            rho_mean, P_2145_mean_dry, T_2145_mean,
+                                            hs, mode)
     else:
         Ag = 0 * u.dB
 
