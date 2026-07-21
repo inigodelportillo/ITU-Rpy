@@ -37,10 +37,15 @@ from .models.itu676 import (
     gaseous_attenuation_terrestrial_path,
 )
 from .models.itu835 import standard_pressure
-from .models.itu836 import surface_water_vapour_density, total_water_vapour_content
 from .models.itu840 import cloud_attenuation
 from .models.itu1510 import surface_mean_temperature
 from .models.itu1511 import topographic_altitude
+from .models.itu2145 import (
+    barometric_surface_pressure,
+    surface_temperature,
+    surface_water_vapour_density,
+    total_water_vapour_content
+)
 
 # Ignore divide by zero errors
 np.seterr(divide="ignore")
