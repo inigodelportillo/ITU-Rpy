@@ -174,6 +174,12 @@ def create_ITU_suite():
     suite.add_test(ITUR2145_0TestCase("test_surface_water_vapour_density_mean"))
     suite.add_test(ITUR2145_0TestCase("test_total_water_vapour_content_mean"))
 
+    # End to End tests
+    suite.add_test(End2End_TestCase("test_total_gaseous_attenuation"))
+    suite.add_test(End2End_TestCase("test_total_rain_attenuation"))
+    suite.add_test(End2End_TestCase("test_total_scintillation_attenuation"))
+    suite.add_test(End2End_TestCase("test_total_cloud_attenuation"))
+    suite.add_test(End2End_TestCase("test_total_attenuation"))
 
 
     return suite
@@ -1488,6 +1494,116 @@ class ITUR2145_0TestCase(ITU_TestCase):
             attributes=["lat","lon","alt"],
             result_value="V",
             n_places=5,
+        )
+
+
+class End2End_TestCase(ITU_TestCase):
+
+    itu_name = "End_to_end_attenuation_components"
+    itu_description = "Tests for end to end atmospheric attenuation with components"
+
+    def test_total_gaseous_attenuation(self):
+
+        path_file = "e2e/e2e_A_gaseous.csv"
+
+        # Read the test data
+        df = self.read_csv(
+            path.join(test_data, "e2e/e2e_A_gaseous.csv"),
+            columns=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", 
+                     "include_rain", "include_gas", "include_scintillation", "include_clouds",
+                     "A_total"],
+        )
+
+        # Run test and generate the report
+        self.__run__(
+            "end2end_gaseous_attenuation",
+            test_fcn="atmospheric_attenuation_slant_path",
+            df=df,
+            attributes=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs",
+                        "include_rain", "include_gas", "include_scintillation", "include_clouds"],
+            result_value="A_total",
+            n_places=4,
+        )
+
+    def test_total_rain_attenuation(self):
+
+        # Read the test data
+        df = self.read_csv(
+            path.join(test_data, "e2e/e2e_A_rain.csv"),
+            columns=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", 
+                     "include_rain", "include_gas", "include_scintillation", "include_clouds",
+                     "A_total"],
+        )
+
+        # Run test and generate the report
+        self.__run__(
+            "end2end_rain_attenuation",
+            test_fcn="atmospheric_attenuation_slant_path",
+            df=df,
+            attributes=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs",
+                        "include_rain", "include_gas", "include_scintillation", "include_clouds"],
+            result_value="A_total",
+            n_places=4,
+        )
+
+    def test_total_scintillation_attenuation(self):
+
+        # Read the test data
+        df = self.read_csv(
+            path.join(test_data, "e2e/e2e_A_scintillation.csv"),
+            columns=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", 
+                     "include_rain", "include_gas", "include_scintillation", "include_clouds",
+                     "A_total"],
+        )
+
+        # Run test and generate the report
+        self.__run__(
+            "end2end_scintillation_attenuation",
+            test_fcn="atmospheric_attenuation_slant_path",
+            df=df,
+            attributes=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs",
+                        "include_rain", "include_gas", "include_scintillation", "include_clouds"],
+            result_value="A_total",
+            n_places=4,
+        )
+
+    def test_total_cloud_attenuation(self):
+
+        # Read the test data
+        df = self.read_csv(
+            path.join(test_data, "e2e/e2e_A_cloud.csv"),
+            columns=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", 
+                     "include_rain", "include_gas", "include_scintillation", "include_clouds",
+                     "A_total"],
+        )
+
+        # Run test and generate the report
+        self.__run__(
+            "end2end_cloud_attenuation",
+            test_fcn="atmospheric_attenuation_slant_path",
+            df=df,
+            attributes=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs",
+                        "include_rain", "include_gas", "include_scintillation", "include_clouds"],
+            result_value="A_total",
+            n_places=4,
+        )
+
+    def test_total_attenuation(self):
+
+        # Read the test data
+        df = self.read_csv(
+            path.join(test_data, "e2e/e2e_A_total.csv"),
+            columns=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", "A_total"],
+        )
+
+        # Run test and generate the report
+        self.__run__(
+            "end2end_total_attenuation",
+            test_fcn="atmospheric_attenuation_slant_path",
+            df=df,
+            attributes=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs"],
+            result_value="A_total",
+            n_places=4,
         )
 
 
