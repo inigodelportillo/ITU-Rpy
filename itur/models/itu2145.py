@@ -408,7 +408,7 @@ def get_version():
     """
     return __model.__version__
 
-def barometric_surface_pressure(lat, lon, p, alt=None):
+def barometric_surface_pressure(lat, lon, p=None, alt=None):
     """
     Compute the barometric surface pressure along a path.
 
@@ -450,7 +450,7 @@ def barometric_surface_pressure(lat, lon, p, alt=None):
     return prepare_output_array(val, type_output) * u.hPa
 
 
-def surface_temperature(lat, lon, p, alt=None):
+def surface_temperature(lat, lon, p=None, alt=None):
     """
     Computes the surface temperature along a path.
 
@@ -493,7 +493,7 @@ def surface_temperature(lat, lon, p, alt=None):
     
 
 
-def surface_water_vapour_density(lat, lon, p, alt=None):
+def surface_water_vapour_density(lat, lon, p=None, alt=None):
     """
     Compute the surface water vapour density along a path.
 
@@ -535,7 +535,7 @@ def surface_water_vapour_density(lat, lon, p, alt=None):
     return prepare_output_array(val, type_output) * u.g / u.m**3
 
 
-def total_water_vapour_content(lat, lon, p, alt=None):
+def total_water_vapour_content(lat, lon, p=None, alt=None):
     """
     Compute the total water vapour content along a path.
 

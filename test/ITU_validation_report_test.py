@@ -164,6 +164,18 @@ def create_ITU_suite():
     suite.add_test(ITUR1623_1TestCase("test_fade_duration_probability"))
     suite.add_test(ITUR1623_1TestCase("test_fade_duration_total_exceedance_time"))
 
+    # IRU-R P.2145
+    suite.add_test(ITUR2145_0TestCase("test_barometric_surface_pressure"))
+    suite.add_test(ITUR2145_0TestCase("test_surface_temperature"))
+    suite.add_test(ITUR2145_0TestCase("test_surface_water_vapour_density"))
+    suite.add_test(ITUR2145_0TestCase("test_total_water_vapour_content"))
+    suite.add_test(ITUR2145_0TestCase("test_barometric_surface_pressure_mean"))
+    suite.add_test(ITUR2145_0TestCase("test_surface_temperature_mean"))
+    suite.add_test(ITUR2145_0TestCase("test_surface_water_vapour_density_mean"))
+    suite.add_test(ITUR2145_0TestCase("test_total_water_vapour_content_mean"))
+
+
+
     return suite
 
 
@@ -1325,6 +1337,156 @@ class ITUR1623_1TestCase(ITU_TestCase):
             df=df,
             attributes=["D", "A", "el", "f", "T_tot"],
             result_value="N",
+            n_places=5,
+        )
+
+
+class ITUR2145_0TestCase(ITU_TestCase):
+
+    itu_name = "ITU-R P.2145-0"
+    itu_description = "Digital maps related to the calculation of gaseous attenuation and related effects"
+
+    def test_barometric_surface_pressure(self):
+        models.itu2145.change_version(0)
+
+        path_file = "2145/ITURP2145-0_barometric_surface_pressure.csv"
+
+        df = self.read_csv(
+            path.join(test_data, path_file), columns=["lat","lon","alt","p","P"]
+        )
+
+        self.__run__(
+            "itur2145_0_barometric_surface_pressure",
+            test_fcn="models.itu2145.barometric_surface_pressure",
+            df=df,
+            attributes=["lat","lon","alt","p"],
+            result_value="P",
+            n_places=5,
+        )
+
+    def test_surface_temperature(self):
+        models.itu2145.change_version(0)
+
+        path_file = "2145/ITURP2145-0_surface_temperature.csv"
+
+        df = self.read_csv(
+            path.join(test_data, path_file), columns=["lat","lon","alt","p","T"]
+        )
+
+        self.__run__(
+            "itur2145_0_surface_temperature",
+            test_fcn="models.itu2145.surface_temperature",
+            df=df,
+            attributes=["lat","lon","alt","p"],
+            result_value="T",
+            n_places=5,
+        )
+
+    def test_surface_water_vapour_density(self):
+        models.itu2145.change_version(0)
+
+        path_file = "2145/ITURP2145-0_surface_water_vapour_density_annual.csv"
+
+        df = self.read_csv(
+            path.join(test_data, path_file), columns=["lat","lon","alt","p","rho"]
+        )
+
+        self.__run__(
+            "itur2145_0_surface_water_vapour_density",
+            test_fcn="models.itu2145.surface_water_vapour_density",
+            df=df,
+            attributes=["lat","lon","alt","p"],
+            result_value="rho",
+            n_places=5,
+        )
+
+    def test_total_water_vapour_content(self):
+        models.itu2145.change_version(0)
+
+        path_file = "2145/ITURP2145-0_total_water_vapour_content_annual.csv"
+
+        df = self.read_csv(
+            path.join(test_data, path_file), columns=["lat","lon","alt","p","V"]
+        )
+
+        self.__run__(
+            "itur2145_0_total_water_vapour_content",
+            test_fcn="models.itu2145.total_water_vapour_content",
+            df=df,
+            attributes=["lat","lon","alt","p"],
+            result_value="V",
+            n_places=5,
+        )
+
+    def test_barometric_surface_pressure_mean(self):
+        models.itu2145.change_version(0)
+
+        path_file = "2145/ITURP2145-0_barometric_surface_pressure_mean.csv"
+
+        df = self.read_csv(
+            path.join(test_data, path_file), columns=["lat","lon","alt","P"]
+        )
+
+        self.__run__(
+            "itur2145_0_barometric_surface_pressure_mean",
+            test_fcn="models.itu2145.barometric_surface_pressure",
+            df=df,
+            attributes=["lat","lon","alt"],
+            result_value="P",
+            n_places=5,
+        )
+
+    def test_surface_temperature_mean(self):
+        models.itu2145.change_version(0)
+
+        path_file = "2145/ITURP2145-0_surface_temperature_mean.csv"
+
+        df = self.read_csv(
+            path.join(test_data, path_file), columns=["lat","lon","alt","T"]
+        )
+
+        self.__run__(
+            "itur2145_0_surface_temperature_mean",
+            test_fcn="models.itu2145.surface_temperature",
+            df=df,
+            attributes=["lat","lon","alt"],
+            result_value="T",
+            n_places=5,
+        )
+
+    def test_surface_water_vapour_density_mean(self):
+        models.itu2145.change_version(0)
+
+        path_file = "2145/ITURP2145-0_surface_water_vapour_density_annual_mean.csv"
+
+        df = self.read_csv(
+            path.join(test_data, path_file), columns=["lat","lon","alt","rho"]
+        )
+
+        self.__run__(
+            "itur2145_0_surface_water_vapour_density_mean",
+            test_fcn="models.itu2145.surface_water_vapour_density",
+            df=df,
+            attributes=["lat","lon","alt"],
+            result_value="rho",
+            n_places=5,
+        )
+
+    def test_total_water_vapour_content_mean(self):
+        models.itu2145.change_version(0)
+
+        path_file = "2145/ITURP2145-0_total_water_vapour_content_annual_mean.csv"
+
+        df = self.read_csv(
+            path.join(test_data, path_file), columns=["lat","lon","alt","V"]
+        )
+
+        self.__run__(
+            "itur2145_0_total_water_vapour_content_mean",
+            test_fcn="models.itu2145.total_water_vapour_content",
+            df=df,
+            attributes=["lat","lon","alt"],
+            result_value="V",
             n_places=5,
         )
 
