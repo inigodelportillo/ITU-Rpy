@@ -1641,10 +1641,25 @@ def gaseous_attenuation_slant_path(f, el, rho, P, T, V_t=None,
     V_t: number or Quantity (kg/m2)
         Integrated water vapour content from: a) local radiosonde or
         radiometric data or b) at the required percentage of time (kg/m2)
-        obtained from the digital maps in Recommendation ITU-R P.836 (kg/m2).
+        obtained from the digital maps in Recommendation ITU-R P.2145 (kg/m2).
         If None, use general method to compute the wet-component of the
         gaseous attenuation. If provided, 'h' must be also provided. Default
         is None.
+    rho_mean : number or Quantity
+        Mean statistical water vapor density (g/m3) for statistical gaseous attenuation
+        (see ITU-R P.676-13 Annex 2 Table 3). The value is obtained from the digital
+        maps in ITU-R P.2145 (g/m3). If None, uses the normal rho parameter in the 
+        instantaneous method. Default is None
+    P_mean : number or Quantity
+        Mean statistical Total Barometric Pressure (hPa) for statistical gaseous attenuation
+        (see ITU-R P.676-13 Annex 2 Table 3). The value is obtained from the digital
+        maps in ITU-R P.2145. If None, uses the normal P parameter in the 
+        instantaneous method.
+    T_mean : number or Quantity
+        Mean statistical surface temperature (K) for statistical gaseous attenuation
+        (see ITU-R P.676-13 Annex 2 Table 3). The value is obtained from the digital
+        maps in ITU-R P.2145. If None, uses the normal T parameter in the 
+        instantaneous method.
     h : number, sequence, or numpy.ndarray
         Altitude of the receivers. If None, use the topographical altitude as
         described in recommendation ITU-R P.1511. If provided, 'V_t' needs to

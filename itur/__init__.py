@@ -73,6 +73,7 @@ def atmospheric_attenuation_slant_path(
     tau=45,
     V_t=None,
     mode="approx",
+    rain_rate_mode="exact",
     return_contributions=False,
     include_rain=True,
     include_gas=True,
@@ -153,6 +154,11 @@ def atmospheric_attenuation_slant_path(
         'approx', 'exact'. If 'approx' Uses the method in Annex 2 of
         Recommendation ITU-R P.676, else uses the method described in
         Section 1. Default, 'approx'
+    rain_rate_mode : string, optional
+        Mode for calculating the rainfall rate R001 if not provided. Valid
+        values are 'approx' or 'exact'. 'approx' uses the provided R001 data
+        tables from ITU-R P.837 (see Annex 1, Note 1). 'exact' uses the iterative
+        method described in ITU-R P.837 Annex 1.
     return_contributions: bool, optional
         Determines whether individual contributions from gases, rain, clouds
         and scintillation are returned in addition to the total attenuation
@@ -244,7 +250,7 @@ def atmospheric_attenuation_slant_path(
 
     # Compute the attenuation components
     if include_rain:
-        Ar = rain_attenuation(lat, lon, f, el, hs, p, R001, tau, Ls)
+        Ar = rain_attenuation(lat, lon, f, el, hs, p, R001, tau, Ls, rain_rate_mode=rain_rate_mode)
     else:
         Ar = 0 * u.dB
 

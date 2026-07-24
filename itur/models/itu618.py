@@ -119,10 +119,10 @@ class _ITU618():
         return self.instance.__version__
 
     def rain_attenuation(self, lat, lon, f, el, hs=None, p=0.01, R001=None,
-                         tau=45, Ls=None):
+                         tau=45, Ls=None, rain_rate_mode = 'exact'):
         fcn = np.vectorize(self.instance.rain_attenuation,
                            excluded=[0, 1, 3, 4, 6], otypes=[np.ndarray])
-        return np.array(fcn(lat, lon, f, el, hs, p, R001, tau, Ls).tolist())
+        return np.array(fcn(lat, lon, f, el, hs, p, R001, tau, Ls, rain_rate_mode).tolist())
 
     def rain_attenuation_probability(self, lat, lon, el, hs, Ls, P0=None):
         fcn = np.vectorize(self.instance.rain_attenuation_probability,
@@ -204,7 +204,7 @@ class _ITU618_13():
 
     @classmethod
     def rain_attenuation(self, lat, lon, f, el, hs=None, p=0.01, R001=None,
-                         tau=45, Ls=None):
+                         tau=45, Ls=None, rain_rate_mode='exact'):
         if np.logical_or(p < 0.001, p > 5).any():
             warnings.warn(
                 RuntimeWarning('The method to compute the rain attenuation in '
@@ -233,7 +233,7 @@ class _ITU618_13():
         # Obtain the raingall rate, exceeded for 0.01% of an average year,
         # if not provided, as described in ITU-R P.837.
         if R001 is None:
-            R001 = rainfall_rate(lat, lon, 0.01).to(u.mm / u.hr).value + EPSILON
+            R001 = rainfall_rate(lat, lon, 0.01, rain_rate_mode).to(u.mm / u.hr).value + EPSILON
 
         # Step 5: Obtain the specific attenuation gammar using the frequency
         # dependent coefficients as given in ITU-R P.838
@@ -687,7 +687,7 @@ def get_version():
 
 
 def rain_attenuation(lat, lon, f, el, hs=None, p=0.01, R001=None,
-                     tau=45, Ls=None):
+                     tau=45, Ls=None, rain_rate_mode='exact'):
     """
     Calculation of long-term rain attenuation statistics from point rainfall
     rate.
@@ -732,6 +732,11 @@ def rain_attenuation(lat, lon, f, el, hs=None, p=0.01, R001=None,
         Slant path length (km). If not provided, it will be computed using the
         rain height and the elevation angle. The ITU model does not require
         this parameter as an input.
+    rain_rate_mode :string, optional
+        This is the mode to calculate the rain rate if it is not provided.
+        Accepted values are 'approx' or 'exact'. 'approx' will use the R001
+        data tables from ITU-R P.837 Annex 1 Note 1, while 'exact' uses the
+        numerical process from ITU-R P.837 Annex 1. Default is 'exact'
 
 
     Returns
@@ -760,7 +765,8 @@ def rain_attenuation(lat, lon, f, el, hs=None, p=0.01, R001=None,
     Ls = prepare_quantity(Ls, u.km, 'Slant path length')
 
     val = __model.rain_attenuation(lat, lon, f, el, hs=hs, p=p,
-                                   R001=R001, tau=tau, Ls=Ls)
+                                   R001=R001, tau=tau, Ls=Ls,
+                                   rain_rate_mode=rain_rate_mode)
     
     # The values of attenuation cannot be negative. The ITU models end up
     # giving out negative values for certain inputs

@@ -66,14 +66,14 @@ class __ITU837():
         # Abstract method to compute the rain height
         return self.instance.rainfall_probability(lat, lon)
 
-    def rainfall_rate(self, lat, lon, p):
+    def rainfall_rate(self, lat, lon, p, mode):
         # Abstract method to compute the zero isoterm height
         fcn = np.vectorize(
             self.instance.rainfall_rate,
-            excluded=[0, 1],
+            excluded=[0, 1, 3],
             otypes=[np.ndarray]
         )
-        return np.array(fcn(lat, lon, p).tolist())
+        return np.array(fcn(lat, lon, p, mode).tolist())
 
 
 class _ITU837_7():
@@ -173,10 +173,10 @@ class _ITU837_7():
 
         return P0anual.reshape(lat_d.shape)
 
-    def rainfall_rate(self, lat_d, lon_d, p):
+    def rainfall_rate(self, lat_d, lon_d, p, mode='exact'):
         """
         """
-        if p == 0.01:
+        if p == 0.01 and mode == 'approx':
             return self.R001(lat_d, lon_d)
 
         lat_f = lat_d.flatten()
@@ -406,7 +406,7 @@ def rainfall_probability(lat, lon):
     return prepare_output_array(val, type_output) * u.pct
 
 
-def rainfall_rate(lat, lon, p):
+def rainfall_rate(lat, lon, p, mode='exact'):
     """
     Compute the rainfall rate exceeded for p% of the average year at a
     given location.
@@ -420,6 +420,12 @@ def rainfall_rate(lat, lon, p):
         Longitudes of the receiver points
     p : number
         Percentage of time exceeded for p% of the average year
+    mode : string, optional
+        Mode for determining the rainfall rate when the percentage
+        of time exceeded p is 0.01. Either 'approx' or 'exact'. 'approx'
+        uses the data files for R001 from ITU-R P.837 Annex 1 Note 1. 
+        'exact' uses an iterative process to determine the rainfall rate, 
+        as described in ITU-R P.837 Annex 1. Default is 'exact'
 
 
     Returns
@@ -437,7 +443,7 @@ def rainfall_rate(lat, lon, p):
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
     lon = np.mod(lon, 360)
-    val = __model.rainfall_rate(lat, lon, p)
+    val = __model.rainfall_rate(lat, lon, p, mode)
     return prepare_output_array(val, type_output) * u.mm / u.hr
 
 
