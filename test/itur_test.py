@@ -28,6 +28,8 @@ def suite():
     suite.addTest(TestFunctionsRecommendation618('test_618'))
     suite.addTest(TestFunctionsRecommendation676('test_676'))
     suite.addTest(TestFunctionsRecommendation835('test_835'))
+    suite.addTest(TestFunctionsRecommendation835(
+        'test_standard_pressure_integer_altitude'))
     suite.addTest(TestFunctionsRecommendation836('test_836'))
     suite.addTest(TestFunctionsRecommendation837('test_837'))
     suite.addTest(TestFunctionsRecommendation838('test_838'))
@@ -782,6 +784,29 @@ class TestFunctionsRecommendation835(test.TestCase):
             models.itu835.change_version(version)
             self.test_all_functions_835()
             self.assertEqual(models.itu835.get_version(), version)
+
+    def test_standard_pressure_integer_altitude(self):
+        # Regression test: `_ITU835_5.standard_pressure` used to build its
+        # output array with `np.ones_like(h) * P_0`, which inherits the
+        # dtype of `h`. Passing an integral altitude array therefore
+        # silently truncated the computed pressure to an integer. Verify
+        # that integer and float altitudes now produce identical results.
+        from itur.models.itu835 import _ITU835_5
+
+        model = _ITU835_5()
+        h_int = np.array([1, 2, 5, 10])
+        h_float = np.array([1, 2, 5, 10], dtype=float)
+
+        expected = np.array(
+            [886.9936534559513, 784.5578628975815,
+             533.136992664673, 260.9076739507232])
+
+        p_int = model.standard_pressure(h_int, T_0=288.15, P_0=1000)
+        p_float = model.standard_pressure(h_float, T_0=288.15, P_0=1000)
+
+        np.testing.assert_allclose(p_int, expected)
+        np.testing.assert_allclose(p_float, expected)
+        np.testing.assert_array_equal(p_int, p_float)
 
 
 class TestFunctionsRecommendation836(test.TestCase):
