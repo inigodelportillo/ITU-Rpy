@@ -396,7 +396,7 @@ class _ITU1853_1:
         e = Tm * rho / 216.7
         go = gamma0_exact(f, P, rho, Tm).value
         ho, _ = slant_inclined_path_equivalent_height(f, P + e, rho).value
-        Ao = ho * go * np.ones_like(Ar)
+        Ao = ho * go * np.ones_like(Ar, dtype=float)
 
         # Step C15: Synthesize unit variance scintillation time series
         sci_0 = self.scintillation_attenuation_synthesis(Ns * Ts, Ts=1)
