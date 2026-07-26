@@ -219,18 +219,30 @@ class _ITU1623_1_:
 
     @classmethod
     def fade_depth(self, N_target, D_target, A, PofA, el, f):
+        # Each (N_target, D_target) pair is an independent root-finding
+        # problem: fsolve is given a scalar initial guess, so the residual has
+        # to stay scalar too. Broadcast the targets and solve them one by one.
+        n_target, d_target = np.broadcast_arrays(np.atleast_1d(N_target),
+                                                 np.atleast_1d(D_target))
 
-        d_target = np.atleast_1d(D_target)
+        def solve(n_t, d_t):
+            def delta_N_events(x):
+                P_it = 10 ** (np.interp(x, A, np.log10(PofA)))
+                T_tot_it = (P_it / 100) * 365.25 * 86400
+                _, _, N_it, _ = self.fade_duration(
+                    np.atleast_1d(d_t), x, el, f, T_tot_it)
+                delta = n_t - N_it
+                return delta
 
-        def delta_N_events(x):
-            P_it = 10 ** (np.interp(x, A, np.log10(PofA)))
-            T_tot_it = (P_it / 100) * 365.25 * 86400
-            _, _, N_it, _ = self.fade_duration(d_target, x, el, f, T_tot_it)
-            delta = N_target - N_it
-            return delta
+            a_min = fsolve(delta_N_events, 1)  # a_min has shape (1,)
+            return a_min.item()
 
-        a_min = fsolve(delta_N_events, 1)  # a_min should have shape (1,)
-        return a_min.item()
+        a_min = np.array([solve(n_t, d_t) for n_t, d_t
+                          in zip(n_target.ravel(), d_target.ravel())])
+
+        if np.ndim(N_target) == 0 and np.ndim(D_target) == 0:
+            return a_min.item()
+        return a_min.reshape(n_target.shape)
 
 
 class _ITU1623_0_:
@@ -622,10 +634,11 @@ def fade_depth(N_target, D_target, A, PofA, el, f):
 
     Parameters
     ----------
-    N_target : int
-        Target outage intensity (scalar)
-    D_target : int
-        Event duration (scalar)
+    N_target : number, sequence, or numpy.ndarray
+        Target outage intensity (number of events)
+    D_target : number, sequence, or numpy.ndarray
+        Event duration (seconds). Broadcast against `N_target`; each resulting
+        pair is solved independently
     A : number, sequence, or numpy.ndarray
         Attenuation distribution (CDF, A) for the link under analysis
     PofA : number, sequence, or numpy.ndarray
@@ -637,8 +650,10 @@ def fade_depth(N_target, D_target, A, PofA, el, f):
 
     Returns
     -------
-    a_min: number
-        Minimum attenuation the link must tolerate to meet the OI target
+    a_min: number or numpy.ndarray
+        Minimum attenuation the link must tolerate to meet the OI target.
+        A scalar if both `N_target` and `D_target` are scalars, otherwise an
+        array with their broadcast shape
 
     Remark
     ------
