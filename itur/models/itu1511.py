@@ -25,8 +25,10 @@ class __ITU1511():
     # This is an abstract class that contains an instance to a version of the
     # ITU-R P.1511 recommendation.
 
-    def __init__(self, version=2):
-        if version == 2:
+    def __init__(self, version=3):
+        if version ==3:
+            self.instance = _ITU1511_3_()
+        elif version == 2:
             self.instance = _ITU1511_2_()
         elif version == 1:
             self.instance = _ITU1511_1_()
@@ -49,6 +51,56 @@ class __ITU1511():
         # Abstract method to compute the topographic altitude
         return self.instance.topographic_altitude(lat, lon)
 
+    def wgs4_altitude(self, lat, lon):
+        return self.instance.wgs4_altitude(lat,lon)
+
+class _ITU1511_3_():
+    """
+    The values of topographical height (km) above mean sea level of the surface
+    of the Earth are  provided on a 0.5° grid in both latitude and longitude.
+    For a location different from the gridpoints, the height above mean sea
+    level at the desired location can be obtained by performing a bi-cubic
+    interpolation.
+    """
+
+    def __init__(self):
+        self.__version__ = 3
+        self.year = 2024
+        self.month = 8
+        self.link = "https://www.itu.int/rec/R-REC-P.1511-3-202408-I/en"
+
+        self._altitude = None
+        self._wgs4_altitude = None
+
+    def altitude(self, lat, lon):
+        if not self._altitude:
+            self._altitude = load_data_interpolator(
+                '1511/v3_lat.npz', '1511/v3_lon.npz',
+                '1511/v3_topo.npz', bicubic_2D_interpolator)
+
+        return self._altitude(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape)
+
+    def wgs4_altitude(self, lat, lon):
+        if not self._wgs4_altitude:
+            self._wgs4_altitude = load_data_interpolator(
+                '1511/v3_lat_wgs.npz', '1511/v3_lon_wgs.npz',
+                '1511/v3_egm2008.npz', bicubic_2D_interpolator)
+
+        lon = np.where(lon > 180, lon - 360, lon)
+        return self._wgs4_altitude(
+            np.array([lat.ravel(), lon.ravel()]).T).reshape(lat.shape) / 1000
+
+    def topographic_altitude(self, lat_d, lon_d):
+        """
+        Method to compute the values of topographical height (km) above mean
+        sea level of the surface of the Earth.
+        """
+
+        # The new recommendation provides the output in meters and uses
+        # a -180 to 180 longitude refernce
+        lon_d = np.where(lon_d > 180, lon_d - 360, lon_d)
+        return self.altitude(lat_d, lon_d) / 1000
 
 class _ITU1511_2_():
     """
@@ -233,4 +285,37 @@ def topographic_altitude(lat, lon):
     lon = np.mod(lon, 360)
     val = __model.topographic_altitude(lat, lon)
     val = np.maximum(val, 1e-9)
+    return prepare_output_array(val, type_output) * u.km
+
+
+def wgs4_altitude(lat, lon):
+    """
+    The WGS geoid undulation between WGS ellipsoid and geoid from EGM2008
+
+
+    Parameters
+    ----------
+    lat : number, sequence, or numpy.ndarray
+        Latitudes of the receiver points
+    lon : number, sequence, or numpy.ndarray
+        Longitudes of the receiver points
+
+
+    Returns
+    -------
+    altitude: numpy.ndarray
+        WGS Undulation (km)
+
+
+    References
+    ----------
+    [1] Topography for Earth-to-space propagation modelling:
+    https://www.itu.int/rec/R-REC-P.1511/en
+
+    """
+    type_output = get_input_type(lat)
+    lat = prepare_input_array(lat)
+    lon = prepare_input_array(lon)
+    lon = np.mod(lon, 360)
+    val = __model.wgs4_altitude(lat, lon)
     return prepare_output_array(val, type_output) * u.km

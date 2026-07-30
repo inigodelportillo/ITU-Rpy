@@ -157,6 +157,8 @@ def create_ITU_suite():
     # ITU-R P.1511
     suite.add_test(ITUR1511_1TestCase("test_topographic_altitude"))
     suite.add_test(ITUR1511_2TestCase("test_topographic_altitude"))
+    suite.add_test(ITUR1511_3TestCase("test_topographic_altitude"))
+    suite.add_test(ITUR1511_3TestCase("test_wgs4_altitude"))
 
     # ITU-R P.1623
     suite.add_test(ITUR1623_1TestCase("test_fade_duration_cummulative_probability"))
@@ -973,7 +975,7 @@ class ITUR837_7TestCase(ITU_TestCase):
         path_file = "837/ITURP837-7_rainfall_rate_R001.csv"
         # Read the test data
         df = self.read_csv(
-            path.join(test_data, path_file), columns=["lat", "lon", "p", "Rp"]
+            path.join(test_data, path_file), columns=["lat", "lon", "p", "mode","Rp"]
         )
 
         # Run test and generate the report
@@ -981,7 +983,7 @@ class ITUR837_7TestCase(ITU_TestCase):
             "test_rainfall_rate_R001",
             test_fcn="models.itu837.rainfall_rate",
             df=df,
-            attributes=["lat", "lon", "p"],
+            attributes=["lat", "lon", "mode","p"],
             result_value="Rp",
             n_places=5,
         )
@@ -1257,6 +1259,48 @@ class ITUR1511_2TestCase(ITU_TestCase):
             df=df,
             attributes=["lat", "lon"],
             result_value="hs",
+            n_places=5,
+        )
+
+
+class ITUR1511_3TestCase(ITU_TestCase):
+
+    itu_name = "ITU-R P.1511-3"
+    itu_description = "Topography for Earth-to-space propogation modelling"
+
+    def test_topographic_altitude(self):
+        models.itu1511.change_version(3)
+
+        path_file = "1511/ITURP1511-3_topographic_altitude.csv"
+
+        df = self.read_csv(
+            path.join(test_data, path_file), columns = ['lat','lon','hs']
+        )
+
+        self.__run__(
+            "ITU1511-3_test_topographic_altitude",
+            test_fcn="models.itu1511.topographic_altitude",
+            df=df,
+            attributes=["lat","lon"],
+            result_value="hs",
+            n_places=5,
+        )
+
+    def test_wgs4_altitude(self):
+        models.itu1511.change_version(3)
+
+        path_file = "1511/ITURP1511-3_wgs4_altitude.csv"
+
+        df = self.read_csv(
+            path.join(test_data, path_file), columns = ["lat", "lon", "h_wgs"]
+        )
+
+        df = self.__run__(
+            "ITU1511-3_test_wgs4_altitude",
+            test_fcn = "models.itu1511.wgs4_altitude",
+            df=df,
+            attributes=["lat","lon"],
+            result_value="h_wgs",
             n_places=5,
         )
 
