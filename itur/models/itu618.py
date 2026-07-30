@@ -543,7 +543,7 @@ class _ITU618_12():
 
     @classmethod
     def rain_attenuation(self, lat, lon, f, el, hs=None, p=0.01, R001=None,
-                         tau=45, Ls=None):
+                         tau=45, Ls=None, rain_rate_mode=None):
 
         if p < 0.001 or p > 5:
             warnings.warn(

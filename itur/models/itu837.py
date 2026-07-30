@@ -299,7 +299,7 @@ class _ITU837_6():
 
         return P0
 
-    def rainfall_rate(self, lat_d, lon_d, p):
+    def rainfall_rate(self, lat_d, lon_d, p, mode=None):
         """
         """
         Pr6 = self.Pr6(lat_d, lon_d)
