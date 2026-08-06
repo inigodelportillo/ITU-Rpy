@@ -54,7 +54,7 @@ class TestMapAfrica(test.TestCase):
         p = 0.1                  # Unavailability (Vals exceeded 0.1% of time)
 
         # Compute the atmospheric attenuation
-        Att = itur.atmospheric_attenuation_slant_path(lat, lon, f, el, p, D)
+        Att = itur.atmospheric_attenuation_slant_path(lat, lon, f, el, p, D, rain_rate_mode='approx')
 
         # Now we show the surface mean temperature distribution
         T = itur.surface_mean_temperature(lat, lon)\
@@ -171,7 +171,7 @@ class TestSingleLocation(test.TestCase):
         itur.models.itu840.columnar_content_reduced_liquid(
             lat, lon, p)
         itur.models.itu676.zenit_water_vapour_attenuation(
-            lat, lon, p, f, h=hs)
+            lat, lon, p, f, h=hs, P=P, rho=rho_p, T=T)
 
         # Compute attenuation values
         itur.gaseous_attenuation_slant_path(f, el, rho_p, P, T)

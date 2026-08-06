@@ -119,7 +119,7 @@ class _ITU618():
         return self.instance.__version__
 
     def rain_attenuation(self, lat, lon, f, el, hs=None, p=0.01, R001=None,
-                         tau=45, Ls=None, rain_rate_mode = 'exact'):
+                         tau=45, Ls=None, rain_rate_mode = 'approx'):
         fcn = np.vectorize(self.instance.rain_attenuation,
                            excluded=[0, 1, 3, 4, 6], otypes=[np.ndarray])
         return np.array(fcn(lat, lon, f, el, hs, p, R001, tau, Ls, rain_rate_mode).tolist())
@@ -204,7 +204,7 @@ class _ITU618_13():
 
     @classmethod
     def rain_attenuation(self, lat, lon, f, el, hs=None, p=0.01, R001=None,
-                         tau=45, Ls=None, rain_rate_mode='exact'):
+                         tau=45, Ls=None, rain_rate_mode='approx'):
         if np.logical_or(p < 0.001, p > 5).any():
             warnings.warn(
                 RuntimeWarning('The method to compute the rain attenuation in '
@@ -687,7 +687,7 @@ def get_version():
 
 
 def rain_attenuation(lat, lon, f, el, hs=None, p=0.01, R001=None,
-                     tau=45, Ls=None, rain_rate_mode='exact'):
+                     tau=45, Ls=None, rain_rate_mode='approx'):
     """
     Calculation of long-term rain attenuation statistics from point rainfall
     rate.

@@ -173,7 +173,7 @@ class _ITU837_7():
 
         return P0anual.reshape(lat_d.shape)
 
-    def rainfall_rate(self, lat_d, lon_d, p, mode='exact'):
+    def rainfall_rate(self, lat_d, lon_d, p, mode='approx'):
         """
         """
         if p == 0.01 and mode == 'approx':
@@ -406,7 +406,7 @@ def rainfall_probability(lat, lon):
     return prepare_output_array(val, type_output) * u.pct
 
 
-def rainfall_rate(lat, lon, p, mode='exact'):
+def rainfall_rate(lat, lon, p, mode='approx'):
     """
     Compute the rainfall rate exceeded for p% of the average year at a
     given location.

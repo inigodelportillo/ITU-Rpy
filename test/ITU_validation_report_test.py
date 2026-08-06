@@ -700,7 +700,7 @@ class ITUR618_14TestCase(ITU_TestCase):
         # Read the test data
         df = self.read_csv(
             path.join(test_data, "618/ITURP618-14_A_total.csv"),
-            columns=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", "A_total"],
+            columns=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", "rain_rate_mode", "A_total"],
         )
 
         # Run test and generate the report
@@ -708,7 +708,7 @@ class ITUR618_14TestCase(ITU_TestCase):
             "itur618_14_total_attenuation",
             test_fcn="atmospheric_attenuation_slant_path",
             df=df,
-            attributes=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs"],
+            attributes=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", "rain_rate_mode"],
             result_value="A_total",
             n_places=4,
         )
@@ -955,7 +955,7 @@ class ITUR837_7TestCase(ITU_TestCase):
         path_file = "837/ITURP837-7_rainfall_rate.csv"
         # Read the test data
         df = self.read_csv(
-            path.join(test_data, path_file), columns=["lat", "lon", "p", "Rp"]
+            path.join(test_data, path_file), columns=["lat", "lon", "p","mode", "Rp"]
         )
 
         # Run test and generate the report
@@ -963,7 +963,7 @@ class ITUR837_7TestCase(ITU_TestCase):
             "test_rainfall_rate",
             test_fcn="models.itu837.rainfall_rate",
             df=df,
-            attributes=["lat", "lon", "p"],
+            attributes=["lat", "lon", "p", "mode"],
             result_value="Rp",
             n_places=3,
         )
@@ -1574,7 +1574,7 @@ class End2End_TestCase(ITU_TestCase):
         # Read the test data
         df = self.read_csv(
             path.join(test_data, "e2e/e2e_A_rain.csv"),
-            columns=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", 
+            columns=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", "rain_rate_mode",
                      "include_rain", "include_gas", "include_scintillation", "include_clouds",
                      "A_total"],
         )
@@ -1584,7 +1584,7 @@ class End2End_TestCase(ITU_TestCase):
             "end2end_rain_attenuation",
             test_fcn="atmospheric_attenuation_slant_path",
             df=df,
-            attributes=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs",
+            attributes=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", "rain_rate_mode",
                         "include_rain", "include_gas", "include_scintillation", "include_clouds"],
             result_value="A_total",
             n_places=4,
@@ -1637,7 +1637,7 @@ class End2End_TestCase(ITU_TestCase):
         # Read the test data
         df = self.read_csv(
             path.join(test_data, "e2e/e2e_A_total.csv"),
-            columns=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", "A_total"],
+            columns=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", "rain_rate_mode", "A_total"],
         )
 
         # Run test and generate the report
@@ -1645,7 +1645,7 @@ class End2End_TestCase(ITU_TestCase):
             "end2end_total_attenuation",
             test_fcn="atmospheric_attenuation_slant_path",
             df=df,
-            attributes=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs"],
+            attributes=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", "rain_rate_mode"],
             result_value="A_total",
             n_places=4,
         )
