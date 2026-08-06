@@ -103,13 +103,6 @@ def create_ITU_suite():
     # ITU-R P.453 tests (Gaseous attenuation)
     suite.add_test(ITUR453_14TestCase("test_wet_term_radio_refractivity"))
 
-    # ITU-R P.618
-    suite.add_test(ITUR618_13TestCase("test_rain_attenuation"))
-    suite.add_test(ITUR618_13TestCase("test_rain_probability"))
-    suite.add_test(ITUR618_13TestCase("test_scintillation_attenuation"))
-    suite.add_test(ITUR618_13TestCase("test_total_attenuation"))
-    suite.add_test(ITUR618_13TestCase("test_cross_polarization_discrimination"))
-
     # ITU-R P.618-14
     suite.add_test(ITUR618_14TestCase("test_rain_attenuation"))
     suite.add_test(ITUR618_14TestCase("test_rain_probability"))
@@ -157,12 +150,32 @@ def create_ITU_suite():
     # ITU-R P.1511
     suite.add_test(ITUR1511_1TestCase("test_topographic_altitude"))
     suite.add_test(ITUR1511_2TestCase("test_topographic_altitude"))
+    suite.add_test(ITUR1511_3TestCase("test_topographic_altitude"))
+    suite.add_test(ITUR1511_3TestCase("test_wgs4_altitude"))
 
     # ITU-R P.1623
     suite.add_test(ITUR1623_1TestCase("test_fade_duration_cummulative_probability"))
     suite.add_test(ITUR1623_1TestCase("test_fade_duration_number_fades"))
     suite.add_test(ITUR1623_1TestCase("test_fade_duration_probability"))
     suite.add_test(ITUR1623_1TestCase("test_fade_duration_total_exceedance_time"))
+
+    # IRU-R P.2145
+    suite.add_test(ITUR2145_0TestCase("test_barometric_surface_pressure"))
+    suite.add_test(ITUR2145_0TestCase("test_surface_temperature"))
+    suite.add_test(ITUR2145_0TestCase("test_surface_water_vapour_density"))
+    suite.add_test(ITUR2145_0TestCase("test_total_water_vapour_content"))
+    suite.add_test(ITUR2145_0TestCase("test_barometric_surface_pressure_mean"))
+    suite.add_test(ITUR2145_0TestCase("test_surface_temperature_mean"))
+    suite.add_test(ITUR2145_0TestCase("test_surface_water_vapour_density_mean"))
+    suite.add_test(ITUR2145_0TestCase("test_total_water_vapour_content_mean"))
+
+    # End to End tests
+    suite.add_test(End2End_TestCase("test_total_gaseous_attenuation"))
+    suite.add_test(End2End_TestCase("test_total_rain_attenuation"))
+    suite.add_test(End2End_TestCase("test_total_scintillation_attenuation"))
+    suite.add_test(End2End_TestCase("test_total_cloud_attenuation"))
+    suite.add_test(End2End_TestCase("test_total_attenuation"))
+
 
     return suite
 
@@ -476,115 +489,6 @@ class ITUR453_14TestCase(ITU_TestCase):
         )
 
 
-class ITUR618_13TestCase(ITU_TestCase):
-
-    itu_name = "ITU-R P.618-13"
-    itu_description = (
-        "Propagation data and prediction methods required for"
-        + " the design of Earth-space telecommunication systems"
-    )
-
-    def test_rain_attenuation(self):
-        # Set the version to the
-        models.itu618.change_version(13)
-
-        # Read the test data
-        df = self.read_csv(
-            path.join(test_data, "618/ITURP618-13_A_rain.csv"),
-            columns=["lat", "lon", "hs", "el", "f", "tau", "p", "R001", "A_rain"],
-        )
-
-        # Run test and generate the report
-        self.__run__(
-            "test_rain_attenuation",
-            test_fcn="models.itu618.rain_attenuation",
-            df=df,
-            attributes=["lat", "lon", "hs", "el", "f", "tau", "p", "R001"],
-            result_value="A_rain",
-            n_places=5,
-        )
-
-    def test_rain_probability(self):
-        # Set the version to the
-        models.itu618.change_version(13)
-
-        # Read the test data
-        df = self.read_csv(
-            path.join(test_data, "618/ITURP618-13_A_rain.csv"),
-            columns=["lat", "lon", "hs", "el", "Ls", "P0", "P_rain"],
-        )
-
-        # Run test and generate the report
-        self.__run__(
-            "test_rain_probability",
-            test_fcn="models.itu618.rain_attenuation_probability",
-            df=df,
-            attributes=["lat", "lon", "hs", "el", "Ls", "P0"],
-            result_value="P_rain",
-            n_places=5,
-        )
-
-    def test_scintillation_attenuation(self):
-        # Set the version to the
-        models.itu618.change_version(13)
-
-        # Read the test data
-        df = self.read_csv(
-            path.join(test_data, "618/ITURP618-13_A_sci.csv"),
-            columns=["lat", "lon", "f", "el", "p", "D", "eta", "A_scin"],
-        )
-
-        # Run test and generate the report
-        self.__run__(
-            "test_scintillation_attenuation",
-            test_fcn="models.itu618.scintillation_attenuation",
-            df=df,
-            attributes=["lat", "lon", "f", "el", "p", "D", "eta"],
-            result_value="A_scin",
-            n_places=5,
-        )
-
-    def test_cross_polarization_discrimination(self):
-        # Set the version to the
-        models.itu618.change_version(13)
-
-        # Read the test data
-        df = self.read_csv(
-            path.join(test_data, "618/ITURP618-13_A_xpd.csv"),
-            columns=["f", "el", "p", "tau", "Ap", "XPD"],
-        )
-
-        # Run test and generate the report
-        self.__run__(
-            "test_cross_polarization_discrimination",
-            test_fcn="models.itu618.rain_cross_polarization_discrimination",
-            df=df,
-            attributes=["f", "el", "p", "tau", "Ap"],
-            result_value="XPD",
-            n_places=5,
-        )
-
-    def test_total_attenuation(self):
-        # Set the version to the
-        models.itu618.change_version(13)
-
-        # Read the test data
-        df = self.read_csv(
-            path.join(test_data, "618/ITURP618-13_A_total.csv"),
-            columns=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", "A_total"],
-        )
-
-        # Run test and generate the report
-        self.__run__(
-            "test_total_attenuation",
-            test_fcn="atmospheric_attenuation_slant_path",
-            df=df,
-            attributes=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs"],
-            result_value="A_total",
-            n_places=4,
-        )
-
-
 class ITUR618_14TestCase(ITU_TestCase):
 
     itu_name = "ITU-R P.618-14"
@@ -680,7 +584,7 @@ class ITUR618_14TestCase(ITU_TestCase):
         # Read the test data
         df = self.read_csv(
             path.join(test_data, "618/ITURP618-14_A_total.csv"),
-            columns=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", "A_total"],
+            columns=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", "rain_rate_mode", "A_total"],
         )
 
         # Run test and generate the report
@@ -688,7 +592,7 @@ class ITUR618_14TestCase(ITU_TestCase):
             "itur618_14_total_attenuation",
             test_fcn="atmospheric_attenuation_slant_path",
             df=df,
-            attributes=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs"],
+            attributes=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", "rain_rate_mode"],
             result_value="A_total",
             n_places=4,
         )
@@ -935,7 +839,7 @@ class ITUR837_7TestCase(ITU_TestCase):
         path_file = "837/ITURP837-7_rainfall_rate.csv"
         # Read the test data
         df = self.read_csv(
-            path.join(test_data, path_file), columns=["lat", "lon", "p", "Rp"]
+            path.join(test_data, path_file), columns=["lat", "lon", "p","mode", "Rp"]
         )
 
         # Run test and generate the report
@@ -943,7 +847,7 @@ class ITUR837_7TestCase(ITU_TestCase):
             "test_rainfall_rate",
             test_fcn="models.itu837.rainfall_rate",
             df=df,
-            attributes=["lat", "lon", "p"],
+            attributes=["lat", "lon", "p", "mode"],
             result_value="Rp",
             n_places=3,
         )
@@ -955,7 +859,7 @@ class ITUR837_7TestCase(ITU_TestCase):
         path_file = "837/ITURP837-7_rainfall_rate_R001.csv"
         # Read the test data
         df = self.read_csv(
-            path.join(test_data, path_file), columns=["lat", "lon", "p", "Rp"]
+            path.join(test_data, path_file), columns=["lat", "lon", "p", "mode","Rp"]
         )
 
         # Run test and generate the report
@@ -963,7 +867,7 @@ class ITUR837_7TestCase(ITU_TestCase):
             "test_rainfall_rate_R001",
             test_fcn="models.itu837.rainfall_rate",
             df=df,
-            attributes=["lat", "lon", "p"],
+            attributes=["lat", "lon", "mode","p"],
             result_value="Rp",
             n_places=5,
         )
@@ -1243,6 +1147,48 @@ class ITUR1511_2TestCase(ITU_TestCase):
         )
 
 
+class ITUR1511_3TestCase(ITU_TestCase):
+
+    itu_name = "ITU-R P.1511-3"
+    itu_description = "Topography for Earth-to-space propogation modelling"
+
+    def test_topographic_altitude(self):
+        models.itu1511.change_version(3)
+
+        path_file = "1511/ITURP1511-3_topographic_altitude.csv"
+
+        df = self.read_csv(
+            path.join(test_data, path_file), columns = ['lat','lon','hs']
+        )
+
+        self.__run__(
+            "ITU1511-3_test_topographic_altitude",
+            test_fcn="models.itu1511.topographic_altitude",
+            df=df,
+            attributes=["lat","lon"],
+            result_value="hs",
+            n_places=5,
+        )
+
+    def test_wgs4_altitude(self):
+        models.itu1511.change_version(3)
+
+        path_file = "1511/ITURP1511-3_wgs4_altitude.csv"
+
+        df = self.read_csv(
+            path.join(test_data, path_file), columns = ["lat", "lon", "h_wgs"]
+        )
+
+        df = self.__run__(
+            "ITU1511-3_test_wgs4_altitude",
+            test_fcn = "models.itu1511.wgs4_altitude",
+            df=df,
+            attributes=["lat","lon"],
+            result_value="h_wgs",
+            n_places=5,
+        )
+
+
 class ITUR1623_1TestCase(ITU_TestCase):
 
     itu_name = "ITU-R P.1623-1"
@@ -1326,6 +1272,266 @@ class ITUR1623_1TestCase(ITU_TestCase):
             attributes=["D", "A", "el", "f", "T_tot"],
             result_value="N",
             n_places=5,
+        )
+
+
+class ITUR2145_0TestCase(ITU_TestCase):
+
+    itu_name = "ITU-R P.2145-0"
+    itu_description = "Digital maps related to the calculation of gaseous attenuation and related effects"
+
+    def test_barometric_surface_pressure(self):
+        models.itu2145.change_version(0)
+
+        path_file = "2145/ITURP2145-0_barometric_surface_pressure.csv"
+
+        df = self.read_csv(
+            path.join(test_data, path_file), columns=["lat","lon","alt","p","P"]
+        )
+
+        self.__run__(
+            "itur2145_0_barometric_surface_pressure",
+            test_fcn="models.itu2145.barometric_surface_pressure",
+            df=df,
+            attributes=["lat","lon","alt","p"],
+            result_value="P",
+            n_places=5,
+        )
+
+    def test_surface_temperature(self):
+        models.itu2145.change_version(0)
+
+        path_file = "2145/ITURP2145-0_surface_temperature.csv"
+
+        df = self.read_csv(
+            path.join(test_data, path_file), columns=["lat","lon","alt","p","T"]
+        )
+
+        self.__run__(
+            "itur2145_0_surface_temperature",
+            test_fcn="models.itu2145.surface_temperature",
+            df=df,
+            attributes=["lat","lon","alt","p"],
+            result_value="T",
+            n_places=5,
+        )
+
+    def test_surface_water_vapour_density(self):
+        models.itu2145.change_version(0)
+
+        path_file = "2145/ITURP2145-0_surface_water_vapour_density_annual.csv"
+
+        df = self.read_csv(
+            path.join(test_data, path_file), columns=["lat","lon","alt","p","rho"]
+        )
+
+        self.__run__(
+            "itur2145_0_surface_water_vapour_density",
+            test_fcn="models.itu2145.surface_water_vapour_density",
+            df=df,
+            attributes=["lat","lon","alt","p"],
+            result_value="rho",
+            n_places=5,
+        )
+
+    def test_total_water_vapour_content(self):
+        models.itu2145.change_version(0)
+
+        path_file = "2145/ITURP2145-0_total_water_vapour_content_annual.csv"
+
+        df = self.read_csv(
+            path.join(test_data, path_file), columns=["lat","lon","alt","p","V"]
+        )
+
+        self.__run__(
+            "itur2145_0_total_water_vapour_content",
+            test_fcn="models.itu2145.total_water_vapour_content",
+            df=df,
+            attributes=["lat","lon","alt","p"],
+            result_value="V",
+            n_places=5,
+        )
+
+    def test_barometric_surface_pressure_mean(self):
+        models.itu2145.change_version(0)
+
+        path_file = "2145/ITURP2145-0_barometric_surface_pressure_mean.csv"
+
+        df = self.read_csv(
+            path.join(test_data, path_file), columns=["lat","lon","alt","P"]
+        )
+
+        self.__run__(
+            "itur2145_0_barometric_surface_pressure_mean",
+            test_fcn="models.itu2145.barometric_surface_pressure",
+            df=df,
+            attributes=["lat","lon","alt"],
+            result_value="P",
+            n_places=5,
+        )
+
+    def test_surface_temperature_mean(self):
+        models.itu2145.change_version(0)
+
+        path_file = "2145/ITURP2145-0_surface_temperature_mean.csv"
+
+        df = self.read_csv(
+            path.join(test_data, path_file), columns=["lat","lon","alt","T"]
+        )
+
+        self.__run__(
+            "itur2145_0_surface_temperature_mean",
+            test_fcn="models.itu2145.surface_temperature",
+            df=df,
+            attributes=["lat","lon","alt"],
+            result_value="T",
+            n_places=5,
+        )
+
+    def test_surface_water_vapour_density_mean(self):
+        models.itu2145.change_version(0)
+
+        path_file = "2145/ITURP2145-0_surface_water_vapour_density_annual_mean.csv"
+
+        df = self.read_csv(
+            path.join(test_data, path_file), columns=["lat","lon","alt","rho"]
+        )
+
+        self.__run__(
+            "itur2145_0_surface_water_vapour_density_mean",
+            test_fcn="models.itu2145.surface_water_vapour_density",
+            df=df,
+            attributes=["lat","lon","alt"],
+            result_value="rho",
+            n_places=5,
+        )
+
+    def test_total_water_vapour_content_mean(self):
+        models.itu2145.change_version(0)
+
+        path_file = "2145/ITURP2145-0_total_water_vapour_content_annual_mean.csv"
+
+        df = self.read_csv(
+            path.join(test_data, path_file), columns=["lat","lon","alt","V"]
+        )
+
+        self.__run__(
+            "itur2145_0_total_water_vapour_content_mean",
+            test_fcn="models.itu2145.total_water_vapour_content",
+            df=df,
+            attributes=["lat","lon","alt"],
+            result_value="V",
+            n_places=5,
+        )
+
+
+class End2End_TestCase(ITU_TestCase):
+
+    itu_name = "End_to_end_attenuation_components"
+    itu_description = "Tests for end to end atmospheric attenuation with components"
+
+    def test_total_gaseous_attenuation(self):
+
+        path_file = "e2e/e2e_A_gaseous.csv"
+
+        # Read the test data
+        df = self.read_csv(
+            path.join(test_data, "e2e/e2e_A_gaseous.csv"),
+            columns=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", 
+                     "include_rain", "include_gas", "include_scintillation", "include_clouds",
+                     "A_total"],
+        )
+
+        # Run test and generate the report
+        self.__run__(
+            "end2end_gaseous_attenuation",
+            test_fcn="atmospheric_attenuation_slant_path",
+            df=df,
+            attributes=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs",
+                        "include_rain", "include_gas", "include_scintillation", "include_clouds"],
+            result_value="A_total",
+            n_places=4,
+        )
+
+    def test_total_rain_attenuation(self):
+
+        # Read the test data
+        df = self.read_csv(
+            path.join(test_data, "e2e/e2e_A_rain.csv"),
+            columns=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", "rain_rate_mode",
+                     "include_rain", "include_gas", "include_scintillation", "include_clouds",
+                     "A_total"],
+        )
+
+        # Run test and generate the report
+        self.__run__(
+            "end2end_rain_attenuation",
+            test_fcn="atmospheric_attenuation_slant_path",
+            df=df,
+            attributes=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", "rain_rate_mode",
+                        "include_rain", "include_gas", "include_scintillation", "include_clouds"],
+            result_value="A_total",
+            n_places=4,
+        )
+
+    def test_total_scintillation_attenuation(self):
+
+        # Read the test data
+        df = self.read_csv(
+            path.join(test_data, "e2e/e2e_A_scintillation.csv"),
+            columns=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", 
+                     "include_rain", "include_gas", "include_scintillation", "include_clouds",
+                     "A_total"],
+        )
+
+        # Run test and generate the report
+        self.__run__(
+            "end2end_scintillation_attenuation",
+            test_fcn="atmospheric_attenuation_slant_path",
+            df=df,
+            attributes=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs",
+                        "include_rain", "include_gas", "include_scintillation", "include_clouds"],
+            result_value="A_total",
+            n_places=4,
+        )
+
+    def test_total_cloud_attenuation(self):
+
+        # Read the test data
+        df = self.read_csv(
+            path.join(test_data, "e2e/e2e_A_cloud.csv"),
+            columns=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", 
+                     "include_rain", "include_gas", "include_scintillation", "include_clouds",
+                     "A_total"],
+        )
+
+        # Run test and generate the report
+        self.__run__(
+            "end2end_cloud_attenuation",
+            test_fcn="atmospheric_attenuation_slant_path",
+            df=df,
+            attributes=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs",
+                        "include_rain", "include_gas", "include_scintillation", "include_clouds"],
+            result_value="A_total",
+            n_places=4,
+        )
+
+    def test_total_attenuation(self):
+
+        # Read the test data
+        df = self.read_csv(
+            path.join(test_data, "e2e/e2e_A_total.csv"),
+            columns=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", "rain_rate_mode", "A_total"],
+        )
+
+        # Run test and generate the report
+        self.__run__(
+            "end2end_total_attenuation",
+            test_fcn="atmospheric_attenuation_slant_path",
+            df=df,
+            attributes=["lat", "lon", "f", "el", "p", "D", "eta", "tau", "hs", "rain_rate_mode"],
+            result_value="A_total",
+            n_places=4,
         )
 
 

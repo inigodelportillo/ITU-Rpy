@@ -39,7 +39,7 @@ p = 0.1                  # Unavailability (Values exceeded 0.1% of time)
 Att = itur.atmospheric_attenuation_slant_path(lat, lon, f, el, p, D)
 
 # Plot the results
-m = itur.plotting.plot_in_map(Att, lat, lon,
+m = itur.plotting.plot_in_map(Att.value, lat, lon,
                               cbar_text='Atmospheric attenuation [dB]',
                               cmap='magma')
 
@@ -49,6 +49,6 @@ m.scatter(lon_sat, lat_sat, c='white', s=20)
 # Now we show the surface mean temperature distribution
 T = itur.surface_mean_temperature(lat, lon)\
     .to(itur.u.Celsius, equivalencies=itur.u.temperature())
-m = itur.plotting.plot_in_map(T, lat, lon,
+m = itur.plotting.plot_in_map(T.value, lat, lon,
                               cbar_text='Surface mean temperature [C]',
                               cmap='RdBu_r')

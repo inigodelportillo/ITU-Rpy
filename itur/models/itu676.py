@@ -17,6 +17,7 @@ from itur.models.itu836 import total_water_vapour_content
 from itur.models.itu1511 import topographic_altitude
 from itur.utils import (prepare_quantity, prepare_output_array, get_input_type,
                         prepare_input_array, load_data, dataset_dir)
+import itur.models.itu2145 as itu2145
 
 
 def __gamma0_exact__(self, f, p, rho, T):
@@ -156,23 +157,37 @@ class __ITU676__():
         fcn = np.vectorize(self.instance.gaseous_attenuation_inclined_path)
         return fcn(f, el, rho, P, T, h1, h2, mode)
 
-    def gaseous_attenuation_slant_path(self, f, el, rho, P, T, V_t, h, mode):
+    def gaseous_attenuation_slant_path(self, f, el, rho, P, T, V_t, 
+                                       h=None, mode='approx',
+                                       rho_mean=None, P_mean=None, T_mean=None):
         # Abstract method to compute the gaseous attenuation over a slant path
         fcn = np.vectorize(self.instance.gaseous_attenuation_slant_path)
-        return fcn(f, el, rho, P, T, V_t, h, mode)
+        if self.instance.__version__ == 13:
+            return fcn(f, el, rho, P, T, V_t, 
+                       h, mode, rho_mean, P_mean, T_mean)
+        else:
+            return fcn(f, el, rho, P, T, V_t, h, mode)
 
     def slant_inclined_path_equivalent_height(self, f, P, rho, T):
         fcn = np.vectorize(self.instance.slant_inclined_path_equivalent_height,
                            excluded=[0], otypes=[np.ndarray])
         return np.array(fcn(f, P, rho, T).tolist())
+    
+    def water_vapour_mass_absorption_coefficient(self, f, P, rho, T):
+        fcn = np.vectorize(self.instance.water_vapour_mass_absorption_coefficient,
+                           excluded=[0], otypes=[np.ndarray])
+        return np.array(fcn(f, P, rho, T))
 
     def zenit_water_vapour_attenuation(
-            self, lat, lon, p, f, V_t=None, h=None):
+            self, lat, lon, p, f, V_t=None, h=None, P=None, rho=None, T=None):
         # Abstract method to compute the water vapour attenuation over the
         # slant path
         fcn = np.vectorize(self.instance.zenit_water_vapour_attenuation,
                            excluded=[0, 1, 4, 5], otypes=[np.ndarray])
-        return np.array(fcn(lat, lon, p, f, V_t, h).tolist())
+        if self.instance.__version__ == 13:
+            return np.array(fcn(lat, lon, p, f, V_t, h, P, rho, T).tolist())
+        else:
+            return np.array(fcn(lat, lon, p, f, V_t, h).tolist())
 
     def gamma_exact(self, f, p, rho, t):
         # Abstract method to compute the specific attenuation using the
@@ -380,7 +395,7 @@ class _ITU676_12_():
             # and h are provided
             if V_t is not None and h is not None:
                 Aw = self.zenit_water_vapour_attenuation(None, None, None,
-                                                         f, V_t, h)
+                                                         f=f, V_t=V_t, h=h)
             else:
                 Aw = gammaw * hw
 
@@ -532,6 +547,16 @@ class _ITU676_13_():
     _h0_c0 = tmp_h0[:, 3]     # c0 coefficients [km/hPa]
     _h0_d0 = tmp_h0[:, 4]     # d0 coefficients [km/(g/m^3)]
 
+    # Part 2 coefficient data for water vapor mass absorption coefficient, K_v (Annex 2, Eq. 39/41)
+    tmp_kv = load_data(os.path.join(dataset_dir,
+                                    '676/v13_kv_coefficients.txt'),
+                       skip_header=1)
+    _kv_freq = tmp_kv[:, 0]   # frequencies [GHz]  
+    _kv_av = tmp_kv[:, 1]     # av coefficients 
+    _kv_bv = tmp_kv[:, 2]
+    _kv_cv = tmp_kv[:, 3]
+    _kv_dv = tmp_kv[:, 4]
+
     # Table 4 coefficients for hw (Annex 2, Eq. 37)
     _hw_A = 5.6585e-5          # [km/GHz]
     _hw_B = 1.8348             # [km]
@@ -637,16 +662,25 @@ class _ITU676_13_():
 
     @classmethod
     def gaseous_attenuation_slant_path(self, f, el, rho, P, T, V_t=None,
-                                       h=None, mode='approx'):
+                                       h=None, mode='approx',
+                                       rho_mean=None, P_mean=None, T_mean=None):
+        if rho_mean is None:
+            rho_mean = rho
+        if P_mean is None:
+            P_mean = P
+        if T_mean is None:
+            T_mean = T
+
         if mode == 'approx':
             gamma0, gammaw = self.gaseous_attenuation_approximation(
-                f, el, rho, P, T)
+                f, el, rho_mean, P_mean, T_mean)
 
             h0, hw = self.slant_inclined_path_equivalent_height(f, P, rho, T)
 
             if V_t is not None and h is not None:
                 Aw = self.zenit_water_vapour_attenuation(None, None, None,
-                                                         f, V_t, h)
+                                                         f, V_t, h,
+                                                         P_mean, rho_mean, T_mean)
             else:
                 Aw = gammaw * hw
 
@@ -737,33 +771,47 @@ class _ITU676_13_():
 
     @classmethod
     def zenit_water_vapour_attenuation(
-            self, lat, lon, p, f, V_t=None, h=None):
-        f_ref = 20.6        # [GHz]
-        p_ref = 845         # [hPa]
+            self, lat, lon, p, f, V_s=None, h=None,
+            P=None, rho=None, T=None):
 
         if h is None:
             h = topographic_altitude(lat, lon).value
+        if rho is None:
+            rho = itu2145.surface_water_vapour_density(lat, lon, p, h).value
+        if V_s is None:
+            V_s = itu2145.total_water_vapour_content(lat, lon, p, h).value
+        if T is None:
+            T = itu2145.surface_temperature(lat, lon, p, h).value
+        if P is None:
+            P = itu2145.barometric_surface_pressure(lat, lon, p, h).value
 
-        if V_t is None:
-            V_t = total_water_vapour_content(lat, lon, p, h).value
+        kv = self.water_vapour_mass_absorption_coefficient(f, P, rho, T)
 
-        rho_ref = V_t / 2.38
-        t_ref = 14 * np.log(0.22 * V_t / 2.38) + 3    # [Celsius]
+        return kv * V_s
+    
+    @classmethod
+    def water_vapour_mass_absorption_coefficient(
+            self, f, P, rho, T):
+        """
+        Compute water vapour mass absorption coefficient (kv)
+        p.676-13 Annex 2 eq. 39/41
 
-        a = (0.2048 * np.exp(- ((f - 22.43) / 3.097)**2) +
-             0.2326 * np.exp(- ((f - 183.5) / 4.096)**2) +
-             0.2073 * np.exp(- ((f - 325) / 3.651)**2) - 0.1113)
+        kv: Eq. 39/41 — linearly interpolated from Part 2 data file
+            Kv = av(f) + bv(f)*T + cv(f)*P + dv(f)*rho
+        """
+        # Eq. 31 uses total surface pressure Ps = P(dry) + e (water vapour)
+        e = rho * T / 216.7
+        Ps = P + e
 
-        b = 8.741e4 * np.exp(-0.587 * f) + 312.2 * f**(-2.38) + 0.723
-        h = np.clip(h, 0, 4)
+        av = np.interp(f, self._kv_freq, self._kv_av)
+        bv = np.interp(f, self._kv_freq, self._kv_bv)
+        cv = np.interp(f, self._kv_freq, self._kv_cv)
+        dv = np.interp(f, self._kv_freq, self._kv_dv)
 
-        gammaw_approx_vect = np.vectorize(self.gammaw_exact)
+        kv = av + bv*rho + cv*T + dv*Ps
 
-        Aw_term1 = (0.0176 * V_t *
-                    gammaw_approx_vect(f, p_ref, rho_ref, t_ref + 273.15) /
-                    gammaw_approx_vect(f_ref, p_ref, rho_ref, t_ref + 273.15))
+        return kv
 
-        return np.where(f < 20, Aw_term1, Aw_term1 * (a * h ** b + 1))
 
 
 class _ITU676_11_():
@@ -960,7 +1008,7 @@ class _ITU676_11_():
             # and h are provided
             if V_t is not None and h is not None:
                 Aw = self.zenit_water_vapour_attenuation(None, None, None,
-                                                         f, V_t, h)
+                                                         f=f, V_t=V_t, h=h)
             else:
                 Aw = gammaw * hw
 
@@ -1305,7 +1353,7 @@ class _ITU676_10_():
             # and h are provided
             if V_t is not None and h is not None:
                 Aw = self.zenit_water_vapour_attenuation(None, None, None,
-                                                         f, V_t, h)
+                                                         f=f, V_t=V_t, h=h)
             else:
                 Aw = gammaw * hw
 
@@ -1578,8 +1626,10 @@ def gaseous_attenuation_terrestrial_path(r, f, el, rho, P, T, mode):
     return prepare_output_array(val, type_output) * u.dB
 
 
-def gaseous_attenuation_slant_path(f, el, rho, P, T, V_t=None, h=None,
-                                   mode='approx'):
+def gaseous_attenuation_slant_path(f, el, rho, P, T, V_t=None, 
+                                   h=None, mode='approx', 
+                                   rho_mean=None, P_mean=None,
+                                   T_mean=None):
     """
     Estimate the attenuation of atmospheric gases on slant paths. This function
     operates in two modes, 'approx', and 'exact':
@@ -1605,10 +1655,25 @@ def gaseous_attenuation_slant_path(f, el, rho, P, T, V_t=None, h=None,
     V_t: number or Quantity (kg/m2)
         Integrated water vapour content from: a) local radiosonde or
         radiometric data or b) at the required percentage of time (kg/m2)
-        obtained from the digital maps in Recommendation ITU-R P.836 (kg/m2).
+        obtained from the digital maps in Recommendation ITU-R P.2145 (kg/m2).
         If None, use general method to compute the wet-component of the
         gaseous attenuation. If provided, 'h' must be also provided. Default
         is None.
+    rho_mean : number or Quantity
+        Mean statistical water vapor density (g/m3) for statistical gaseous attenuation
+        (see ITU-R P.676-13 Annex 2 Table 3). The value is obtained from the digital
+        maps in ITU-R P.2145 (g/m3). If None, uses the normal rho parameter in the 
+        instantaneous method. Default is None
+    P_mean : number or Quantity
+        Mean statistical Total Barometric Pressure (hPa) for statistical gaseous attenuation
+        (see ITU-R P.676-13 Annex 2 Table 3). The value is obtained from the digital
+        maps in ITU-R P.2145. If None, uses the normal P parameter in the 
+        instantaneous method.
+    T_mean : number or Quantity
+        Mean statistical surface temperature (K) for statistical gaseous attenuation
+        (see ITU-R P.676-13 Annex 2 Table 3). The value is obtained from the digital
+        maps in ITU-R P.2145. If None, uses the normal T parameter in the 
+        instantaneous method.
     h : number, sequence, or numpy.ndarray
         Altitude of the receivers. If None, use the topographical altitude as
         described in recommendation ITU-R P.1511. If provided, 'V_t' needs to
@@ -1633,14 +1698,18 @@ def gaseous_attenuation_slant_path(f, el, rho, P, T, V_t=None, h=None,
     f = prepare_quantity(f, u.GHz, 'Frequency')
     el = prepare_quantity(prepare_input_array(el), u.deg, 'Elevation angle')
     rho = prepare_quantity(rho, u.g / u.m**3, 'Water vapor density')
-    P = prepare_quantity(P, u.hPa, 'Atospheric pressure')
+    P = prepare_quantity(P, u.hPa, 'Atmospheric pressure (dry air)')
     T = prepare_quantity(T, u.K, 'Temperature')
     V_t = prepare_quantity(V_t, u.kg / u.m**2,
                            'Integrated water vapour content')
+    rho_mean = prepare_quantity(rho_mean, u.g / u.m**3, 'Mean water vapour density')
+    P_mean = prepare_quantity(P_mean, u.hPa, 'Mean Atmospheric Pressure (dry air)')
+    T_mean = prepare_quantity(T_mean, u.Kelvin, 'Mean Temperature')
     h = prepare_quantity(h, u.km, 'Altitude')
     val = __model.gaseous_attenuation_slant_path(
-        f, el, rho, P, T, V_t, h, mode)
-    
+            f, el, rho, P, T, V_t, h, mode,
+            rho_mean, P_mean, T_mean)
+
     # The values of attenuation cannot be negative. The ITU models end up
     # giving out negative values for certain inputs
     val[val < 0] = 0
@@ -1741,7 +1810,7 @@ def slant_inclined_path_equivalent_height(f, P, rho=7.5, T=298.15):
     return prepare_output_array(val, type_output) * u.km
 
 
-def zenit_water_vapour_attenuation(lat, lon, p, f, V_t=None, h=None):
+def zenit_water_vapour_attenuation(lat, lon, p, f, V_t=None, h=None, P=None, rho=None, T=None,):
     """
     An alternative method may be used to compute the slant path attenuation by
     water vapour, in cases where the integrated water vapour content along the
@@ -1781,15 +1850,19 @@ def zenit_water_vapour_attenuation(lat, lon, p, f, V_t=None, h=None):
     type_output = get_input_type(lat)
     lat = prepare_input_array(lat)
     lon = prepare_input_array(lon)
-    lon = np.mod(lon, 360)
+    if lon is not None:
+        lon = np.mod(lon, 360)
     f = prepare_quantity(f, u.GHz, 'Frequency')
+    P = prepare_quantity(P, u.hPa, 'dry Pressure')
+    rho = prepare_quantity(rho, u.g/u.m**3, "Water Vapor Density")
+    T = prepare_quantity(T, u.K, "Temperature")
     V_t = prepare_quantity(
         V_t,
         u.kg / u.m**2,
         'Integrated water vapour content along the path')
     h = prepare_quantity(h, u.km, 'Altitude')
     val = __model.zenit_water_vapour_attenuation(
-        lat, lon, p, f, V_t=V_t, h=h)
+        lat, lon, p, f, V_t, h, P, rho, T)
     return prepare_output_array(val, type_output) * u.dB
 
 
