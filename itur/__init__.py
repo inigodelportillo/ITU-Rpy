@@ -30,6 +30,7 @@ import itur.utils
 
 from .__version__ import __version__
 from .models.itu618 import rain_attenuation, scintillation_attenuation
+from .models.itu618 import get_version as get_version_618
 from .models.itu678 import inter_annual_variability, risk_of_exceedance
 from .models.itu676 import (
     gaseous_attenuation_inclined_path,
@@ -37,6 +38,8 @@ from .models.itu676 import (
     gaseous_attenuation_terrestrial_path,
 )
 from .models.itu835 import standard_pressure
+from .models.itu836 import surface_water_vapour_density as surface_water_vapour_density_836
+from .models.itu836 import total_water_vapour_content as total_water_vapour_content_836
 from .models.itu840 import cloud_attenuation
 from .models.itu1510 import surface_mean_temperature
 from .models.itu1511 import topographic_altitude
@@ -46,6 +49,7 @@ from .models.itu2145 import (
     surface_water_vapour_density,
     total_water_vapour_content
 )
+
 
 # Ignore divide by zero errors
 np.seterr(divide="ignore")
@@ -73,7 +77,7 @@ def atmospheric_attenuation_slant_path(
     tau=45,
     V_t=None,
     mode="approx",
-    rain_rate_mode="exact",
+    rain_rate_mode="approx",
     return_contributions=False,
     include_rain=True,
     include_gas=True,
@@ -207,46 +211,53 @@ def atmospheric_attenuation_slant_path(
             )
         )
 
+    if hs is None:
+        hs = topographic_altitude(lat, lon)
+
     # This takes account of the fact that a large part of the cloud attenuation
     # and gaseous attenuation is already included in the rain attenuation
     # prediction for time percentages below 1%. Eq. 64 and Eq. 65 in
     # Recommendation ITU 618-12
-    p_c_g = np.maximum(5, p)
+    if get_version_618() == 14:
+        p_c_g = np.maximum(5, p)
 
-    # Estimate the ground station altitude
-    if hs is None:
-        hs = topographic_altitude(lat, lon)
+        if T is None:
+            T_p = surface_temperature(lat, lon, p_c_g, hs)
+            T_mean = surface_temperature(lat, lon, 'mean', hs)
+        else:
+            T_p = T_mean = T
 
-    # Surface mean temperature
-    if T is None:
-        T_2145_p = surface_temperature(lat, lon, p_c_g, hs)
-        T_2145_mean = surface_temperature(lat, lon, 'mean', hs)
+        if rho is None:
+            rho_p = surface_water_vapour_density(lat, lon, p_c_g, hs)
+            rho_mean = surface_water_vapour_density(lat, lon, 'mean', hs)
+        else:
+            rho_p = rho_mean = rho
+
+        if P is None:
+            P = standard_pressure(hs)
+            P_p = barometric_surface_pressure(lat, lon, p_c_g, hs)
+            P_p = P_p - rho_p*T_p / (216.7*(u.Kelvin*u.g/u.hJ))
+            P_mean = barometric_surface_pressure(lat, lon, 'mean', hs)
+            P_mean = P_mean - rho_mean*T_mean / (216.7*(u.Kelvin*u.g/u.hJ))
+        else:
+            P_p = P - rho_p*T_p / (216.7*(u.Kelvin*u.g/u.hJ))
+            P_mean = P - rho_mean*T_mean / (216.7*(u.Kelvin*u.g/u.hJ))
+
+        if V_t is None:
+            V_t = total_water_vapour_content(lat, lon, p_c_g, hs)
+
     else:
-        T_2145_p = T
-        T_2145_mean = T
+        p_c_g = np.maximum(1, p)
 
-    # Estimate the surface water vapour density
-    if rho is None:
-        rho_p = surface_water_vapour_density(lat, lon, p_c_g, hs)
-        rho_mean = surface_water_vapour_density(lat, lon, 'mean', hs)
-    else:
-        rho_p = rho
-        rho_mean = rho
+        if T is None:
+            T_p = T_mean = surface_mean_temperature(lat, lon)
+        if rho is None:
+            rho_p = rho_mean = surface_water_vapour_density_836(lat, lon, p_c_g, hs)
+        if P is None:
+            P = P_p = P_mean = standard_pressure(hs)
+        if V_t is None:
+            V_t = total_water_vapour_content_836(lat, lon, p_c_g, hs)
 
-    # Estimate the surface Pressure
-    if P is None:
-        P = standard_pressure(hs)
-        P_2145_p = barometric_surface_pressure(lat, lon, p_c_g, hs)
-        P_2145_p_dry = P_2145_p - rho_p*T_2145_p / (216.7*(u.Kelvin*u.g/u.hJ))
-        P_2145_mean = barometric_surface_pressure(lat,lon,'mean', hs)
-        P_2145_mean_dry = P_2145_mean - rho_mean*T_2145_mean / (216.7*(u.Kelvin*u.g/u.hJ))
-    else:
-        P_2145_p_dry = P - rho_p*T_2145_p / (216.7 * (u.Kelvin*u.g/u.hJ))
-        P_2145_mean_dry = P - rho_mean*T_2145_mean / (216.7 * (u.Kelvin*u.g/u.hJ))
-
-    # Estimate the surface Pressure
-    if V_t is None:
-        V_t = total_water_vapour_content(lat, lon, p_c_g, hs)
 
     # Compute the attenuation components
     if include_rain:
@@ -255,9 +266,9 @@ def atmospheric_attenuation_slant_path(
         Ar = 0 * u.dB
 
     if include_gas:
-        Ag = gaseous_attenuation_slant_path(f, el, rho_p, P_2145_p_dry, T_2145_p, V_t,
-                                            rho_mean, P_2145_mean_dry, T_2145_mean,
-                                            hs, mode)
+        Ag = gaseous_attenuation_slant_path(f, el, rho_p, P_p, T_p, V_t,
+                                            hs, mode,
+                                            rho_mean, P_mean, T_mean)
     else:
         Ag = 0 * u.dB
 
