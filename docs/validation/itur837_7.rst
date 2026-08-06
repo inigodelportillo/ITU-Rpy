@@ -33,9 +33,10 @@ first row of the results in the table:
     lat = 3.133  #  (°N)
     lon = 101.7  # (°E)
     p = 0.01  # (%)
+    mode = exact  # nan
 
     # Make call to test-function rainfall_rate
-    itur_val = itur.models.itu837.rainfall_rate(lat=lat, lon=lon, p=p)
+    itur_val = itur.models.itu837.rainfall_rate(lat=lat, lon=lon, p=p, mode=mode)
 
     # Compute error with respect to value in ITU example file
     ITU_example_val = 99.15117186  # (mm/hr)
@@ -69,10 +70,11 @@ first row of the results in the table:
     # Define input attributes
     lat = 3.133  #  (°N)
     lon = 101.7  # (°E)
+    mode = approx  # nan
     p = 0.01  # (%)
 
     # Make call to test-function rainfall_rate
-    itur_val = itur.models.itu837.rainfall_rate(lat=lat, lon=lon, p=p)
+    itur_val = itur.models.itu837.rainfall_rate(lat=lat, lon=lon, mode=mode, p=p)
 
     # Compute error with respect to value in ITU example file
     ITU_example_val = 99.1481136  # (mm/hr)

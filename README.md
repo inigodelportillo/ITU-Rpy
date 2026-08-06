@@ -1,8 +1,6 @@
 # ITU-Rpy 
 [![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg)](https://raw.githubusercontent.com/Carthage/Carthage/master/LICENSE.md) [![Build Status](https://github.com/inigodelportillo/ITU-Rpy/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/inigodelportillo/ITU-Rpy/actions/workflows/build.yml) [![PyPI version](https://badge.fury.io/py/itur.svg)](https://badge.fury.io/py/itur) [![codecov](https://codecov.io/gh/inigodelportillo/ITU-Rpy/branch/master/graph/badge.svg?token=0FZBWMH271)](https://codecov.io/gh/inigodelportillo/ITU-Rpy) [![PyPI pyversions](https://img.shields.io/pypi/pyversions/itur.svg)](https://pypi.python.org/pypi/itur/) [![Documentation Status](https://readthedocs.org/projects/itu-rpy/badge/?version=latest)](http://itu-rpy.readthedocs.io/?badge=latest)
 
-Aerospace Corporation validation of iturpy package to ITU-R P.618 -14 revision
-
 A python implementation of the ITU-R P. Recommendations to compute atmospheric attenuation in slant and horizontal paths.
 
 The propagation loss on an Earth-space path and a horizontal-path, relative to the free-space loss, is the sum of different contributions, namely:  attenuation by atmospheric gases; attenuation by rain, other precipitation and clouds; scintillation and multipath effects; attenuation by sand and dust storms. Each of these contributions has its own characteristics as a function of frequency, geographic location and elevation angle. ITU-Rpy allows for fast, vectorial computation of the different contributions to the atmospheric attenuation. 
@@ -26,8 +24,8 @@ More information about the installation process can be found on the [documentati
 The following ITU-R Recommendations are implemented in ITU-Rpy
 *   **ITU-R P.453-13:** The radio refractive index: its formula and refractivity data
 *   **ITU-R P.530-17:** Propagation data and prediction methods required for the design of terrestrial line-of-sight systems
-*   **ITU-R P.618-13:** Propagation data and prediction methods required for the design of Earth-space telecommunication systems
-*   **ITU-R P.676-12:** Attenuation by atmospheric gases
+*   **ITU-R P.618-14:** Propagation data and prediction methods required for the design of Earth-space telecommunication systems
+*   **ITU-R P.676-13:** Attenuation by atmospheric gases
 *   **ITU-R P.835-6:** Reference Standard Atmospheres
 *   **ITU-R P.836-6:** Water vapour: surface density and total columnar content
 *   **ITU-R P.837-7:** Characteristics of precipitation for propagation modelling
@@ -36,9 +34,10 @@ The following ITU-R Recommendations are implemented in ITU-Rpy
 *   **ITU-R P.840-8:** Attenuation due to clouds and fog 
 *   **ITU-R P.1144-10:** Interpolation methods for the geophysical properties used to compute propagation effects 
 *   **ITU-R P.1510-1:** Mean surface temperature
-*   **ITU-R P.1511-2:** Topography for Earth-to-space propagation modelling
+*   **ITU-R P.1511-3:** Topography for Earth-to-space propagation modelling
 *   **ITU-R P.1623-1:** Prediction method of fade dynamics on Earth-space paths
 *   **ITU-R P.1853-1:** Tropospheric attenuation time series synthesis
+*   **ITU-R P.2145-0:** Digital maps related to the calculation of gaseous attenuation and related effects
 
 The individual models can be accessed using the `itur.models` package.
 
@@ -65,7 +64,7 @@ which produces:
 
 ##  Validation
 
-ITU-Rpy has been validated using the [ITU Validation examples (rev 5.1)](https://www.itu.int/en/ITU-R/study-groups/rsg3/ionotropospheric/CG-3M3J-13-ValEx-Rev5_1.xlsx) , which provides test cases for parts of Recommendations ITU-R P.453-14, P.618-13, P.676-12, P.836-6, P.837-7, P.838-3, P.839-4, P.840-8, P.1511-2, P.1623-1.
+ITU-Rpy has been validated using the [ITU Validation examples (rev 8.3.0)](https://www.itu.int/en/ITU-R/study-groups/rsg3/rwp3m/Validation%20Example/CG-3M3J-13-ValEx-Rev8.3.0.xlsx) , which provides test cases for parts of Recommendations ITU-R P.453-14, P.618-14, P.676-13, P.836-6, P.837-7, P.838-3, P.839-4, P.840-9, P.1510-1, P.1511-3, P.1623-1, P.1815-1, P.2145-0.
 
 The results of this validation exercise are available at the [validation page](https://itu-rpy.readthedocs.io/en/latest/validation.html) in the documentation.
 

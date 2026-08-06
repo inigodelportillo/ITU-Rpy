@@ -1,0 +1,30 @@
+
+Recommendation ITU-R P.2145
+---------------------------
+
+This Recommendation provides methods to predict the surface total barometric pressure, surface 
+temperature, surface water vapour density and integrated water vapour content required for the calculation of 
+gaseous attenuation and related effects on terrestrial and Earth-space paths. 
+
+.. include:: itu2145_table.rst
+
+Introduction
+************
+
+This model shall be used to obtain the statistical surface temperature, total pressure, water vapour density, and water vapour content for gaseous attenuation calculations when no local data are available or when no data with a better spatial resolution is available.
+It contains this data for several percent probability of exceedences (p) and includes the mean values for the atmospheric data.
+
+The values of the statistical annual total pressure, surface temperature, water vapour density, water vapour content, height above mean sea level, and scale heights: PSCH, TSCH, and VSCH are integral parts of this recommendation.
+These files utilize a 0.25 coordinate increment, ranging from -90 to 90 latitude range and a -180 to 180 longitude range, with (-90, -180) representing the top left coordinate.
+For an arbitrary coordinate, bilinear interpolation is used between the atmopheric values, factoring in the corresponding scale heights, PSCH (P), TSCH (T), VSCH (rho,V) which are another integral part of this recommendation.
+A bicubic interpolation is used for the mean height above sea level.
+The files include the exceedance percentage probabilities of 0.01, 0.02, 0.03, 0.05, 0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 30, 50, 60, 70, 80, 90, 95, 99, and the mean statistical values.
+For an arbitrary percentage probability of exceedance, the recommendation performs a linear-log10 linear interpolation between the value and the two nearest percentages.
+
+Module description
+******************
+
+.. automodule:: itur.models.itu2145
+    :members:
+    :undoc-members:
+    :show-inheritance:
