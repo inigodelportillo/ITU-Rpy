@@ -24,6 +24,28 @@ from itur.utils import prepare_quantity
 from astropy import units as u
 
 
+def _prepare_sample_count(value, name_val, units=None):
+    """Coerce a sample count or sampling interval to a Python ``int``.
+
+    ``Ns`` and ``Ts`` end up as array sizes and slice steps, so they have to be
+    integral. Every other argument in this module accepts plain numbers and
+    astropy Quantities alike, and a Quantity always stores its value as a
+    float, so ``Ts=1 * u.s`` would otherwise reach numpy as ``1.0`` and fail
+    with an opaque ``TypeError: slice indices must be integers``.
+    """
+    if units is not None:
+        value = prepare_quantity(value, units, name_val)
+    value = getattr(value, 'value', value)
+
+    if np.ndim(value) != 0:
+        raise ValueError('{} must be a scalar, got shape {}'.format(
+            name_val, np.shape(value)))
+    if value != int(value):
+        raise ValueError('{} must be a whole number, got {}'.format(
+            name_val, value))
+    return int(value)
+
+
 class __ITU1853:
 
     """Tropospheric attenuation time series synthesis
@@ -396,7 +418,7 @@ class _ITU1853_1:
         e = Tm * rho / 216.7
         go = gamma0_exact(f, P, rho, Tm).value
         ho, _ = slant_inclined_path_equivalent_height(f, P + e, rho).value
-        Ao = ho * go * np.ones_like(Ar)
+        Ao = ho * go * np.ones_like(Ar, dtype=float)
 
         # Step C15: Synthesize unit variance scintillation time series
         sci_0 = self.scintillation_attenuation_synthesis(Ns * Ts, Ts=1)
@@ -536,9 +558,10 @@ def rain_attenuation_synthesis(lat, lon, f, el, hs, Ns, Ts=1, tau=45, n=None):
         estimate is obtained from the maps of topographic altitude
         given in Recommendation ITU-R P.1511.
     Ns : int
-        Number of samples
-    Ts : int
-        Time step between consecutive samples (seconds)
+        Number of samples. Must be a whole number
+    Ts : int or Quantity
+        Time step between consecutive samples (seconds). Must be a
+        whole number of samples
     tau : number, optional
         Polarization tilt angle relative to the horizontal (degrees)
         (tau = 45 deg for circular polarization). Default value is 45
@@ -563,7 +586,8 @@ def rain_attenuation_synthesis(lat, lon, f, el, hs, Ns, Ts=1, tau=45, n=None):
     f = prepare_quantity(f, u.GHz, "Frequency")
     el = prepare_quantity(el, u.deg, "Elevation angle")
     hs = prepare_quantity(hs, u.km, "Heigh above mean sea level of the earth station")
-    Ts = prepare_quantity(Ts, u.second, "Time step between samples")
+    Ns = _prepare_sample_count(Ns, "Number of samples")
+    Ts = _prepare_sample_count(Ts, "Time step between samples", u.second)
     val = __model.rain_attenuation_synthesis(
         lat, lon, f, el, hs, Ns, Ts=Ts, tau=tau, n=n
     )
@@ -579,11 +603,12 @@ def scintillation_attenuation_synthesis(Ns, f_c=0.1, Ts=1):
     Parameters
     ----------
     Ns : int
-        Number of samples
+        Number of samples. Must be a whole number
     f_c : float
         Cut-off frequency for the low pass filter
-    Ts : int
-        Time step between consecutive samples (seconds)
+    Ts : int or Quantity
+        Time step between consecutive samples (seconds). Must be a
+        whole number of samples
 
     Returns
     -------
@@ -598,6 +623,8 @@ def scintillation_attenuation_synthesis(Ns, f_c=0.1, Ts=1):
     """
     global __model  # noqa: F824
 
+    Ns = _prepare_sample_count(Ns, "Number of samples")
+    Ts = _prepare_sample_count(Ts, "Time step between samples", u.second)
     val = __model.scintillation_attenuation_synthesis(Ns, f_c, Ts)
     return val * u.dB
 
@@ -615,9 +642,10 @@ def integrated_water_vapour_synthesis(lat, lon, Ns, Ts=1, n=None):
     lon : number, sequence, or numpy.ndarray
         Longitudes of the receiver points
     Ns : int
-        Number of samples
-    Ts : int
-        Time step between consecutive samples (seconds)
+        Number of samples. Must be a whole number
+    Ts : int or Quantity
+        Time step between consecutive samples (seconds). Must be a
+        whole number of samples
     n : list, np.array, optional
         Additive White Gaussian Noise used as input for the
 
@@ -635,6 +663,8 @@ def integrated_water_vapour_synthesis(lat, lon, Ns, Ts=1, n=None):
     global __model  # noqa: F824
 
     lon = np.mod(lon, 360)
+    Ns = _prepare_sample_count(Ns, "Number of samples")
+    Ts = _prepare_sample_count(Ts, "Time step between samples", u.second)
     val = __model.integrated_water_vapour_synthesis(lat, lon, Ns, Ts, n)
     return val * u.kg / u.m**2
 
@@ -651,9 +681,10 @@ def cloud_liquid_water_synthesis(lat, lon, Ns, Ts=1, n=None):
     lon : number, sequence, or numpy.ndarray
         Longitudes of the receiver points
     Ns : int
-        Number of samples
-    Ts : int
-        Time step between consecutive samples (seconds)
+        Number of samples. Must be a whole number
+    Ts : int or Quantity
+        Time step between consecutive samples (seconds). Must be a
+        whole number of samples
     n : list, np.array, optional
         Additive White Gaussian Noise used as input for the
 
@@ -671,6 +702,8 @@ def cloud_liquid_water_synthesis(lat, lon, Ns, Ts=1, n=None):
     global __model  # noqa: F824
 
     lon = np.mod(lon, 360)
+    Ns = _prepare_sample_count(Ns, "Number of samples")
+    Ts = _prepare_sample_count(Ts, "Time step between samples", u.second)
     val = __model.cloud_liquid_water_synthesis(lat, lon, Ns, Ts, n)
     return val * u.mm
 
@@ -715,9 +748,10 @@ def total_attenuation_synthesis(
     D: number or Quantity
         Physical diameter of the earth-station antenna (m)
     Ns : int
-        Number of samples
-    Ts : int
-        Time step between consecutive samples (seconds)
+        Number of samples. Must be a whole number
+    Ts : int or Quantity
+        Time step between consecutive samples (seconds). Must be a
+        whole number of samples
     tau : number, optional
         Polarization tilt angle relative to the horizontal (degrees)
         (tau = 45 deg for circular polarization). Default value is 45
@@ -771,6 +805,8 @@ def total_attenuation_synthesis(
     H = prepare_quantity(H, u.percent, "Average surface relative humidity")
     P = prepare_quantity(P, u.hPa, "Average surface pressure")
     hL = prepare_quantity(hL, u.m, "Height of the turbulent layer")
+    Ns = _prepare_sample_count(Ns, "Number of samples")
+    Ts = _prepare_sample_count(Ts, "Time step between samples", u.second)
 
     val = __model.total_attenuation_synthesis(
         lat,

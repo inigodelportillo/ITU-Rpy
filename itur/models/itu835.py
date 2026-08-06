@@ -480,7 +480,7 @@ class _ITU835_5():
         if not hasattr(num_splits, '__iter__'):
             num_splits = list([num_splits])
 
-        ret = np.ones_like(h) * P_0
+        ret = np.ones_like(h, dtype=float) * P_0
         for ret_i, n in enumerate(num_splits):
             n = n.squeeze()
             P = np.zeros((n + 1))

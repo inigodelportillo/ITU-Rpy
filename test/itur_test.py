@@ -28,6 +28,8 @@ def suite():
     suite.addTest(TestFunctionsRecommendation618('test_618'))
     suite.addTest(TestFunctionsRecommendation676('test_676'))
     suite.addTest(TestFunctionsRecommendation835('test_835'))
+    suite.addTest(TestFunctionsRecommendation835(
+        'test_standard_pressure_integer_altitude'))
     suite.addTest(TestFunctionsRecommendation836('test_836'))
     suite.addTest(TestFunctionsRecommendation837('test_837'))
     suite.addTest(TestFunctionsRecommendation838('test_838'))
@@ -36,7 +38,11 @@ def suite():
     suite.addTest(TestFunctionsRecommendation1510('test_1510'))
     suite.addTest(TestFunctionsRecommendation1511('test_1511'))
     suite.addTest(TestFunctionsRecommendation1623('test_1623'))
+    suite.addTest(TestFunctionsRecommendation1623(
+        'test_fade_depth_array_targets'))
     suite.addTest(TestFunctionsRecommendation1853('test_1853'))
+    suite.addTest(TestFunctionsRecommendation1853(
+        'test_sample_arguments_accept_quantities'))
 
     # Basic import module functionality
     suite.addTest(TestImportModules('test_import_itur'))
@@ -783,6 +789,29 @@ class TestFunctionsRecommendation835(test.TestCase):
             self.test_all_functions_835()
             self.assertEqual(models.itu835.get_version(), version)
 
+    def test_standard_pressure_integer_altitude(self):
+        # Regression test: `_ITU835_5.standard_pressure` used to build its
+        # output array with `np.ones_like(h) * P_0`, which inherits the
+        # dtype of `h`. Passing an integral altitude array therefore
+        # silently truncated the computed pressure to an integer. Verify
+        # that integer and float altitudes now produce identical results.
+        from itur.models.itu835 import _ITU835_5
+
+        model = _ITU835_5()
+        h_int = np.array([1, 2, 5, 10])
+        h_float = np.array([1, 2, 5, 10], dtype=float)
+
+        expected = np.array(
+            [886.9936534559513, 784.5578628975815,
+             533.136992664673, 260.9076739507232])
+
+        p_int = model.standard_pressure(h_int, T_0=288.15, P_0=1000)
+        p_float = model.standard_pressure(h_float, T_0=288.15, P_0=1000)
+
+        np.testing.assert_allclose(p_int, expected)
+        np.testing.assert_allclose(p_float, expected)
+        np.testing.assert_array_equal(p_int, p_float)
+
 
 class TestFunctionsRecommendation836(test.TestCase):
     def setUp(self):
@@ -1036,6 +1065,60 @@ class TestFunctionsRecommendation1623(test.TestCase):
             self.test_all_functions_1623()
             self.assertEqual(models.itu1623.get_version(), version)
 
+    def test_fade_depth_array_targets(self):
+        # Regression test: `fade_depth` used to hand `fsolve` a scalar initial
+        # guess while the residual returned one value per element of
+        # `D_target`, so any non-scalar target raised `ValueError: The array
+        # returned by a function changed size between calls`. Each target pair
+        # is now solved independently.
+        # Attenuation CDF of the link under analysis, and the elevation and
+        # frequency it was measured at (same values as the `fade_depth`
+        # docstring example, whose expected answer is 21.6922280 dB)
+        PofA = np.array([50, 30, 20, 10, 5, 3, 2, 1, .5, .3, .2, .1, .05, .03,
+                         .02, .01, .005, .003, .002, .001])
+        A_arr = np.array([0.4, 0.6, 0.8, 1.8, 2.70, 3.5, 4.20, 5.7, 7.4, 9,
+                          10.60, 14, 18.3, 22.3, 25.8, 32.6, 40.1, 46.1, 50.8,
+                          58.8])
+        el = 38.5
+        f = 28
+
+        # The target the scalar reference answer corresponds to: 25 outage
+        # events per year, each lasting 60 s
+        N_ref, D_ref = 25, 60
+
+        for version in self.versions:
+            models.itu1623.change_version(version)
+
+            # Scalar targets keep returning a plain scalar
+            scalar = models.itu1623.fade_depth(
+                N_target=N_ref, D_target=D_ref,
+                A=A_arr, PofA=PofA, el=el, f=f)
+            self.assertEqual(np.ndim(scalar), 0)
+            self.assertAlmostEqual(scalar, 21.6922280, places=5)
+
+            # Arrays are solved element-wise; the entry matching the scalar
+            # target must reproduce the scalar answer exactly
+            by_duration = models.itu1623.fade_depth(
+                N_target=N_ref, D_target=np.array([30, D_ref, 120]),
+                A=A_arr, PofA=PofA, el=el, f=f)
+            self.assertEqual(by_duration.shape, (3,))
+            self.assertAlmostEqual(by_duration[1], scalar, places=10)
+
+            by_intensity = models.itu1623.fade_depth(
+                N_target=np.array([10, N_ref, 50]), D_target=D_ref,
+                A=A_arr, PofA=PofA, el=el, f=f)
+            self.assertEqual(by_intensity.shape, (3,))
+            self.assertAlmostEqual(by_intensity[1], scalar, places=10)
+
+            # Both targets broadcast against each other: a column of
+            # intensities against a row of durations gives a 2x2 grid
+            grid = models.itu1623.fade_depth(
+                N_target=np.array([[10], [N_ref]]),
+                D_target=np.array([30, D_ref]),
+                A=A_arr, PofA=PofA, el=el, f=f)
+            self.assertEqual(grid.shape, (2, 2))
+            self.assertAlmostEqual(grid[1, 1], scalar, places=10)
+
 
 class TestFunctionsRecommendation1853(test.TestCase):
 
@@ -1072,6 +1155,63 @@ class TestFunctionsRecommendation1853(test.TestCase):
             models.itu1853.change_version(version)
             self.test_all_functions_1853()
             self.assertEqual(models.itu1853.get_version(), version)
+
+    def test_sample_arguments_accept_quantities(self):
+        # Regression test: `Ns` and `Ts` are used as array sizes and slice
+        # steps, so they must reach numpy as integers. A float `Ts=1.0` -- and
+        # therefore also the documented `Ts=1 * u.s`, since a Quantity always
+        # stores its value as a float -- used to fail with `TypeError: slice
+        # indices must be integers` or `UnitConversionError`.
+        # Singapore: wet enough that 1000 samples are not all zeros, so the
+        # comparisons below are actually discriminating
+        lat = 1.4                   # latitude (deg)
+        lon = 103.8                 # longitude (deg)
+        f = 22 * itur.u.GHz         # frequency
+        el = 60                     # elevation angle (deg)
+        p = 1.0                     # exceedance probability (%)
+        D = 1 * itur.u.m            # antenna diameter
+        hs = 0 * itur.u.m           # height above mean sea level
+        Ns = 1000                   # number of samples
+
+        def synthesize(fname, Ns, Ts, **kwargs):
+            models.itu1853.set_seed(42)
+            val = getattr(models.itu1853, fname)(Ns=Ns, Ts=Ts, **kwargs)
+            return np.asarray(val.value, dtype=float)
+
+        # Each synthesis function, with the extra arguments it needs beyond
+        # `Ns` and `Ts`
+        cases = [
+            ('scintillation_attenuation_synthesis',
+             dict()),
+            ('rain_attenuation_synthesis',
+             dict(lat=lat, lon=lon, f=f, el=el, hs=hs)),
+            ('cloud_liquid_water_synthesis',
+             dict(lat=lat, lon=lon)),
+            ('integrated_water_vapour_synthesis',
+             dict(lat=lat, lon=lon)),
+            ('total_attenuation_synthesis',
+             dict(lat=lat, lon=lon, f=f, el=el, p=p, D=D)),
+        ]
+
+        models.itu1853.change_version(1)
+        for fname, kwargs in cases:
+            expected = synthesize(fname, Ns=Ns, Ts=1, **kwargs)
+            for Ts in (1.0, 1 * itur.u.s, np.int64(1)):
+                np.testing.assert_array_equal(
+                    synthesize(fname, Ns=Ns, Ts=Ts, **kwargs), expected,
+                    err_msg='%s disagrees for Ts=%r' % (fname, Ts))
+            # `Ns` gets the same treatment
+            np.testing.assert_array_equal(
+                synthesize(fname, Ns=float(Ns), Ts=1, **kwargs), expected,
+                err_msg='%s disagrees for a float Ns' % fname)
+
+        # A sampling interval that is not a whole number of samples is
+        # rejected up front rather than deep inside numpy
+        with self.assertRaises(ValueError):
+            models.itu1853.scintillation_attenuation_synthesis(Ns=Ns, Ts=1.5)
+        with self.assertRaises(ValueError):
+            models.itu1853.scintillation_attenuation_synthesis(
+                Ns=Ns, Ts=np.array([1, 2]))
 
 
 if __name__ == '__main__':
